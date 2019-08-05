@@ -1,46 +1,47 @@
-﻿namespace TUMCMS_SE_ModelGraphGen
+﻿using System;
+using ModelGraphGen.Ifc_InstanceOnly;
+
+namespace ModelGraphGen
 {
+    /// <summary>
+    /// </summary>
     public class InstanceModel2Neo4jParser
     {
-        private string SourceLocation { get; set; }
-        private string TargetLocation { get; set; }
+        public string SourceLocation { get; set; }
+        public string TargetLocation { get; set; }
 
         /// <summary>
-        /// 
         /// </summary>
-        public InstanceModel2Neo4jParser()
-        {
-        }
-
-        public InstanceModel2Neo4jParser(string sourceLocation)
-        {
-            SourceLocation = sourceLocation;
-        }
-
-
-        public void CreateNeo4jScript()
+        public string CreateNeo4jScript()
         {
             var sourceFile = SourceLocation;
             var modelType = "IFC";
-            // switch format
 
+            string neo4jScript = null;
+
+            // switch format
             switch (modelType)
             {
                 case "IFC":
-
+                    var modelParser = new Ifc2Neo4JInstanceOnly();
+                    neo4jScript = modelParser.Parse();
                     break;
 
-                case "PlanPro":
-
-                    break;
-
-                case "RailML":
-
-                    break;
-
-                default:
-                    break;
+                // add additional data structures here
             }
+
+            return neo4jScript;
+        }
+
+        /// <summary>
+        ///     Store resulting Neo4j Script in text file
+        /// </summary>
+        public void StoreResult()
+        {
+            Console.WriteLine("Started Storing...");
+
+
+            Console.WriteLine("Finished. ");
         }
     }
 }
