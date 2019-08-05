@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelGraphGen", "ModelGraph
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App_Ifc2Neo4j", "..\App_Ifc2Neo4j\App_Ifc2Neo4j.csproj", "{17A8CA20-3F59-45BF-AE88-47DC4BEFBEEB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModelGraphGen.Domain", "ModelGraphGen.Domain\ModelGraphGen.Domain.csproj", "{7C3414A1-AEBF-465E-9850-471CD4EEFC74}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{17A8CA20-3F59-45BF-AE88-47DC4BEFBEEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17A8CA20-3F59-45BF-AE88-47DC4BEFBEEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17A8CA20-3F59-45BF-AE88-47DC4BEFBEEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C3414A1-AEBF-465E-9850-471CD4EEFC74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C3414A1-AEBF-465E-9850-471CD4EEFC74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C3414A1-AEBF-465E-9850-471CD4EEFC74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C3414A1-AEBF-465E-9850-471CD4EEFC74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

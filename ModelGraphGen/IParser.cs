@@ -2,6 +2,6 @@
 {
     public interface IParser
     {
-        string Parse(); 
+        string Parse(string FileDirectory); 
     }
 }

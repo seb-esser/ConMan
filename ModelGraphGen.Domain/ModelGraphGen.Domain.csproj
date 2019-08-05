@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BD57A0CE-AC35-4450-BF3A-FB8763216BE5}</ProjectGuid>
+    <ProjectGuid>{7C3414A1-AEBF-465E-9850-471CD4EEFC74}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ModelGraphGen</RootNamespace>
-    <AssemblyName>ModelGraphGen</AssemblyName>
+    <RootNamespace>ModelGraphGen.Domain</RootNamespace>
+    <AssemblyName>ModelGraphGen.Domain</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -41,19 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Ifc_InstanceOnly\Ifc2Neo4JInstanceOnly.cs" />
-    <Compile Include="InstanceModel2Neo4jParser.cs" />
-    <Compile Include="IParser.cs" />
+    <Compile Include="RawIfcEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Ifc_InstanceAndProduct\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ModelGraphGen.Domain\ModelGraphGen.Domain.csproj">
-      <Project>{7C3414A1-AEBF-465E-9850-471CD4EEFC74}</Project>
-      <Name>ModelGraphGen.Domain</Name>
-    </ProjectReference>
+    <Compile Include="RawIfcProperty.cs" />
+    <Compile Include="Vec2D.cs" />
+    <Compile Include="Vec3D.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
