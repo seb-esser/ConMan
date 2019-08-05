@@ -95,6 +95,10 @@ namespace ModelGraphGen.Ifc_InstanceOnly
 
             // process string
             var splittedProps = propertyString.Split(',');
+
+            // find lists and vectors
+            var specialCases = splittedProps.Select(a => a.StartsWith("(") || a.EndsWith(")")).ToList();
+
             foreach (var prop in splittedProps) // process each prop
             {
                 var myProperty = new RawIfcProperty();
