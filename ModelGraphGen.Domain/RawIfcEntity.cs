@@ -26,7 +26,16 @@ namespace ModelGraphGen.Domain
             Console.WriteLine(EntityId + "   " + entityName);
             foreach (var kvp in Properties)
             {
-                Console.WriteLine("     pName = {0}, pVal = {1}", kvp.PName, kvp.PVal_Normal);
+                string pVal = "";
+                if (kvp.PVal_Simple != null)
+                {
+                    pVal = kvp.PVal_Simple;
+                }
+                else if (kvp.PVal_Complex != null)
+                {
+                    pVal = kvp.PVal_Complex;
+                }
+                Console.WriteLine("     pName = {0}, pVal = {1}", kvp.PName, pVal);
             }
             Console.WriteLine();
         }

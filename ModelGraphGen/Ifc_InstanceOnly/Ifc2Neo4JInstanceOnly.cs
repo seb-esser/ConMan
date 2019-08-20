@@ -31,7 +31,7 @@ namespace ModelGraphGen.Ifc_InstanceOnly
 
             // Read a text file line by line.
             var lines = File.ReadAllLines(fileDirectory).ToList();
-            lines.RemoveAll(s => s.Equals("") );    // remove empty lines
+            lines.RemoveAll(s => s.Equals("")); // remove empty lines
 
             foreach (var line in lines)
                 // get schema version
@@ -97,28 +97,35 @@ namespace ModelGraphGen.Ifc_InstanceOnly
             var splittedProps = propertyString.Split(',');
 
             // find lists and vectors
-            var specialCases = splittedProps.Select(a => a.StartsWith("(") || a.EndsWith(")")).ToList();
+            var openingChar = splittedProps.Where(a => a.StartsWith("(")).ToList();
+            var closingChar = splittedProps.Where(a => a.EndsWith(")")).ToList();
 
-            foreach (var prop in splittedProps) // process each prop
+            foreach (var property in splittedProps)
             {
-                var myProperty = new RawIfcProperty();
+                var rawProperty = new RawIfcProperty();
 
-                if (prop.StartsWith("(")) // sub-property ahead!
+                if (openingChar.Contains(property) && closingChar.Contains(property)) // List with single element   
                 {
-                    myProperty.PVal_Reference = prop;
+                    rawProperty.PVal_Complex = property;
                 }
-                else if (prop.StartsWith("#")) // reference
+
+                else if (openingChar.Contains(property)) // opens list
                 {
-                    myProperty.PVal_Reference = prop;
+                    // find closing property
+                    rawProperty.PVal_Complex = "complexOpen: " + property;
+                }
+
+                else if (closingChar.Contains(property))
+                {
+                    rawProperty.PVal_Complex = "complexClose: " + property;
                 }
 
                 else
                 {
-                    myProperty.PVal_Normal = prop;
+                    rawProperty.PVal_Simple = property;
                 }
 
-
-                pList.Add(myProperty);
+                pList.Add(rawProperty);
             }
 
 
