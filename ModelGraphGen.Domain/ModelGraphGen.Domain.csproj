@@ -41,11 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="abstractProperty.cs" />
+    <Compile Include="ArrayProperty.cs" />
     <Compile Include="RawIfcEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RawIfcProperty.cs" />
+    <Compile Include="SingleProperty.cs" />
     <Compile Include="Vec2D.cs" />
     <Compile Include="Vec3D.cs" />
+    <Compile Include="WrapArrayProperty.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

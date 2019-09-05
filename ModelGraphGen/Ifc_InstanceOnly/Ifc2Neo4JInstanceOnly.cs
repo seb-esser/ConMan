@@ -25,9 +25,9 @@ namespace ModelGraphGen.Ifc_InstanceOnly
         ///     Loads an Ifc instance model and prepares the contained data for further processing
         /// </summary>
         /// <param name="fileDirectory">Full Path to *.ifc file</param>
-        private List<RawIfcEntity> ParseIfcInstanceModel(string fileDirectory)
+        private List<Entity> ParseIfcInstanceModel(string fileDirectory)
         {
-            var rawIfcEntities = new List<RawIfcEntity>();
+            var rawIfcEntities = new List<Entity>();
 
             // Read a text file line by line.
             var lines = File.ReadAllLines(fileDirectory).ToList();
@@ -43,6 +43,7 @@ namespace ModelGraphGen.Ifc_InstanceOnly
                     ifcVersion = ifcVersion.Replace(" ", string.Empty);
                 }
 
+                // parse entities
                 else if (line[0] == '#') // no comment, nothing else
                 {
                     // Get correct keyWord/IfcClass name
@@ -66,10 +67,10 @@ namespace ModelGraphGen.Ifc_InstanceOnly
                     var properties = SplitProperties(propertyString);
 
                     // setup storage
-                    var rawIfcEntity = new RawIfcEntity
+                    var rawIfcEntity = new Entity
                     {
                         EntityId = index,
-                        entityName = entityClass,
+                        EntityName = entityClass,
                         Properties = properties
                     };
 
@@ -88,45 +89,128 @@ namespace ModelGraphGen.Ifc_InstanceOnly
         /// </summary>
         /// <param name="propertyString"></param>
         /// <returns></returns>
-        private List<RawIfcProperty> SplitProperties(string propertyString)
+        private List<AbstractProperty> SplitProperties(string propertyString)
         {
             // init return val 
-            var pList = new List<RawIfcProperty>();
+            var pList = new List<AbstractProperty>();
 
             // process string
-            var splittedProps = propertyString.Split(',');
+            var rawProps = propertyString.Split(',');
 
-            // find lists and vectors
-            var openingChar = splittedProps.Where(a => a.StartsWith("(")).ToList();
-            var closingChar = splittedProps.Where(a => a.EndsWith(")")).ToList();
-
-            foreach (var property in splittedProps)
+            
+            var i = 0; 
+            // loop over all properties
+            while (i < rawProps.Length)
             {
-                var rawProperty = new RawIfcProperty();
+                var property = rawProps[i];
 
-                if (openingChar.Contains(property) && closingChar.Contains(property)) // List with single element   
+                // doubleArray Situation!
+                if (property.StartsWith("(("))
                 {
-                    rawProperty.PVal_Complex = property;
+                    var wrapper = new WrapArrayProperty();
+
+                    // init second iteration var
+                    var j = i;
+                    while (rawProps[j].EndsWith("))") == false) // find start and end 
+                    {
+                        j++;
+                    }
+                    
+                    // all properties in the range between i and j are arrays themselves
+                    for (int k = i; k <= j; k++)
+                    {
+                        // identify innerArray
+                        var ptArray = new ArrayProperty();
+
+                        // loop inner list
+                        while (rawProps[k].EndsWith(")" )== false)
+                        {
+                            var simpleVal = new SingleProperty();
+                            simpleVal.PVal = rawProps[k];
+                            ptArray.Properties.Add(simpleVal);
+                            k++;
+                        }
+                        var lastVal = new SingleProperty();
+                        lastVal.PVal = rawProps[k];
+                        ptArray.Properties.Add(lastVal);
+
+                        wrapper.ArrayProperties.Add(ptArray);
+                    }
+                    
+                    // add wrapperArray to return var
+                    pList.Add(wrapper);
                 }
 
-                else if (openingChar.Contains(property)) // opens list
+                // detect a simple arrayProperty
+                else if (property.StartsWith("(") == true)
                 {
                     // find closing property
-                    rawProperty.PVal_Complex = "complexOpen: " + property;
+                    // init second iteration var
+                    var j = i;
+                    while (rawProps[j].EndsWith(")") == false)
+                    {
+                        j++;
+                    }
+
+                    // i is the opening one, j is the closing one
+                    var arrayProp = new ArrayProperty();
+                    for (int k = i; k <= j; k++)
+                    {
+                        // init new simple property
+                        var prop = new SingleProperty();
+                        prop.PVal = rawProps[k];
+
+                        // add to array property
+                        arrayProp.Properties.Add(prop);
+                    }
+                    // add to returning list
+                    pList.Add(arrayProp);
+
+                    // finally: set while iterator to j to skip arrayProps
+                    i = j + 1; 
                 }
 
-                else if (closingChar.Contains(property))
-                {
-                    rawProperty.PVal_Complex = "complexClose: " + property;
-                }
-
+                // it is a simple property
                 else
                 {
-                    rawProperty.PVal_Simple = property;
-                }
+                    var singleProp = new SingleProperty {PVal = property};
 
-                pList.Add(rawProperty);
+                    // add to returning list
+                    pList.Add(singleProp);
+
+                    // increase while criteria
+                    i++; 
+                }
             }
+
+
+            //foreach (var property in splittedProps)
+            //{
+            //    var rawProperty = new RawIfcProperty();
+
+            //    if (openingChar.Contains(property) && closingChar.Contains(property)) // List with single element   
+            //    {
+            //        rawProperty.PVal_Complex = property;
+            //    }
+
+            //    else if (openingChar.Contains(property)) // opens list
+            //    {
+            //        // find closing property
+            //        rawProperty.PVal_Complex = "complexOpen: " + property;
+            //    }
+
+            //    else if (closingChar.Contains(property))
+            //    {
+            //        rawProperty.PVal_Complex = "complexClose: " + property;
+            //    }
+
+            //    else
+            //    {
+            //        rawProperty.PVal_Simple = property;
+            //    }
+
+                
+            //}
 
 
             return pList;

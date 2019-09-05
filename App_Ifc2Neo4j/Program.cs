@@ -17,7 +17,8 @@ namespace App_Ifc2Neo4j
 
             // log
             Console.WriteLine("Location Source File: {0}", sourceFile);
-            Console.WriteLine("Location Targe File: {0}", resultFile);
+            Console.WriteLine("Location Target File: {0} \n", resultFile);
+            
 
             // call the parser
             var parser = new InstanceModel2Neo4jParser

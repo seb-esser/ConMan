@@ -3,18 +3,22 @@ using System.Collections.Generic;
 
 namespace ModelGraphGen.Domain
 {
-    public class RawIfcEntity
+
+    public class Entity
     {
         public int EntityId { get; set; }
-        public string entityName { get; set; }
-        public List<RawIfcProperty> Properties { get; set; }
-        
+        public string EntityName { get; set; }
+
+        // contains both, SingleProperty an ArrayProperty
+        public List<AbstractProperty> Properties; 
+       
+
         /// <summary>
         /// Default constructor
         /// </summary>
-        public RawIfcEntity()
+        public Entity()
         {
-            Properties = new List<RawIfcProperty>();
+                Properties = new List<AbstractProperty>();
         }
 
         /// <summary>
@@ -23,20 +27,55 @@ namespace ModelGraphGen.Domain
         public void ToConsole()
         {
             // log
-            Console.WriteLine(EntityId + "   " + entityName);
-            foreach (var kvp in Properties)
+            Console.WriteLine(EntityId + "\t" + EntityName);
+            foreach (var property in Properties)
             {
-                string pVal = "";
-                if (kvp.PVal_Simple != null)
+                switch (property.GetType().Name)
                 {
-                    pVal = kvp.PVal_Simple;
+                    case "SingleProperty":
+                        // cast
+                        var p = property as SingleProperty;
+
+                        // write to console
+                        Console.WriteLine("\t Type: SingleProperty \t pName = {0} \t pVal = {1}",  property.PropertyName, p.PVal);
+                        break;
+
+                    case "ArrayProperty":
+                        // cast
+                        var q = property as ArrayProperty;
+
+                        // write to console
+                        Console.WriteLine("\t Type: ArrayProperty \t pName = {0}", q.PropertyName);
+                        // loop over all contained values
+                        foreach (var singleProperty in q.Properties)
+                        {
+                            Console.WriteLine("\t \t pVal = {0}", singleProperty.PVal);
+                        }
+                        break;
+
+                    case "WrapArrayProperty":
+                        var r = property as WrapArrayProperty;
+
+                        // write to console
+                        Console.WriteLine("\t Type: WrapArrayProperty \t pName = {0}", r.PropertyName);
+                        // loop over all contained values
+                        foreach (ArrayProperty arrayProperty in r.ArrayProperties)
+                        {
+                            Console.WriteLine("\t \t ArrayProperty");
+                            foreach (var singleProperty in arrayProperty.Properties)
+                            {
+                                Console.WriteLine("\t \t \t pVal = {0}", singleProperty.PVal);
+                            }
+                            
+                        }
+                        break;
+
+                    default:
+                        Console.WriteLine("Unknown property type was detected. Entity: " + EntityId);
+                     break;
                 }
-                else if (kvp.PVal_Complex != null)
-                {
-                    pVal = kvp.PVal_Complex;
-                }
-                Console.WriteLine("     pName = {0}, pVal = {1}", kvp.PName, pVal);
             }
+            // space to next entity
             Console.WriteLine();
         }
     }
