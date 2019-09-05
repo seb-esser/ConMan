@@ -97,8 +97,8 @@ namespace ModelGraphGen.Ifc_InstanceOnly
             // process string
             var rawProps = propertyString.Split(',');
 
-            
-            var i = 0; 
+
+            var i = 0;
             // loop over all properties
             while (i < rawProps.Length)
             {
@@ -115,7 +115,7 @@ namespace ModelGraphGen.Ifc_InstanceOnly
                     {
                         j++;
                     }
-                    
+
                     // all properties in the range between i and j are arrays themselves
                     for (int k = i; k <= j; k++)
                     {
@@ -123,22 +123,24 @@ namespace ModelGraphGen.Ifc_InstanceOnly
                         var ptArray = new ArrayProperty();
 
                         // loop inner list
-                        while (rawProps[k].EndsWith(")" )== false)
+                        do
                         {
-                            var simpleVal = new SingleProperty();
-                            simpleVal.PVal = rawProps[k];
+                            var simpleVal = new SingleProperty { PVal = rawProps[k] };
                             ptArray.Properties.Add(simpleVal);
                             k++;
-                        }
-                        var lastVal = new SingleProperty();
-                        lastVal.PVal = rawProps[k];
+                        } while (rawProps[k].EndsWith(")") == false);
+
+                        var lastVal = new SingleProperty {PVal = rawProps[k]};
                         ptArray.Properties.Add(lastVal);
 
                         wrapper.ArrayProperties.Add(ptArray);
                     }
-                    
+
                     // add wrapperArray to return var
                     pList.Add(wrapper);
+
+                    // set outer counter 
+                    i = j + 1;
                 }
 
                 // detect a simple arrayProperty
@@ -157,17 +159,17 @@ namespace ModelGraphGen.Ifc_InstanceOnly
                     for (int k = i; k <= j; k++)
                     {
                         // init new simple property
-                        var prop = new SingleProperty();
-                        prop.PVal = rawProps[k];
+                        var prop = new SingleProperty {PVal = rawProps[k]};
 
                         // add to array property
                         arrayProp.Properties.Add(prop);
                     }
+
                     // add to returning list
                     pList.Add(arrayProp);
 
                     // finally: set while iterator to j to skip arrayProps
-                    i = j + 1; 
+                    i = j + 1;
                 }
 
                 // it is a simple property
@@ -179,40 +181,10 @@ namespace ModelGraphGen.Ifc_InstanceOnly
                     pList.Add(singleProp);
 
                     // increase while criteria
-                    i++; 
+                    i++;
                 }
             }
-
-
-            //foreach (var property in splittedProps)
-            //{
-            //    var rawProperty = new RawIfcProperty();
-
-            //    if (openingChar.Contains(property) && closingChar.Contains(property)) // List with single element   
-            //    {
-            //        rawProperty.PVal_Complex = property;
-            //    }
-
-            //    else if (openingChar.Contains(property)) // opens list
-            //    {
-            //        // find closing property
-            //        rawProperty.PVal_Complex = "complexOpen: " + property;
-            //    }
-
-            //    else if (closingChar.Contains(property))
-            //    {
-            //        rawProperty.PVal_Complex = "complexClose: " + property;
-            //    }
-
-            //    else
-            //    {
-            //        rawProperty.PVal_Simple = property;
-            //    }
-
-                
-            //}
-
-
+            
             return pList;
         }
     }

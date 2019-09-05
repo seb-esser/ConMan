@@ -17,20 +17,20 @@ namespace ModelGraphGen
             var sourceFile = SourceLocation;
             var modelType = "IFC";
 
-            string neo4jScript = null;
+            string neo4JScript = null;
 
             // switch format
             switch (modelType)
             {
                 case "IFC":
                     var modelParser = new Ifc2Neo4JInstanceOnly();
-                    neo4jScript = modelParser.Parse(sourceFile);
+                    neo4JScript = modelParser.Parse(sourceFile);
                     break;
 
                 // add additional data structures here
             }
 
-            return neo4jScript;
+            return neo4JScript;
         }
 
         /// <summary>
