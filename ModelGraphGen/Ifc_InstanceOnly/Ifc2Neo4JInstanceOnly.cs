@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ModelGraphGen.Domain;
+using ModelGraphGen.ScriptGenerator;
 
 namespace ModelGraphGen.Ifc_InstanceOnly
 {
@@ -12,13 +13,17 @@ namespace ModelGraphGen.Ifc_InstanceOnly
     {
         /// <summary>
         /// </summary>
-        /// <param name="FileDirectory"></param>
+        /// <param name="fileDirectory"></param>
         /// <returns></returns>
-        public string Parse(string FileDirectory)
+        public string DeserializeInstanceData(string fileDirectory)
         {
-            var rawData = ParseIfcInstanceModel(FileDirectory);
+            // process raw data
+            List<Entity> rawData = ParseIfcInstanceModel(fileDirectory);
+           
+            // produce neo4j script
+            var script = IfcToGraph.GenerateNeo4JGraph(rawData);
 
-            return "ResultingScript";
+            return script;
         }
 
         /// <summary>
@@ -201,6 +206,10 @@ namespace ModelGraphGen.Ifc_InstanceOnly
             return pList;
         }
 
+        /// <summary>
+        /// Style IFC properties
+        /// </summary>
+        /// <param name="arrayProp"></param>
         private static void RunBeautyOnProperty(ref ArrayProperty arrayProp)
         {
             // post beauty: reduce ( and ) from property values

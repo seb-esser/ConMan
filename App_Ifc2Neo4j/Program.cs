@@ -11,7 +11,7 @@ namespace App_Ifc2Neo4j
 
             // define some paths
             var sourceFile = @"C:\Users\Sebastian Esser\Documents\Demos und Modelle\Alignment und LinearPlacement\SimpleLinearPlacement.ifc";
-            var resultFile = @"C:\C:\Users\Sebastian Esser\Documents\Demos und Modelle\Alignment und LinearPlacement\SimpleLinearPlacement_Cypher.txt";
+            var resultFile = @"C:\Users\Sebastian Esser\Documents\Demos und Modelle\Alignment und LinearPlacement\SimpleLinearPlacement_Cypher.txt";
             //var sourceFile = @"C:\Users\Sebastian Esser\Documents\Demos und Modelle\Alignment\04-testfile-LineArcClothoid.ifc";
             //var resultFile = @"C:\C:\Users\Sebastian Esser\Documents\Demos und Modelle\Alignment\04-testfile-LineArcClothoid_Cypher.txt";
             //var sourceFile = @"C:\Users\Sebastian Esser\Documents\Demos und Modelle\Gebäude\Haltepunkt_HpNeuhof_BSC_RosalieHolzinger_2019-03-21.ifc";
@@ -30,7 +30,7 @@ namespace App_Ifc2Neo4j
             };
 
             // run the parser
-            var neo4JScript = parser.CreateNeo4jScript();
+            var neo4JScript = parser.CreateNeo4JScript();
 
             // control log
             Console.WriteLine("Resulting Neo4j Commands are:");
@@ -41,7 +41,7 @@ namespace App_Ifc2Neo4j
             var userInput = Console.ReadLine();
             if (userInput == "1")
             {
-                parser.StoreResult();
+                parser.StoreResult(neo4JScript);
             }
 
 
