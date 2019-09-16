@@ -107,6 +107,7 @@ namespace ModelGraphGen.Ifc_InstanceOnly
                 // doubleArray Situation!
                 if (property.StartsWith("(("))
                 {
+                    // init storage
                     var wrapper = new WrapArrayProperty();
 
                     // init second iteration var
@@ -115,6 +116,10 @@ namespace ModelGraphGen.Ifc_InstanceOnly
                     {
                         j++;
                     }
+
+                    // reduce outer braces
+                    rawProps[i] = rawProps[i].Substring(1); 
+                    rawProps[j] = rawProps[j].Substring(0, rawProps[j].Length - 1);
 
                     // all properties in the range between i and j are arrays themselves
                     for (int k = i; k <= j; k++)
@@ -133,6 +138,10 @@ namespace ModelGraphGen.Ifc_InstanceOnly
                         var lastVal = new SingleProperty {PVal = rawProps[k]};
                         ptArray.Properties.Add(lastVal);
 
+                        // do some beauty 
+                        RunBeautyOnProperty(ref ptArray);
+
+                        // add pts to wrapper
                         wrapper.ArrayProperties.Add(ptArray);
                     }
 
@@ -160,10 +169,13 @@ namespace ModelGraphGen.Ifc_InstanceOnly
                     {
                         // init new simple property
                         var prop = new SingleProperty {PVal = rawProps[k]};
-
+                        
                         // add to array property
                         arrayProp.Properties.Add(prop);
                     }
+
+                    // do some beauty
+                    RunBeautyOnProperty(ref arrayProp);
 
                     // add to returning list
                     pList.Add(arrayProp);
@@ -175,6 +187,7 @@ namespace ModelGraphGen.Ifc_InstanceOnly
                 // it is a simple property
                 else
                 {
+                    // init storage
                     var singleProp = new SingleProperty {PVal = property};
 
                     // add to returning list
@@ -186,6 +199,21 @@ namespace ModelGraphGen.Ifc_InstanceOnly
             }
             
             return pList;
+        }
+
+        private static void RunBeautyOnProperty(ref ArrayProperty arrayProp)
+        {
+            // post beauty: reduce ( and ) from property values
+            var firstProperty = arrayProp.Properties.First();
+            var lastProperty = arrayProp.Properties.Last();
+
+            // run the beauty:
+            var updatedFirstVal = firstProperty.PVal.Substring(1);
+            arrayProp.Properties.First().PVal = updatedFirstVal;
+
+            var updatedLastVal = lastProperty.PVal.Substring(0, lastProperty.PVal.Length - 1);
+            arrayProp.Properties.Last().PVal = updatedLastVal;
+
         }
     }
 }
