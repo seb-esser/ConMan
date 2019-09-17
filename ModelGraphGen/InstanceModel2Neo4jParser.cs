@@ -25,7 +25,7 @@ namespace ModelGraphGen
             {
                 case "IFC":
                     var modelParser = new Ifc2Neo4JInstanceOnly();
-                    neo4JScript = modelParser.DeserializeInstanceData(sourceFile);
+                    neo4JScript = modelParser.Parse(sourceFile);
                     break;
 
                 //ToDo: add additional data structures here
