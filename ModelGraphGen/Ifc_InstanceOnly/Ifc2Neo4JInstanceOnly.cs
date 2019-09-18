@@ -34,15 +34,57 @@ namespace ModelGraphGen.Ifc_InstanceOnly
         public void ParseAndSend(string fileDirectory)
         {  
             // process raw data
-            // List<Entity> rawData = ParseIfcInstanceModel(fileDirectory);
-
-
+             List<Entity> rawData = ParseIfcInstanceModel(fileDirectory);
+            
             var uri = "bolt://localhost:7687";
             var user = "neo4j";
             var password = "0000";
 
-            var con = new Neo4JConnector(uri, user, password); 
-            con.PrintGreeting("mytest");
+            var con = new Neo4JConnector(uri, user, password);
+
+            // clear db
+            con.DeleteAllNodes();
+            
+            // insert entities
+            foreach (var entity in rawData)
+            {
+                con.InsertIfcEntity(entity.EntityName, entity.EntityId);
+            }
+
+            // insert properties
+            foreach (var entity in rawData)
+            {
+                var counter = 0; 
+                foreach (var abstractProperty in entity.Properties)
+                {
+                    if (abstractProperty.GetType().Name == "SingleProperty")
+                    {
+                        var p = abstractProperty as SingleProperty;
+                        p.PropertyName = "p" + counter;
+                        con.SetParameter(entity.EntityId, p.PropertyName, p.PVal);
+                    }
+                    else
+                    {
+                        
+                    }
+
+                    counter++;
+                }
+            }
+
+            // insert relationships
+            //foreach (var entity in rawData)
+            //{
+            //    foreach (var property in entity.Properties)
+            //    {
+                  
+            //        if (singleProperty.PVal.StartsWith("#"))    // rel
+            //        {
+                        
+            //        }
+            //    }
+            //    con.InsertIfcEntity(entity);
+            //}
 
             con.Dispose();
 

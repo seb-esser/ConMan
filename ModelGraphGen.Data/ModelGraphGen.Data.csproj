@@ -8,4 +8,8 @@
     <PackageReference Include="Neo4j.Driver" Version="1.7.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ModelGraphGen.Domain\ModelGraphGen.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
