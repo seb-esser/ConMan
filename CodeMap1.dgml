@@ -1,34 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <DirectedGraph DataVirtualized="True" Layout="ForceDirected" ZoomLevel="-1" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
   <Nodes>
-    <Node Id="(@1 @3 @13 Member=.ctor)" Category="CodeSchema_Method" Bounds="4572.13949056514,9598.84561013962,184.18,25.9599999999991" CodeSchemaProperty_IsConstructor="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsSpecialName="True" DelayedCrossGroupLinksState="Fetched" Label="InstanceModel2Neo4jParser" />
-    <Node Id="(@1 @3 @13 Member=StoreResult)" Category="CodeSchema_Method" Bounds="4446.64615723181,9598.84561013962,95.4933333333329,25.9599999999991" CodeSchemaProperty_IsPublic="True" DelayedCrossGroupLinksState="Fetched" Label="StoreResult" />
-    <Node Id="(@1 @3 @13 Member=TargetLocation)" Category="CodeSchema_Property" Bounds="4446.64615723181,9654.80561013962,136.202394787382,25" CodeSchemaProperty_IsPublic="True" DelayedChildNodesState="NotFetched" DelayedCrossGroupLinksState="Fetched" Group="Collapsed" Label="TargetLocation" />
-    <Node Id="(@1 @3 Type=IParser Member=(Name=Parse OverloadingParameters=[(@17 Namespace=System Type=String)]))" Category="CodeSchema_Method" Bounds="4513.12655170092,9197.59116225488,63.96,25.9599999999991" CodeSchemaProperty_IsAbstract="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="Parse" />
-    <Node Id="(@1 @3 Type=IScriptGenerator Member=GenerateGrGenGraph)" Category="CodeSchema_Method" Bounds="4495.52427592443,9369.58140196954,150.263333333333,25.9599999999991" CodeSchemaProperty_IsAbstract="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="GenerateGrGenGraph" />
-    <Node Id="(@1 @3 Type=IScriptGenerator Member=GenerateNeo4JGraph)" Category="CodeSchema_Method" Bounds="4495.52431488568,9313.62144067159,149.593333333333,25.9599999999991" CodeSchemaProperty_IsAbstract="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="GenerateNeo4JGraph" />
-    <Node Id="(@1 @7 @11 Member=.ctor)" Category="CodeSchema_Method" Bounds="4186.29682064372,9334.24296674305,92.9966666666669,25.9599999999991" CodeSchemaProperty_IsConstructor="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsSpecialName="True" DelayedCrossGroupLinksState="Fetched" Label="IfcToGraph" />
-    <Node Id="(@1 @7 @11 Member=GenerateGrGenGraph)" Category="CodeSchema_Method" Bounds="4186.29678809163,9446.16288933895,150.263333333333,25.9599999999991" CodeSchemaProperty_IsFinal="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="GenerateGrGenGraph" />
-    <Node Id="(@1 @7 @11 Member=GenerateNeo4JGraph)" Category="CodeSchema_Method" Bounds="4186.29682715413,9390.202928041,149.593333333333,25.9599999999991" CodeSchemaProperty_IsFinal="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="GenerateNeo4JGraph" />
-    <Node Id="@10" Category="CodeSchema_Class" Bounds="4910.33858919716,9244.50495339967,378.190458984373,253.841337499995" CodeSchemaProperty_IsInternal="True" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="5" Group="Expanded" Label="Ifc2Neo4JInstanceOnly" />
-    <Node Id="@12" Category="CodeSchema_Class" Bounds="4166.29683570739,9294.2431085741,190.263333333332,197.880399999995" CodeSchemaProperty_IsPublic="True" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="3" Group="Expanded" Label="IfcToGraph" UseManualLocation="True" />
-    <Node Id="@14" Category="CodeSchema_Class" Bounds="4426.64615723181,9445.47784442504,349.673333333334,254.327765714583" CodeSchemaProperty_IsPublic="True" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="5" Group="Expanded" Label="InstanceModel2Neo4jParser" UseManualLocation="True" />
-    <Node Id="@15" Category="CodeSchema_Interface" Bounds="4493.13786194466,9157.55068010024,103.959999999999,85.9602000000014" CodeSchemaProperty_IsAbstract="True" CodeSchemaProperty_IsPublic="True" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="1" Group="Expanded" Label="IParser" UseManualLocation="True" />
-    <Node Id="@16" Category="CodeSchema_Interface" Bounds="4475.52445646232,9273.63357131964,190.263333333334,141.920299999998" CodeSchemaProperty_IsAbstract="True" CodeSchemaProperty_IsInternal="True" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="2" Group="Expanded" Label="IScriptGenerator" UseManualLocation="True" />
-    <Node Id="@18" Category="CodeSchema_Method" Bounds="5192.67435348452,9284.50472017345,63.96,25.9599999999991" CodeSchemaProperty_IsFinal="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="Parse" />
-    <Node Id="@19" Category="CodeSchema_Method" Bounds="5114.15929489077,9340.46468111095,154.37,25.9599999999991" CodeSchemaProperty_IsPrivate="True" DelayedCrossGroupLinksState="Fetched" Label="ParseIfcInstanceModel" />
-    <Node Id="@2" Category="CodeSchema_Assembly" Bounds="4126.08939056514,9077.59744442504,1202.43919863202,662.208165714579" CodeSchemaProperty_StrongName="ModelGraphGen, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="3" FilePath="$(bd57a0ce-ac35-4450-bf3a-fb8763216be5.OutputPath)" Group="Expanded" Label="ModelGraphGen.dll" />
-    <Node Id="@20" Category="CodeSchema_Method" Bounds="5039.22710413557,9396.42464204845,113.076666666667,25.9599999999991" CodeSchemaProperty_IsPrivate="True" DelayedCrossGroupLinksState="Fetched" Label="SplitProperties" />
-    <Node Id="@22" Category="CodeSchema_Method" Bounds="4930.33834762515,9340.46468111095,153.82,25.9599999999991" CodeSchemaProperty_IsPrivate="True" CodeSchemaProperty_IsStatic="True" DelayedCrossGroupLinksState="Fetched" Label="RunBeautyOnProperty" />
-    <Node Id="@23" Category="CodeSchema_Method" Bounds="4930.33949020327,9452.38557954845,156.41,25.9599999999991" CodeSchemaProperty_IsConstructor="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsSpecialName="True" DelayedCrossGroupLinksState="Fetched" Label="Ifc2Neo4JInstanceOnly" />
-    <Node Id="@24" Category="CodeSchema_Method" Bounds="4446.64615723181,9485.47784442504,133.483333333334,25.9599999999991" CodeSchemaProperty_IsPublic="True" DelayedCrossGroupLinksState="Fetched" Label="CreateNeo4JScript" />
-    <Node Id="@25" Category="CodeSchema_Property" Bounds="4508.33100456655,9543.84561013962,139.75906145405,25" CodeSchemaProperty_IsPublic="True" DelayedChildNodesState="NotFetched" DelayedCrossGroupLinksState="Fetched" Group="Collapsed" Label="SourceLocation" />
-    <Node Id="@4" Category="CodeSchema_Namespace" Bounds="4406.64615723181,9117.59744442504,389.673333333334,602.208165714579" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="3" Group="Expanded" Label="ModelGraphGen" />
-    <Node Id="@6" Category="CodeSchema_Namespace" Bounds="4890.33858919716,9204.50485339967,418.190458984374,313.841537499993" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="1" Group="Expanded" Label="ModelGraphGen‎.Ifc_InstanceOnly" />
-    <Node Id="@8" Category="CodeSchema_Namespace" Bounds="4146.15016904072,9254.2430085741,230.556666666667,257.880599999993" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="1" Group="Expanded" Label="ModelGraphGen‎.ScriptGenerator" />
+    <Node Id="(@1 @3 @13 Member=.ctor)" Category="CodeSchema_Method" Bounds="4483.4212976831,9331.49439134671,184.18,25.9599999999991" CodeSchemaProperty_IsConstructor="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsSpecialName="True" DelayedCrossGroupLinksState="Fetched" Label="InstanceModel2Neo4jParser" />
+    <Node Id="(@1 @3 @13 Member=StoreResult)" Category="CodeSchema_Method" Bounds="4357.88436393941,9331.48416264955,95.493333333332,25.9599999999991" CodeSchemaProperty_IsPublic="True" DelayedCrossGroupLinksState="Fetched" Label="StoreResult" />
+    <Node Id="(@1 @3 @13 Member=TargetLocation)" Category="CodeSchema_Property" Bounds="4357.99221693644,9387.4257398267,136.202394787382,25" CodeSchemaProperty_IsPublic="True" DelayedChildNodesState="NotFetched" DelayedCrossGroupLinksState="Fetched" Group="Collapsed" Label="TargetLocation" />
+    <Node Id="(@1 @3 Type=IParser Member=(Name=Parse OverloadingParameters=[(@17 Namespace=System Type=String)]))" Category="CodeSchema_Method" Bounds="4357.99221693644,9502.36685982671,63.9599999999991,25.9599999999991" CodeSchemaProperty_IsAbstract="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="Parse" />
+    <Node Id="(@1 @3 Type=IScriptGenerator Member=GenerateGrGenGraph)" Category="CodeSchema_Method" Bounds="4737.4711575231,9274.11601840817,150.263333333332,25.9599999999991" CodeSchemaProperty_IsAbstract="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="GenerateGrGenGraph" />
+    <Node Id="(@1 @3 Type=IScriptGenerator Member=GenerateNeo4JGraph)" Category="CodeSchema_Method" Bounds="4737.4711575231,9218.18466992817,149.593333333334,25.9599999999991" CodeSchemaProperty_IsAbstract="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="GenerateNeo4JGraph" />
+    <Node Id="(@1 @7 @11 Member=.ctor)" Category="CodeSchema_Method" Bounds="4097.375373054,9312.23616953125,92.996666666666,25.9599999999991" CodeSchemaProperty_IsConstructor="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsSpecialName="True" DelayedCrossGroupLinksState="Fetched" Label="IfcToGraph" />
+    <Node Id="(@1 @7 @11 Member=GenerateGrGenGraph)" Category="CodeSchema_Method" Bounds="4097.37534050191,9424.15636953125,150.263333333332,25.9599999999991" CodeSchemaProperty_IsFinal="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="GenerateGrGenGraph" />
+    <Node Id="(@1 @7 @11 Member=GenerateNeo4JGraph)" Category="CodeSchema_Method" Bounds="4097.37537956441,9368.19626953125,149.593333333334,25.9599999999991" CodeSchemaProperty_IsFinal="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="GenerateNeo4JGraph" />
+    <Node Id="@10" Category="CodeSchema_Class" Bounds="4977.83036912718,9363.58700920033,378.190099999999,253.84004259424" CodeSchemaProperty_IsInternal="True" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="5" Group="Expanded" Label="Ifc2Neo4JInstanceOnly" />
+    <Node Id="@12" Category="CodeSchema_Class" Bounds="4077.37534050191,9272.23606953125,190.263333333332,197.880399999995" CodeSchemaProperty_IsPublic="True" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="3" Group="Expanded" Label="IfcToGraph" />
+    <Node Id="@14" Category="CodeSchema_Class" Bounds="4337.8588119231,9178.11072631794,349.673333333332,254.327765714583" CodeSchemaProperty_IsPublic="True" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="5" Group="Expanded" Label="InstanceModel2Neo4jParser" />
+    <Node Id="@15" Category="CodeSchema_Interface" Bounds="4337.89360246051,9462.43196865362,103.959999999999,85.9599999999991" CodeSchemaProperty_IsAbstract="True" CodeSchemaProperty_IsPublic="True" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="1" Group="Expanded" Label="IParser" />
+    <Node Id="@16" Category="CodeSchema_Interface" Bounds="4717.56693579384,9178.10420293903,190.263333333332,141.919999999998" CodeSchemaProperty_IsAbstract="True" CodeSchemaProperty_IsInternal="True" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="2" Group="Expanded" Label="IScriptGenerator" />
+    <Node Id="@18" Category="CodeSchema_Method" Bounds="5010.21035418445,9515.50705179458,63.9599999999991,25.9599999999991" CodeSchemaProperty_IsFinal="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsVirtual="True" DelayedCrossGroupLinksState="Fetched" Label="Parse" />
+    <Node Id="@19" Category="CodeSchema_Method" Bounds="4997.83036912718,9459.54700920033,154.369999999999,25.9599999999991" CodeSchemaProperty_IsPrivate="True" DelayedCrossGroupLinksState="Fetched" Label="ParseIfcInstanceModel" />
+    <Node Id="@2" Category="CodeSchema_Assembly" Bounds="4037.22867383525,9098.1457620841,1358.87850260417,559.281523853395" CodeSchemaProperty_StrongName="ModelGraphGen, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="3" FilePath="$(bd57a0ce-ac35-4450-bf3a-fb8763216be5.OutputPath)" Group="Expanded" Label="ModelGraphGen.dll" />
+    <Node Id="@20" Category="CodeSchema_Method" Bounds="5114.05789207666,9403.58700920033,113.076666666668,25.9599999999991" CodeSchemaProperty_IsPrivate="True" DelayedCrossGroupLinksState="Fetched" Label="SplitProperties" />
+    <Node Id="@22" Category="CodeSchema_Method" Bounds="5182.20046912718,9459.54700920033,153.82,25.9599999999991" CodeSchemaProperty_IsPrivate="True" CodeSchemaProperty_IsStatic="True" DelayedCrossGroupLinksState="Fetched" Label="RunBeautyOnProperty" />
+    <Node Id="@23" Category="CodeSchema_Method" Bounds="4997.83036912718,9571.46705179457,156.41,25.9599999999991" CodeSchemaProperty_IsConstructor="True" CodeSchemaProperty_IsPublic="True" CodeSchemaProperty_IsSpecialName="True" DelayedCrossGroupLinksState="Fetched" Label="Ifc2Neo4JInstanceOnly" />
+    <Node Id="@24" Category="CodeSchema_Method" Bounds="4357.99221693644,9218.18466992817,133.483333333334,25.9599999999991" CodeSchemaProperty_IsPublic="True" DelayedCrossGroupLinksState="Fetched" Label="CreateNeo4JScript" />
+    <Node Id="@25" Category="CodeSchema_Property" Bounds="4419.64548162934,9276.5225513467,139.75906145405,25" CodeSchemaProperty_IsPublic="True" DelayedChildNodesState="NotFetched" DelayedCrossGroupLinksState="Fetched" Group="Collapsed" Label="SourceLocation" />
+    <Node Id="@4" Category="CodeSchema_Namespace" Bounds="4317.89360246051,9138.10420293903,609.936666666665,430.287765714582" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="3" Group="Expanded" Label="ModelGraphGen" />
+    <Node Id="@6" Category="CodeSchema_Namespace" Bounds="4957.83036912718,9323.58700920033,418.190099999999,313.84004259424" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="1" Group="Expanded" Label="ModelGraphGen‎.Ifc_InstanceOnly" />
+    <Node Id="@8" Category="CodeSchema_Namespace" Bounds="4057.22867383525,9232.23596953125,230.556666666667,257.880599999997" DelayedChildNodesState="Fetched" DelayedCrossGroupLinksState="Fetched" FetchedChildrenCount="1" Group="Expanded" Label="ModelGraphGen‎.ScriptGenerator" />
   </Nodes>
   <Links>
-    <Link Source="@10" Target="@15" Category="Implements" Weight="1" />
+    <Link Source="@10" Target="@15" Category="Implements" Bounds="4450.95051015502,9494.13679883969,526.94902065633,10.1155666458053" Weight="1" />
     <Link Source="@10" Target="@18" Category="Contains" FetchingParent="@10" />
     <Link Source="@10" Target="@19" Category="Contains" FetchingParent="@10" />
     <Link Source="@10" Target="@20" Category="Contains" FetchingParent="@10" />
@@ -46,15 +46,15 @@
     <Link Source="@15" Target="(@1 @3 Type=IParser Member=(Name=Parse OverloadingParameters=[(@17 Namespace=System Type=String)]))" Category="Contains" FetchingParent="@15" />
     <Link Source="@16" Target="(@1 @3 Type=IScriptGenerator Member=GenerateGrGenGraph)" Category="Contains" FetchingParent="@16" />
     <Link Source="@16" Target="(@1 @3 Type=IScriptGenerator Member=GenerateNeo4JGraph)" Category="Contains" FetchingParent="@16" />
-    <Link Source="@18" Target="@19" Category="CodeSchema_Calls" Bounds="5203.60458538514,9310.49539462374,13.2541395637672,22.266348888299" Weight="1" />
-    <Link Source="@19" Target="@20" Category="CodeSchema_Calls" Bounds="5125.6327205785,9366.45532444539,43.4725121152205,25.4526751805333" Weight="1" />
+    <Link Source="@18" Target="@19" Category="CodeSchema_Calls" Bounds="5049.80415635837,9493.27002860262,13.0437823975562,22.2370231919504" Weight="1" />
+    <Link Source="@19" Target="@20" Category="CodeSchema_Calls" Bounds="5097.18548196762,9434.09424115743,43.4738628361092,25.4527680429055" Weight="1" />
     <Link Source="@2" Target="@4" Category="Contains" FetchingParent="@2" />
     <Link Source="@2" Target="@6" Category="Contains" FetchingParent="@2" />
     <Link Source="@2" Target="@8" Category="Contains" FetchingParent="@2" />
-    <Link Source="@20" Target="@22" Category="CodeSchema_Calls" Bounds="5035.31852811677,9371.26461600153,39.8463640185801,25.1907084438608" Weight="2" />
+    <Link Source="@20" Target="@22" Category="CodeSchema_Calls" Bounds="5191.12722761602,9429.54700920033,39.8450232498717,25.1906067026521" Weight="2" />
     <Link Source="@24" Target="@18" Category="CodeSchema_Calls" Weight="1" />
     <Link Source="@24" Target="@23" Category="CodeSchema_Calls" Weight="1" />
-    <Link Source="@24" Target="@25" Category="CodeSchema_Calls" Bounds="4527.92282595844,9511.43784442503,29.5773044982825,26.4130277246622" IsTargetVirtualized="True" Weight="1" />
+    <Link Source="@24" Target="@25" Category="CodeSchema_Calls" Bounds="4439.13548064974,9244.07072631794,29.5773044982798,26.4130277246422" IsTargetVirtualized="True" Weight="1" />
     <Link Source="@4" Target="@14" Category="Contains" FetchingParent="@4" />
     <Link Source="@4" Target="@15" Category="Contains" FetchingParent="@4" />
     <Link Source="@4" Target="@16" Category="Contains" FetchingParent="@4" />
@@ -109,7 +109,6 @@
     <Property Id="NavigationActionLabel" Label="NavigationActionLabel" Description="NavigationActionLabel" DataType="System.String" />
     <Property Id="OutgoingActionLabel" Label="OutgoingActionLabel" Description="OutgoingActionLabel" DataType="System.String" />
     <Property Id="TargetType" DataType="System.Type" />
-    <Property Id="UseManualLocation" DataType="System.Boolean" />
     <Property Id="Value" DataType="System.String" />
     <Property Id="ValueLabel" DataType="System.String" />
     <Property Id="Visibility" Label="Sichtbarkeit" Description="Definiert, ob ein Knoten des Diagramms sichtbar ist oder nicht" DataType="System.Windows.Visibility" />
@@ -370,9 +369,11 @@
     </Style>
   </Styles>
   <Paths>
+    <Path Id="7c3414a1-aebf-465e-9850-471cd4eefc74.OutputPath" Value="C:\Users\Sebastian Esser\Documents\Local Stuff\00_PhD\ModelGraphGen\ModelGraphGen.Domain\bin\Debug\ModelGraphGen.Domain.dll" />
     <Path Id="7c3414a1-aebf-465e-9850-471cd4eefc74.OutputPathUri" Value="file:///C:/Users/Sebastian Esser/Documents/Local Stuff/00_PhD/ModelGraphGen/ModelGraphGen.Domain/bin/Debug/ModelGraphGen.Domain.dll" />
     <Path Id="bd57a0ce-ac35-4450-bf3a-fb8763216be5.OutputPath" Value="C:\Users\Sebastian Esser\Documents\Local Stuff\00_PhD\ModelGraphGen\ModelGraphGen\bin\Debug\ModelGraphGen.dll" />
     <Path Id="bd57a0ce-ac35-4450-bf3a-fb8763216be5.OutputPathUri" Value="file:///C:/Users/Sebastian Esser/Documents/Local Stuff/00_PhD/ModelGraphGen/ModelGraphGen/bin/Debug/ModelGraphGen.dll" />
+    <Path Id="FxReferenceAssemblies" Value="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework" />
     <Path Id="FxReferenceAssembliesUri" Value="file:///C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework" />
   </Paths>
 </DirectedGraph>

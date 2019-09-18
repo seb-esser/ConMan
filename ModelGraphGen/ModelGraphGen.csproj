@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefinitionParser\IfcProductModel.cs" />
     <Compile Include="Ifc_InstanceOnly\Ifc2Neo4JInstanceOnly.cs" />
     <Compile Include="InstanceModel2Neo4jParser.cs" />
     <Compile Include="IParser.cs" />
@@ -51,9 +52,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptGenerator\IfcToGraph.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Ifc_InstanceAndProduct\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\ModelGraphGen.Domain\ModelGraphGen.Domain.csproj">
       <Project>{7C3414A1-AEBF-465E-9850-471CD4EEFC74}</Project>

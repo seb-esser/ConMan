@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ModelGraphGen.DefinitionParser;
 using ModelGraphGen.Domain;
 using ModelGraphGen.ScriptGenerator;
 
@@ -15,15 +16,19 @@ namespace ModelGraphGen.Ifc_InstanceOnly
         /// </summary>
         /// <param name="fileDirectory"></param>
         /// <returns></returns>
-        public string DeserializeInstanceData(string fileDirectory)
+        public string Parse(string fileDirectory)
         {
             // process raw data
-            List<Entity> rawData = ParseIfcInstanceModel(fileDirectory);
+            // List<Entity> rawData = ParseIfcInstanceModel(fileDirectory);
            
-            // produce neo4j script
-            var script = IfcToGraph.GenerateNeo4JGraph(rawData);
+            // load corresponding Product Model
+            var productModel = new IfcProductModel();
+            productModel.Parse(@"IFC4x2.exp");
 
-            return script;
+            // produce neo4j script
+           // var script = IfcToGraph.GenerateNeo4JGraph(rawData);
+
+            return null;
         }
 
         /// <summary>
