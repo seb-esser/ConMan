@@ -23,26 +23,27 @@ namespace App_Ifc2Neo4j
             
 
             // call the parser
-            var parser = new InstanceModel2Neo4jParser
+            var parser = new Instance2Neo4jParser
             {
                 SourceLocation = sourceFile,
                 TargetLocation = resultFile
             };
 
             // run the parser
-            var neo4JScript = parser.CreateNeo4JScript();
+          //  var neo4JScript = parser.CreateNeo4JScript();
+            parser.SendToDb();
 
             // control log
-            Console.WriteLine("Resulting Neo4j Commands are:");
-            Console.Write(neo4JScript);
+            //Console.WriteLine("Resulting Neo4j Commands are:");
+            //Console.Write(neo4JScript);
 
-            // Safe result? 
-            Console.WriteLine("\n \n Store result? Press 0 for no, 1 for yes");
-            var userInput = Console.ReadLine();
-            if (userInput == "1")
-            {
-                parser.StoreResult(neo4JScript);
-            }
+            //// Safe result? 
+            //Console.WriteLine("\n \n Store result? Press 0 for no, 1 for yes");
+            //var userInput = Console.ReadLine();
+            //if (userInput == "1")
+            //{
+            //    parser.StoreResult(neo4JScript);
+            //}
 
 
             Console.WriteLine("--- End of App ---");

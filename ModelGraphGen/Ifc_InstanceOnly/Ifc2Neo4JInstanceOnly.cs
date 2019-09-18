@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ModelGraphGen.Data;
 using ModelGraphGen.DefinitionParser;
 using ModelGraphGen.Domain;
 using ModelGraphGen.ScriptGenerator;
@@ -29,6 +30,25 @@ namespace ModelGraphGen.Ifc_InstanceOnly
             var script = IfcToGraph.GenerateNeo4JGraph(rawData);
 
             return script;
+        }
+        public void ParseAndSend(string fileDirectory)
+        {  
+            // process raw data
+            // List<Entity> rawData = ParseIfcInstanceModel(fileDirectory);
+
+
+            var uri = "bolt://localhost:7687";
+            var user = "neo4j";
+            var password = "0000";
+
+            var con = new Neo4JConnector(uri, user, password); 
+            con.PrintGreeting("mytest");
+
+            con.Dispose();
+
+          
+
+           
         }
 
         /// <summary>

@@ -6,7 +6,7 @@ namespace ModelGraphGen
 {
     /// <summary>
     /// </summary>
-    public class InstanceModel2Neo4jParser
+    public class Instance2Neo4jParser
     {
         public string SourceLocation { get; set; }
         public string TargetLocation { get; set; }
@@ -50,5 +50,24 @@ namespace ModelGraphGen
 
             Console.WriteLine("Finished. ");
         }
+
+        public void SendToDb()
+        {
+            var modelType = "IFC";
+
+            string neo4JScript = null;
+
+            // switch format
+            switch (modelType)
+            {
+                case "IFC":
+                    var modelParser = new Ifc2Neo4JInstanceOnly();
+                    modelParser.ParseAndSend(SourceLocation);
+                    break;
+
+                //ToDo: add additional data structures here
+            }
+
+    }
     }
 }

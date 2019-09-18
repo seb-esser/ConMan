@@ -24,6 +24,7 @@ namespace ModelGraphGen.ScriptGenerator
             }
             return neo4jScript;
         }
+        
 
         public void GenerateGrGenGraph()
         {
