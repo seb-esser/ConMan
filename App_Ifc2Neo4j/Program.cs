@@ -37,7 +37,7 @@ namespace App_Ifc2Neo4j
             Console.Write(neo4JScript);
 
             // Safe result? 
-            Console.WriteLine("Store result? Press 0 for no, 1 for yes");
+            Console.WriteLine("\n \n Store result? Press 0 for no, 1 for yes");
             var userInput = Console.ReadLine();
             if (userInput == "1")
             {

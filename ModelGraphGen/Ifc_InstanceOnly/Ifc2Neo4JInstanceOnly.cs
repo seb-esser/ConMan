@@ -19,16 +19,16 @@ namespace ModelGraphGen.Ifc_InstanceOnly
         public string Parse(string fileDirectory)
         {
             // process raw data
-            // List<Entity> rawData = ParseIfcInstanceModel(fileDirectory);
+            List<Entity> rawData = ParseIfcInstanceModel(fileDirectory);
            
-            // load corresponding Product Model
-            var productModel = new IfcProductModel();
-            productModel.Parse(@"IFC4x2.exp");
+            //// load corresponding Product Model
+            //var productModel = new IfcProductModel();
+            //productModel.Parse(@"IFC4x2.exp");
 
             // produce neo4j script
-           // var script = IfcToGraph.GenerateNeo4JGraph(rawData);
+            var script = IfcToGraph.GenerateNeo4JGraph(rawData);
 
-            return null;
+            return script;
         }
 
         /// <summary>

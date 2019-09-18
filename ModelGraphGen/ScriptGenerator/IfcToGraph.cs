@@ -14,7 +14,7 @@ namespace ModelGraphGen.ScriptGenerator
             // build entities
             foreach (var entity in instanceData)
             {
-                neo4jScript += BuildEntity(entity);
+               neo4jScript += BuildEntity(entity);
             }
 
             // build relationships and properties
@@ -37,7 +37,23 @@ namespace ModelGraphGen.ScriptGenerator
 
         private static string BuildEntity(Entity entity)
         {
-            var fragment = "(`" + entity.EntityId + "` :" + entity.EntityName + " ), ";
+            string fragment; 
+            if (entity.EntityName.StartsWith("IfcRel"))
+            {
+                fragment = "(objRel" + entity.EntityId + ":IfcEntity" +
+                           "{EntityNr: " + entity.EntityId + ", "
+                           + "EntityName: " + "'" + entity.EntityName + "'"
+                           + "}), ";
+            }
+            else
+            {
+                fragment = "(Entity" + entity.EntityId + ":IfcEntity" +
+                               "{EntityNr: " + entity.EntityId + ", "
+                               + "EntityName: " + "'" + entity.EntityName + "'"
+                               + "}), ";
+            }
+
+           
             return fragment;
         }
 
@@ -58,7 +74,7 @@ namespace ModelGraphGen.ScriptGenerator
                         if (p.PVal.StartsWith("#"))
                         {
                             // build a relationship
-                            fragment += " (`" + entity.EntityId + "`)-[:`UnknownRel` ]->(`" + p.PVal.Substring(1, p.PVal.Length -1) +"`), ";
+                            fragment += " (`n" + entity.EntityId + "`)-[:`UnknownRel` ]->(`n" + p.PVal.Substring(1, p.PVal.Length -1) +"`), ";
                         }
                         else
                         {
@@ -75,7 +91,7 @@ namespace ModelGraphGen.ScriptGenerator
 
                         foreach (var singleProperty in q.Properties)
                         {
-                            fragment += " (`" + entity.EntityId + "`)-[:`UnknownRel` ]->(`" + singleProperty.PVal + "`), ";
+                            fragment += " (`n" + entity.EntityId + "`)-[:`UnknownRel`]->(`n" + singleProperty.PVal + "`), ";
                         }
 
                         break;
