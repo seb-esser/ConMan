@@ -44,7 +44,7 @@ namespace ModelGraphGen.Ifc_InstanceOnly
 
             // clear db
             con.DeleteAllNodes();
-            
+
             // insert entities
             foreach (var entity in rawData)
             {
@@ -55,37 +55,69 @@ namespace ModelGraphGen.Ifc_InstanceOnly
             foreach (var entity in rawData)
             {
                 var counter = 0; 
-                foreach (var abstractProperty in entity.Properties)
-                {
-                    if (abstractProperty.GetType().Name == "SingleProperty")
+              
+                foreach (var property in entity.Properties)
+                { 
+                    switch (property.GetType().Name)
                     {
-                        var p = abstractProperty as SingleProperty;
-                        p.PropertyName = "p" + counter;
-                        con.SetParameter(entity.EntityId, p.PropertyName, p.PVal);
-                    }
-                    else
-                    {
-                        
-                    }
+                        case "SingleProperty":
+                            // cast
+                            var p = property as SingleProperty;
+                            if (p.PVal.StartsWith("#"))
+                            {
+                                con.InsertIfcRelationships(entity.EntityId, Convert.ToInt32(p.PVal.Substring(1)));
+                            }
+                            else
+                            {
+                                 con.SetParameter(entity.EntityId, "prop"+counter, p.PVal);
+                            }
+                            break;
 
+                        case "ArrayProperty":
+                            // cast
+                            var arrayProperty = property as ArrayProperty;
+                            
+                            // loop over all contained values
+                            foreach (var q in arrayProperty.Properties)
+                            {
+                                // extract this code in a private function
+                                if (q.PVal.StartsWith("#"))
+                                {
+                                    con.InsertIfcRelationships(entity.EntityId, Convert.ToInt32(q.PVal.Substring(1)));
+                                }
+                                else
+                                {
+                                    con.SetParameter(entity.EntityId, "prop" + counter, q.PVal);
+                                }
+                            }
+
+                            break;
+
+                        case "WrapArrayProperty":
+                            var r = property as WrapArrayProperty;
+
+                           
+                            //// loop over all contained properties
+                            //foreach (ArrayProperty arrayP in r.ArrayProperties)
+                            //{
+                            //    // loop for each array property
+                            //    foreach (var singleProperty in arrayP.Properties)
+                            //    {
+                                   
+                            //    }
+
+                            //}
+
+                            break;
+
+
+                    }
+                    
                     counter++;
                 }
             }
 
-            // insert relationships
-            //foreach (var entity in rawData)
-            //{
-            //    foreach (var property in entity.Properties)
-            //    {
-                  
-            //        if (singleProperty.PVal.StartsWith("#"))    // rel
-            //        {
-                        
-            //        }
-            //    }
-            //    con.InsertIfcEntity(entity);
-            //}
-
+           
             con.Dispose();
 
           

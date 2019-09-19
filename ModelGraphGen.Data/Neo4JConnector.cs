@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Dynamic;
 using System.Linq;
 using ModelGraphGen.Domain;
 using Neo4j.Driver.V1;
@@ -59,7 +60,7 @@ namespace ModelGraphGen.Data
                 var entityResult = session.WriteTransaction(tx =>
                 {
                     var result = tx.Run("MATCH (a),(b) " +
-                                        "WHERE a.EntityId = $sourceId OR b.EntityId = $targetId " +
+                                        "WHERE a.EntityId = $sourceId AND b.EntityId = $targetId " +
                                         "CREATE (a)-[r:hasRelation]->(b) " +
                                         "RETURN r ",
                         new {sourceId , targetId });
@@ -94,7 +95,7 @@ namespace ModelGraphGen.Data
             {
                 var greeting = session.WriteTransaction(tx =>
                 {
-                    var result = tx.Run("Match(n) delete n");
+                    var result = tx.Run("Match(n) DETACH delete n");
                     return result;
                 });
             }
