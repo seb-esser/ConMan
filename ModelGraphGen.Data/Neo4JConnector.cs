@@ -33,24 +33,7 @@ namespace ModelGraphGen.Data
         }
 
         #region Transactions
-
-        public void PrintGreeting(string message)
-        {
-            using (var session = _driver.Session())
-            {
-                var greeting = session.WriteTransaction(tx =>
-                {
-                    var result = tx.Run("CREATE (a:test{id: 1}) " +
-                                        "SET a.message = $message " +
-                                        "RETURN a.message + ', from node ' + id(a)",
-                        new { message });
-                    return result;
-                });
-                Console.WriteLine(greeting);
-
-            }
-        }
-
+        
         public void InsertIfcEntity(string entityLabel, int entityId)
         {
             using (var session = _driver.Session())
@@ -75,14 +58,13 @@ namespace ModelGraphGen.Data
             {
                 var entityResult = session.WriteTransaction(tx =>
                 {
-                    var result = tx.Run("MATCH (a:IfcEntity)(b:IfcEntity) " +
-                                        "WHERE a.EntityId = $sourceId AND b.EntityId = $targetId " +
+                    var result = tx.Run("MATCH (a),(b) " +
+                                        "WHERE a.EntityId = $sourceId OR b.EntityId = $targetId " +
                                         "CREATE (a)-[r:hasRelation]->(b) " +
-                                        "RETURN type(r) ",
+                                        "RETURN r ",
                         new {sourceId , targetId });
                     return result;
                 });
-
             }
         }
 
