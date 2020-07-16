@@ -1,23 +1,23 @@
 def relSwitcher(rel):
-    relName = rel.Name
+
     switcher = {
         # IfcRelAssigns derived
-        "IfcRelAssignsToActor": "adf",
-        "IfcRelAssignsToControl": "adf",
-        "IfcRelAssignsToGroup": "adf",
-        "IfcRelAssignsToProcess": "adf",
-        "IfcRelAssignsToProduct": "asdf",
-        "IfcRelAssignsToResource": "asdf",
+        "IfcRelAssignsToActor": map_IfcRelAssignsToActor(rel),
+        "IfcRelAssignsToControl": map_IfcRelAssignsToControl(rel),
+        "IfcRelAssignsToGroup": map_IfcRelAssignsToGroup(rel),
+        "IfcRelAssignsToProcess": map_IfcRelAssignsToProcess(rel),
+        "IfcRelAssignsToProduct": map_IfcRelAssignsToProduct(rel),
+        "IfcRelAssignsToResource": map_IfcRelAssignsToResource(rel),
 
 
         # IfcRelAssociates derived
-        "IfcRelAssociatesApproval": "asdefr",
-        "IfcRelAssociatesClassification": "asdefr",
-        "IfcRelAssociatesConstraint": "asdefr",
-        "IfcRelAssociatesDocument": "asdefr",
-        "IfcRelAssociatesLibrary": "asdefr",
-        "IfcRelAssociatesMaterial": "asdefr",
-        "IfcRelAssociatesProfileDef": "asdefr",
+        "IfcRelAssociatesApproval": map_IfcRelAssociatesApproval(rel),
+        "IfcRelAssociatesClassification": map_IfcRelAssociatesClassification(rel),
+        "IfcRelAssociatesConstraint": map_IfcRelAssociatesConstraint(rel),
+        "IfcRelAssociatesDocument": map_IfcRelAssociatesDocument(rel),
+        "IfcRelAssociatesLibrary": map_IfcRelAssociatesLibrary(rel),
+        "IfcRelAssociatesMaterial": map_IfcRelAssociatesMaterial(rel),
+        "IfcRelAssociatesProfileDef": map_IfcRelAssociatesProfileDef(rel),
 
 
         # IfcRelConnects derived
@@ -59,11 +59,53 @@ def relSwitcher(rel):
         # "IfcRelAggegrates": mapRelAggregates(rel),
         # "IfcRelCrosses": 2
     }
-    return switcher(relName)
 
+    rel_name = rel.Name
+    return switcher(rel_name)
 
-def mapRelAggregates(rel):
+# map RelAssigns
+def map_IfcRelAssignsToActor(rel):
     return "mappingJSON"
+
+def map_IfcRelAssignsToControl(rel):
+    return "mappingJSON"
+
+def map_IfcRelAssignsToGroup(rel):
+    return "mappingJSON"
+
+def map_IfcRelAssignsToProcess(rel):
+    return "mappingJSON"
+
+def map_IfcRelAssignsToProduct(rel):
+    return "mappingJSON"
+
+def map_IfcRelAssignsToResource(rel):
+    return "mappingJSON"
+
+# map RelAssociates
+
+def map_IfcRelAssociatesApproval(rel):
+    return "mappingJSON"
+
+def map_IfcRelAssociatesClassification(rel):
+    return "mappingJSON"
+
+def map_IfcRelAssociatesConstraint(rel):
+    return "mappingJSON"
+
+def map_IfcRelAssociatesDocument(rel):
+    return "mappingJSON"
+
+def map_IfcRelAssociatesLibrary(rel):
+    return "mappingJSON"
+
+def map_IfcRelAssociatesMaterial(rel):
+    return "mappingJSON"
+
+def map_IfcRelAssociatesProfileDef(rel):
+    return "mappingJSON"
+
+
 
 
 
