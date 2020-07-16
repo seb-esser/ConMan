@@ -1,7 +1,7 @@
 def relSwitcher(rel):
     relName = rel.Name
-    switcher ={
-       # "IfcRelAssigns": "asdf",
+    switcher = {
+        # IfcRelAssigns derived
         "IfcRelAssignsToActor": "adf",
         "IfcRelAssignsToControl": "adf",
         "IfcRelAssignsToGroup": "adf",
@@ -10,7 +10,7 @@ def relSwitcher(rel):
         "IfcRelAssignsToResource": "asdf",
 
 
-       # "IfcRelAssociates": "asdefr",
+        # IfcRelAssociates derived
         "IfcRelAssociatesApproval": "asdefr",
         "IfcRelAssociatesClassification": "asdefr",
         "IfcRelAssociatesConstraint": "asdefr",
@@ -20,7 +20,7 @@ def relSwitcher(rel):
         "IfcRelAssociatesProfileDef": "asdefr",
 
 
-        # "IfcRelConnects": "adf",
+        # IfcRelConnects derived
         "IfcRelConnectsElements": "asdefr",
         "IfcRelConnectsPortToElement": "asdefr",
         "IfcRelConnectsPorts": "asdefr",
@@ -38,16 +38,28 @@ def relSwitcher(rel):
         "IfcRelServicesBuildings": "adsf",
         "IfcRelSpaceBoundary": "adsf",
 
-        # "IfcRelDeclares": "asdf",
 
-        # "IfcRelDecomposes": "adf",
+        "IfcRelDeclares": "asdf",
 
-        # "IfcRelDefines": "asdf",
+
+        # IfcRelDecomposes derived
+        "fcRelAggregates": "asdf",
+        "IfcRelNests": "asdf",
+        "IfcRelProjectsElement": "asdf",
+        "IfcRelVoidsElement": "asdf",
+
+
+        # IfcRelDefines derived
+        "IfcRelDefinesByObject": "asdf",
+        "IfcRelDefinesByProperties": "asdf",
+        "IfcRelDefinesByTemplate": "asdf",
+        "IfcRelDefinesByType": "asdf"
+
 
         # "IfcRelAggegrates": mapRelAggregates(rel),
         # "IfcRelCrosses": 2
     }
-    return "mappingJSONforRelationship"
+    return switcher(relName)
 
 
 def mapRelAggregates(rel):
