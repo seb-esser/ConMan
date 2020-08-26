@@ -30,12 +30,12 @@ router.post('/addUpdateType', (req, res) => {
     console.log(`Adding new update type: -- ${newType} --. Processing...`);
 
     const updateType = {
-        name: req.params["name"],
-        id: updateTypes.length + 1
-    }
-    updateTypes.push(updateType);
+            name: req.params["name"],
+            id: updateTypes.length + 1
+        }
+        // updateTypes.push(updateType);
 
-    res.send(updateTypes);
+    res.status(200).send('not yet added to the json, but req was fine.');
 
 });
 
