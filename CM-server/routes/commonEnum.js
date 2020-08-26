@@ -4,11 +4,11 @@ var router = express.Router();
 // custom modules
 var updateTypes = require('../enums/enum-updateTypes')
 
-// middle ware
-router.use(function timeLog(req, res, next) {
-    console.log('Called Middleware commonEnums');
-    next();
-});
+// // middle ware
+// router.use(function timeLog(req, res, next) {
+//     console.log('Called Middleware commonEnums');
+//     next();
+// });
 
 router.get('/getUpdateTypes', (req, res) => {
     res.send(updateTypes);
