@@ -29,7 +29,7 @@ app.use('/api', commonEnums);
 var io = socket(server);
 io.on('connection', (socket) => {
 
-    console.log('made socket connection', socket.id);
+    console.log(`made socket connection ${socket.id}`);
 
     // // Handle chat event
     // socket.on('chat', function(data){
@@ -45,8 +45,4 @@ io.on('connection', (socket) => {
 // --- utility functions ---
 function serverStarted(port) {
     console.log(`CM server started on port ${port}`)
-}
-
-function doHandshake(socket) {
-    console.log(`new socket connection ${socket.id}`);
 }
