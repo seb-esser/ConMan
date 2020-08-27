@@ -1,7 +1,6 @@
 // --- import packages ---
 var express = require('express')
-var websocket = require('websocket')
-
+var socket = require('socket.io')
 
 // custom modules
 
@@ -12,11 +11,8 @@ let app = express();
 var port = process.env.PORT || 3000; // use the env defined port or define individual port
 var server = app.listen(port, serverStarted(port))
 
-// ensure correct encoding of json-based post requests
-
-// Parse JSON bodies (as sent by API clients)
+// ensure correct encoding of json-based post requests - Parse JSON bodies (as sent by API clients)
 app.use(express.json());
-
 
 // routing the landing page
 app.get('/', (req, res) => {
@@ -25,13 +21,19 @@ app.get('/', (req, res) => {
     res.sendFile('public/index.html', { root: __dirname });
 });
 
-// import all routes of the server
+// import all REST routes of the server
 var commonEnums = require('./routes/commonEnum');
 app.use('/api', commonEnums);
 
-
+// --- Socket setup
+var io = socket(server);
+io.on('connection', doHandshake(socket));
 
 // --- utility functions ---
 function serverStarted(port) {
     console.log(`CM server started on port ${port}`)
+}
+
+function doHandshake(socket) {
+    console.log(`new socket connection ${socket.id}`);
 }
