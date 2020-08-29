@@ -1,0 +1,5 @@
+name: ConMan
+channels:
+  - defaults
+prefix: C:\pythonDist\anaconda3\envs\ConMan
+
