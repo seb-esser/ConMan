@@ -33,11 +33,12 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
             console.log(`user disconnected:\t \t ${socket.id} `)
         })
-        // // Handle chat event
-        // socket.on('chat', function(data){
-        //     // console.log(data);
-        //     io.sockets.emit('chat', data);
-        // });
+        // Handle chat event
+        socket.on('updatePatch', function(data){
+            console.log(data);
+            // io.sockets.emit('updatePatchConfirm', 'thank you');
+            socket.broadcast.emit('updatePatchConfirm', data);
+        });
 
     // // Handle typing event
     // socket.on('typing', function(data){
