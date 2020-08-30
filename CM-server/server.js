@@ -21,6 +21,13 @@ app.get('/', (req, res) => {
     res.sendFile('public/index.html', { root: __dirname });
 });
 
+// routing the admin page
+app.get('/admin/', (req, res) => {
+    var ip = req.connection.remoteAddress || req.headers['x-forwarded-for'];
+    console.log(`${ip} has requested the admin panel.`)
+    res.sendFile('public/admin.html', { root: __dirname });
+});
+
 // import all REST routes of the server
 var commonEnums = require('./routes/commonEnum');
 app.use('/api', commonEnums);

@@ -6,9 +6,23 @@
 - Logging-functions (check incoming updates)
 - History of incoming updates incl. timestamp -> enable disconnected clients to get all updates eventually
 - MessageToReceiver -> define receivers that must consume incoming updates (idea of blacklist and whitelist)
+- TCP-based sockets?
+- UDP-based sockets?
+
+ws protocol might not be enough for the communication. 
+Additional need of http, ftp
+
+Model Upload and View: 
+- link BIM360 doc environment
+- Forge Viewer
+- websocket-based forge viewer
+
+use bootstrap to style the frontend 
+
 
 -> nodeJs based
--> implements webSocket
+-> implements express for http/RESTful management
+-> implements socket.io (realizing RFC6455)
 
 ## Required functions for @client.py
 - ComputeDiff(initial, updated)
@@ -17,6 +31,7 @@
 - connectSocket()
 - disconnectSocket()
 - emitUpdate()
+- recvUpdate()
 - OnUpdateAvailableWhileConnected()
 - GetAllUpdatesAfterDisconnection()
 
