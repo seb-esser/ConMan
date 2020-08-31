@@ -1,6 +1,9 @@
 // --- import packages ---
 var express = require('express');
 var socket = require('socket.io');
+var morgan = require('morgan')
+var fs = require('fs')
+var path = require('path')
 
 // custom modules
 
@@ -13,6 +16,12 @@ var server = app.listen(port, serverStarted(port))
 
 // ensure correct encoding of json-based post requests - Parse JSON bodies (as sent by API clients)
 app.use(express.json());
+
+// register morgan logger
+// create a write stream (in append mode)
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+app.use(morgan('common', { stream: accessLogStream }));
+
 
 // routing the landing page
 app.get('/', (req, res) => {
@@ -41,11 +50,11 @@ io.on('connection', (socket) => {
             console.log(`user disconnected:\t \t ${socket.id} `)
         })
         // Handle chat event
-        socket.on('updatePatch', function(data){
-            console.log(data);
-            // io.sockets.emit('updatePatchConfirm', 'thank you');
-            socket.broadcast.emit('updatePatchConfirm', data);
-        });
+    socket.on('updatePatch', function(data) {
+        console.log(data);
+        // io.sockets.emit('updatePatchConfirm', 'thank you');
+        socket.broadcast.emit('updatePatchConfirm', data);
+    });
 
     // // Handle typing event
     // socket.on('typing', function(data){
@@ -55,4 +64,5 @@ io.on('connection', (socket) => {
 // --- utility functions ---
 function serverStarted(port) {
     console.log(`CM server started on port ${port}`)
+        // logger.info(`Server started on ${port}`)
 }
