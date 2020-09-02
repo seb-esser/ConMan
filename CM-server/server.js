@@ -52,7 +52,7 @@ io.on('connection', (socket) => {
         // Handle chat event
     socket.on('updatePatch', function(data) {
         console.log(data);
-        // io.sockets.emit('updatePatchConfirm', 'thank you');
+        io.sockets.emit('updatePatchConfirm', 'thank you');
         socket.broadcast.emit('updatePatchConfirm', data);
     });
 
