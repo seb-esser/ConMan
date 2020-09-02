@@ -10,13 +10,14 @@
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
-    <LaunchProvider>Web launcher</LaunchProvider>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
     <WebBrowserUrl>http://localhost</WebBrowserUrl>
     <OutputPath>.</OutputPath>
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
     <Name>CM-client_pythonFlask</Name>
     <RootNamespace>CM-client_pythonFlask</RootNamespace>
     <WebBrowserPort>4000</WebBrowserPort>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
