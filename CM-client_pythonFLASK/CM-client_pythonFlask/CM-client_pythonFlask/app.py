@@ -18,11 +18,7 @@ wsgi_app = app.wsgi_app
 
 @app.route('/')
 def hello():
-    # connect socket
-    print('trying to connect socket to CM server...')
-    sio.connect('http://localhost:3000')
-    print('connected to CM server as {}'.format(sio.sid))
-
+    
     # frontend message
     return "Hello World!"
 
@@ -54,6 +50,12 @@ if __name__ == '__main__':
     #    PORT = int(os.environ.get('SERVER_PORT', '5000'))
     #except ValueError:
     #    PORT = 5000
+
+    # connect socket
+    print('trying to connect socket to CM server...')
+    sio.connect('http://localhost:3000')
+    print('connected to CM server as {}'.format(sio.sid))
+
     app.run(port=4000, threaded=True)
 
 
