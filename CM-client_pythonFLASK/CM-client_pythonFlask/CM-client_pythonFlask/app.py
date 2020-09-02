@@ -1,12 +1,11 @@
-"""
-This script runs the application using a development server.
-It contains the definition of routes and views for the application.
-"""
 
+# --- imports ---
 from flask import Flask
 import socketio
 import os
+import ifcopenshell
 
+# - define some basic objects
 app = Flask(__name__)
 app.config['DEBUG'] = False
 
@@ -15,10 +14,9 @@ sio = socketio.Client()
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
 
-
+# -- http routes
 @app.route('/')
-def hello():
-    
+def hello():    
     # frontend message
     return "Hello World!"
 
@@ -27,7 +25,12 @@ def emitTest():
     sio.emit('updatePatch', 'This is my first websocket-based message ever. Celebrate this!')
     return "test the emit function"
 
-# --- catch socket events ---
+# --- catch socket events : 
+#   syntax pattern: 
+#       def <socketHeader>(<socketData>): 
+#           ... do something ... 
+# ---
+
 @sio.event
 def connect():
     print('#Socket-Event: \t connected to server')
