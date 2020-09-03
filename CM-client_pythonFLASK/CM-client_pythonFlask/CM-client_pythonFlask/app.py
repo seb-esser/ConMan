@@ -1,4 +1,3 @@
-
 # --- imports ---
 from flask import Flask, request
 import socketio
@@ -14,6 +13,21 @@ sio = socketio.Client()
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
 wsgi_app = app.wsgi_app
+
+# --- utils ---
+def format_json(obj_dict):
+    res_str = "{"
+    for key, value in obj_dict.items():
+        # try:
+        #     res_str = res_str + key + ":" + value + ", "
+        # except:
+        res_str = res_str + key + ": '" + str(value) + "', "
+
+    # remove last comma
+    res_str = res_str[:-2]
+    res_str = res_str + "}"
+    return res_str
+
 
 # -- http routes
 @app.route('/')
@@ -41,19 +55,27 @@ def map_to_neo4j():
     
     try:
          for entity in ifc_json['data']:
-            cypher_statement = 'Create(n:' + entity['type'] + "{globalId: " + '"{}"'.format(entity['globalId']) + '})'
+            
+            prop_cyper = {}
+            for attr, val in entity.items():
+                if isinstance(val, dict) or isinstance(val, list):
+                # dealing with lists and arrays
+                    prop_val = hash(str(val))
+                    prop_cyper[attr] = prop_val
+                # ToDo: implement recursive parsing
+                else:
+                    # dealing with a atomic property
+                    prop_val = val
+                    prop_cyper[attr] = prop_val
+            
+            print('\t{:<25}: {}'.format(attr, prop_val))
+
+            prps = format_json(prop_cyper)
+
+            cypher_statement = 'CREATE(n:' + entity['type'] + prps  + ')'
             print(cypher_statement)
             connector.run_cypher_statement(cypher_statement)
-                          
-#for attr, val in entity.items():
-            #    if isinstance(val, dict) or isinstance(val, list):
-            #        # dealing with lists and arrays
-            #        prop_val = hash(str(val))
-            #    else:
-            #        # dealing with a atomic property
-            #        prop_val = val
-            
-            #    print('\t{:<25}: {}'.format(attr, prop_val))
+
             print('\n')
 
     except :
