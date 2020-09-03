@@ -1,13 +1,16 @@
 
 # --- imports ---
-from flask import Flask
+from flask import Flask, request
 import socketio
 import os
 import ifcopenshell
 
+
 # - define some basic objects
 app = Flask(__name__)
 app.config['DEBUG'] = False
+
+ifc_json = None
 
 sio = socketio.Client()
 
@@ -24,6 +27,12 @@ def hello():
 def emitTest(): 
     sio.emit('updatePatch', 'This is my first websocket-based message ever. Celebrate this!')
     return "test the emit function"
+
+@app.route('/loadIfcJSON', methods=['POST'])
+def map_to_neo4j(): 
+   ifc_json = request.get_json()
+   # print(data)
+   return "successful"
 
 # --- catch socket events : 
 #   syntax pattern: 
