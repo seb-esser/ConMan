@@ -32,9 +32,21 @@ app.get('/', (req, res) => {
 
 // routing the admin page
 app.get('/admin/', (req, res) => {
-    var ip = req.connection.remoteAddress || req.headers['x-forwarded-for'];
-    console.log(`${ip} has requested the admin panel.`)
+    console.log(` has requested the admin panel.`)
     res.sendFile('public/admin.html', { root: __dirname });
+});
+
+app.get('/model01_v4/', (req, res) => {
+    res.sendFile('./processedModels/output_model01_v4.json');
+});
+app.get('/model02_v4/', (req, res) => {
+    res.sendFile('./processedModels/output_model02_v4.json');
+});
+app.get('/model01_v5/', (req, res) => {
+    res.sendFile('./processedModels/output_model01_v5.json');
+});
+app.get('/model02_v5/', (req, res) => {
+    res.sendFile('./processedModels/output_model02_v5.json');
 });
 
 // import all REST routes of the server
