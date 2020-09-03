@@ -37,16 +37,16 @@ app.get('/admin/', (req, res) => {
 });
 
 app.get('/model01_v4/', (req, res) => {
-    res.sendFile('./processedModels/output_model01_v4.json');
+    res.sendFile('processedModels/output_model01_v4.json', { root: __dirname });
 });
 app.get('/model02_v4/', (req, res) => {
-    res.sendFile('./processedModels/output_model02_v4.json');
+    res.sendFile('processedModels/output_model02_v4.json', { root: __dirname });
 });
 app.get('/model01_v5/', (req, res) => {
-    res.sendFile('./processedModels/output_model01_v5.json');
+    res.sendFile('processedModels/output_model01_v5.json', { root: __dirname });
 });
 app.get('/model02_v5/', (req, res) => {
-    res.sendFile('./processedModels/output_model02_v5.json');
+    res.sendFile('processedModels/output_model02_v5.json', { root: __dirname });
 });
 
 // import all REST routes of the server

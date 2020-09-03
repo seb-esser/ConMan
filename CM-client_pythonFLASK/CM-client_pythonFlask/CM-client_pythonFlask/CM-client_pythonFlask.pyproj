@@ -37,6 +37,7 @@
     <Compile Include="ifcdiff.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="neo4jConnector.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="IFC2JSON_python\.git" />
