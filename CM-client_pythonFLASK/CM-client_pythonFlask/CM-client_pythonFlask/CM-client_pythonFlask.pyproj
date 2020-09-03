@@ -29,12 +29,32 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="app.py" />
+    <Compile Include="IFC2JSON_python\ifc2json.py" />
+    <Compile Include="IFC2JSON_python\ifcjson\common.py" />
+    <Compile Include="IFC2JSON_python\ifcjson\ifc2json4.py" />
+    <Compile Include="IFC2JSON_python\ifcjson\ifc2json5a.py" />
+    <Compile Include="IFC2JSON_python\ifcjson\__init__.py" />
     <Compile Include="ifcdiff.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="IFC2JSON_python\.git" />
+    <Content Include="IFC2JSON_python\.gitignore" />
+    <Content Include="IFC2JSON_python\LICENSE" />
+    <Content Include="IFC2JSON_python\README.md" />
+    <Content Include="IFC2JSON_python\samples\7m900_tue_hello_wall_with_door.ifc" />
+    <Content Include="IFC2JSON_python\samples\7m900_tue_hello_wall_with_door_4.json" />
+    <Content Include="IFC2JSON_python\samples\7m900_tue_hello_wall_with_door_5a.json" />
+    <Content Include="IFC2JSON_python\samples\Duplex_A_20110907_optimized.ifc" />
+    <Content Include="IFC2JSON_python\samples\Duplex_A_20110907_optimized_4.json" />
+    <Content Include="IFC2JSON_python\samples\Duplex_A_20110907_optimized_5a.json" />
     <Content Include="requirements.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="IFC2JSON_python\" />
+    <Folder Include="IFC2JSON_python\ifcjson\" />
+    <Folder Include="IFC2JSON_python\samples\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

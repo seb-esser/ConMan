@@ -10,8 +10,6 @@ import ifcopenshell
 app = Flask(__name__)
 app.config['DEBUG'] = False
 
-ifc_json = None
-
 sio = socketio.Client()
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.
@@ -31,15 +29,34 @@ def emitTest():
 @app.route('/loadIfcJSON', methods=['POST'])
 def map_to_neo4j(): 
    ifc_json = request.get_json()
+
+   for entity in ifc_json['data']:
+       
+       for attr, val in entity.items():
+           if isinstance(val, dict) or isinstance(val, list):
+               # dealing with an array
+               prop_val = hash(str(val))
+           else:
+               # dealing with a atomic property
+               prop_val = val
+            
+           print('\t{:<25}: {}'.format(attr, prop_val))
+       print('\n')
+           
+
+
    # print(data)
    return "successful"
 
-# --- catch socket events : 
-#   syntax pattern: 
-#       def <socketHeader>(<socketData>): 
-#           ... do something ... 
-# ---
+@app.route('/getIfcJSON')
+def getJson():
+    return ifc_json
 
+# --- catch socket events :
+#   syntax pattern:
+#       def <socketHeader>(<socketData>):
+#           ...  do something ...
+# ---
 @sio.event
 def connect():
     print('#Socket-Event: \t connected to server')
@@ -53,7 +70,7 @@ def disconnect():
     print('#Socket-Event: \t disconnected from server')
 
 
-# --- main function --- 
+# --- main function ---
 if __name__ == '__main__':
     
     HOST = os.environ.get('SERVER_HOST', 'localhost')
