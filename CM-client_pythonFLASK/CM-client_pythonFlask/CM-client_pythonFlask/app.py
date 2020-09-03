@@ -54,29 +54,35 @@ def map_to_neo4j():
     connector.connect_driver()
     
     try:
+         # STEP 1: create all routed entities and add their guids
          for entity in ifc_json['data']:
+             cypher_statement = str.join('CREATE(n:', entity['type'] , "{" + 'globalId: {}'.format(entity['globalId'])  , "}" , ')')
+             print(cypher_statement)
+             connector.run_cypher_statement(cypher_statement)
             
-            prop_cyper = {}
-            for attr, val in entity.items():
+             print('\n')
+
+         # STEP 2: set all atomic attributes
+         for entity in ifc_json['data']:
+              prop_cyper = {}
+              for attr, val in entity.items():
                 if isinstance(val, dict) or isinstance(val, list):
                 # dealing with lists and arrays
                     prop_val = hash(str(val))
                     prop_cyper[attr] = prop_val
                 # ToDo: implement recursive parsing
-                else:
-                    # dealing with a atomic property
-                    prop_val = val
-                    prop_cyper[attr] = prop_val
+                # else if attr = ofType('globalId'):
+                    ## dealing with a atomic property
+                    #prop_val = val
+                    #prop_cyper[attr] = prop_val
             
-            print('\t{:<25}: {}'.format(attr, prop_val))
+            #print('\t{:<25}: {}'.format(attr, prop_val))
 
-            prps = format_json(prop_cyper)
+            #prps = format_json(prop_cyper)
 
-            cypher_statement = 'CREATE(n:' + entity['type'] + prps  + ')'
-            print(cypher_statement)
-            connector.run_cypher_statement(cypher_statement)
 
-            print('\n')
+              cypher_statement = ''
+              cypher_statement = 'Match(n) where n.globalId="{}" set n.{} = {} return n'.format(entity['globalId'], attrName, attrVal)
 
     except :
         pass
