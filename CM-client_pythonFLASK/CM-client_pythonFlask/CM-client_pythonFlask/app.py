@@ -62,26 +62,9 @@ def map_to_neo4j():
 
          # STEP 2: set all atomic attributes
          for entity in ifc_json['data']:
-              prop_cyper = {}
-              for attr, val in entity.items():
-                if isinstance(val, dict) or isinstance(val, list):
-                # dealing with lists and arrays
-                    prop_val = hash(str(val))
-                    prop_cyper[attr] = prop_val
-                # ToDo: implement recursive parsing
-                # else if attr = ofType('globalId'):
-                    ## dealing with a atomic property
-                    #prop_val = val
-                    #prop_cyper[attr] = prop_val
-            
-            #print('\t{:<25}: {}'.format(attr, prop_val))
-
-            #prps = format_json(prop_cyper)
-
-
-              cypher_statement = ''
-              cypher_statement = 'Match(n) where n.globalId="{}" set n.{} = {} return n'.format(entity['globalId'], attrName, attrVal)
-
+             attributes = entity.items()
+             mapper.mapAttributes(attributes)
+             
     except :
         pass
    
