@@ -18,6 +18,7 @@
     <RootNamespace>CM-client_pythonFlask</RootNamespace>
     <WebBrowserPort>4000</WebBrowserPort>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <SuppressEnvironmentCreationPrompt>True</SuppressEnvironmentCreationPrompt>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,6 +36,9 @@
     <Compile Include="IFC2JSON_python\ifcjson\ifc2json5a.py" />
     <Compile Include="IFC2JSON_python\ifcjson\__init__.py" />
     <Compile Include="ifcdiff.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="IfcNeo4jMapper.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jConnector.py" />

@@ -4,6 +4,7 @@ import socketio
 import os
 import ifcopenshell
 from neo4jConnector import Neo4jConnector 
+from IfcNeo4jMapper import IfcNeo4jMapper
 
 # - define some basic objects
 app = Flask(__name__)
@@ -53,14 +54,11 @@ def map_to_neo4j():
     connector = Neo4jConnector()
     connector.connect_driver()
     
+    mapper = IfcNeo4jMapper()
     try:
-         # STEP 1: create all routed entities and add their guids
-         for entity in ifc_json['data']:
-             cypher_statement = str.join('CREATE(n:', entity['type'] , "{" + 'globalId: {}'.format(entity['globalId'])  , "}" , ')')
-             print(cypher_statement)
-             connector.run_cypher_statement(cypher_statement)
-            
-             print('\n')
+        # map all entities with their globalIds into the graph database
+         entities = ifc_json['data']
+         mapper.mapEntities(entities)
 
          # STEP 2: set all atomic attributes
          for entity in ifc_json['data']:
