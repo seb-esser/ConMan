@@ -20,13 +20,14 @@ class IfcNeo4jMapper:
 
         return True
 
-    def mapAttributes(self, connector, attributes, isRecursionEntry):
+    def mapAttributes(self, connector, attributes, entityId, isRecursionEntry):
         
         print('is recursion entry? \t {}'.format(isRecursionEntry))
 
         ### recursive function that maps all unrooted attributes of a given entity
         for attr, val in attributes:
             print('{:<15} \t {}'.format(attr, val))
+            cypher_statement = ''
 
             if attr == 'ref': 
                 # build relationship
@@ -47,14 +48,17 @@ class IfcNeo4jMapper:
                 if isinstance(val, str): 
                     val_type = 'stringAttr'
                     print('-> {} with value {} has to be processed as a string attr'.format(attr, val))
+                    cypher_statement = 'Match(n) where n.globalId="{}" set n.{} = "{}" return n'.format(entityId, attr, val)
+                    print(cypher_statement)
+
 
                 if isinstance(val, (int, float, complex)):
                     val_type = 'numericType'
                     print('-> {} with value {} has to be processed as a NUMERIC attr'.format(attr, val))
+                    cypher_statement = 'Match(n) where n.globalId="{}" set n.{} = {} return n'.format(entityId, attr, val)
+                    print(cypher_statement)
+
+                # run command on database
+                connector.run_cypher_statement(cypher_statement)
         print('\n')
                 
-
-
-      
-              #cypher_statement = 'Match(n) where n.globalId="{}" set n.{} = {} return n'.format(entity['globalId'], attrName, attrV
-

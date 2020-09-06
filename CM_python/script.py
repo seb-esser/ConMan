@@ -42,7 +42,7 @@ mapper.mapEntities(connector, entities)
 # STEP 2: set all attributes
 for entity in entities:
     attributes = entity.items()
-    mapper.mapAttributes(connector, attributes, True)
+    mapper.mapAttributes(connector, attributes, entity['globalId'], True)
 
              
 
