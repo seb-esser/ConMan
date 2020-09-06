@@ -1,8 +1,11 @@
 
+import types
+
 class IfcNeo4jMapper:
-    
-    def __init__(self):
+      
+    def __init__(self, myConnector):
         print('Initialized mapper. ')
+        connector = myConnector
         pass
 
 
@@ -17,32 +20,41 @@ class IfcNeo4jMapper:
 
         return True
 
-    def mapAttributes(self, attributes):
+    def mapAttributes(self, connector, attributes, isRecursionEntry):
+        
+        print('is recursion entry? \t {}'.format(isRecursionEntry))
 
-        # cases to be considered:
-        switch = {
-            "atomicAttr": "mapAtomic",
-            "dictAttr": "mapNestedAttrs",
-            "globalId": "mapIdAsRelationship"
-            }
-
-        ## recursive function that maps all unrooted attributes of a given entity
+        ### recursive function that maps all unrooted attributes of a given entity
         for attr, val in attributes:
-            if isinstance(val, dict) or isinstance(val, list):
-            # dealing with lists and arrays
-                prop_val = hash(str(val))
-                prop_cyper[attr] = prop_val
-                # ToDo: implement recursive parsing
-                # else if attr = ofType('globalId'):
-                    ## dealing with a atomic property
-                    #prop_val = val
-                    #prop_cyper[attr] = prop_val
-            
-            # print('\t{:<25}: {}'.format(attr, prop_val))
-             
-            # prps = format_json(prop_cyper)
+            print('{:<15} \t {}'.format(attr, val))
+
+            if attr == 'ref': 
+                # build relationship
+                print('{} with value {} has to be processed as a relationship.'.format(attr, val))
+
+                print('-> parse ref as relationship')
+                # parse next attribute
+                continue
+
+            if attr != 'globalId' and attr != 'type': # exclude the globalId and type attr as this was already parsed
+
+                if isinstance(val, dict) or isinstance(val, list):
+                    # dealing with lists and arrays
+                    val_type = 'dictAttr'
+                    print('-> Do a recursive call here!')
+                    # mapAttributes(connector, val, False) -> not working yet
+
+                if isinstance(val, str): 
+                    val_type = 'stringAttr'
+                    print('-> {} with value {} has to be processed as a string attr'.format(attr, val))
+
+                if isinstance(val, (int, float, complex)):
+                    val_type = 'numericType'
+                    print('-> {} with value {} has to be processed as a NUMERIC attr'.format(attr, val))
+        print('\n')
+                
 
 
-              #cypher_statement = ''
+      
               #cypher_statement = 'Match(n) where n.globalId="{}" set n.{} = {} return n'.format(entity['globalId'], attrName, attrV
 

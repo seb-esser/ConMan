@@ -32,7 +32,7 @@ print('connecting to neo4j database... ')
 connector = Neo4jConnector()
 connector.connect_driver()
  
-mapper = IfcNeo4jMapper()
+mapper = IfcNeo4jMapper(connector)
 
 
 # map all entities with their globalIds into the graph database
@@ -42,7 +42,7 @@ mapper.mapEntities(connector, entities)
 # STEP 2: set all attributes
 for entity in entities:
     attributes = entity.items()
-    # mapper.mapAttributes(attributes)
+    mapper.mapAttributes(connector, attributes, True)
 
              
 
