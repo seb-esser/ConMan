@@ -6,14 +6,15 @@ class IfcNeo4jMapper:
         pass
 
 
-    def mapEntities(self, entities):
+    def mapEntities(self, connector, entities):
         # STEP 1: create all routed entities and add their guids
         for entity in entities:
-            cypher_statement = str.join('CREATE(n:', entity['type'] , "{" + 'globalId: {}'.format(entity['globalId'])  , "}" , ')')
-            print(cypher_statement)
+            print('Creating entity with guid {} in graph...'.format(entity['globalId']))
+            # formulate cypher command
+            cypher_statement = 'CREATE(n:' + entity['type'] + '{' + 'globalId:"{}'.format(entity['globalId']) + '"}' + ')'
+            # run command on database
             connector.run_cypher_statement(cypher_statement)
-            
-            print('\n')
+
         return True
 
     def mapAttributes(self, attributes):

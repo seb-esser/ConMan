@@ -31,7 +31,7 @@ class Neo4jConnector:
     def run_cypher_statement(self, statement):
         with self.my_driver.session() as session:
             with session.begin_transaction() as tx:
-                print("\n -- Performing: " + statement)
+                print("\t -- Performing: " + statement + '\n')
                 res = tx.run(statement)
                 for ans in res:
                     print(ans)
