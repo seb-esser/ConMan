@@ -1,6 +1,10 @@
 import json
 import os
 import ifcopenshell
+
+import sys
+sys.path.append('../CM-client_pythonCOMMON')
+
 from neo4jConnector import Neo4jConnector 
 from IfcNeo4jMapper import IfcNeo4jMapper
 # --- methods ---

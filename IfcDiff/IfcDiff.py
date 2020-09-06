@@ -168,12 +168,12 @@ class DiffEncoder(json.JSONEncoder):
 if __name__ == '__main__':
 
     location = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-    file_name_old = 'Column-Wall.ifc'
-    file_name_new = 'Column-Wall_moved.ifc'
+    file_name_old = 'C-LayeredWalls_01.ifc'
+    file_name_new = 'C-LayeredWalls_02.ifc'
 
-    file_old = os.path.join(location, 'set02', file_name_old)
+    file_old = os.path.join(location, 'set03', file_name_old)
     print('path initial state:\t {}'.format(file_old))
-    file_new = os.path.join(location, 'set02', file_name_new)
+    file_new = os.path.join(location, 'set03', file_name_new)
     print('path initial state:\t {}'.format(file_new))
 
     output = os.path.join(location, "result.json")

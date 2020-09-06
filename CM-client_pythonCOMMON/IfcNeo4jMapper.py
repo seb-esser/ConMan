@@ -25,11 +25,11 @@ class IfcNeo4jMapper:
             }
 
         ## recursive function that maps all unrooted attributes of a given entity
-         for attr, val in attributes:
-                if isinstance(val, dict) or isinstance(val, list):
-                # dealing with lists and arrays
-                    prop_val = hash(str(val))
-                    prop_cyper[attr] = prop_val
+        for attr, val in attributes:
+            if isinstance(val, dict) or isinstance(val, list):
+            # dealing with lists and arrays
+                prop_val = hash(str(val))
+                prop_cyper[attr] = prop_val
                 # ToDo: implement recursive parsing
                 # else if attr = ofType('globalId'):
                     ## dealing with a atomic property

@@ -1,15 +1,40 @@
 {
-    "added": [],
-    "deleted": [],
-    "changed": {
-        "3vZwlMtP1BEB4gKH6vuOIe": {
-            "has_geometry_change": true
+  "added": [],
+  "deleted": [],
+  "changed": {
+    "3jiozTSUvB79wVNLWrOQAk": {
+      "has_geometry_change": true
+    },
+
+    "3jiozTSUvB79wVNLWrOQ9q": {
+      "has_geometry_change": true
+    },
+    "3jiozTSUvB79wVNLWrOQ9i": {
+      "has_geometry_change": true
+    },
+    "3jiozTSUvB79wVNLWrOQsV": {
+      "values_changed": {
+        "root.Name": {
+          "new_value": "Basiswand:STB 250:2459726",
+          "old_value": "Basiswand:Ziegel+WD hart 300+160:2459726"
         },
-        "1vzwdy2ajBNPFqU8ZqAJKE": {
-            "has_geometry_change": true
-        },
-        "1vzwdy2ajBNPFqU8ZqAJh8": {
-            "has_geometry_change": true
+        "root.ObjectType": {
+          "new_value": "Basiswand:STB 250",
+          "old_value": "Basiswand:Ziegel+WD hart 300+160"
         }
+      },
+      "has_geometry_change": true
+    },
+    "3jiozTSUvB79wVNLWrOQ86": {
+      "has_geometry_change": true
+    },
+    "3jiozTSUvB79wVNLWrOQtI": {
+      "has_geometry_change": true
+    },
+    "0nYQG32MX7ZwhT8Q2YNHdJ": {
+      "has_geometry_change": true
     }
+  }
 }
+
+
