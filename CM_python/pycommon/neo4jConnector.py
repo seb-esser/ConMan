@@ -11,6 +11,7 @@ class Neo4jConnector:
     # constructor
     def __init__(self):
         print("Initialized new Connector instance.")
+        pass
 
     # methods
     def connect_driver(self):

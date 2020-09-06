@@ -2,6 +2,7 @@
 class IfcNeo4jMapper:
     
     def __init__(self):
+        print('Initialized mapper. ')
         pass
 
 

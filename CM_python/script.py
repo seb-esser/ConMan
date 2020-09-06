@@ -2,11 +2,11 @@ import json
 import os
 import ifcopenshell
 
-import sys
-sys.path.append('../CM-client_pythonCOMMON')
+from pycommon.ifcNeo4jMapper import IfcNeo4jMapper
+from pycommon.neo4jConnector import Neo4jConnector
 
-from neo4jConnector import Neo4jConnector 
-from IfcNeo4jMapper import IfcNeo4jMapper
+
+
 # --- methods ---
 
 
@@ -29,8 +29,9 @@ if ifc_json == None:
 print('connecting to neo4j database... ')
 connector = Neo4jConnector()
 connector.connect_driver()
-    
+ 
 mapper = IfcNeo4jMapper()
+
 try:
     # map all entities with their globalIds into the graph database
         entities = ifc_json['data']
@@ -39,7 +40,7 @@ try:
         # STEP 2: set all attributes
         for entity in entities:
             attributes = entity.items()
-            mapper.mapAttributes(attributes)
+            # mapper.mapAttributes(attributes)
 
              
 except :
