@@ -82,7 +82,7 @@ class IfcNeo4jMapper:
         print('\n')
                 
 
-    def parseRelationship(self, sourceNodeId, qualifier, type, ref):
+    def CreateRelationship(self, sourceNodeId, qualifier, type, ref):
         cypher_statement = [
             'MATCH(s) where ID(s) = {}'.format(sourceNodeId), 
             'MATCH(t) where t.globalId = "{}"'.format(ref),
@@ -104,6 +104,32 @@ class IfcNeo4jMapper:
             ')' ]
 
         return "".join(str(x) for x in cypher_statement)
+
+
+    def AddAttributesToRootedNode(self, entityId, attributes):
+        cypher_statement = 'MATCH(n) WHERE n.globalId = "{}" '.format(entityId)
+
+        for attr, val in attributes: 
+            add_param = 'SET n.{} = {} '.format(attr, val)
+            cypher_statement = cypher_statement + add_param
+
+        return cypher_statement + ' return n'
+
+
+    def CreateAttributeNode(self, ParentEntityId, attrName,  attributes):
+        separator = ''
+        create = [
+            'CREATE(n:',
+            attrName ,
+            ':attrNode' ,
+            ')' ]
+        cypher_statement = "".join(str(x) for x in create)
+
+        for attr, val in attributes: 
+            add_param = 'SET n.{} = {}'.format(attr, val)
+            cypher_statement = cypher_statement + add_param
+
+        return cypher_statement
 
 
 
