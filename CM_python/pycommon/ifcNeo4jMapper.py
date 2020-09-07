@@ -27,10 +27,6 @@ class IfcNeo4jMapper:
 
     def mapAttributes(self, attributes, entityId, isRecursionEntry):
         
-        print('is recursion entry? \t {}'.format(isRecursionEntry))
-
-        print(attributes)
-
         ### recursive function that maps all unrooted attributes of a given
         ### entity
         for attr, val in attributes:
@@ -45,7 +41,7 @@ class IfcNeo4jMapper:
                 # parse next attribute
                 continue
 
-            if attr != 'globalId' and attr != 'type' and isRecursionEntry == True: # exclude the globalId and type attr as this was already parsed
+            if isRecursionEntry == True: 
 
                 if isinstance(val, dict):
                     # dealing with dicts
@@ -54,14 +50,14 @@ class IfcNeo4jMapper:
                     
                     inner_vals = val.items()
 
-                    self.mapAttributes(inner_vals, entityId, False) 
+                   #  self.mapAttributes(inner_vals, entityId, False) 
 
                 if isinstance(val, list):
                     # dealing with lists
                     val_type = 'dictAttr'
                     print('-> Do a recursive call here!')
                     
-                    self.mapAttributes(inner_vals, entityId, False) 
+                    # self.mapAttributes(inner_vals, entityId, False) 
 
 
                 if isinstance(val, str): 
