@@ -40,13 +40,16 @@ class IfcNeo4jMapper:
                 # parse next attribute
                 continue
 
-            if attr != 'globalId' and attr != 'type': # exclude the globalId and type attr as this was already parsed
+            if attr != 'globalId' and attr != 'type' and isRecursionEntry == True: # exclude the globalId and type attr as this was already parsed
 
                 if isinstance(val, dict) or isinstance(val, list):
                     # dealing with lists and arrays
                     val_type = 'dictAttr'
                     print('-> Do a recursive call here!')
-                    self.mapAttributes(val, entityId, False) 
+                    
+                    inner_vals = val.items()
+
+                    self.mapAttributes(inner_vals, entityId, False) 
 
                 if isinstance(val, str): 
                     val_type = 'stringAttr'
