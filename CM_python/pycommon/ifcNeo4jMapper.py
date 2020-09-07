@@ -17,7 +17,7 @@ class IfcNeo4jMapper:
         for entity in entities:
             print('Creating entity with guid {} in graph...'.format(entity['globalId']))
             # formulate cypher command
-            cypher_statement = 'CREATE(n:' + entity['type'] + '{' + 'globalId:"{}'.format(entity['globalId']) + '"}' + ')'
+            cypher_statement = 'CREATE(n:' + entity['type'] + ':rootedNode' + '{' + 'globalId:"{}'.format(entity['globalId']) + '"}' + ')'
             # run command on database
             self.connector.run_cypher_statement(cypher_statement)
 
