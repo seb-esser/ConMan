@@ -1,26 +1,29 @@
 
 import types
+from .neo4jConnector import Neo4jConnector 
+
 
 class IfcNeo4jMapper:
-      
+
+        
     def __init__(self, myConnector):
         print('Initialized mapper. ')
-        connector = myConnector
+        self.connector = myConnector
         pass
 
 
-    def mapEntities(self, connector, entities):
+    def mapEntities(self, entities):
         # STEP 1: create all routed entities and add their guids
         for entity in entities:
             print('Creating entity with guid {} in graph...'.format(entity['globalId']))
             # formulate cypher command
             cypher_statement = 'CREATE(n:' + entity['type'] + '{' + 'globalId:"{}'.format(entity['globalId']) + '"}' + ')'
             # run command on database
-            connector.run_cypher_statement(cypher_statement)
+            self.connector.run_cypher_statement(cypher_statement)
 
         return True
 
-    def mapAttributes(self, connector, attributes, entityId, isRecursionEntry):
+    def mapAttributes(self, attributes, entityId, isRecursionEntry):
         
         print('is recursion entry? \t {}'.format(isRecursionEntry))
 
@@ -59,6 +62,6 @@ class IfcNeo4jMapper:
                     print(cypher_statement)
 
                 # run command on database
-                connector.run_cypher_statement(cypher_statement)
+                self.connector.run_cypher_statement(cypher_statement)
         print('\n')
                 
