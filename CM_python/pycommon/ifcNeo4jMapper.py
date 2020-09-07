@@ -25,7 +25,7 @@ class IfcNeo4jMapper:
 
         return True
 
-    def mapAttributes(self, attributes, entityId, isRecursionEntry):
+    def mapAttributes(self, attributes, entityId):
         
         ### recursive function that maps all unrooted attributes of a given
         ### entity
@@ -33,51 +33,44 @@ class IfcNeo4jMapper:
             print('{:<15} \t {}'.format(attr, val))
             cypher_statement = ''
 
-            if attr == 'ref': 
-                # build relationship
-                print('{} with value {} has to be processed as a relationship.'.format(attr, val))
+            ## top level: either atomic or dict/list
 
-                print('-> parse ref as relationship')
-                # parse next attribute
-                continue
+            # --- atomic prop --- 
+            """
+            Atomic properties are parsed with SET
+            """
 
-            if isRecursionEntry == True: 
+            if isinstance(val, (int, float, complex, str)):
+                attribute = {attr: val}
+                print(attribute)
+                cypher_statement = self.AddAttributesToRootedNode(entityId, attribute)
+                print(cypher_statement)
 
-                if isinstance(val, dict):
-                    # dealing with dicts
-                    val_type = 'dictAttr'
-                    print('-> Do a recursive call here!')
+            # --- dict/list ---
+            """ 
+            Complex properties get so-called unrooted nodes
+            """
+
+            if isinstance(val, dict):
+                # dealing with dicts
+                val_type = 'dictAttr'
+                print('-> DictAttr')
                     
-                    inner_vals = val.items()
-
-                   #  self.mapAttributes(inner_vals, entityId, False) 
-
-                if isinstance(val, list):
-                    # dealing with lists
-                    val_type = 'dictAttr'
-                    print('-> Do a recursive call here!')
-                    
-                    # self.mapAttributes(inner_vals, entityId, False) 
+                inner_vals = val.items()
 
 
-                if isinstance(val, str): 
-                    val_type = 'stringAttr'
-                    print('-> {} with value {} has to be processed as a string attr'.format(attr, val))
-                    cypher_statement = 'Match(n) where n.globalId="{}" set n.{} = "{}" return n'.format(entityId, attr, val)
-                    print(cypher_statement)
+            if isinstance(val, list):
+                # dealing with lists
+                val_type = 'dictAttr'
+                print('-> ListAttr')
+                
 
-
-                if isinstance(val, (int, float, complex)):
-                    val_type = 'numericType'
-                    print('-> {} with value {} has to be processed as a NUMERIC attr'.format(attr, val))
-                    cypher_statement = 'Match(n) where n.globalId="{}" set n.{} = {} return n'.format(entityId, attr, val)
-                    print(cypher_statement)
-
-                # run command on database
-                self.connector.run_cypher_statement(cypher_statement)
+            # run command on database
+            self.connector.run_cypher_statement(cypher_statement)
         print('\n')
                 
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     def CreateRelationship(self, sourceNodeId, qualifier, type, ref):
         cypher_statement = [
             'MATCH(s) where ID(s) = {}'.format(sourceNodeId), 
@@ -105,8 +98,14 @@ class IfcNeo4jMapper:
     def AddAttributesToRootedNode(self, entityId, attributes):
         cypher_statement = 'MATCH(n) WHERE n.globalId = "{}" '.format(entityId)
 
-        for attr, val in attributes: 
-            add_param = 'SET n.{} = {} '.format(attr, val)
+        for attr, val in attributes.items(): 
+            if isinstance(val, str):
+                add_param = 'SET n.{} = "{}" '.format(attr, val)
+            elif isinstance(val, (int, float, complex)):
+                add_param = 'SET n.{} = {} '.format(attr, val)
+            else: 
+                # ToDo: throw exeption
+                print('Do something... ERROR!!')
             cypher_statement = cypher_statement + add_param
 
         return cypher_statement + ' return n'

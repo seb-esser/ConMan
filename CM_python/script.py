@@ -49,7 +49,7 @@ for entity in entities:
     
     # reduced attributes
     reduced_attributes = resultset.items()
-    mapper.mapAttributes(reduced_attributes, entity['globalId'], True)
+    mapper.mapAttributes(reduced_attributes, entity['globalId'])
                 
 
 # finally disconnect
