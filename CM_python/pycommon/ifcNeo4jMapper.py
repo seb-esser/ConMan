@@ -12,12 +12,14 @@ class IfcNeo4jMapper:
         pass
 
 
+    
+
     def mapEntities(self, entities):
         # STEP 1: create all routed entities and add their guids
         for entity in entities:
             print('Creating entity with guid {} in graph...'.format(entity['globalId']))
             # formulate cypher command
-            cypher_statement = 'CREATE(n:' + entity['type'] + ':rootedNode' + '{' + 'globalId:"{}'.format(entity['globalId']) + '"}' + ')'
+            cypher_statement = self.CreateRootedNode(entity['globalId'], entity['type'])
             # run command on database
             self.connector.run_cypher_statement(cypher_statement)
 
@@ -27,7 +29,10 @@ class IfcNeo4jMapper:
         
         print('is recursion entry? \t {}'.format(isRecursionEntry))
 
-        ### recursive function that maps all unrooted attributes of a given entity
+        print(attributes)
+
+        ### recursive function that maps all unrooted attributes of a given
+        ### entity
         for attr, val in attributes:
             print('{:<15} \t {}'.format(attr, val))
             cypher_statement = ''
@@ -42,14 +47,22 @@ class IfcNeo4jMapper:
 
             if attr != 'globalId' and attr != 'type' and isRecursionEntry == True: # exclude the globalId and type attr as this was already parsed
 
-                if isinstance(val, dict) or isinstance(val, list):
-                    # dealing with lists and arrays
+                if isinstance(val, dict):
+                    # dealing with dicts
                     val_type = 'dictAttr'
                     print('-> Do a recursive call here!')
                     
                     inner_vals = val.items()
 
                     self.mapAttributes(inner_vals, entityId, False) 
+
+                if isinstance(val, list):
+                    # dealing with lists
+                    val_type = 'dictAttr'
+                    print('-> Do a recursive call here!')
+                    
+                    self.mapAttributes(inner_vals, entityId, False) 
+
 
                 if isinstance(val, str): 
                     val_type = 'stringAttr'
@@ -68,3 +81,32 @@ class IfcNeo4jMapper:
                 self.connector.run_cypher_statement(cypher_statement)
         print('\n')
                 
+
+    def parseRelationship(self, sourceNodeId, qualifier, type, ref):
+        cypher_statement = [
+            'MATCH(s) where ID(s) = {}'.format(sourceNodeId), 
+            'MATCH(t) where t.globalId = "{}"'.format(ref),
+            'MERGE (s)-[r.{}]->(t)'.format(type) ,
+            'SET r.Qualifier = {}'.format(qualifier)]
+
+        return "".join(str(x) for x in cypher_statement)
+        
+
+    def CreateRootedNode(self, entityId, entityType):
+        separator = ''
+        cypher_statement = [
+            'CREATE(n:',
+            entityType ,
+            ':rootedNode' ,
+            '{' ,
+            'globalId:"{}'.format(entityId) ,
+            '"}' ,
+            ')' ]
+
+        return "".join(str(x) for x in cypher_statement)
+
+
+
+
+
+
