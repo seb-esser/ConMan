@@ -46,7 +46,7 @@ class IfcNeo4jMapper:
                     # dealing with lists and arrays
                     val_type = 'dictAttr'
                     print('-> Do a recursive call here!')
-                    # mapAttributes(connector, val, False) -> not working yet
+                    self.mapAttributes(val, entityId, False) 
 
                 if isinstance(val, str): 
                     val_type = 'stringAttr'
