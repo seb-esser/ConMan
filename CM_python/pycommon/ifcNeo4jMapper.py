@@ -25,84 +25,65 @@ class IfcNeo4jMapper:
            
         return True
 
-    def mapAttributes(self, attributes, parentId):
+    def mapProperties(self, entityGlobalId, attributes):
+        # get node id of parent
+        root_node_id = self.connector.run_cypher_statement('MATCH(n) WHERE n.globalId = "{}" RETURN ID(n)'.format(entityGlobalId), 'ID(n)')
+
+        root_node_id = root_node_id[0]
+
+        # remove type and globalId from entity properties
+        exlude = ['globalId', 'type']
+        reduced_properties = {key: val for key,val in attributes if key not in exlude}
+    
+        # reduced attributes
+        reduced_attributes = reduced_properties.items()
+
+        for pName, pVal in reduced_attributes: 
+            self._MapAttribute(pName, pVal, root_node_id)
+
+
+    def _MapAttribute(self, pName, pVal, parentId):
         
-        # get Parent Id
-        if isinstance(parentId, str): 
-            id = self.connector.run_cypher_statement('MATCH(n) WHERE n.globalId = "{}" RETURN ID(n)'.format(parentId), 'ID(n)')
-
-        else:
-            id = parentId
-
-
-        print(id)   
-        ### recursive function that maps all unrooted attributes of a given
-        ### entity
-        for attr, val in attributes:
-            print('{:<15} \t {}'.format(attr, val))
-            cypher_statement = ''
-
-            ## top level: either atomic or dict/list
-
-            # --- atomic prop --- 
-            """
-            Atomic properties are parsed with SET
-            """
-
-            if isinstance(val, (int, float, complex, str)):
-                attribute = {attr: val}
+            # --- atomic prop ---            
+            if isinstance(pVal, (int, float, complex, str)):
+                attribute = {pName: pVal}
                 print(attribute)
-                cypher_statement = self.AddAttributesToRootedNode(id, attribute)
-                print(cypher_statement)
+                cypher_statement = self.AddAttributesToNode(parentId, attribute)
+                self.connector.run_cypher_statement(cypher_statement)                
+                return None
 
             # --- dict/list ---
-            """ 
-            Complex properties get so-called unrooted nodes
-            """
-
-            if isinstance(val, dict): # single pValue but referencing to another class
-                nodeLabel = val['type']
-                parentglobalId = parentId
+            if isinstance(pVal, dict): # single pValue but referencing to another class
                 
-                # create node
-                cypher_statement = self.CreateAttributeNode(parentglobalId, nodeLabel, attr )
-                # run command on database
-                response = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
-                ID_created = response[0]
+                # STEP 1: create new node, get its Id and merge with parent using the 'type' value
+                nodeLabel = pName
 
-                # remote type attr
-                exlude = ['type']
-                resultset = {key: val for key,val in attributes if key not in exlude}
+                # Issue: not every property has a type
+                if 'type' in pVal:
+                    relationship_label = pVal['type']
+                else:
+                    relationship_label = 'undefinedRel'
+                cypher_statement = self.CreateAttributeNode(parentId, nodeLabel, relationship_label)
+                current_parent = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
                 
-                inner_vals = resultset.items()
+                # STEP 2: remove the type property from the inner dict (already used to label the node
+                #exlude = ['type']
+                #reduced_properties = {key:val for key,val in pVal if key not in exlude}
+                #reduced_attributes = reduced_properties.items()
+                #reduced_attributes = pVal
 
-                # recursion:
-                self.mapAttributes(inner_vals, ID_created)
+                # STEP 3: take the new parent and parse the inner dict values:
+                for pName,pInnerVal in pVal.items():
+                    self._MapAttribute(pName, pInnerVal, current_parent[0])                          
+                return None
 
-                # for key, val in inner_vals: 
-                    # print('{}: \t {}'.format(key, val))
-                    # ToDo: Implement parsing
+            if isinstance(pVal, list): # set of pValues
+                for list_val in pVal:
+                    # loop over all list items and insert them into the graph
+                    # list_val is a dict in itself most of the time!
+                    self._MapAttribute(pName, list_val, parentId)
 
-               # refObj = self.DetectReferenceObject(val)
-
-
-            if isinstance(val, list): # set of pValues
-                # dealing with lists
-                val_type = 'dictAttr'
-                print('-> ListAttr \n')
-                i = 1
-                for list_val in val:
-                    print('-- list val item {}'.format(i))
-                    print(list_val)
-                    i += 1
-                    print('\n')
-
-
-            # run command on database
-            self.connector.run_cypher_statement(cypher_statement)
-        print('\n')
-                
-
+                   
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     def CreateRelationship(self, sourceNodeId, qualifier, type, ref):
         
@@ -121,7 +102,7 @@ class IfcNeo4jMapper:
         return self.BuildMultiStatement([create, setGuid, returnID])
 
 
-    def AddAttributesToRootedNode(self, nodeId, attributes):
+    def AddAttributesToNode(self, nodeId, attributes):
         match         = 'MATCH(n) WHERE ID(n) = {}'.format(nodeId)
 
         for attr, val in attributes.items(): 
@@ -138,10 +119,10 @@ class IfcNeo4jMapper:
         return self.BuildMultiStatement([match, add_param, returnID])
 
 
-    def CreateAttributeNode(self, ParentEntityId, NodeLabel, parentAttrName):
-        match          = 'MATCH (p) WHERE p.globalId = "{}"'.format(ParentEntityId)
+    def CreateAttributeNode(self, ParentId, NodeLabel, RelationshipLabel):
+        match          = 'MATCH (p) WHERE ID(p) = {}'.format(ParentId)
         create         = 'CREATE (n: {}:attrNode)'.format(NodeLabel)             
-        merge          = 'MERGE (p)-[:{}]-> (n)'.format(parentAttrName)
+        merge          = 'MERGE (p)-[:{}]->(n)'.format(RelationshipLabel)
         returnID       = 'RETURN ID(n)'
 
         #for attr, val in atomicAttrs: 

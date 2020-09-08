@@ -41,15 +41,8 @@ mapper.mapEntities(entities)
 
 # STEP 2: set all attributes
 for entity in entities:
-    attributes = entity.items()
-
-    # removing id and type from attributes -> already parsed
-    exlude = ['globalId', 'type']
-    resultset = {key: val for key,val in attributes if key not in exlude}
-    
-    # reduced attributes
-    reduced_attributes = resultset.items()
-    mapper.mapAttributes(reduced_attributes, entity['globalId'])
+    attributes = entity.items()   
+    mapper.mapProperties(entity['globalId'], attributes)
                 
 
 # finally disconnect
