@@ -1,5 +1,5 @@
 from neo4j import GraphDatabase
-
+import json
 
 class Neo4jConnector:
 
@@ -28,14 +28,32 @@ class Neo4jConnector:
                 for record in tx.run("MATCH (n) RETURN n LIMIT 25"):
                     print(record)
 
-    def run_cypher_statement(self, statement):
+    def run_cypher_statement(self, statement, postStatement=None):
+
+        #returnTypes = {
+        #    'getId' : (lambda record: result = record['ID(n)'] ), 
+        #    'getGlobalId' : (lambda record: result = record['globalId'] )
+        #    }
+
         with self.my_driver.session() as session:
             with session.begin_transaction() as tx:
                 print("\t -- Performing: " + statement + '\n')
                 res = tx.run(statement)
-                for ans in res:
-                    print(ans)
-                return res
+                
+                return_val = []
+
+                if postStatement != None:
+                    for record in res:
+                       print(record[postStatement])
+                       return_val.append(record[postStatement])
+                   
+                else: 
+                    for record in res:
+                       print(record)
+                       return_val.append(record)
+        return return_val
+
+
 
     def disconnect_driver(self):
         self.my_driver.close()

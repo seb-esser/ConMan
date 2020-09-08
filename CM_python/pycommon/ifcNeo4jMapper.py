@@ -21,12 +21,21 @@ class IfcNeo4jMapper:
             # formulate cypher command
             cypher_statement = self.CreateRootedNode(entity['globalId'], entity['type'])
             # run command on database
-            self.connector.run_cypher_statement(cypher_statement)
-
+            response = self.connector.run_cypher_statement(cypher_statement)
+           
         return True
 
-    def mapAttributes(self, attributes, entityId):
+    def mapAttributes(self, attributes, parentId):
         
+        # get Parent Id
+        if isinstance(parentId, str): 
+            id = self.connector.run_cypher_statement('MATCH(n) WHERE n.globalId = "{}" RETURN ID(n)'.format(parentId), 'ID(n)')
+
+        else:
+            id = entityId
+
+
+        print(id)   
         ### recursive function that maps all unrooted attributes of a given
         ### entity
         for attr, val in attributes:
@@ -58,8 +67,8 @@ class IfcNeo4jMapper:
                 # create node
                 cypher_statement = self.CreateAttributeNode(parentglobalId, nodeLabel, attr )
                 # run command on database
-                self.connector.run_cypher_statement(cypher_statement)
-
+                response = self.connector.run_cypher_statement(cypher_statement)
+                ID_created = response[0]
 
                 # remote type attr
                 exlude = ['type']
@@ -70,7 +79,7 @@ class IfcNeo4jMapper:
                     print('{}: \t {}'.format(key, val))
                     # ToDo: Implement parsing
 
-                refObj = self.DetectReferenceObject(val)
+               # refObj = self.DetectReferenceObject(val)
 
 
             if isinstance(val, list): # set of pValues
@@ -104,8 +113,8 @@ class IfcNeo4jMapper:
     def CreateRootedNode(self, entityId, entityType):
         create        = 'CREATE(n:{}:rootedNode)'.format(entityType)
         setGuid       = 'SET n.globalId = "{}"'.format(entityId)
-
-        return self.BuildMultiStatement([create, setGuid])
+        returnID      = 'RETURN ID(n)'
+        return self.BuildMultiStatement([create, setGuid, returnID])
 
 
     def AddAttributesToRootedNode(self, entityId, attributes):
@@ -120,21 +129,22 @@ class IfcNeo4jMapper:
                 # ToDo: throw exeption
                 print('Do something... ERROR!!')
 
-        return_val     = 'RETURN n'
+        returnID         = 'RETURN n'
 
-        return self.BuildMultiStatement([match, add_param, return_val])
+        return self.BuildMultiStatement([match, add_param, returnID])
 
 
     def CreateAttributeNode(self, ParentEntityId, NodeLabel, parentAttrName):
         match          = 'MATCH (p) WHERE p.globalId = "{}"'.format(ParentEntityId)
         create         = 'CREATE (n: {}:attrNode)'.format(NodeLabel)             
         merge          = 'MERGE (p)-[:{}]-> (n)'.format(parentAttrName)
+        returnID       = 'RETURN ID(n)'
 
         #for attr, val in atomicAttrs: 
         #    add_param = 'SET n.{} = {}'.format(attr, val)
         #    cypher_statement = cypher_statement + add_param
                 
-        return self.BuildMultiStatement([match, create, merge])
+        return self.BuildMultiStatement([match, create, merge, returnID])
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
@@ -147,6 +157,9 @@ class IfcNeo4jMapper:
         else:
            return False
 
+    # constructs a multi statement cypher command
+    def BuildMultiStatement(self, cypherCMDs):
+         return ' '.join(cypherCMDs)
 
 
     
