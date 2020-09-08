@@ -51,19 +51,39 @@ class IfcNeo4jMapper:
             Complex properties get so-called unrooted nodes
             """
 
-            if isinstance(val, dict):
-                # dealing with dicts
-                val_type = 'dictAttr'
-                print('-> DictAttr')
-                    
-                inner_vals = val.items()
+            if isinstance(val, dict): # single pValue but referencing to another class
+                nodeLabel = val['type']
+                parentglobalId = entityId
+                
+                # create node
+                cypher_statement = self.CreateAttributeNode(parentglobalId, nodeLabel, attr )
+                # run command on database
+                self.connector.run_cypher_statement(cypher_statement)
 
 
-            if isinstance(val, list):
+                # remote type attr
+                exlude = ['type']
+                resultset = {key: val for key,val in attributes if key not in exlude}
+                
+                inner_vals = resultset.items()
+                for key, val in inner_vals: 
+                    print('{}: \t {}'.format(key, val))
+                    # ToDo: Implement parsing
+
+                refObj = self.DetectReferenceObject(val)
+
+
+            if isinstance(val, list): # set of pValues
                 # dealing with lists
                 val_type = 'dictAttr'
-                print('-> ListAttr')
-                
+                print('-> ListAttr \n')
+                i = 1
+                for list_val in val:
+                    print('-- list val item {}'.format(i))
+                    print(list_val)
+                    i += 1
+                    print('\n')
+
 
             # run command on database
             self.connector.run_cypher_statement(cypher_statement)
@@ -90,13 +110,13 @@ class IfcNeo4jMapper:
             '{' ,
             'globalId:"{}'.format(entityId) ,
             '"}' ,
-            ')' ]
+            '); ' ]
 
         return "".join(str(x) for x in cypher_statement)
 
 
     def AddAttributesToRootedNode(self, entityId, attributes):
-        cypher_statement = 'MATCH(n) WHERE n.globalId = "{}" '.format(entityId)
+        cypher_statement = 'MATCH(n) WHERE n.globalId = "{}" ; '.format(entityId)
 
         for attr, val in attributes.items(): 
             if isinstance(val, str):
@@ -111,23 +131,37 @@ class IfcNeo4jMapper:
         return cypher_statement + ' return n'
 
 
-    def CreateAttributeNode(self, ParentEntityId, attrName,  attributes):
+    def CreateAttributeNode(self, ParentEntityId, NodeLabel, parentAttrName):
+        
         separator = ''
         create = [
             'CREATE(n:',
-            attrName ,
+            NodeLabel ,
             ':attrNode' ,
             ')' ]
         cypher_statement = "".join(str(x) for x in create)
 
-        for attr, val in attributes: 
-            add_param = 'SET n.{} = {}'.format(attr, val)
-            cypher_statement = cypher_statement + add_param
+        match = 'MATCH (p) WHERE p.globalId = "{}" ; '.format(ParentEntityId)
+        merge = 'MERGE (p)-[:{}]-> (n) '.format(parentAttrName)
 
-        return cypher_statement
+        #for attr, val in atomicAttrs: 
+        #    add_param = 'SET n.{} = {}'.format(attr, val)
+        #    cypher_statement = cypher_statement + add_param
+        combined = (match + cypher_statement + merge)
+
+        return combined
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # identifies an ReferenceObject
+    def DetectReferenceObject(self, nestedValDict): 
+        keys = nestedValDict.keys()
+        print(keys)
+        if nestedValDict.keys == ['type' , 'ref']:
+            return True
+        else:
+           return False
 
 
 
-
-
-
+    
