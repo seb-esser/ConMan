@@ -32,7 +32,7 @@ class IfcNeo4jMapper:
             id = self.connector.run_cypher_statement('MATCH(n) WHERE n.globalId = "{}" RETURN ID(n)'.format(parentId), 'ID(n)')
 
         else:
-            id = entityId
+            id = parentId
 
 
         print(id)   
@@ -52,7 +52,7 @@ class IfcNeo4jMapper:
             if isinstance(val, (int, float, complex, str)):
                 attribute = {attr: val}
                 print(attribute)
-                cypher_statement = self.AddAttributesToRootedNode(entityId, attribute)
+                cypher_statement = self.AddAttributesToRootedNode(id, attribute)
                 print(cypher_statement)
 
             # --- dict/list ---
@@ -62,12 +62,12 @@ class IfcNeo4jMapper:
 
             if isinstance(val, dict): # single pValue but referencing to another class
                 nodeLabel = val['type']
-                parentglobalId = entityId
+                parentglobalId = parentId
                 
                 # create node
                 cypher_statement = self.CreateAttributeNode(parentglobalId, nodeLabel, attr )
                 # run command on database
-                response = self.connector.run_cypher_statement(cypher_statement)
+                response = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
                 ID_created = response[0]
 
                 # remote type attr
@@ -75,8 +75,12 @@ class IfcNeo4jMapper:
                 resultset = {key: val for key,val in attributes if key not in exlude}
                 
                 inner_vals = resultset.items()
-                for key, val in inner_vals: 
-                    print('{}: \t {}'.format(key, val))
+
+                # recursion:
+                self.mapAttributes(inner_vals, ID_created)
+
+                # for key, val in inner_vals: 
+                    # print('{}: \t {}'.format(key, val))
                     # ToDo: Implement parsing
 
                # refObj = self.DetectReferenceObject(val)
@@ -117,8 +121,8 @@ class IfcNeo4jMapper:
         return self.BuildMultiStatement([create, setGuid, returnID])
 
 
-    def AddAttributesToRootedNode(self, entityId, attributes):
-        match         = 'MATCH(n) WHERE n.globalId = "{}"'.format(entityId)
+    def AddAttributesToRootedNode(self, nodeId, attributes):
+        match         = 'MATCH(n) WHERE ID(n) = {}'.format(nodeId)
 
         for attr, val in attributes.items(): 
             if isinstance(val, str):
