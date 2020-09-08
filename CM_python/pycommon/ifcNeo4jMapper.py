@@ -92,64 +92,49 @@ class IfcNeo4jMapper:
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
     def CreateRelationship(self, sourceNodeId, qualifier, type, ref):
-        cypher_statement = [
-            'MATCH(s) where ID(s) = {}'.format(sourceNodeId), 
-            'MATCH(t) where t.globalId = "{}"'.format(ref),
-            'MERGE (s)-[r.{}]->(t)'.format(type) ,
-            'SET r.Qualifier = {}'.format(qualifier)]
+        
+        match_source  = 'MATCH(s) where ID(s) = {}'.format(sourceNodeId)
+        match_target  = 'MATCH(t) where t.globalId = "{}"'.format(ref)
+        merge         = 'MERGE (s)-[r.{}]->(t)'.format(type)
+        set_qualifier = 'SET r.Qualifier = {}'.format(qualifier)
 
-        return "".join(str(x) for x in cypher_statement)
+        return self.BuildMultiStatement([match_source, match_target, merge, set_qualifier])
         
 
     def CreateRootedNode(self, entityId, entityType):
-        separator = ''
-        cypher_statement = [
-            'CREATE(n:',
-            entityType ,
-            ':rootedNode' ,
-            '{' ,
-            'globalId:"{}'.format(entityId) ,
-            '"}' ,
-            '); ' ]
+        create        = 'CREATE(n:{}:rootedNode)'.format(entityType)
+        setGuid       = 'SET n.globalId = "{}"'.format(entityId)
 
-        return "".join(str(x) for x in cypher_statement)
+        return self.BuildMultiStatement([create, setGuid])
 
 
     def AddAttributesToRootedNode(self, entityId, attributes):
-        cypher_statement = 'MATCH(n) WHERE n.globalId = "{}" ; '.format(entityId)
+        match         = 'MATCH(n) WHERE n.globalId = "{}"'.format(entityId)
 
         for attr, val in attributes.items(): 
             if isinstance(val, str):
-                add_param = 'SET n.{} = "{}" '.format(attr, val)
+                add_param = 'SET n.{} = "{}"'.format(attr, val)
             elif isinstance(val, (int, float, complex)):
-                add_param = 'SET n.{} = {} '.format(attr, val)
+                add_param = 'SET n.{} = {}'.format(attr, val)
             else: 
                 # ToDo: throw exeption
                 print('Do something... ERROR!!')
-            cypher_statement = cypher_statement + add_param
 
-        return cypher_statement + ' return n'
+        return_val     = 'RETURN n'
+
+        return self.BuildMultiStatement([match, add_param, return_val])
 
 
     def CreateAttributeNode(self, ParentEntityId, NodeLabel, parentAttrName):
-        
-        separator = ''
-        create = [
-            'CREATE(n:',
-            NodeLabel ,
-            ':attrNode' ,
-            ')' ]
-        cypher_statement = "".join(str(x) for x in create)
-
-        match = 'MATCH (p) WHERE p.globalId = "{}" ; '.format(ParentEntityId)
-        merge = 'MERGE (p)-[:{}]-> (n) '.format(parentAttrName)
+        match          = 'MATCH (p) WHERE p.globalId = "{}"'.format(ParentEntityId)
+        create         = 'CREATE (n: {}:attrNode)'.format(NodeLabel)             
+        merge          = 'MERGE (p)-[:{}]-> (n)'.format(parentAttrName)
 
         #for attr, val in atomicAttrs: 
         #    add_param = 'SET n.{} = {}'.format(attr, val)
         #    cypher_statement = cypher_statement + add_param
-        combined = (match + cypher_statement + merge)
-
-        return combined
+                
+        return self.BuildMultiStatement([match, create, merge])
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
