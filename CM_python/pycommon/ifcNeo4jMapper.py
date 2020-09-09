@@ -44,7 +44,7 @@ class IfcNeo4jMapper:
 
     def _MapAttribute(self, pName, pVal, parentId):
         
-            # --- atomic prop ---            
+            # --- atomic prop ---
             if isinstance(pVal, (int, float, complex, str)):
                 attribute = {pName: pVal}
                 print(attribute)
@@ -55,7 +55,8 @@ class IfcNeo4jMapper:
             # --- dict/list ---
             if isinstance(pVal, dict): # single pValue but referencing to another class
                 
-                # STEP 1: create new node, get its Id and merge with parent using the 'type' value
+                # STEP 1: create new node, get its Id and merge with parent
+                # using the 'type' value
                 nodeLabel = pName
 
                 # Issue: not every property has a type
@@ -66,9 +67,11 @@ class IfcNeo4jMapper:
                 cypher_statement = self.CreateAttributeNode(parentId, nodeLabel, relationship_label)
                 current_parent = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
                 
-                # STEP 2: remove the type property from the inner dict (already used to label the node
+                # STEP 2: remove the type property from the inner dict (already
+                # used to label the node
                 #exlude = ['type']
-                #reduced_properties = {key:val for key,val in pVal if key not in exlude}
+                #reduced_properties = {key:val for key,val in pVal if key not
+                #in exlude}
                 #reduced_attributes = reduced_properties.items()
                 #reduced_attributes = pVal
 
@@ -84,26 +87,27 @@ class IfcNeo4jMapper:
                     self._MapAttribute(pName, list_val, parentId)
 
                    
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - -
     def CreateRelationship(self, sourceNodeId, qualifier, type, ref):
         
-        match_source  = 'MATCH(s) where ID(s) = {}'.format(sourceNodeId)
-        match_target  = 'MATCH(t) where t.globalId = "{}"'.format(ref)
-        merge         = 'MERGE (s)-[r.{}]->(t)'.format(type)
+        match_source = 'MATCH(s) where ID(s) = {}'.format(sourceNodeId)
+        match_target = 'MATCH(t) where t.globalId = "{}"'.format(ref)
+        merge = 'MERGE (s)-[r.{}]->(t)'.format(type)
         set_qualifier = 'SET r.Qualifier = {}'.format(qualifier)
 
         return self.BuildMultiStatement([match_source, match_target, merge, set_qualifier])
         
 
     def CreateRootedNode(self, entityId, entityType):
-        create        = 'CREATE(n:{}:rootedNode)'.format(entityType)
-        setGuid       = 'SET n.globalId = "{}"'.format(entityId)
-        returnID      = 'RETURN ID(n)'
+        create = 'CREATE(n:{}:rootedNode)'.format(entityType)
+        setGuid = 'SET n.globalId = "{}"'.format(entityId)
+        returnID = 'RETURN ID(n)'
         return self.BuildMultiStatement([create, setGuid, returnID])
 
 
     def AddAttributesToNode(self, nodeId, attributes):
-        match         = 'MATCH(n) WHERE ID(n) = {}'.format(nodeId)
+        match = 'MATCH(n) WHERE ID(n) = {}'.format(nodeId)
 
         for attr, val in attributes.items(): 
             if isinstance(val, str):
@@ -114,25 +118,26 @@ class IfcNeo4jMapper:
                 # ToDo: throw exeption
                 print('Do something... ERROR!!')
 
-        returnID         = 'RETURN n'
+        returnID = 'RETURN n'
 
         return self.BuildMultiStatement([match, add_param, returnID])
 
 
     def CreateAttributeNode(self, ParentId, NodeLabel, RelationshipLabel):
-        match          = 'MATCH (p) WHERE ID(p) = {}'.format(ParentId)
-        create         = 'CREATE (n: {}:attrNode)'.format(NodeLabel)             
-        merge          = 'MERGE (p)-[:{}]->(n)'.format(RelationshipLabel)
-        returnID       = 'RETURN ID(n)'
+        match = 'MATCH (p) WHERE ID(p) = {}'.format(ParentId)
+        create = 'CREATE (n: {}:attrNode)'.format(NodeLabel)             
+        merge = 'MERGE (p)-[:{}]->(n)'.format(RelationshipLabel)
+        returnID = 'RETURN ID(n)'
 
-        #for attr, val in atomicAttrs: 
+        #for attr, val in atomicAttrs:
         #    add_param = 'SET n.{} = {}'.format(attr, val)
         #    cypher_statement = cypher_statement + add_param
                 
         return self.BuildMultiStatement([match, create, merge, returnID])
 
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - -
     # identifies an ReferenceObject
     def DetectReferenceObject(self, nestedValDict): 
         keys = nestedValDict.keys()
@@ -146,5 +151,61 @@ class IfcNeo4jMapper:
     def BuildMultiStatement(self, cypherCMDs):
          return ' '.join(cypherCMDs)
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - -
+    def getObjectifiedRels(self): 
+        return [           
+            # IfcRelAssigns derived
+            "IfcRelAssignsToActor",
+            "IfcRelAssignsToControl",
+            "IfcRelAssignsToGroup",
+            "IfcRelAssignsToProcess",
+            "IfcRelAssignsToProduct",
+            "IfcRelAssignsToResource",
 
-    
+
+            # IfcRelAssociates derived
+            "IfcRelAssociatesApproval",
+            "IfcRelAssociatesClassification",
+            "IfcRelAssociatesConstraint",
+            "IfcRelAssociatesDocument",
+            "IfcRelAssociatesLibrary",
+            "IfcRelAssociatesMaterial",
+            "IfcRelAssociatesProfileDef",
+
+            # IfcRelConnects derived
+            "IfcRelConnectsElements",
+            "IfcRelConnectsPortToElement",
+            "IfcRelConnectsPorts",
+            "IfcRelConnectsStructuralActivity",
+            "IfcRelConnectsStructuralMember",
+            "IfcRelContainedInSpatialStructure",
+            "IfcRelCoversBldgElements",
+            "IfcRelCoversSpaces",
+            "IfcRelFillsElement",
+            "IfcRelFlowControlElements",
+            "IfcRelInterferesElements",
+            "IfcRelPositions",
+            "IfcRelReferencedInSpatialStructure",
+            "IfcRelSequence",
+            "IfcRelServicesBuildings",
+            "IfcRelSpaceBoundary",
+            "IfcRelDeclares",
+
+            # IfcRelDecomposes derived
+            "fcRelAggregates",
+            "IfcRelNests",
+            "IfcRelProjectsElement",
+            "IfcRelVoidsElement",
+
+
+            # IfcRelDefines derived
+            "IfcRelDefinesByObject",
+            "IfcRelDefinesByProperties",
+            "IfcRelDefinesByTemplate",
+            "IfcRelDefinesByType",
+
+
+            "IfcRelAggegrates",
+            "IfcRelCrosses"
+        ]
