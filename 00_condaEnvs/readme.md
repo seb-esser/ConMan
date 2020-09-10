@@ -5,9 +5,9 @@
 
 ## importing the conda env
 - open CMD
-- navigate to the folder that contains the 'cmpackage.txt' file
-- run 'conda create --name CM --file cmpackage.txt'
+- navigate to the folder that contains the `cm_packages.txt` file
+- run `conda create --name CM --file cmpackage.txt` in the cmd
 
 ## test installation
 - start python the created env
-- try 'import ifcopenshell' 
+- try `import ifcopenshell` 
