@@ -59,10 +59,21 @@ class IfcNeo4jMapper:
                 # using the 'type' value
                 nodeLabel = pName
 
-                # Issue: not every property has a type
-                if 'type' in pVal:
-                    relationship_label = pVal['type']
+                objectified_rel_list = self.getObjectifiedRels()                
+                inverse_attr_list = self.getInverseAttributes()
+                
+                # STEP 2: check if property is an inverse attribute referencing an objectified relationship
+                if pVal in inverse_attr_list:
+                    # found an objectified relationship!
+
+                     build_refs_from_to = self.ParseObjectifiedRelationship(pVal)
+
+                elif 'type' in pVal: 
+                    # deal with a complex attribute (i.e., an instance of another class:
+                    relationship_label = pVal['type']                                      
+
                 else:
+                    # ToDo: some fancy geometry thing is happening
                     relationship_label = 'undefinedRel'
                 cypher_statement = self.CreateAttributeNode(parentId, nodeLabel, relationship_label)
                 current_parent = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
@@ -86,6 +97,14 @@ class IfcNeo4jMapper:
                     # list_val is a dict in itself most of the time!
                     self._MapAttribute(pName, list_val, parentId)
 
+    def ParseObjectifiedRelationship(self, pName, pVal, sourceNodeId):
+
+        # STEP 1: Parse all attributes
+
+        # STEP 2: Store all new relationships in a suitable dict: {rel_label: [fromNodeID -> toNodeID] }
+
+
+        return 'doSomething'
                    
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # - - - - -
@@ -209,3 +228,12 @@ class IfcNeo4jMapper:
             "IfcRelAggegrates",
             "IfcRelCrosses"
         ]
+
+    def getInverseAttributes(self): 
+        return {
+            
+            
+            
+            
+            
+            }
