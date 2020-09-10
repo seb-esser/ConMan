@@ -4,7 +4,7 @@ import json
 class Neo4jConnector:
 
     # member variables
-    password = "0000"
+    password = "password"
     uri = "bolt://localhost:7687"
     my_driver = []
 
