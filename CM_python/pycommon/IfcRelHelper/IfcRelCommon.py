@@ -2,10 +2,10 @@
 
 class IfcRelCommon:
 
-	relatingElementId
-	relatedElementIds
-	relatingType 
-	relatedType
+	relatingElementId = None
+	relatedElementIds = None
+	relatingType = None
+	relatedType= None
 
 	def __init__(self, relElement, relatingElems):
 
