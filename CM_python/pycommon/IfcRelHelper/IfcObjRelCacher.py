@@ -7,8 +7,8 @@ class IfcObjRelCacher:
 		self.RelType = ty
 		self.globalId = guid
 		self.ownerHistory = guidOwnerHist
-		self.outgoing_Rels = None
-		self.incoming_Rels = None
+		self.outgoing_Rels = []
+		self.incoming_Rels = []
 
 	def AddOutgoingRel(self, outgoing):
 		self.outgoing_Rels.append(outgoing)
