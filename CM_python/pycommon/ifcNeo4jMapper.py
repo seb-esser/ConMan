@@ -22,8 +22,19 @@ class IfcNeo4jMapper:
             # formulate cypher command
             cypher_statement = self.CreateRootedNode(entity['globalId'], entity['type'])
             # run command on database
-            response = self.connector.run_cypher_statement(cypher_statement)
-           
+            response = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
+
+            # extract owner history and merge with correct owner history
+            # (assuming it already exists!)
+            try:
+                parent_owner_history = entity['ownerHistory']
+                OH_guid = parent_owner_history['ref']
+                cypher_statement = ''
+                cypher_statement = self.MergeRootedNodeWithOwnerHistory(OH_guid, response[0])
+                response = self.connector.run_cypher_statement(cypher_statement, 'ID(me)')
+            except :
+                pass
+            
         return True
 
     def mapProperties(self, entityGlobalId, attributes):
@@ -32,8 +43,10 @@ class IfcNeo4jMapper:
 
         root_node_id = root_node_id[0]
 
+
+
         # remove type and globalId from entity properties
-        exlude = ['globalId', 'type']
+        exlude = ['globalId', 'type', 'ownerHistory']
         reduced_properties = {key: val for key,val in attributes if key not in exlude}
     
         # reduced attributes
@@ -68,7 +81,6 @@ class IfcNeo4jMapper:
             # STEP 1: create new node, get its Id and merge with parent
             # using the 'type' value
             nodeLabel = pName
-
             
             child_type = 'undefinedRel'
             try:
@@ -76,21 +88,17 @@ class IfcNeo4jMapper:
             except :
                 pass
                        
-            # STEP 2: check if property is an inverse attribute referencing an objectified relationship
+            # STEP 2: check if property is an inverse attribute referencing an
+            # objectified relationship
             if child_type in objectified_rel_list:
                 # found an objectified relationship!
-                print('help')
+                print(pVal)
+                
                 return
                 # build_refs_from_to = self.ParseObjectifiedRelationship(pVal)
+                           
 
-            elif 'type' in pVal: 
-                # deal with a complex attribute (i.e., an instance of another class):
-                relationship_label = pVal['type']                                      
-
-            else:
-                # ToDo: some fancy geometry thing is happening
-                relationship_label = 'undefinedRel'
-            cypher_statement = self.CreateAttributeNode(parentId, nodeLabel, relationship_label)
+            cypher_statement = self.CreateAttributeNode(parentId, nodeLabel, child_type)
             current_parent = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
             # STEP 3: take the new parent and parse the inner dict values:
@@ -98,7 +106,7 @@ class IfcNeo4jMapper:
                 self._MapAttribute(pName, pInnerVal, current_parent[0])                          
             return None
 
-        if isinstance(pVal, list): # set of pValues           
+        if isinstance(pVal, list): # set of pValues
 
             for list_val in pVal:
                 # loop over all list items and insert them into the graph
@@ -111,9 +119,10 @@ class IfcNeo4jMapper:
                     pass
                 if child_type in objectified_rel_list:
                     # found an objectified relationship!
-                    print('help') 
+                    print(list_val) 
                     return 
-                    # build_refs_from_to = self.ParseObjectifiedRelationship(pName, pVal, parentId)
+                    # build_refs_from_to =
+                    # self.ParseObjectifiedRelationship(pName, pVal, parentId)
                 else:
                     self._MapAttribute(pName, list_val, parentId)
 
@@ -123,15 +132,14 @@ class IfcNeo4jMapper:
 
         # STEP 1: Parse all attributes
 
-        # STEP 2: Store all new relationships in a suitable dict: {rel_label: [fromNodeID -> toNodeID] }
+        # STEP 2: Store all new relationships in a suitable dict: {rel_label:
+        # [fromNodeID -> toNodeID] }
 
 
         return 'doSomething'
                    
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# - - - - -
     def CreateRelationship(self, sourceNodeId, qualifier, type, ref):
-        
         match_source = 'MATCH(s) where ID(s) = {}'.format(sourceNodeId)
         match_target = 'MATCH(t) where t.globalId = "{}"'.format(ref)
         merge = 'MERGE (s)-[r.{}]->(t)'.format(type)
@@ -177,9 +185,15 @@ class IfcNeo4jMapper:
                 
         return self.BuildMultiStatement([match, create, merge, returnID])
 
+    def MergeRootedNodeWithOwnerHistory(self, ownerHistoryGuid, myNodeId):
+        match = 'MATCH (p) WHERE p.globalId = "{}"'.format(ownerHistoryGuid)
+        matchOwn = 'MATCH (me) WHERE ID(me) = {}'.format(myNodeId)
+        merge = 'MERGE (me)-[:{}]->(p)'.format('IfcOwnerHistory')
+        returnID = 'RETURN ID(me)'
+
+        return self.BuildMultiStatement([match, matchOwn, merge, returnID])
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# - - - - -
     # identifies an ReferenceObject
     def DetectReferenceObject(self, nestedValDict): 
         keys = nestedValDict.keys()
@@ -196,8 +210,7 @@ class IfcNeo4jMapper:
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # - - - - -
     def getObjectifiedRels(self): 
-        return [           
-            # IfcRelAssigns derived
+        return [# IfcRelAssigns derived
             "IfcRelAssignsToActor",
             "IfcRelAssignsToControl",
             "IfcRelAssignsToGroup",
@@ -247,16 +260,7 @@ class IfcNeo4jMapper:
             "IfcRelDefinesByTemplate",
             "IfcRelDefinesByType",
 
-
             "IfcRelAggegrates",
-            "IfcRelCrosses"
-        ]
+            "IfcRelCrosses"]
 
-    def getInverseAttributes(self): 
-        return {
-            
-            
-            
-            
-            
-            }
+
