@@ -45,11 +45,14 @@ class IfcNeo4jMapper:
 
     def _MapAttribute(self, pName, pVal, parentId):
             
-        inverseAttrDetector = InverseAttrDectector()
-        invAttr = inverseAttrDetector.IsInverseAttr(pName)
+        #inverseAttrDetector = InverseAttrDectector()
+        #invAttr = inverseAttrDetector.IsInverseAttr(pName)
 
-        if invAttr:
-            print('detected inverse attribute')
+        #if invAttr:
+        #    print('detected inverse attribute')
+
+        objectified_rel_list = self.getObjectifiedRels()
+
 
         # --- atomic prop ---
         if isinstance(pVal, (int, float, complex, str)):
@@ -66,17 +69,22 @@ class IfcNeo4jMapper:
             # using the 'type' value
             nodeLabel = pName
 
-            objectified_rel_list = self.getObjectifiedRels()                
-            inverse_attr_list = self.getInverseAttributes()
-                
+            
+            child_type = 'undefinedRel'
+            try:
+                 child_type = pVal['type'] 
+            except :
+                pass
+                       
             # STEP 2: check if property is an inverse attribute referencing an objectified relationship
-            if pVal in inverse_attr_list:
+            if child_type in objectified_rel_list:
                 # found an objectified relationship!
-
-                    build_refs_from_to = self.ParseObjectifiedRelationship(pVal)
+                print('help')
+                return
+                # build_refs_from_to = self.ParseObjectifiedRelationship(pVal)
 
             elif 'type' in pVal: 
-                # deal with a complex attribute (i.e., an instance of another class:
+                # deal with a complex attribute (i.e., an instance of another class):
                 relationship_label = pVal['type']                                      
 
             else:
@@ -84,25 +92,32 @@ class IfcNeo4jMapper:
                 relationship_label = 'undefinedRel'
             cypher_statement = self.CreateAttributeNode(parentId, nodeLabel, relationship_label)
             current_parent = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
-                
-            # STEP 2: remove the type property from the inner dict (already
-            # used to label the node
-            #exlude = ['type']
-            #reduced_properties = {key:val for key,val in pVal if key not
-            #in exlude}
-            #reduced_attributes = reduced_properties.items()
-            #reduced_attributes = pVal
 
             # STEP 3: take the new parent and parse the inner dict values:
             for pName,pInnerVal in pVal.items():
                 self._MapAttribute(pName, pInnerVal, current_parent[0])                          
             return None
 
-        if isinstance(pVal, list): # set of pValues
+        if isinstance(pVal, list): # set of pValues           
+
             for list_val in pVal:
                 # loop over all list items and insert them into the graph
                 # list_val is a dict in itself most of the time!
-                self._MapAttribute(pName, list_val, parentId)
+
+                child_type = 'undefinedRel'
+                try:
+                     child_type = pVal['type'] 
+                except :
+                    pass
+                if child_type in objectified_rel_list:
+                    # found an objectified relationship!
+                    print('help') 
+                    return 
+                    # build_refs_from_to = self.ParseObjectifiedRelationship(pName, pVal, parentId)
+                else:
+                    self._MapAttribute(pName, list_val, parentId)
+
+
 
     def ParseObjectifiedRelationship(self, pName, pVal, sourceNodeId):
 
@@ -220,7 +235,7 @@ class IfcNeo4jMapper:
             "IfcRelDeclares",
 
             # IfcRelDecomposes derived
-            "fcRelAggregates",
+            "IfcRelAggregates",
             "IfcRelNests",
             "IfcRelProjectsElement",
             "IfcRelVoidsElement",
