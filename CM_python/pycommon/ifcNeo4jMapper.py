@@ -2,7 +2,7 @@
 import types
 from .neo4jConnector import Neo4jConnector 
 from .IfcRelHelper.InverseAttrDetector import InverseAttrDectector
-from .IfcRelHelper.IfcRelCommon import IfcRelCommon
+from .IfcRelHelper.IfcObjRelCacher import IfcObjRelCacher
 
 class IfcNeo4jMapper:
 
@@ -10,6 +10,7 @@ class IfcNeo4jMapper:
     def __init__(self, myConnector):
         print('Initialized mapper. ')
         self.connector = myConnector
+        self.RelCacherList = []
         pass
 
 
@@ -92,6 +93,15 @@ class IfcNeo4jMapper:
             # objectified relationship
             if child_type in objectified_rel_list:
                 # found an objectified relationship!
+                relCache = IfcObjRelCacher(child_type, pVal['globalId'], pVal['ownerHistory']['ref'])
+                self.RelCacherList.append(relCache)
+                # reduce pVal:
+                exlude = ['globalId', 'type', 'ownerHistory']
+                reduced_properties = {key: val for key,val in pVal if key not in exlude}
+
+                # try to catch all relationships stored within reduced_pVal
+
+
                 print(pVal)
                 
                 return

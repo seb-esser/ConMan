@@ -1,0 +1,31 @@
+
+
+class IfcObjRelCacher:
+	
+	def __init__(self, ty, guid, guidOwnerHist):
+
+		self.RelType = ty
+		self.globalId = guid
+		self.ownerHistory = guidOwnerHist
+		self.outgoing_Rels = None
+		self.incoming_Rels = None
+
+	def AddOutgoingRel(self, outgoing):
+		self.outgoing_Rels.append(outgoing)
+
+	def AddIncomingRel(self, incoming):
+		self.incoming_Rels.append(incoming)
+
+
+class Rel:
+	
+	def __init__(self, ty, target):
+		type = ty
+		target_guid = target
+
+
+
+
+
+
+
