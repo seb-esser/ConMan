@@ -128,8 +128,9 @@ class IfcNeo4jMapper:
     def CreateRootedNode(self, entityId, entityType):
         create = 'CREATE(n:{}:rootedNode)'.format(entityType)
         setGuid = 'SET n.globalId = "{}"'.format(entityId)
+        setEntityType = 'SET n.entityType = "{}"'.format(entityType)
         returnID = 'RETURN ID(n)'
-        return self.BuildMultiStatement([create, setGuid, returnID])
+        return self.BuildMultiStatement([create, setGuid, setEntityType, returnID])
 
 
     def AddAttributesToNode(self, nodeId, attributes):

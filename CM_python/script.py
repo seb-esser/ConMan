@@ -15,7 +15,7 @@ from pycommon.neo4jConnector import Neo4jConnector
 print(os.getcwd())
 
 # open the json file
-f = open('./processedModels/output_model01_v4.json', 'r') 
+f = open('./processedModels/spatial.json', 'r') 
    # read the data
 ifc_json = json.load(f)
 f.close()
