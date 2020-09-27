@@ -20,8 +20,8 @@ class IfcObjRelCacher:
 class Rel:
 	
 	def __init__(self, ty, target):
-		type = ty
-		target_guid = target
+		self.type = ty
+		self.target_guid = target
 
 
 

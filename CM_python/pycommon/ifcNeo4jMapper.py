@@ -2,7 +2,7 @@
 import types
 from .neo4jConnector import Neo4jConnector 
 from .IfcRelHelper.InverseAttrDetector import InverseAttrDectector
-from .IfcRelHelper.IfcObjRelCacher import IfcObjRelCacher
+from .IfcRelHelper.IfcObjRelCacher import IfcObjRelCacher, Rel
 
 class IfcNeo4jMapper:
 
@@ -56,7 +56,6 @@ class IfcNeo4jMapper:
         for pName, pVal in reduced_attributes: 
             self._MapAttribute(pName, pVal, root_node_id)
 
-
     def _MapAttribute(self, pName, pVal, parentId):
             
         #inverseAttrDetector = InverseAttrDectector()
@@ -105,17 +104,19 @@ class IfcNeo4jMapper:
 
                     # list or dict?
                     if isinstance(nestedRelVal, dict):
-                         print('\t{}'.format(nestedRelVal))
+                         # print('\t{}'.format(nestedRelVal))
+                         rel = Rel(nestedRelVal['type'], nestedRelVal['ref'])
+                         relCache.AddOutgoingRel(rel)
 
                     elif isinstance(nestedRelVal, list):
                         for target in nestedRelVal:
-                            print('\t{}'.format(target))
+                            # print('\t{}'.format(target))
+                            rel = Rel(target['type'], target['ref'])
+                            relCache.AddOutgoingRel(rel)
 
-
-                # print(reduced_properties)
+                self.RelCacherList.append(relCache)
                 return
-                # build_refs_from_to = self.ParseObjectifiedRelationship(pVal)
-                           
+                
 
             cypher_statement = self.CreateAttributeNode(parentId, nodeLabel, child_type)
             current_parent = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
@@ -147,13 +148,25 @@ class IfcNeo4jMapper:
 
 
 
-    def ParseObjectifiedRelationship(self, pName, pVal, sourceNodeId):
+    def mapObjectifiedRelationships(self):
+        unsorted = self.RelCacherList
+        # unify the objRels by guids
+        sorted = [] 
+        for i in unsorted: 
+            if i not in sorted: 
+                sorted.append(i) 
+        
+        sorted2 = list(set(unsorted))
 
-        # STEP 1: Parse all attributes
+        print(len(unsorted))
+        print(len(sorted))
+        print(len(sorted2))
 
-        # STEP 2: Store all new relationships in a suitable dict: {rel_label:
-        # [fromNodeID -> toNodeID] }
-
+        for objRel in sorted:
+            print('{} -> {}'.format(objRel.globalId, objRel.RelType))
+            print('outgoing: ')
+            for outs in objRel.outgoing_Rels:                
+                print('\t type: {} \t ref: {}'.format(outs.type, outs.target_guid))
 
         return 'doSomething'
                    

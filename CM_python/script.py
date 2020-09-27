@@ -44,6 +44,8 @@ for entity in entities:
     attributes = entity.items()   
     mapper.mapProperties(entity['globalId'], attributes)
                 
+# STEP 3: build objectified relationships
+mapper.mapObjectifiedRelationships()
 
 # finally disconnect
 connector.disconnect_driver()       
