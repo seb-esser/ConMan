@@ -151,25 +151,40 @@ class IfcNeo4jMapper:
     def mapObjectifiedRelationships(self):
         unsorted = self.RelCacherList
         # unify the objRels by guids
-        sorted = [] 
-        for i in unsorted: 
-            if i not in sorted: 
-                sorted.append(i) 
+
+        all_unsorted_guids = self.getGuidsFromList(unsorted)
+        sorted_guids = [] 
         
-        sorted2 = list(set(unsorted))
+        # unify list
+        for i in all_unsorted_guids: 
+            if i not in sorted_guids: 
+                sorted_guids.append(i) 
 
-        print(len(unsorted))
-        print(len(sorted))
-        print(len(sorted2))
+        # add rels to sorted_rel if not added yet 
+        sorted_rels = []
+        for i in unsorted:            
+            try:
+                already_added_guids = self.getGuidsFromList(sorted_rels)
+            except :
+                already_added_guids = []
+           
+            if i.globalId in sorted_guids and i.globalId not in already_added_guids:
+                sorted_rels.append(i)
 
-        for objRel in sorted:
+        for objRel in sorted_rels:
             print('{} -> {}'.format(objRel.globalId, objRel.RelType))
             print('outgoing: ')
             for outs in objRel.outgoing_Rels:                
                 print('\t type: {} \t ref: {}'.format(outs.type, outs.target_guid))
 
         return 'doSomething'
-                   
+            
+    def getGuidsFromList(self, rel_list):
+        returnList = []
+        for relationship in rel_list:
+            returnList.append(relationship.globalId)
+        return returnList
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     def CreateRelationship(self, sourceNodeId, qualifier, type, ref):
         match_source = 'MATCH(s) where ID(s) = {}'.format(sourceNodeId)
