@@ -7,10 +7,11 @@ from .IfcRelHelper.IfcObjRelCacher import IfcObjRelCacher, Rel
 class IfcNeo4jMapper:
 
         
-    def __init__(self, myConnector):
+    def __init__(self, myConnector, timestamp):
         print('Initialized mapper. ')
         self.connector = myConnector
         self.RelCacherList = []
+        self.timeStamp = timestamp
         pass
 
 
@@ -31,7 +32,7 @@ class IfcNeo4jMapper:
                 parent_owner_history = entity['ownerHistory']
                 OH_guid = parent_owner_history['ref']
                 cypher_statement = ''
-                cypher_statement = self.MergeRootedNodeWithOwnerHistory(OH_guid, response[0])
+                cypher_statement = self.MergeRootedNodeWithOwnerHistory(OH_guid, response[-1])
                 response = self.connector.run_cypher_statement(cypher_statement, 'ID(me)')
             except :
                 pass
@@ -40,10 +41,9 @@ class IfcNeo4jMapper:
 
     def mapProperties(self, entityGlobalId, attributes):
         # get node id of parent
-        root_node_id = self.connector.run_cypher_statement('MATCH(n) WHERE n.globalId = "{}" RETURN ID(n)'.format(entityGlobalId), 'ID(n)')
+        root_node_id = self.connector.run_cypher_statement('MATCH(n:{}) WHERE n.globalId = "{}" RETURN ID(n)'.format(self.timeStamp, entityGlobalId), 'ID(n)')
 
         root_node_id = root_node_id[0]
-
 
 
         # remove type and globalId from entity properties
@@ -193,14 +193,14 @@ class IfcNeo4jMapper:
         return self.BuildMultiStatement([match_source, match_target, merge, set_qualifier])
     
     def CreateRootedNode(self, entityId, entityType):
-        create = 'CREATE(n:{}:rootedNode)'.format(entityType)
+        create = 'CREATE(n:{}:rootedNode:{})'.format(entityType, self.timeStamp)
         setGuid = 'SET n.globalId = "{}"'.format(entityId)
         setEntityType = 'SET n.entityType = "{}"'.format(entityType)
         returnID = 'RETURN ID(n)'
         return self.BuildMultiStatement([create, setGuid, setEntityType, returnID])
 
     def AddAttributesToNode(self, nodeId, attributes):
-        match = 'MATCH(n) WHERE ID(n) = {}'.format(nodeId)
+        match = 'MATCH(n:{}) WHERE ID(n) = {}'.format(self.timeStamp, nodeId)
 
         for attr, val in attributes.items(): 
             if isinstance(val, str):
@@ -217,7 +217,7 @@ class IfcNeo4jMapper:
 
     def CreateAttributeNode(self, ParentId, NodeLabel, RelationshipLabel):
         match = 'MATCH (p) WHERE ID(p) = {}'.format(ParentId)
-        create = 'CREATE (n: {}:attrNode)'.format(NodeLabel)             
+        create = 'CREATE (n: {}:attrNode:{})'.format(NodeLabel, self.timeStamp)             
         merge = 'MERGE (p)-[:{}]->(n)'.format(RelationshipLabel)
         returnID = 'RETURN ID(n)'
 
@@ -228,22 +228,22 @@ class IfcNeo4jMapper:
         return self.BuildMultiStatement([match, create, merge, returnID])
 
     def MergeRootedNodeWithOwnerHistory(self, ownerHistoryGuid, myNodeId):
-        match = 'MATCH (p) WHERE p.globalId = "{}"'.format(ownerHistoryGuid)
+        match = 'MATCH (p:{}) WHERE p.globalId = "{}"'.format(self.timeStamp, ownerHistoryGuid)
         matchOwn = 'MATCH (me) WHERE ID(me) = {}'.format(myNodeId)
         merge = 'MERGE (me)-[:{}]->(p)'.format('IfcOwnerHistory')
         returnID = 'RETURN ID(me)'
         return self.BuildMultiStatement([match, matchOwn, merge, returnID])
 
     def CreateObjectifiedRelNode(self, relGuid, relType):
-        create = 'CREATE(n:{}:objRelNode)'.format(relType)
+        create = 'CREATE(n:{}:objRelNode:{})'.format(relType, self.timeStamp)
         setGuid = 'SET n.globalId = "{}"'.format(relGuid)
         setEntityType = 'SET n.entityType = "{}"'.format(relType)
         returnID = 'RETURN ID(n)'
         return self.BuildMultiStatement([create, setGuid, setEntityType, returnID])
 
     def MergeObjRelWithRootedNode(self, objRelGuid, targetNodeGuid, TypeFromRelToNode, TypeFromNodeToRel):
-        matchObjRel = 'MATCH (objrel) WHERE objrel.globalId = "{}"'.format(objRelGuid)
-        matchRootedObj = 'MATCH (rooted) WHERE rooted.globalId = "{}"'.format(targetNodeGuid)
+        matchObjRel = 'MATCH (objrel:{}) WHERE objrel.globalId = "{}"'.format(self.timeStamp, objRelGuid)
+        matchRootedObj = 'MATCH (rooted:{}) WHERE rooted.globalId = "{}"'.format(self.timeStamp, targetNodeGuid)
         merge1 = 'MERGE (objrel)-[:{}]->(rooted)'.format(TypeFromRelToNode)
         merge2 = 'MERGE (objrel)<-[:{}]-(rooted)'.format(TypeFromNodeToRel)
         returnID = 'RETURN ID(rooted)'
