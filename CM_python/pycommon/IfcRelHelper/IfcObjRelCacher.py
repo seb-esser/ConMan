@@ -19,8 +19,9 @@ class IfcObjRelCacher:
 
 class Rel:
 	
-	def __init__(self, ty, target):
+	def __init__(self, ty, inverseTy, target):
 		self.type = ty
+		self.inverseType = inverseTy
 		self.target_guid = target
 
 

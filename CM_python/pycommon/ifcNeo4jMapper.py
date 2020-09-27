@@ -58,12 +58,6 @@ class IfcNeo4jMapper:
 
     def _MapAttribute(self, pName, pVal, parentId):
             
-        #inverseAttrDetector = InverseAttrDectector()
-        #invAttr = inverseAttrDetector.IsInverseAttr(pName)
-
-        #if invAttr:
-        #    print('detected inverse attribute')
-
         objectified_rel_list = self.getObjectifiedRels()
 
 
@@ -105,13 +99,13 @@ class IfcNeo4jMapper:
                     # list or dict?
                     if isinstance(nestedRelVal, dict):
                          # print('\t{}'.format(nestedRelVal))
-                         rel = Rel(nestedRelVal['type'], nestedRelVal['ref'])
+                         rel = Rel(nestedRelName, pName, nestedRelVal['ref'])
                          relCache.AddOutgoingRel(rel)
 
                     elif isinstance(nestedRelVal, list):
                         for target in nestedRelVal:
                             # print('\t{}'.format(target))
-                            rel = Rel(target['type'], target['ref'])
+                            rel = Rel(nestedRelName, pName, target['ref'])
                             relCache.AddOutgoingRel(rel)
 
                 self.RelCacherList.append(relCache)
@@ -178,7 +172,7 @@ class IfcNeo4jMapper:
 
             for outs in objRel.outgoing_Rels:                
                 # print('\t type: {} \t ref: {}'.format(outs.type, outs.target_guid))
-                cypher_statement = self.MergeObjRelWithRootedNode(objRel.globalId, outs.target_guid, outs.type, outs.type)
+                cypher_statement = self.MergeObjRelWithRootedNode(objRel.globalId, outs.target_guid, outs.type, outs.inverseType)
                 self.connector.run_cypher_statement(cypher_statement)
 
         return 'doSomething'
