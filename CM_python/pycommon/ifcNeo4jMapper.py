@@ -172,10 +172,14 @@ class IfcNeo4jMapper:
                 sorted_rels.append(i)
 
         for objRel in sorted_rels:
-            print('{} -> {}'.format(objRel.globalId, objRel.RelType))
-            print('outgoing: ')
+            # print('{} -> {}'.format(objRel.globalId, objRel.RelType))
+            cypher_statement = self.CreateObjectifiedRelNode(objRel.globalId, objRel.RelType)
+            nodeId = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
+
             for outs in objRel.outgoing_Rels:                
-                print('\t type: {} \t ref: {}'.format(outs.type, outs.target_guid))
+                # print('\t type: {} \t ref: {}'.format(outs.type, outs.target_guid))
+                cypher_statement = self.MergeObjRelWithRootedNode(objRel.globalId, outs.target_guid, outs.type, outs.type)
+                self.connector.run_cypher_statement(cypher_statement)
 
         return 'doSomething'
             
@@ -193,15 +197,13 @@ class IfcNeo4jMapper:
         set_qualifier = 'SET r.Qualifier = {}'.format(qualifier)
 
         return self.BuildMultiStatement([match_source, match_target, merge, set_qualifier])
-        
-
+    
     def CreateRootedNode(self, entityId, entityType):
         create = 'CREATE(n:{}:rootedNode)'.format(entityType)
         setGuid = 'SET n.globalId = "{}"'.format(entityId)
         setEntityType = 'SET n.entityType = "{}"'.format(entityType)
         returnID = 'RETURN ID(n)'
         return self.BuildMultiStatement([create, setGuid, setEntityType, returnID])
-
 
     def AddAttributesToNode(self, nodeId, attributes):
         match = 'MATCH(n) WHERE ID(n) = {}'.format(nodeId)
@@ -218,7 +220,6 @@ class IfcNeo4jMapper:
         returnID = 'RETURN n'
 
         return self.BuildMultiStatement([match, add_param, returnID])
-
 
     def CreateAttributeNode(self, ParentId, NodeLabel, RelationshipLabel):
         match = 'MATCH (p) WHERE ID(p) = {}'.format(ParentId)
@@ -237,8 +238,22 @@ class IfcNeo4jMapper:
         matchOwn = 'MATCH (me) WHERE ID(me) = {}'.format(myNodeId)
         merge = 'MERGE (me)-[:{}]->(p)'.format('IfcOwnerHistory')
         returnID = 'RETURN ID(me)'
-
         return self.BuildMultiStatement([match, matchOwn, merge, returnID])
+
+    def CreateObjectifiedRelNode(self, relGuid, relType):
+        create = 'CREATE(n:{}:objRelNode)'.format(relType)
+        setGuid = 'SET n.globalId = "{}"'.format(relGuid)
+        setEntityType = 'SET n.entityType = "{}"'.format(relType)
+        returnID = 'RETURN ID(n)'
+        return self.BuildMultiStatement([create, setGuid, setEntityType, returnID])
+
+    def MergeObjRelWithRootedNode(self, objRelGuid, targetNodeGuid, TypeFromRelToNode, TypeFromNodeToRel):
+        matchObjRel = 'MATCH (objrel) WHERE objrel.globalId = "{}"'.format(objRelGuid)
+        matchRootedObj = 'MATCH (rooted) WHERE rooted.globalId = "{}"'.format(targetNodeGuid)
+        merge1 = 'MERGE (objrel)-[:{}]->(rooted)'.format(TypeFromRelToNode)
+        merge2 = 'MERGE (objrel)<-[:{}]-(rooted)'.format(TypeFromNodeToRel)
+        returnID = 'RETURN ID(rooted)'
+        return self.BuildMultiStatement([matchObjRel, matchRootedObj, merge1, merge2, returnID])
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # identifies an ReferenceObject
