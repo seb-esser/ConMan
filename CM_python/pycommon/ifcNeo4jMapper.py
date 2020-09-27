@@ -97,13 +97,22 @@ class IfcNeo4jMapper:
                 self.RelCacherList.append(relCache)
                 # reduce pVal:
                 exlude = ['globalId', 'type', 'ownerHistory']
-                reduced_properties = {key: val for key,val in pVal if key not in exlude}
+                reduced_properties = {key: val for key,val in pVal.items() if key not in exlude}
 
                 # try to catch all relationships stored within reduced_pVal
+                for nestedRelName, nestedRelVal in reduced_properties.items():
+                    print('{}:'.format(nestedRelName))
+
+                    # list or dict?
+                    if isinstance(nestedRelVal, dict):
+                         print('\t{}'.format(nestedRelVal))
+
+                    elif isinstance(nestedRelVal, list):
+                        for target in nestedRelVal:
+                            print('\t{}'.format(target))
 
 
-                print(pVal)
-                
+                # print(reduced_properties)
                 return
                 # build_refs_from_to = self.ParseObjectifiedRelationship(pVal)
                            
