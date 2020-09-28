@@ -1,7 +1,7 @@
 {
   "fileSchema": "IFC.JSON-4",
   "originatingSystem": "IFC2JSON_python",
-  "timeStamp": "2020-09-28T08:28:03",
+  "timeStamp": "2020-09-14T10:08:19",
   "data": [
     {
       "type": "IfcOwnerHistory",
@@ -14,7 +14,7 @@
         },
         "theOrganization": {
           "type": "IfcOrganization",
-          "name": "Unknown"
+          "name": "Technical University of Munich, Chair of Computational Modeling and Simulation"
         }
       },
       "owningApplication": {
@@ -23,21 +23,21 @@
           "type": "IfcOrganization",
           "name": "Geometry Gym Pty Ltd"
         },
-        "version": "0.1.1.0",
-        "applicationFullName": "DynamoSandbox v2.8.0.2471",
-        "applicationIdentifier": "DynamoSandbox v2.8.0.2471"
+        "version": "0.1.0.0",
+        "applicationFullName": "ConsoleCreateSpatialStructure v1.0.0.0",
+        "applicationIdentifier": "ConsoleCreateSpatialStructure v1.0.0.0"
       },
       "changeAction": "ADDED",
-      "lastModifiedDate": 1601272050,
-      "creationDate": 1601272050,
-      "globalId": "bf76e752-abd7-4377-8d90-a700ec8577a2"
+      "lastModifiedDate": 1599814909,
+      "creationDate": 1599814909,
+      "globalId": "d367f51a-3a93-4f25-86d7-c2e2eb06dd6b"
     },
     {
       "type": "IfcSite",
-      "globalId": "5191f4e3-e3cf-4473-86ea-67544adddfee",
+      "globalId": "24291367-cdfd-4dc0-826d-39f3b7877602",
       "ownerHistory": {
         "type": "IfcOwnerHistory",
-        "ref": "bf76e752-abd7-4377-8d90-a700ec8577a2"
+        "ref": "d367f51a-3a93-4f25-86d7-c2e2eb06dd6b"
       },
       "name": "sampleSite",
       "objectPlacement": {
@@ -64,19 +64,19 @@
       "decomposes": [
         {
           "type": "IfcRelAggregates",
-          "globalId": "3f935f55-6cfc-41a8-9379-43e5254f221a",
+          "globalId": "7da07914-44a3-457e-8ce1-adc820e8daa8",
           "ownerHistory": {
             "type": "IfcOwnerHistory",
-            "ref": "bf76e752-abd7-4377-8d90-a700ec8577a2"
+            "ref": "d367f51a-3a93-4f25-86d7-c2e2eb06dd6b"
           },
           "relatingObject": {
             "type": "IfcProject",
-            "ref": "3530ca45-87e3-4d9d-9ac4-2e41c79e4940"
+            "ref": "30e11913-6af9-4bf0-90c8-ebd1356672fe"
           },
           "relatedObjects": [
             {
               "type": "IfcSite",
-              "ref": "5191f4e3-e3cf-4473-86ea-67544adddfee"
+              "ref": "24291367-cdfd-4dc0-826d-39f3b7877602"
             }
           ]
         }
@@ -84,12 +84,12 @@
     },
     {
       "type": "IfcProject",
-      "globalId": "3530ca45-87e3-4d9d-9ac4-2e41c79e4940",
+      "globalId": "30e11913-6af9-4bf0-90c8-ebd1356672fe",
       "ownerHistory": {
         "type": "IfcOwnerHistory",
-        "ref": "bf76e752-abd7-4377-8d90-a700ec8577a2"
+        "ref": "d367f51a-3a93-4f25-86d7-c2e2eb06dd6b"
       },
-      "name": "sampleProject",
+      "name": "myProject",
       "unitsInContext": {
         "type": "IfcUnitAssignment",
         "units": [
@@ -135,19 +135,19 @@
       "isDecomposedBy": [
         {
           "type": "IfcRelAggregates",
-          "globalId": "3f935f55-6cfc-41a8-9379-43e5254f221a",
+          "globalId": "7da07914-44a3-457e-8ce1-adc820e8daa8",
           "ownerHistory": {
             "type": "IfcOwnerHistory",
-            "ref": "bf76e752-abd7-4377-8d90-a700ec8577a2"
+            "ref": "d367f51a-3a93-4f25-86d7-c2e2eb06dd6b"
           },
           "relatingObject": {
             "type": "IfcProject",
-            "ref": "3530ca45-87e3-4d9d-9ac4-2e41c79e4940"
+            "ref": "30e11913-6af9-4bf0-90c8-ebd1356672fe"
           },
           "relatedObjects": [
             {
               "type": "IfcSite",
-              "ref": "5191f4e3-e3cf-4473-86ea-67544adddfee"
+              "ref": "24291367-cdfd-4dc0-826d-39f3b7877602"
             }
           ]
         }
