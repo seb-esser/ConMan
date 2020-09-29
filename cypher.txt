@@ -31,3 +31,17 @@ match(n:IfcSite) with
 with apoc.create.vNode([] ) as vn
 
 return vn
+
+
+MATCH (n:IfcProject)
+with apoc.hashing.fingerprint(n)  as hash
+Return hash
+
+
+match(n:rootedNode:version20200928T082803)
+CALL{ WITH n 
+REMOVE n:version20200928T082803
+with apoc.hashing.fingerprint(n) as hash 
+RETURN hash}
+SET n:version20200928T082803
+RETURN n, hash

@@ -58,3 +58,8 @@ class Neo4jConnector:
     def disconnect_driver(self):
         self.my_driver.close()
         print('Driver disconnected.')
+
+
+    # constructs a multi statement cypher command
+    def BuildMultiStatement(self, cypherCMDs):
+         return ' '.join(cypherCMDs)
