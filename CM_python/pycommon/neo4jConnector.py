@@ -37,19 +37,19 @@ class Neo4jConnector:
 
         with self.my_driver.session() as session:
             with session.begin_transaction() as tx:
-                print("\t -- Performing: " + statement + '\n')
+                print("[neo4j_connector] Performing: " + str(statement)[:50] + '...')
                 res = tx.run(statement)
                 
                 return_val = []
 
                 if postStatement != None:
                     for record in res:
-                       print(record[postStatement])
+                       # print(record[postStatement])
                        return_val.append(record[postStatement])
                    
                 else: 
                     for record in res:
-                       print(record)
+                       # print(record)
                        return_val.append(record)
         return return_val
 

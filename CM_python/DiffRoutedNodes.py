@@ -9,7 +9,7 @@ def GetHashes(label):
 	calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash RETURN hash'
 	close_sub = '}'
 	add_label_again = 'SET n:{}'.format(label)
-	return_results = 'RETURN hash, n.EntityType'
+	return_results = 'RETURN hash, n.entityType'
 	return [getModel, open_sub, removeLabel, calc_fingerprint,close_sub, add_label_again, return_results]
 
 
@@ -29,14 +29,16 @@ hash_statement_updated = GetHashes(label_updated)
 cypher_hash_init = connector.BuildMultiStatement(hash_statement_init)
 cypher_hash_updated = connector.BuildMultiStatement(hash_statement_updated)
 
-res_init = connector.run_cypher_statement(cypher_hash_init, 'hash')
-res_updated = connector.run_cypher_statement(cypher_hash_updated, 'hash')
+res_init = connector.run_cypher_statement(cypher_hash_init)
+res_updated = connector.run_cypher_statement(cypher_hash_updated)
 
-print('\n --- HASHES for initial model: ')
+# output
+print('\n')
+print('[DiffCalc] HASHES for initial model: ')
 for res in res_init:
 	print(res)
 print('\n')
-print('\n --- HASHES for updated model: ')
+print('[DiffCalc] HASHES for updated model: ')
 for res in res_updated:
 	print(res)
 
