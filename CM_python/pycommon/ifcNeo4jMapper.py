@@ -249,6 +249,12 @@ class IfcNeo4jMapper:
         returnID = 'RETURN ID(rooted)'
         return self.BuildMultiStatement([matchObjRel, matchRootedObj, merge1, merge2, returnID])
 
+    def DeleteNode(self, nodeId):
+        match = 'MATCH (n) WHERE ID(n) = {}'.format(nodeId)
+        detach = 'DETACH'
+        delete = 'DELETE n'
+        return self.BuildMultiStatement([match, detach, delete])
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     # identifies an ReferenceObject
     def DetectReferenceObject(self, nestedValDict): 

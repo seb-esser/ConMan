@@ -1,0 +1,3 @@
+[submodule "IFCtoRDF"]
+	path = IFCtoRDF
+	url = https://github.com/pipauwel/IFCtoRDF.git

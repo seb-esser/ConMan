@@ -1,0 +1,27 @@
+{
+    "header": {
+        "name": "patchSample",
+        "ID": "1",
+        "checksum_initial": null
+    },
+    "data": {
+        "insertOperations": {
+            "anchorId": null,
+            "operation": null
+        },
+        "modifyOperations": {
+            "anchorId": null,
+            "operation": null
+        },
+        "deleteOperations": {
+            "anchorId": null,
+            "operation": null
+        },
+        // RDF translation
+        "translations": {
+            "toRailML": null,
+            "toPlanPro": null,
+            "toIFC": null
+        }
+    }
+}
