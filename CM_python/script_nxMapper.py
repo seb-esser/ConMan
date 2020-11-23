@@ -8,42 +8,57 @@ print('nX mapper')
 ifc_initial = './processedModels/spatial_initial.ifc'
 ifc_updated = './processedModels/spatial_updated.ifc'
 
-mapper = IfcNetworkXMapper()
-model = mapper.loadIfcModel(ifc_initial)
-ifc_objDefs = model.by_type('IfcObjectDefinition')
-ifc_Rels = model.by_type('IfcRelationship')
+mapper_initial = IfcNetworkXMapper()
+mapper_initial.loadIfcModel(ifc_initial)
 
-for ent in ifc_objDefs: 
-	print('{} references:'.format(ent.Name))
-	try:
-	    print(model.get_traverse(ent))
-	except :
-	    pass
+mapper_updated = IfcNetworkXMapper()
+mapper_updated.loadIfcModel(ifc_updated)
 
-	print('{} gets referenced by:'.format(ent.Name))
-	try:
-	    print(model.get_inverse(ent))
-	except :
-	    pass
+print('basic quanitites of initial model:')
+mapper_initial.getBasicMetaDataFromModel()
+print('basic quanitites of updated model:')
+mapper_updated.getBasicMetaDataFromModel()
+
+
+
+
+
+
+#for ent in ifc_objDefs: 
+#	print('{} references:'.format(ent.Name))
+#	try:
+#	    print(model.get_traverse(ent))
+#	except :
+#	    pass
+
+#	print('{} gets referenced by:'.format(ent.Name))
+#	try:
+#	    print(model.get_inverse(ent))
+#	except :
+#	    pass
 	
-	print('\n')
+#	print('\n')
 
-for ent in ifc_Rels: 
-	print('{} references:'.format(ent.Name))
-	try:
-	    print(model.get_traverse(ent))
-	except :
-	    pass
+#for ent in ifc_objDefs: 
+#	print('{} references:'.format(ent))
+#	try:
+#		references = model.traverse(ent, max_levels=1)
+#		for ref in references:
+#			print(ref.Name)
+#	except :
+#	    pass
 
-	print('{} gets referenced by:'.format(ent.Name))
-	try:
-	    print(model.get_inverse(ent))
-	except :
-	    pass
+#	print('{} gets referenced by:'.format(ent))
+#	try:
+#		references = model.traverse(ent, max_levels=1)
+#		for ref in references:
+#			print(ref.Name)
+#	except :
+#	    pass
 	
-	print('\n')
+#	print('\n')
 
-	# print(ent.get_info())
+#	# print(ent.get_info())
 
 
 

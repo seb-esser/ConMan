@@ -18,7 +18,16 @@ class IfcNetworkXMapper(IfcMapper):
 		self.ifc_model = ifcopenshell.open(path)
 		return self.ifc_model
 		 
-	
+	def getBasicMetaDataFromModel(self):
+		ifc_objDefs = self.ifc_model.by_type('IfcObjectDefinition')
+		ifc_Rels = self.ifc_model.by_type('IfcRelationship')
+		ifc_properties = self.ifc_model.by_type('IfcPropertyDefinition') 
+
+		print(' Amt IfcObjectDefinition: \t {}'.format(len(ifc_objDefs)))
+		print(' Amt IfcRelationship: \t {}'.format(len(ifc_Rels)))
+		print(' Amt IfcPropertyDefinition: \t {}\n'.format(len(ifc_properties)))
+
+		
 
 
 

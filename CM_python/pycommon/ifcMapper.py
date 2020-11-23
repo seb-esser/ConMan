@@ -3,6 +3,7 @@
 class IfcMapper:
 	
 	def __init__(self):
-		print('[IfcMapper] Initialized IFC Mapper.')
+		# print('[IfcMapper] Initialized new IFC Mapper instance')
+		pass
 
 
