@@ -1,6 +1,6 @@
 import json
 import os
-import ifcopenshell
+
 
 from pycommon.ifcNeo4jMapper import IfcNeo4jMapper
 from pycommon.neo4jConnector import Neo4jConnector
