@@ -3,19 +3,18 @@ import types
 from .neo4jConnector import Neo4jConnector 
 from .IfcRelHelper.InverseAttrDetector import InverseAttrDectector
 from .IfcRelHelper.IfcObjRelCacher import IfcObjRelCacher, Rel
+from .ifcMapper import IfcMapper
 
-class IfcNeo4jMapper:
+
+class IfcNeo4jMapper(IfcMapper):
 
         
     def __init__(self, myConnector, timestamp):
-        print('Initialized mapper. ')
         self.connector = myConnector
         self.RelCacherList = []
         self.timeStamp = timestamp
-        pass
+        super().__init__()
 
-
-    
 
     def mapEntities(self, entities):
         # STEP 1: create all routed entities and add their guids
