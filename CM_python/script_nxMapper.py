@@ -19,8 +19,9 @@ mapper_initial.getBasicMetaDataFromModel()
 print('basic quanitites of updated model:')
 mapper_updated.getBasicMetaDataFromModel()
 
-
-
+mapper_initial.mapEntity()
+mapper_initial.mapObjRelationships()
+mapper_initial.printGraph()
 
 
 
