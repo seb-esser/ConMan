@@ -34,24 +34,30 @@ class Neo4jConnector:
         #    'getId' : (lambda record: result = record['ID(n)'] ), 
         #    'getGlobalId' : (lambda record: result = record['globalId'] )
         #    }
-
-        with self.my_driver.session() as session:
-            with session.begin_transaction() as tx:
-                print("[neo4j_connector] Performing: " + str(statement)[:50] + '...')
-                res = tx.run(statement)
+        try:
+            with self.my_driver.session() as session:
+                with session.begin_transaction() as tx:
+                    print("[neo4j_connector] Running query: " + str(statement)[:50] + '...')
+                    res = tx.run(statement)
                 
-                return_val = []
+                    return_val = []
 
-                if postStatement != None:
-                    for record in res:
-                       # print(record[postStatement])
-                       return_val.append(record[postStatement])
+                    if postStatement != None:
+                        for record in res:
+                           # print(record[postStatement])
+                           return_val.append(record[postStatement])
                    
-                else: 
-                    for record in res:
-                       # print(record)
-                       return_val.append(record)
-        return return_val
+                    else: 
+                        for record in res:
+                           # print(record)
+                           return_val.append(record)
+                print('[neo4j_connector] Received response. ')
+                return return_val
+
+        except :
+            print('[neo4j_connector] something went wrong. Check the neo4j connector. ')
+            
+       
 
 
 
