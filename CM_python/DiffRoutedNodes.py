@@ -1,4 +1,7 @@
 ""
+
+import numpy as np
+
 from pycommon.neo4jConnector import Neo4jConnector
 
 # defs
@@ -36,6 +39,19 @@ def extractHashes(result):
 
 	return return_dict
 
+def GetAdjacencyMatrixByNodeId(i, j):	
+	#match1 = 'MATCH (n) WHERE ID(n) = {}'.format(i)
+	#match2 = 'MATCH (m) WHERE ID(m) = {}'.format(j)		
+	#case = 'CASE size((n)--(m))'
+	#ifState = 'WHEN 0 THEN 0'
+	#elseState = 'ELSE 1'
+	#endif = 'END AS adjacent'
+	#ret = 'RETURN adjacent'
+	match1 = 'MATCH (n) WHERE ID(n) = {}'.format(i)
+	match2 = 'MATCH (m) WHERE ID(m) = {}'.format(j)
+	ret = 'RETURN ID(n), ID(m), EXISTS ((n)--(m)) as is_connected'
+
+	return [match1, match2, ret]
 
 # -- ... --
 
@@ -109,3 +125,31 @@ for node in nodes_deleted:
 print('Added nodes: ')
 for node in nodes_added: 
 	print('\t Node {}'.format(node))
+
+print('\n ---- ---- ')
+
+hashes_init_list = list(hashes_init.keys()); 
+hashes_init_list.sort()
+
+hashes_updated_list = list(hashes_updated.keys()); 
+hashes_init_list.sort()
+
+adj_init = []
+
+# calc adjacency for initial
+for i in hashes_init.values(): 
+	row = []
+	for j in hashes_init.values(): 
+		cy = GetAdjacencyMatrixByNodeId(i, j)
+		res = connector.run_cypher_statement(connector.BuildMultiStatement(cy), 'is_connected')
+		
+		if res[0] == False: 
+			row.append(0)
+		else: 
+			row.append(1)
+
+	adj_init.append(row)
+
+print(adj_init)
+		
+

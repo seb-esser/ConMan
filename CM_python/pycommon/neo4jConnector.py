@@ -29,7 +29,7 @@ class Neo4jConnector:
                     print(record)
 
     def run_cypher_statement(self, statement, postStatement=None):
-
+        """ executes a given cypher statement and does some post processing if stated """
         #returnTypes = {
         #    'getId' : (lambda record: result = record['ID(n)'] ), 
         #    'getGlobalId' : (lambda record: result = record['globalId'] )
