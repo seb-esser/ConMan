@@ -1,6 +1,6 @@
 ""
 
-import numpy as np
+# import numpy as np
 
 from pycommon.neo4jConnector import Neo4jConnector
 
@@ -95,25 +95,29 @@ print('\n[DiffCalc] Mapping the hashcodes between initial and updated: ')
 
 # loop over all initial nodes
 nodes_deleted = []
-
+print('\n[TASK] Looking for hashes from the initial graph... \n')
 for key, val in hashes_init.items():
+	print('\t hash: {}'.format(key))
 	if key in hashes_updated.keys():
 		print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_updated[key], key))
 		# run cypher to connect both nodes 
 		cypher_connect = ConnectNodesWithSameHash(hashes_init[key], hashes_updated[key])
-		connector.run_cypher_statement(connector.BuildMultiStatement(cypher_connect))
+		# connector.run_cypher_statement(connector.BuildMultiStatement(cypher_connect))
 	else: 
 		print('\t[RESULT] No match for hashsum {}. Node {} from the initial graph has no matching partner in the updated graph.'.format(key, val))
 		nodes_deleted.append(val);
 
 nodes_added = []
+
+print('\n[TASK] Looking for hashes from the updated graph... \n')
 # loop over updated nodes
 for key, val in hashes_updated.items():
+	print('\t hash: {}'.format(key))
 	if key in hashes_init.keys():
 		print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_init[key], key))
 		# run cypher to connect both nodes 
 		cypher_connect = ConnectNodesWithSameHash(hashes_updated[key], hashes_init[key])
-		connector.run_cypher_statement(connector.BuildMultiStatement(cypher_connect))
+		# connector.run_cypher_statement(connector.BuildMultiStatement(cypher_connect))
 	else: 
 		print('\t[RESULT] No match for hashsum {}. Node {} from the updated graph has no matching partner in the initial graph.'.format(key, val))
 		nodes_added.append(val)
@@ -132,24 +136,61 @@ hashes_init_list = list(hashes_init.keys());
 hashes_init_list.sort()
 
 hashes_updated_list = list(hashes_updated.keys()); 
-hashes_init_list.sort()
+hashes_updated_list.sort()
 
 adj_init = []
 
 # calc adjacency for initial
-for i in hashes_init.values(): 
-	row = []
-	for j in hashes_init.values(): 
-		cy = GetAdjacencyMatrixByNodeId(i, j)
-		res = connector.run_cypher_statement(connector.BuildMultiStatement(cy), 'is_connected')
-		
-		if res[0] == False: 
-			row.append(0)
-		else: 
-			row.append(1)
+def calcAdjacencyMatrix(hashes_sorted, hash_dict):
+	adj = []
+	for hash_i in hashes_sorted: 
+		node_i = hash_dict[hash_i]
+		row = []
+		for hash_j in hashes_sorted: 
+			node_j = hash_dict[hash_j]
+			cy = GetAdjacencyMatrixByNodeId(node_i, node_j)
+			res = connector.run_cypher_statement(connector.BuildMultiStatement(cy), 'is_connected')
+			
+			if res[0] == False: 
+				row.append(0)
+			else: 
+				row.append(1)
+	
+		adj.append(row)
+	return adj
 
-	adj_init.append(row)
+adj_init = calcAdjacencyMatrix(hashes_init_list, hashes_init)
+adj_updated = calcAdjacencyMatrix(hashes_updated_list, hashes_updated)
 
-print(adj_init)
-		
 
+	
+def print_grid(adj, hash_list): 
+	i = 0
+	for row in adj:
+		# print('{0:<30}'.format(hash_list[i]))
+		j = 0
+		for col in row:
+			# print('{0:<30}'.format(hash_list[j]))
+			print(col,end='\t')
+			j +=1
+		print()
+		i +=1
+	print('\n\n')
+
+print('[TASK] Compare edges by adjacency matrix')
+
+print('Adjacency Mtx initial model - sorted by hashes:')
+i = 0
+for hash in hashes_init_list: 
+	print('row|col {} : {}'.format(i, hash))
+	i +=1
+print()
+print_grid(adj_init, hashes_init_list)
+
+print('Adjacency Mtx updated model - sorted by hashes:')
+i = 0
+for hash in hashes_updated_list: 
+	print('row|col {} : {}'.format(i, hash))
+	i +=1
+print()
+print_grid(adj_updated, hashes_updated_list)
