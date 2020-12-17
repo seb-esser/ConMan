@@ -5,7 +5,7 @@
     <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>GraphBasedModelDiff.py</StartupFile>
+    <StartupFile>script_GraphBasedModelDiff.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -25,7 +25,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="common_base\ifcMapper.py" />
-    <Compile Include="GraphBasedModelDiff.py" />
+    <Compile Include="script_GraphBasedModelDiff.py" />
     <Compile Include="grGen_middleware\ifcGrGen_SchemaMapper.py" />
     <Compile Include="neo4j_middleware\DiffIgnore_parser.py" />
     <Compile Include="neo4j_middleware\ifcGrGen_SchemaMapper.py" />
