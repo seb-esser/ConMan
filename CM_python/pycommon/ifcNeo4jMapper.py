@@ -4,7 +4,7 @@ from .neo4jConnector import Neo4jConnector
 from .IfcRelHelper.InverseAttrDetector import InverseAttrDectector
 from .IfcRelHelper.IfcObjRelCacher import IfcObjRelCacher, Rel
 from .ifcMapper import IfcMapper
-
+from .neo4jQeryUtilites import neo4jQueryUtilities as neo4jUtils
 
 class IfcNeo4jMapper(IfcMapper):
 
@@ -188,7 +188,7 @@ class IfcNeo4jMapper(IfcMapper):
         match_target = 'MATCH(t) where t.globalId = "{}"'.format(ref)
         merge = 'MERGE (s)-[r.{}]->(t)'.format(type)
         set_qualifier = 'SET r.Qualifier = {}'.format(qualifier)
-
+        
         return self.BuildMultiStatement([match_source, match_target, merge, set_qualifier])
     
     def CreateRootedNode(self, entityId, entityType):
@@ -264,10 +264,9 @@ class IfcNeo4jMapper(IfcMapper):
         else:
            return False
 
-    # constructs a multi statement cypher command
-    def BuildMultiStatement(self, cypherCMDs):
-         return ' '.join(cypherCMDs)
 
+    def BuildMultiStatement(self, cypherCMDs):
+		return ' '.join(cypherCMDs)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # - - - - -
     def getObjectifiedRels(self): 

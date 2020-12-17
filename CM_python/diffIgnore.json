@@ -1,0 +1,12 @@
+{
+  "IgnoreNodeLabels": [
+    "IfcOwnerHistory"
+    ],
+
+  "IgnoreNodeAttributes": 
+  [
+    "globalId"
+  ]
+
+
+}
