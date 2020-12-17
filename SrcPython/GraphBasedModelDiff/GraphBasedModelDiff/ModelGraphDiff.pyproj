@@ -5,7 +5,7 @@
     <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>script_parseIFCjson.py</StartupFile>
+    <StartupFile>GraphBasedModelDiff.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
