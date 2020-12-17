@@ -1,0 +1,22 @@
+{
+  "name": "cm-server",
+  "version": "1.0.0",
+  "description": "ConsistenyManager central server managing the information bus",
+  "main": "server.js",
+  "scripts": {
+    "debug": "nodemon server",
+    "test": "node server"
+  },
+  "author": "Sebastian Esser",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "morgan": "^1.10.0",
+    "path": "^0.12.7",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}

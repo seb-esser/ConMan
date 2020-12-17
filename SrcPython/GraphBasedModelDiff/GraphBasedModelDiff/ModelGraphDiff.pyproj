@@ -1,0 +1,87 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
+    <ProjectHome>
+    </ProjectHome>
+    <StartupFile>script_parseIFCjson.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>ModelGraphDiff</Name>
+    <RootNamespace>GraphBasedModelDiff</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <InterpreterId>CondaEnv|CondaEnv|ConsistencyManager</InterpreterId>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="common_base\ifcMapper.py" />
+    <Compile Include="GraphBasedModelDiff.py" />
+    <Compile Include="grGen_middleware\ifcGrGen_SchemaMapper.py" />
+    <Compile Include="neo4j_middleware\DiffIgnore_parser.py" />
+    <Compile Include="neo4j_middleware\ifcGrGen_SchemaMapper.py" />
+    <Compile Include="neo4j_middleware\IFCjson_neo4jMapper.py" />
+    <Compile Include="neo4j_middleware\IFCp21_neo4jMapper.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="neo4j_middleware\IfcRelHelper\IfcObjRelCacher.py" />
+    <Compile Include="neo4j_middleware\IfcRelHelper\InverseAttrDetector.py" />
+    <Compile Include="neo4j_middleware\neo4jConnector.py" />
+    <Compile Include="neo4j_middleware\neo4jGraphFactory.py" />
+    <Compile Include="neo4j_middleware\neo4jQueryFactory.py" />
+    <Compile Include="neo4j_middleware\neo4jQueryUtilities.py" />
+    <Compile Include="networkX_middleware\ifcNetworkXMapper.py" />
+    <Compile Include="script_GrGen.py" />
+    <Compile Include="script_parseIFCjson.py" />
+    <Compile Include="script_nxMapper.py" />
+    <Compile Include="script_parseIFCp21.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="00_sampleData\IFC_stepP21\" />
+    <Folder Include="00_sampleData\IFC_json\" />
+    <Folder Include="neo4j_middleware\" />
+    <Folder Include="common_base\" />
+    <Folder Include="grGen_middleware\" />
+    <Folder Include="neo4j_middleware\IfcRelHelper\" />
+    <Folder Include="networkX_middleware\" />
+    <Folder Include="00_sampleData\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="00_sampleData\IFC_json\output_model01_v4.json" />
+    <Content Include="00_sampleData\IFC_json\output_model01_v5.json" />
+    <Content Include="00_sampleData\IFC_json\output_model02_v4.json" />
+    <Content Include="00_sampleData\IFC_json\output_model02_v5.json" />
+    <Content Include="00_sampleData\IFC_json\spatial_initial.json" />
+    <Content Include="00_sampleData\IFC_json\spatial_initial_old.json" />
+    <Content Include="00_sampleData\IFC_json\spatial_updated.json" />
+    <Content Include="00_sampleData\IFC_json\spatial_updated_old.json" />
+    <Content Include="00_sampleData\IFC_stepP21\sampleModel2x3.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\sampleModel4x1.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\sampleModel4x2.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\sampleModel4x3.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\spatial_initial.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\spatial_updated.ifc" />
+    <Content Include="neo4j_middleware\diffIgnore.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="CondaEnv|CondaEnv|ConsistencyManager" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>
