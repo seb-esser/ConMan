@@ -18,7 +18,7 @@ class IFCp21_neo4jMapper:
     # public entry
     def mapEntities(self, rootedEntities): 
         for entity in rootedEntities: 
-            getDirectChildren(entity)
+            self.getDirectChildren(entity)
 
     # private recursive function
     def getDirectChildren(entity, indend): 
