@@ -12,3 +12,9 @@ class neo4jQueryUtilities:
 	def BuildMultiStatement(self, cypherCMDs):
 		return ' '.join(cypherCMDs)
 
+	@classmethod
+	def removeAttrsFromDict(self, dictionary, exlude):
+
+
+
+

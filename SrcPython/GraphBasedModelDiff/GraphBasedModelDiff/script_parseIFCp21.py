@@ -4,82 +4,37 @@ import ifcopenshell
 
 """ class import """
 from neo4j_middleware.IFCp21_neo4jMapper import IFCp21_neo4jMapper
+from neo4j_middleware.neo4jGraphFactory import neo4jGraphFactory
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
 # --- defs ---
 
-def getDirectChildren(entity, indend): 
-    print("".ljust(indend*4) + '{}'.format(entity))
-
-    # print atomic attributes: 
-    info = entity.get_info()
-    excludeKeys = ['id', 'type']
-    attrs_dict = {key: val for key, val in info.items() if key not in excludeKeys }    
-    filtered_attrs = {}
-
-    # remove traverse attrs
-    for key, val in attrs_dict.items():
-        if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) or isinstance(val, list): 
-            filtered_attrs[key] = val
-    if len(filtered_attrs.items()) > 0: 
-        print("\t".ljust(indend*4) + '{}'.format(filtered_attrs))
-
-    # query all traversal entities
-    children = model.traverse(entity, 1)
-    
-
-
-    if len(children) == 1:
-        # print("".ljust(indend*4) + '{}'.format(entity))
-        entity = children[0]
-        entity_dict = entity.__dict__
-        my_id = entity_dict['id']
-        my_type = entity_dict['type']
-
-        # decode wrapped values
-
-         
-        #if 'wrappedValue' in entity_dict.keys(): 
-        #    print('measure')
-           
-        # toDo: append the value to the parent node
-
-        exclude = ['id', 'type']
-        attr_dict = {key: val for key, val in entity_dict.items() if key not in exclude}
-        print("\t".ljust(indend*4) + '{}'.format(attr_dict))      
-
-        return children
-    else: 
-        
-
-        entity_dict = children[0].__dict__
-        my_id = entity_dict['id']
-        my_type = entity_dict['type']
-
-
-        for child in children[1:]:
-            children = getDirectChildren(child, indend + 1)
-
 
 # --- Script --- 
 
-print('TestScript to map a given IFC model into a simplified Neo4j graph \n')
+print('Parsing Ifc StepP21 model to Neo4j.... \n')
+print('connecting to neo4j database... ')
+connector = Neo4jConnector()
+connector.connect_driver()
 
-model_path = './00_sampleData/IFC_stepP21/sampleModel4x2.ifc'
+model_path = './00_sampleData/IFC_stepP21/sampleModel4x1.ifc'
 
 model = ifcopenshell.open(model_path)
 
 # --- get all rooted entities -> GUID exists ---
 
 # loop over all entities
-for obj_definition in model.by_type('IfcObjectDefinition'): 
-    # print(obj_definition)
+obj_definitions =  model.by_type('IfcObjectDefinition')
 
-    getDirectChildren(obj_definition, 0)
-    
+# init mapper
+mapper = IFCp21_neo4jMapper(connector, 'P21DefaultTimestamp')
+# parse rooted node + subgraphs
+mapper.mapEntities(obj_definitions)
 
-        
+
+# disconnect from database
+connector.disconnect_driver()
 
 
 
