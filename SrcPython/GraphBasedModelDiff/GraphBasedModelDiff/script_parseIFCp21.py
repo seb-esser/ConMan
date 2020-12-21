@@ -10,11 +10,28 @@ from neo4j_middleware.neo4jConnector import Neo4jConnector
 # --- defs ---
 
 def getDirectChildren(entity, indend): 
-    
+    print("".ljust(indend*4) + '{}'.format(entity))
+
+    # print atomic attributes: 
+    info = entity.get_info()
+    excludeKeys = ['id', 'type']
+    attrs_dict = {key: val for key, val in info.items() if key not in excludeKeys }    
+    filtered_attrs = {}
+
+    # remove traverse attrs
+    for key, val in attrs_dict.items():
+        if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) or isinstance(val, list): 
+            filtered_attrs[key] = val
+    if len(filtered_attrs.items()) > 0: 
+        print("\t".ljust(indend*4) + '{}'.format(filtered_attrs))
+
+    # query all traversal entities
     children = model.traverse(entity, 1)
+    
+
 
     if len(children) == 1:
-        print("".ljust(indend*4) + '{}'.format(entity))
+        # print("".ljust(indend*4) + '{}'.format(entity))
         entity = children[0]
         entity_dict = entity.__dict__
         my_id = entity_dict['id']
@@ -22,21 +39,19 @@ def getDirectChildren(entity, indend):
 
         # decode wrapped values
 
-      
-        if 'wrappedValue' in entity_dict.keys(): 
-            print('measure')
-            # toDo: append the value to the parent node
-
+         
+        #if 'wrappedValue' in entity_dict.keys(): 
+        #    print('measure')
+           
+        # toDo: append the value to the parent node
 
         exclude = ['id', 'type']
         attr_dict = {key: val for key, val in entity_dict.items() if key not in exclude}
-        print("\t".ljust(indend*4) + '{}'.format(attr_dict))
-
-        
+        print("\t".ljust(indend*4) + '{}'.format(attr_dict))      
 
         return children
     else: 
-        print("".ljust(indend*4) + '{}'.format(entity))
+        
 
         entity_dict = children[0].__dict__
         my_id = entity_dict['id']
@@ -59,7 +74,7 @@ model = ifcopenshell.open(model_path)
 
 # loop over all entities
 for obj_definition in model.by_type('IfcObjectDefinition'): 
-    print(obj_definition)
+    # print(obj_definition)
 
     getDirectChildren(obj_definition, 0)
     
