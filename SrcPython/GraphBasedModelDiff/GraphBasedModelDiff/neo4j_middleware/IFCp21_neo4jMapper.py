@@ -51,12 +51,26 @@ class IFCp21_neo4jMapper(IfcMapper):
         complex_attrs = []
         filtered_attrs['p21_id'] = p21_id
         # remove traverse attrs
+        
         for key, val in attrs_dict.items():
-            if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) or isinstance(val, list) : 
+
+            special_key_names = ['Coordinates', 'DirectionRatios']
+
+            if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) : 
                 filtered_attrs[key] = val
-            # ToDo: handle special situation with tuples
-            elif isinstance(val, tuple):
-                pass 
+                        
+            elif isinstance(val, tuple) and key in special_key_names:
+                
+                for tuple_val in range(len(val)): 
+                    cur_key = 'value{}'.format(tuple_val)
+                    cur_val = val[tuple_val]
+                    filtered_attrs[cur_key] = cur_val
+            
+            elif isinstance(val, tuple) and len(val) > 1 and key not in special_key_names: 
+
+                for i in range(len(val)):
+                    complex_attrs.append(key)
+                
             else: 
                 if val != None: 
                     complex_attrs.append(key)
@@ -64,19 +78,12 @@ class IFCp21_neo4jMapper(IfcMapper):
         if len(filtered_attrs.items()) > 0: 
             print("\t".ljust(indend*4) + '{}'.format(filtered_attrs))
 
-            # run connector if parent node id was stated
+            # append atomic attrs to current node
             if parent_NodeId != None: 
                 # atomic attrs exist on current node -> map to node 
                 cypher_statement = neo4jGraphFactory.AddAttributesToNode(parent_NodeId, filtered_attrs, self.timeStamp)
                 self.connector.run_cypher_statement(cypher_statement)
-
-        if 'wrappedValue' in info.keys(): 
-            print(filtered_attrs['wrappedValue'])
-
-
-
-
-
+       
         # query all traversal entities
         children = self.model.traverse(entity, 1)
 
@@ -84,9 +91,6 @@ class IFCp21_neo4jMapper(IfcMapper):
         children = children[1:]
 
         complex_childs = set(zip(complex_attrs, children))
-        #for ch in complex_childs: 
-        #    print(ch[0])
-
 
         if len(children) == 0:
             pass
@@ -110,8 +114,6 @@ class IFCp21_neo4jMapper(IfcMapper):
 
                     # recursively call the function again but update the node id. It will append the atomic properties and creates the nested child nodes again
                     children = self.getDirectChildren(child[1], indend + 1, node_id[0])
-
-
 
                 elif len(res) == 1:
                     # node already exists, run merge command

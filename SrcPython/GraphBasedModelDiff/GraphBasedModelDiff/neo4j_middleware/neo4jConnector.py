@@ -9,8 +9,10 @@ class Neo4jConnector:
     my_driver = []
 
     # constructor
-    def __init__(self):
+    def __init__(self, writeToConsole=True, writeToLogFile=False):
         print("Initialized new Connector instance.")
+        self.ToConsole = writeToConsole
+        self.ToLogFile = writeToLogFile
         pass
 
     # methods
@@ -18,8 +20,7 @@ class Neo4jConnector:
         try:
             self.my_driver = GraphDatabase.driver(self.uri, auth=("neo4j", self.password), encrypted=False)
         except self.my_driver:
-            print("Oops!  Connection failed.  Try again...")
-        
+            raise Exception("Oops!  Connection failed.  Try again...")       
             
 
     def test_connection(self):
@@ -30,14 +31,12 @@ class Neo4jConnector:
 
     def run_cypher_statement(self, statement, postStatement=None):
         """ executes a given cypher statement and does some post processing if stated """
-        #returnTypes = {
-        #    'getId' : (lambda record: result = record['ID(n)'] ), 
-        #    'getGlobalId' : (lambda record: result = record['globalId'] )
-        #    }
+      
         try:
             with self.my_driver.session() as session:
                 with session.begin_transaction() as tx:
-                    print("[neo4j_connector] Running query: " + str(statement)[:50] + '...')
+                    if self.ToConsole:
+                        print("[neo4j_connector] Running query: " + str(statement)[:80] + '...')
                     res = tx.run(statement)
                 
                     return_val = []
@@ -51,7 +50,8 @@ class Neo4jConnector:
                         for record in res:
                            # print(record)
                            return_val.append(record)
-                print('[neo4j_connector] Received response. ')
+                if self.ToConsole:
+                    print('[neo4j_connector] Received response. ')
                 return return_val
 
         except :
@@ -59,7 +59,7 @@ class Neo4jConnector:
             print('[neo4j_connector] Possible issues: ' + 
                     '\t Incorrect cypher statement' + 
                     '\t Missing packages inside the graph database \n')
-       
+            raise Exception('Error in neo4j Connector.')
 
     def disconnect_driver(self):
         self.my_driver.close()

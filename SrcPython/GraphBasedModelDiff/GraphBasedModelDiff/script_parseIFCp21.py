@@ -15,7 +15,7 @@ from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 print('Parsing Ifc StepP21 model to Neo4j.... \n')
 print('connecting to neo4j database... ')
-connector = Neo4jConnector()
+connector = Neo4jConnector(False, False)
 connector.connect_driver()
 
 ## DEBUG ONLY! delete entire graph: 
