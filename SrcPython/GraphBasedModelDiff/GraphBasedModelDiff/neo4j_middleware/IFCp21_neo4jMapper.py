@@ -102,25 +102,32 @@ class IFCp21_neo4jMapper(IfcMapper):
         else: 
         
 
-            entity_dict = children[0].__dict__
-            my_id = entity_dict['id']
-            my_type = entity_dict['type']
-
-
             for child in children:
 
-                # step 1: create new node in graph and get its node id
+                ## check if child is already existing in  graph. otherwise create node
+               
                 cypher_statement = ''
                 cypher_statement = neo4jQueryFactory.GetNodeIdByP21(child.__dict__['id'])
                 res = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
                 if len(res) == 0:
                     # node doesnt exist yet, continue with creating a new attr node
-                    pass
+                    
+                    cypher_statement = ''
+                    cypher_statement = neo4jGraphFactory.CreateAttributeNode(parent_NodeId, child.__dict__['type'], 'relationshipLabel', self.timeStamp)
+                    node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
+
+                    # recursively call the function again but update the node id. It will append the atomic properties and creates the nested child nodes again
+                    children = self.getDirectChildren(child, indend + 1, node_id[0])
+
 
 
                 elif len(res) == 1:
                     # node already exists, run merge command
+                    cypher_statement = ''
+                    cypher_statement = neo4jGraphFactory.MergeOnP21(p21_id, child.__dict__['id'], 'relationshipLabel', self.timeStamp)
+                    node_id = self.connector.run_cypher_statement(cypher_statement)
+
                     pass
 
 
@@ -130,14 +137,7 @@ class IFCp21_neo4jMapper(IfcMapper):
 
 
 
-                ## check if child is already existing in  graph. otherwise create node
-                cypher_statement = ''
-                cypher_statement = neo4jGraphFactory.CreateAttributeNode(parent_NodeId, child.__dict__['type'], 'relationshipLabel', self.timeStamp)
-                node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
-
-                # recursively call the function again but update the node id. It will append the atomic properties and creates the nested child nodes again
-                children = self.getDirectChildren(child, indend + 1, node_id[0])
-
+                
         return children
 
 

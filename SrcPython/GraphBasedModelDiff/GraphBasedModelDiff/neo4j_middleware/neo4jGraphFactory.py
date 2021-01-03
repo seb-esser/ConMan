@@ -78,6 +78,15 @@ class neo4jGraphFactory:
 		return neo4jUtils.BuildMultiStatement([matchObjRel, matchRootedObj, merge1, merge2, returnID])
 
 	@classmethod
+	def MergeOnP21(self, from_p21, to_p21, relType, timestamp):
+		from_node = 'MATCH (source:{}) WHERE source.p21_id = {}'.format(timestamp, from_p21)
+		to_node = 'MATCH (target:{}) WHERE target.p21_id = {}'.format(timestamp, to_p21)
+		merge = 'MERGE (source)-[:{}]->(target)'.format(relType)		
+		returnID = 'RETURN ID(source), ID(target)'
+		return neo4jUtils.BuildMultiStatement([from_node, to_node, merge, returnID])
+
+
+	@classmethod
 	def DeleteNode(self, nodeId):
 		match = 'MATCH (n) WHERE ID(n) = {}'.format(nodeId)
 		detach = 'DETACH'
