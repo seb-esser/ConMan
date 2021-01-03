@@ -48,6 +48,7 @@ class IFCp21_neo4jMapper(IfcMapper):
         
         # remove complex traversal attributes
         filtered_attrs = {}
+        complex_attrs = []
         filtered_attrs['p21_id'] = p21_id
         # remove traverse attrs
         for key, val in attrs_dict.items():
@@ -56,6 +57,9 @@ class IFCp21_neo4jMapper(IfcMapper):
             # ToDo: handle special situation with tuples
             elif isinstance(val, tuple):
                 pass 
+            else: 
+                if val != None: 
+                    complex_attrs.append(key)
 
         if len(filtered_attrs.items()) > 0: 
             print("\t".ljust(indend*4) + '{}'.format(filtered_attrs))
@@ -79,53 +83,40 @@ class IFCp21_neo4jMapper(IfcMapper):
         # cut the first item
         children = children[1:]
 
+        complex_childs = set(zip(complex_attrs, children))
+        #for ch in complex_childs: 
+        #    print(ch[0])
+
+
         if len(children) == 0:
-        #    print("".ljust(indend*4) + '{}'.format(entity))
-        #    entity = children[0]
-        #    entity_dict = entity.__dict__
-        #    my_id = entity_dict['id']
-        #    my_type = entity_dict['type']
-
-        #    ## decode wrapped values
-
-         
-
-           
-        #    ## toDo: append the value to the parent node
-
-        #    exclude = ['id', 'type']
-        #    attr_dict = {key: val for key, val in entity_dict.items() if key not in exclude}
-        #    print("\t".ljust(indend*4) + '{}'.format(attr_dict))      
-
-        #    return children
             pass
         else: 
         
 
-            for child in children:
+            for child in complex_childs:
 
                 ## check if child is already existing in  graph. otherwise create node
                
                 cypher_statement = ''
-                cypher_statement = neo4jQueryFactory.GetNodeIdByP21(child.__dict__['id'])
+                cypher_statement = neo4jQueryFactory.GetNodeIdByP21(child[1].__dict__['id'])
                 res = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
                 if len(res) == 0:
                     # node doesnt exist yet, continue with creating a new attr node
                     
                     cypher_statement = ''
-                    cypher_statement = neo4jGraphFactory.CreateAttributeNode(parent_NodeId, child.__dict__['type'], 'relationshipLabel', self.timeStamp)
+                    cypher_statement = neo4jGraphFactory.CreateAttributeNode(parent_NodeId, child[1].__dict__['type'], child[0], self.timeStamp)
                     node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
                     # recursively call the function again but update the node id. It will append the atomic properties and creates the nested child nodes again
-                    children = self.getDirectChildren(child, indend + 1, node_id[0])
+                    children = self.getDirectChildren(child[1], indend + 1, node_id[0])
 
 
 
                 elif len(res) == 1:
                     # node already exists, run merge command
                     cypher_statement = ''
-                    cypher_statement = neo4jGraphFactory.MergeOnP21(p21_id, child.__dict__['id'], 'relationshipLabel', self.timeStamp)
+                    cypher_statement = neo4jGraphFactory.MergeOnP21(p21_id, child[1].__dict__['id'], child[0], self.timeStamp)
                     node_id = self.connector.run_cypher_statement(cypher_statement)
 
                     pass
