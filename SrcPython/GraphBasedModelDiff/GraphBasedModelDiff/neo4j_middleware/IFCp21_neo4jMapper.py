@@ -5,6 +5,7 @@ import ifcopenshell
 """ file import """
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 from neo4j_middleware.neo4jGraphFactory import neo4jGraphFactory
+from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 from common_base.ifcMapper import IfcMapper
 
 class IFCp21_neo4jMapper(IfcMapper):
@@ -109,6 +110,25 @@ class IFCp21_neo4jMapper(IfcMapper):
             for child in children:
 
                 # step 1: create new node in graph and get its node id
+                cypher_statement = ''
+                cypher_statement = neo4jQueryFactory.GetNodeIdByP21(child.__dict__['id'])
+                res = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
+
+                if len(res) == 0:
+                    # node doesnt exist yet, continue with creating a new attr node
+                    pass
+
+
+                elif len(res) == 1:
+                    # node already exists, run merge command
+                    pass
+
+
+                elif len(res) > 1: 
+                    # node exist multiple times. 
+                    raise Exception('Detected nodes with same p21 id. ERROR!')
+
+
 
                 ## check if child is already existing in  graph. otherwise create node
                 cypher_statement = ''
