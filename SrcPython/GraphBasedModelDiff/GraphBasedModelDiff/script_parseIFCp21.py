@@ -37,6 +37,9 @@ mapper = IFCp21_neo4jMapper(connector, 'P21DefaultTimestamp', model)
 mapper.mapEntities(obj_definitions)
 
 
+# post processing: remove all p21 ids
+cypher = 'MATCH(n:{} REMOVE n.p21_id '.format('P21DefaultTimestamp')
+
 # disconnect from database
 connector.disconnect_driver()
 

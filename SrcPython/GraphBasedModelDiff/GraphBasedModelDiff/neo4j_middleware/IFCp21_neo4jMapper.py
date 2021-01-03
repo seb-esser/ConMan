@@ -39,15 +39,15 @@ class IFCp21_neo4jMapper(IfcMapper):
 
         # print atomic attributes: 
         info = entity.get_info()
-        entityId = info['id']
+        p21_id = info['id']
         entityType = info['type']
         # remove type and id from attrDict
-        excludeKeys = ['id', 'type']
+        excludeKeys = ['id', 'type']        
         attrs_dict = {key: val for key, val in info.items() if key not in excludeKeys }    
         
         # remove complex traversal attributes
         filtered_attrs = {}
-
+        filtered_attrs['p21_id'] = p21_id
         # remove traverse attrs
         for key, val in attrs_dict.items():
             if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) or isinstance(val, list) : 
