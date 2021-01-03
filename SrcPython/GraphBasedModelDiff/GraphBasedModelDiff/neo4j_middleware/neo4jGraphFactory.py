@@ -44,13 +44,14 @@ class neo4jGraphFactory:
 		return neo4jUtils.BuildMultiStatement([match] + attrs + [returnID])
 
 	@classmethod
-	def CreateAttributeNode(self, ParentId, NodeLabel, RelationshipLabel, timestamp):
+	def CreateAttributeNode(self, ParentId, entityType, RelationshipLabel, timestamp):
 		match = 'MATCH (p) WHERE ID(p) = {}'.format(ParentId)
-		create = 'CREATE (n: {}:attrNode:{})'.format(NodeLabel, timestamp)             
+		create = 'CREATE (n: {}:attrNode:{})'.format(entityType, timestamp) 
+		setEntityType = 'SET n.entityType = "{}"'.format(entityType)
 		merge = 'MERGE (p)-[:{}]->(n)'.format(RelationshipLabel)
 		returnID = 'RETURN ID(n)'
 
-		return neo4jUtils.BuildMultiStatement([match, create, merge, returnID])
+		return neo4jUtils.BuildMultiStatement([match, create, setEntityType, merge, returnID])
 
 	@classmethod
 	def MergeRootedNodeWithOwnerHistory(self, ownerHistoryGuid, myNodeId, timeStamp):
