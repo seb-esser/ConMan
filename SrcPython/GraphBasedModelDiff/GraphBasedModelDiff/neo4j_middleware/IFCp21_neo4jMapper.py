@@ -20,10 +20,21 @@ class IFCp21_neo4jMapper(IfcMapper):
     # public entry
     def mapEntities(self, rootedEntities): 
         for entity in rootedEntities: 
-            self.getDirectChildren(entity, 0)
+        
+            info = entity.get_info()
+            entityId = info['GlobalId']
+            entityType = info['type']
+
+            # neo4j: build node
+            cypher_statement = neo4jGraphFactory.CreateRootedNode(entityId, entityType, self.timeStamp)
+            node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
+
+            
+            # get all attrs and children
+            self.getDirectChildren(entity, 0, node_id[0])
 
     # private recursive function
-    def getDirectChildren(self, entity, indend): 
+    def getDirectChildren(self, entity, indend, parent_NodeId=None): 
         print("".ljust(indend*4) + '{}'.format(entity))
 
         # print atomic attributes: 
@@ -39,17 +50,25 @@ class IFCp21_neo4jMapper(IfcMapper):
 
         # remove traverse attrs
         for key, val in attrs_dict.items():
-            if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) or isinstance(val, list) or isinstance(val, tuple): 
+            if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) or isinstance(val, list) : 
                 filtered_attrs[key] = val
+            # handle special situation with tuples
+            elif isinstance(val, tuple):
+                pass 
+
         if len(filtered_attrs.items()) > 0: 
             print("\t".ljust(indend*4) + '{}'.format(filtered_attrs))
+
+            # run connector if parent node id was stated
+            if parent_NodeId != None: 
+                # atomic attrs exist on current node -> map to node 
+                cypher_statement = neo4jGraphFactory.AddAttributesToNode(parent_NodeId, filtered_attrs, self.timeStamp)
+                self.connector.run_cypher_statement(cypher_statement)
 
         if 'wrappedValue' in info.keys(): 
             print(filtered_attrs['wrappedValue'])
 
-        # neo4j: build node
-        neo4jGraphFactory.CreateRootedNode(entityId, entityType, 'timestamp')
-        # neo4j: append atomic properties
+
 
 
 

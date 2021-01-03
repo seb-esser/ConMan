@@ -18,6 +18,10 @@ print('connecting to neo4j database... ')
 connector = Neo4jConnector()
 connector.connect_driver()
 
+## DEBUG ONLY! delete entire graph: 
+print('DEBUG INFO: entire graph gets deleted')
+connector.run_cypher_statement('MATCH(n) DETACH DELETE n')
+
 model_path = './00_sampleData/IFC_stepP21/sampleModel4x1.ifc'
 
 model = ifcopenshell.open(model_path)

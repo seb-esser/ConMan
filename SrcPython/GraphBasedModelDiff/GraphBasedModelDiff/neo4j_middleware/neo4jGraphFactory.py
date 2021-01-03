@@ -27,18 +27,21 @@ class neo4jGraphFactory:
 	@classmethod
 	def AddAttributesToNode(self, nodeId, attributes, timestamp):
 		match = 'MATCH(n:{}) WHERE ID(n) = {}'.format(timestamp, nodeId)
+		attrs = []
 		for attr, val in attributes.items(): 
 			if isinstance(val, str):
 				add_param = 'SET n.{} = "{}"'.format(attr, val)
+				attrs.append(add_param)
 			elif isinstance(val, (int, float, complex)):
 				add_param = 'SET n.{} = {}'.format(attr, val)
+				attrs.append(add_param)
 			else: 
 				# ToDo: throw exeption
-				print('Do something... ERROR!!')
+				print('ERROR when adding attributes to existing node. check your inputs. ')
 
 		returnID = 'RETURN n'
 
-		return neo4jUtils.BuildMultiStatement([match, add_param, returnID])
+		return neo4jUtils.BuildMultiStatement([match] + attrs + [returnID])
 
 	@classmethod
 	def CreateAttributeNode(self, ParentId, NodeLabel, RelationshipLabel, timestamp):
