@@ -19,7 +19,7 @@ class neo4jGraphFactory:
 	@classmethod
 	def CreateRootedNode(cls, entityId, entityType, timestamp):
 		create = 'CREATE(n:{}:rootedNode:{})'.format(entityType, timestamp)
-		setGuid = 'SET n.globalId = "{}"'.format(entityId)
+		setGuid = 'SET n.GlobalId = "{}"'.format(entityId)
 		setEntityType = 'SET n.entityType = "{}"'.format(entityType)
 		returnID = 'RETURN ID(n)'
 		return neo4jUtils.BuildMultiStatement([create, setGuid, setEntityType, returnID])

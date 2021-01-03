@@ -52,7 +52,7 @@ class IFCp21_neo4jMapper(IfcMapper):
         for key, val in attrs_dict.items():
             if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) or isinstance(val, list) : 
                 filtered_attrs[key] = val
-            # handle special situation with tuples
+            # ToDo: handle special situation with tuples
             elif isinstance(val, tuple):
                 pass 
 
@@ -107,7 +107,16 @@ class IFCp21_neo4jMapper(IfcMapper):
 
 
             for child in children:
-                children = self.getDirectChildren(child, indend + 1)
+
+                # step 1: create new node in graph and get its node id
+
+                ## check if child is already existing in  graph. otherwise create node
+                cypher_statement = ''
+                cypher_statement = neo4jGraphFactory.CreateAttributeNode(parent_NodeId, child.__dict__['type'], 'relationshipLabel', self.timeStamp)
+                node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
+
+                # recursively call the function again but update the node id. It will append the atomic properties and creates the nested child nodes again
+                children = self.getDirectChildren(child, indend + 1, node_id[0])
 
         return children
 
