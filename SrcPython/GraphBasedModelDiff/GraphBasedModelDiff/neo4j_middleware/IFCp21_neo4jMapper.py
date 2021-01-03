@@ -5,23 +5,25 @@ import ifcopenshell
 """ file import """
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 from neo4j_middleware.neo4jGraphFactory import neo4jGraphFactory
+from common_base.ifcMapper import IfcMapper
 
-class IFCp21_neo4jMapper:
+class IFCp21_neo4jMapper(IfcMapper):
     """description of class"""
 
     # constructor
-    def __init__(self, myConnector, timestamp): 
+    def __init__(self, myConnector, timestamp, my_model): 
         self.connector = myConnector
         self.timeStamp = timestamp
+        self.model = my_model
         super().__init__()
 
     # public entry
     def mapEntities(self, rootedEntities): 
         for entity in rootedEntities: 
-            self.getDirectChildren(entity)
+            self.getDirectChildren(entity, 0)
 
     # private recursive function
-    def getDirectChildren(entity, indend): 
+    def getDirectChildren(self, entity, indend): 
         print("".ljust(indend*4) + '{}'.format(entity))
 
         # print atomic attributes: 
@@ -52,8 +54,9 @@ class IFCp21_neo4jMapper:
 
 
         # query all traversal entities
-        children = model.traverse(entity, 1)
+        children = self.model.traverse(entity, 1)
 
+        # cut the first item
         children = children[1:]
 
         if len(children) == 0:
@@ -85,7 +88,7 @@ class IFCp21_neo4jMapper:
 
 
             for child in children:
-                children = getDirectChildren(child, indend + 1)
+                children = self.getDirectChildren(child, indend + 1)
 
         return children
 

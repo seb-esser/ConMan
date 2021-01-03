@@ -28,7 +28,7 @@ model = ifcopenshell.open(model_path)
 obj_definitions =  model.by_type('IfcObjectDefinition')
 
 # init mapper
-mapper = IFCp21_neo4jMapper(connector, 'P21DefaultTimestamp')
+mapper = IFCp21_neo4jMapper(connector, 'P21DefaultTimestamp', model)
 # parse rooted node + subgraphs
 mapper.mapEntities(obj_definitions)
 
