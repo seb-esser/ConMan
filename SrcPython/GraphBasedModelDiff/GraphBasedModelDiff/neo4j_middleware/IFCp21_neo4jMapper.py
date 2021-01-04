@@ -19,7 +19,7 @@ class IFCp21_neo4jMapper(IfcMapper):
     Public constructor for IFCP21_neo4jMapper
     trigger console output while parsing using the ToConsole boolean
     """
-    def __init__(self, myConnector, timestamp, my_model, ToConsole = False, ToLog = False): 
+    def __init__(self, myConnector, timestamp, my_model, ToConsole = False, ToLog = True): 
        
         self.connector = myConnector
         self.timeStamp = timestamp

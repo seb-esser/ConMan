@@ -1,6 +1,7 @@
 
 """ package import """
 import ifcopenshell
+import logging
 
 """ class import """
 from neo4j_middleware.IFCp21_neo4jMapper import IFCp21_neo4jMapper
@@ -13,9 +14,13 @@ from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 # --- Script --- 
 
+# init logging
+logging.basicConfig(filename='myapp.log', level=logging.INFO)
+logging.info('Started')
+
 print('Parsing Ifc StepP21 model to Neo4j.... \n')
 print('connecting to neo4j database... ')
-connector = Neo4jConnector(False, False)
+connector = Neo4jConnector(False, True)
 connector.connect_driver()
 
 ## DEBUG ONLY! delete entire graph: 

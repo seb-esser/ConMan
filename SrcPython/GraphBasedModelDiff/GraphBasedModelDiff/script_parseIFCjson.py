@@ -2,6 +2,7 @@
 """ package import """
 import json
 import os
+import logging
 
 """ class import """ 
 from neo4j_middleware.IFCjson_neo4jMapper import IfcJsonNeo4jMapper
@@ -14,6 +15,12 @@ from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 # --- script ---
 print('Parsing IfcJSON models to Neo4j....')
+
+# init logging
+logging.basicConfig(filename='myapp.log', level=logging.INFO)
+logging.info('Started')
+
+
 # open the json file
 f_initial = open('./00_sampleData/IFC_json/spatial_initial.json', 'r') 
 f_updated = open('./00_sampleData/IFC_json/spatial_updated.json', 'r') 

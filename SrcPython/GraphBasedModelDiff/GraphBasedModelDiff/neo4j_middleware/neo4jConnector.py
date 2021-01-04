@@ -1,5 +1,9 @@
+
+
 from neo4j import GraphDatabase
 import json
+import logging
+
 
 class Neo4jConnector:
 
@@ -13,7 +17,6 @@ class Neo4jConnector:
         print("Initialized new Connector instance.")
         self.ToConsole = writeToConsole
         self.ToLogFile = writeToLogFile
-        pass
 
     # methods
     def connect_driver(self):
@@ -37,6 +40,8 @@ class Neo4jConnector:
                 with session.begin_transaction() as tx:
                     if self.ToConsole:
                         print("[neo4j_connector] Running query: " + str(statement)[:80] + '...')
+                    if self.ToLogFile:
+                        logging.info("Running query:" +str(statement))
                     res = tx.run(statement)
                 
                     return_val = []
