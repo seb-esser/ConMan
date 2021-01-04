@@ -7,6 +7,7 @@ from neo4j_middleware.neo4jConnector import Neo4jConnector
 from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
 
 from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
+from neo4jGraphDiff.DirectedSubgraphDiff import DirectedSubgraphDiff
 
 
 # defs
@@ -49,12 +50,20 @@ label_updated = "ts20200204T105551"
 cypher = []
 
 # 1: Check base structure of rooted nodes
-rootedNodeDiff = RootedNodeDiff()
-rootedNodeDiff.compareRootedNodes(connector, label_init, label_updated)
+#rootedNodeDiff = RootedNodeDiff()
+#rootedNodeDiff.compareRootedNodes(connector, label_init, label_updated)
 
 
 # 2: Check sub-graphs for each rooted node
+subgraphDiff = DirectedSubgraphDiff(label_init, label_updated)
 
+# DEBUG only, implement a for loop over all rooted nodes to query their nodeIDs
+siteId_initial = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_init), 'ID(n)')
+siteId_updated = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_updated), 'ID(n)')
+
+similar = subgraphDiff.compareChildren(connector, siteId_initial[0], siteId_updated[0], True, 0)
+
+print('Similar subgraphs: {}'.format(similar))
 
 # 3: 
 

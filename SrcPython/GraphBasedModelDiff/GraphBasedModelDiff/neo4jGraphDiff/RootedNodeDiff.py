@@ -4,7 +4,8 @@ from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUti
 
 class RootedNodeDiff:
 	
-	def __init__(self): 
+	def __init__(self, toConsole = True): 
+		self.toConsole = toConsole
 		pass
 
 	def compareRootedNodes(self, connector, label_init, label_updated):
@@ -22,29 +23,31 @@ class RootedNodeDiff:
 
 
 		# output
-		print('\n')
-		print('[DiffCalc] HASHES for initial model: ')
-		for res in res_init:
-			print(res)
-		print('\n')
-		print('[DiffCalc] HASHES for updated model: ')
-		for res in res_updated:
-			print(res)
+		if self.toConsole:
+			print('\n')
+			print('[DiffCalc] HASHES for initial model: ')
+			for res in res_init:
+				print(res)
+			print('\n')
+			print('[DiffCalc] HASHES for updated model: ')
+			for res in res_updated:
+				print(res)
 
 
 		# compare hashes: 
 
 		# loop over initial nodes
+		if self.toConsole:
+			print('\n[DiffCalc] Mapping the hashcodes between initial and updated: ')
 
-		print('\n[DiffCalc] Mapping the hashcodes between initial and updated: ')
-
+		# ToDo: Replace this part by common method from DiffUtilities
 		nodes_unchanged = {}
 		nodes_deleted = []
 		nodes_added = []
 
 		# loop over all initial nodes
-		
-		print('\n[TASK] Looking for hashes from the initial graph... \n')
+		if self.toConsole:
+			print('\n[TASK] Looking for hashes from the initial graph... \n')
 		for key, val in hashes_init.items():
 			# print('\t hash: {}'.format(key))
 			if key in hashes_updated.keys():
@@ -60,11 +63,13 @@ class RootedNodeDiff:
 				nodes_deleted.append(val);
 
 		
-
-		print('\n[TASK] Looking for hashes from the updated graph... \n')
+		if self.toConsole:
+			print('\n[TASK] Looking for hashes from the updated graph... \n')
 		# loop over updated nodes
 		for key, val in hashes_updated.items():
-			print('\t hash: {}'.format(key))
+			if self.toConsole:
+				print('\t hash: {}'.format(key))
+
 			if key in hashes_init.keys():
 				# print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_init[key], key))
 		
@@ -75,19 +80,22 @@ class RootedNodeDiff:
 			else: 
 				# print('\t[RESULT] No match for hashsum {}. Node {} from the updated graph has no matching partner in the initial graph.'.format(key, val))
 				nodes_added.append(val)
+		if self.toConsole:
+			print('Results:')
+			print('\t Deleted nodes: ')
+			for node in nodes_deleted: 
+				print('\t Node {}'.format(node))
 
-		print('Results:')
-		print('\t Deleted nodes: ')
-		for node in nodes_deleted: 
-			print('\t Node {}'.format(node))
+			print('\n \t Added nodes: ')
+			for node in nodes_added: 
+				print('\t Node {}'.format(node))
 
-		print('\n \t Added nodes: ')
-		for node in nodes_added: 
-			print('\t Node {}'.format(node))
+			print('\n \t Unchanged nodes: ')
+			for key, val in nodes_unchanged.items(): 
+				print('\t Hash {:<25} \t Node_Id {:<5} \t NodeId: {}'.format( key, val[0], val[1]))
 
-		print('\n \t Unchanged nodes: ')
-		for key, val in nodes_unchanged.items(): 
-			print('\t Hash {:<25} \t Node_Id {:<5} \t NodeId: {}'.format( key, val[0], val[1]))
+
+
 
 	def compareRootedNodeRelationships(self):
 		hash_statement_init = DiffUtilities.GetHashes(label_init)

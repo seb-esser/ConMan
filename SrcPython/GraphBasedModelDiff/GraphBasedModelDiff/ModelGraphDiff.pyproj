@@ -25,7 +25,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="common_base\ifcMapper.py" />
-    <Compile Include="neo4jGraphDiff\AttributeNodeDiff.py">
+    <Compile Include="neo4jGraphDiff\DirectedSubgraphDiff.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphDiff\DiffUtilities.py">
