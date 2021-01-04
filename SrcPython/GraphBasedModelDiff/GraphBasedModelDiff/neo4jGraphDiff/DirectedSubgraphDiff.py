@@ -85,25 +85,6 @@ class DirectedSubgraphDiff:
             return []
         else:
             return return_val
-           
-
-
-
-
-        #    # print
-        #    print("".ljust(indent*4) + '{:<5} \t {:<22}  {:<1}'.format(child_node_id, relType, hash[0][0])) 
-           
-
-        ## unify 
-        #childIds = [item[0] for item in res] 
-        #childIds = list(dict.fromkeys(childIds))
-
-        ## recursively loop over all child nodes
-        #for childId in childIds: 
-            
-        #    self.getChildren(connector, label, childId, indent +1)
-
-
 
 
 # -- Helper Functions --- 
