@@ -20,7 +20,7 @@ def parseModel(connector, model_path):
 	label = label.replace(':','')
 		
 	## DEBUG ONLY! delete entire graph: 
-	print('DEBUG INFO: entire graph gets deleted')
+	print('DEBUG INFO: entire graph labeled with >> {} << gets deleted'.format(label))
 	connector.run_cypher_statement('MATCH(n:{}) DETACH DELETE n'.format(label))
 
 	print('Parsing IFC model. Label: {}'.format(label))
@@ -28,7 +28,7 @@ def parseModel(connector, model_path):
 	# extract model data
 	obj_definitions =  model.by_type('IfcObjectDefinition')
 	obj_relationships = model.by_type('IfcRelationship')
-	props = model.by_type('IfcProperty')
+	props = model.by_type('IfcPropertyDefinition')
 	
 	# init mapper
 	mapper = IFCp21_neo4jMapper(connector, label, model)
@@ -45,6 +45,9 @@ def parseModel(connector, model_path):
 	# post processing: remove all p21 ids
 	cypher = 'MATCH(n:{}) REMOVE n.p21_id '.format(label)
 
+	# tests
+	# 1: check num_entities vs. num_nodes created in the graph. 
+
 
 
 # --- Script --- 
@@ -59,10 +62,12 @@ connector = Neo4jConnector(False, True)
 connector.connect_driver()
 
 
-model_path = './00_sampleData/IFC_stepP21/sampleModel4x1.ifc'
+model_path_init = './00_sampleData/IFC_stepP21/sampleModel4x1_init.ifc'
+model_path_updated = './00_sampleData/IFC_stepP21/sampleModel4x1_updated.ifc'
 
 # parse model
-parseModel(connector, model_path)
+parseModel(connector, model_path_init)
+parseModel(connector, model_path_updated)
 
 
 # disconnect from database

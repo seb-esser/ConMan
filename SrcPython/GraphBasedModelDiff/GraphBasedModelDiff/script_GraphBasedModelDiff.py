@@ -11,7 +11,7 @@ def GetHashes(label):
 	getModel = 'MATCH(n:rootedNode:{})'.format(label)
 	open_sub = 'CALL {WITH n'
 	removeLabel = 'REMOVE n:{}'.format(label)
-	calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash RETURN hash'
+	calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash RETURN hash'.format('["p21_id"]')
 	close_sub = '}'
 	add_label_again = 'SET n:{}'.format(label)
 	return_results = 'RETURN hash, n.entityType, ID(n)'
@@ -55,13 +55,19 @@ def GetAdjacencyMatrixByNodeId(i, j):
 
 	return [match1, match2, ret]
 
+def GetSubGraphOfNode(): 
+	match = 'MATCH path  = (n:IfcAlignment)-[*0..100]->(p)' 
+	ret = 'RETURN p'
+
+	return [match, ret]
+
 # -- ... --
 
-connector = Neo4jConnector()
+connector = Neo4jConnector(False, False)
 connector.connect_driver()
 
-label_init = "version20200928T082803"
-label_updated = "version20200928T082848"
+label_init = "ts20200202T105551"
+label_updated = "ts20200204T105551"
 
 cypher = []
 
@@ -95,18 +101,24 @@ for res in res_updated:
 
 print('\n[DiffCalc] Mapping the hashcodes between initial and updated: ')
 
+nodes_unchanged = {}
+
 # loop over all initial nodes
 nodes_deleted = []
 print('\n[TASK] Looking for hashes from the initial graph... \n')
 for key, val in hashes_init.items():
-	print('\t hash: {}'.format(key))
+	# print('\t hash: {}'.format(key))
 	if key in hashes_updated.keys():
-		print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_updated[key], key))
+		# print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_updated[key], key))
+		
+		if key not in nodes_unchanged: 
+			nodes_unchanged[key] = (val, hashes_updated[key])
+		
 		# run cypher to connect both nodes 
 		cypher_connect = ConnectNodesWithSameHash(hashes_init[key], hashes_updated[key])
 		# connector.run_cypher_statement(neo4jUtils.BuildMultiStatement(cypher_connect))
 	else: 
-		print('\t[RESULT] No match for hashsum {}. Node {} from the initial graph has no matching partner in the updated graph.'.format(key, val))
+		# print('\t[RESULT] No match for hashsum {}. Node {} from the initial graph has no matching partner in the updated graph.'.format(key, val))
 		nodes_deleted.append(val);
 
 nodes_added = []
@@ -116,21 +128,31 @@ print('\n[TASK] Looking for hashes from the updated graph... \n')
 for key, val in hashes_updated.items():
 	print('\t hash: {}'.format(key))
 	if key in hashes_init.keys():
-		print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_init[key], key))
+		# print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_init[key], key))
+		
+		if key not in nodes_unchanged: 
+			nodes_unchanged[key] = (val, hashes_updated[key])
+
 		# run cypher to connect both nodes 
 		cypher_connect = ConnectNodesWithSameHash(hashes_updated[key], hashes_init[key])
 		# connector.run_cypher_statement(neo4jUtils.BuildMultiStatement(cypher_connect))
 	else: 
-		print('\t[RESULT] No match for hashsum {}. Node {} from the updated graph has no matching partner in the initial graph.'.format(key, val))
+		# print('\t[RESULT] No match for hashsum {}. Node {} from the updated graph has no matching partner in the initial graph.'.format(key, val))
 		nodes_added.append(val)
 
-print('Deleted nodes: ')
+print('Results:')
+print('\t Deleted nodes: ')
 for node in nodes_deleted: 
 	print('\t Node {}'.format(node))
 
-print('Added nodes: ')
+print('\n \t Added nodes: ')
 for node in nodes_added: 
 	print('\t Node {}'.format(node))
+
+print('\n \t Unchanged nodes: ')
+for key, val in nodes_unchanged.items(): 
+	print('\t Hash {:<25} \t Node_Id {:<5} \t NodeId: {}'.format( key, val[0], val[1]))
+
 
 print('\n ---- ---- ')
 

@@ -127,7 +127,7 @@ class IFCp21_neo4jMapper(IfcMapper):
                 ## check if child is already existing in the graph. otherwise create new node
                
                 cypher_statement = ''
-                cypher_statement = neo4jQueryFactory.GetNodeIdByP21(child[1].__dict__['id'])
+                cypher_statement = neo4jQueryFactory.GetNodeIdByP21(child[1].__dict__['id'], self.timeStamp)
                 res = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
                 if len(res) == 0:
