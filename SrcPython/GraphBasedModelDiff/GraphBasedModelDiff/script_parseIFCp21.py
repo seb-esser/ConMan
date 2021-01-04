@@ -30,12 +30,16 @@ model = ifcopenshell.open(model_path)
 
 # loop over all entities
 obj_definitions =  model.by_type('IfcObjectDefinition')
+obj_relationships = model.by_type('IfcRelationship')
+props = model.by_type('IfcProperty')
 
 # init mapper
 mapper = IFCp21_neo4jMapper(connector, 'P21DefaultTimestamp', model)
 # parse rooted node + subgraphs
 mapper.mapEntities(obj_definitions)
 
+# parse objectified relationships
+mapper.mapObjRelationships(obj_relationships)
 
 # post processing: remove all p21 ids
 cypher = 'MATCH(n:{} REMOVE n.p21_id '.format('P21DefaultTimestamp')

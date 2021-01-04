@@ -9,34 +9,47 @@ from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 from common_base.ifcMapper import IfcMapper
 
 class IFCp21_neo4jMapper(IfcMapper):
-    """description of class"""
+    """
+    IfcP21 to neo4j mapper. 
+    Translates a given IFC model in P21 encoding into a propertyGraph 
+    """
 
     # constructor
-    def __init__(self, myConnector, timestamp, my_model): 
+    """ 
+    Public constructor for IFCP21_neo4jMapper
+    trigger console output while parsing using the ToConsole boolean
+    """
+    def __init__(self, myConnector, timestamp, my_model, ToConsole = False, ToLog = False): 
+       
         self.connector = myConnector
         self.timeStamp = timestamp
         self.model = my_model
+        self.printToConsole = ToConsole
+        self.printToLog = ToLog
         super().__init__()
 
     # public entry
     def mapEntities(self, rootedEntities): 
+        # loop over all rooted entites 
         for entity in rootedEntities: 
         
+            # get some basic data
             info = entity.get_info()
             entityId = info['GlobalId']
             entityType = info['type']
 
-            # neo4j: build node
+            # neo4j: build rooted node
             cypher_statement = neo4jGraphFactory.CreateRootedNode(entityId, entityType, self.timeStamp)
             node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
-
             
             # get all attrs and children
             self.getDirectChildren(entity, 0, node_id[0])
 
     # private recursive function
-    def getDirectChildren(self, entity, indend, parent_NodeId=None): 
-        print("".ljust(indend*4) + '{}'.format(entity))
+    def getDirectChildren(self, entity, indent, parent_NodeId=None): 
+        
+        if self.printToConsole: 
+            print("".ljust(indent*4) + '{}'.format(entity))
 
         # print atomic attributes: 
         info = entity.get_info()
@@ -49,16 +62,20 @@ class IFCp21_neo4jMapper(IfcMapper):
         # remove complex traversal attributes
         filtered_attrs = {}
         complex_attrs = []
+
+        # add artifical parameter indicating the P21 entity number. Can be removed in post processing. 
         filtered_attrs['p21_id'] = p21_id
-        # remove traverse attrs
-        
+        # remove traverse attrs        
         for key, val in attrs_dict.items():
 
+            # some special tuples that have to be treated differently from pure lists
             special_key_names = ['Coordinates', 'DirectionRatios']
 
+            # detecting atomic attribute -> map to existing node
             if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) : 
                 filtered_attrs[key] = val
-                        
+            
+            # detecting atomic attribute but encapsulated in tuple
             elif isinstance(val, tuple) and key in special_key_names:
                 
                 for tuple_val in range(len(val)): 
@@ -66,17 +83,25 @@ class IFCp21_neo4jMapper(IfcMapper):
                     cur_val = val[tuple_val]
                     filtered_attrs[cur_key] = cur_val
             
+            # detecting a list of child entities (again encapsulated as a list)
             elif isinstance(val, tuple) and len(val) > 1 and key not in special_key_names: 
 
+                # reserve suitable names for the relationships between parent and children
                 for i in range(len(val)):
                     complex_attrs.append(key)
-                
+            
+            # detecting a simple child node
             else: 
                 if val != None: 
                     complex_attrs.append(key)
 
+        # run the mapping of the detected data. 
+        #       filtered_attrs contain atomic attributes, which gets attached as properties at the parent node
+        #       complex_attrs  contain all attributes that need sub-nodes. They get zipped with the traverse children afterwards. 
+
         if len(filtered_attrs.items()) > 0: 
-            print("\t".ljust(indend*4) + '{}'.format(filtered_attrs))
+            if self.printToConsole:
+                print("\t".ljust(indent*4) + '{}'.format(filtered_attrs))
 
             # append atomic attrs to current node
             if parent_NodeId != None: 
@@ -84,22 +109,22 @@ class IFCp21_neo4jMapper(IfcMapper):
                 cypher_statement = neo4jGraphFactory.AddAttributesToNode(parent_NodeId, filtered_attrs, self.timeStamp)
                 self.connector.run_cypher_statement(cypher_statement)
        
-        # query all traversal entities
+        # query all traversal entities -> subnodes 
         children = self.model.traverse(entity, 1)
 
-        # cut the first item
+        # cut the first item as it is the parent itself
         children = children[1:]
 
+        # combine the detected entities with the corresponding attribute names from 'complex_attrs' list
         complex_childs = set(zip(complex_attrs, children))
 
         if len(children) == 0:
             pass
-        else: 
-        
+        else:        
 
             for child in complex_childs:
 
-                ## check if child is already existing in  graph. otherwise create node
+                ## check if child is already existing in the graph. otherwise create new node
                
                 cypher_statement = ''
                 cypher_statement = neo4jQueryFactory.GetNodeIdByP21(child[1].__dict__['id'])
@@ -112,118 +137,40 @@ class IFCp21_neo4jMapper(IfcMapper):
                     cypher_statement = neo4jGraphFactory.CreateAttributeNode(parent_NodeId, child[1].__dict__['type'], child[0], self.timeStamp)
                     node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
-                    # recursively call the function again but update the node id. It will append the atomic properties and creates the nested child nodes again
-                    children = self.getDirectChildren(child[1], indend + 1, node_id[0])
+                    # recursively call the function again but update the node id. 
+                    # It will append the atomic properties and creates the nested child nodes again
+                    children = self.getDirectChildren(child[1], indent + 1, node_id[0])
 
                 elif len(res) == 1:
                     # node already exists, run merge command
+
                     cypher_statement = ''
                     cypher_statement = neo4jGraphFactory.MergeOnP21(p21_id, child[1].__dict__['id'], child[0], self.timeStamp)
                     node_id = self.connector.run_cypher_statement(cypher_statement)
 
-                    pass
-
-
                 elif len(res) > 1: 
                     # node exist multiple times. 
                     raise Exception('Detected nodes with same p21 id. ERROR!')
-
-
-
-                
+                                
         return children
 
+    # public entry
+    def mapObjRelationships(self, objRels): 
+
+        # loop over all relationships
+        for entity in objRels: 
+        
+            # get some basic data
+            info = entity.get_info()
+            entityId = info['GlobalId']
+            entityType = info['type']
+
+            # neo4j: build rooted node
+            cypher_statement = neo4jGraphFactory.CreateObjectifiedRelNode(entityId, entityType, self.timeStamp)
+            node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
+            
+            # get all attrs and children
+            self.getDirectChildren(entity, 0, node_id[0])
 
 
-
-    #def map_entity_to_node(database, entity):
-    #    # fetch all var names and assign attributes
-    #    info = entity.get_info()
-    #    class_name = info['type']
-    #    instance_id = info['id']
-    #    print("\tClass:\t" + class_name)
-    #    print("\tEntityId:\t" + str(instance_id))
-
-    #    # formulate cypher statement
-    #    props_obj = {}
-    #    cypher_statement = 'Create(n:' + class_name
-    #    props_obj['EntityId'] = instance_id
-
-    #    # parse attributes
-    #    # stolen from: https://github.com/jakob-beetz/IfcOpenShellScriptingTutorial/wiki/02:-Inspecting-IFC-instance-objects
-    #    for att_idx in range(0, len(entity) - 1):
-    #        field_width = 20
-    #        # In case we are dealing with a different IFC version
-    #        # there might by attributes that do not exist in a 2x3 file
-    #        # handle the attempt to print out a value where there is no
-    #        # attribute gracefully
-    #        try:
-    #            att_name = entity.attribute_name(att_idx)
-    #            att_type = entity.attribute_type(att_name)
-    #            att_value = entity[att_idx]
-    #            print("\t \t {}\t{}\t{}".format(att_name.ljust(field_width), att_type.ljust(field_width), att_value))
-
-    #            # build properties json for cypher command
-    #            if att_type == "AGGREGATE OF ENTITY INSTANCE":
-    #                props_obj[att_name] = bin(att_value)
-    #            else:
-    #                props_obj[att_name] = att_value
-
-    #            # ToDo: do something with complex attr_types
-    #            # Ideas:
-    #                # - recursively run though all sub-entities, create a sub-tree and hash this tree
-    #        except:
-    #            pass
-    #        # print("\t \t" + str(var_name) + " \t " + str(att_type))
-
-    #    # print(props_obj)
-
-    #    formatted = format_json(props_obj)
-
-    #    cypher_statement = cypher_statement + formatted + ')'
-    #    print(cypher_statement)
-
-    #    # perform insert operation on database
-    #    database.run_cypher_statement(cypher_statement)
-    #    print("")
-
-    #def map_relationship_to_node(rel, database):
-    #    # fetch all var names and assign attributes
-    #    info = rel.get_info()
-    #    class_name = info['type']
-    #    instance_id = info['id']
-    #    print("\tClass:\t" + class_name)
-    #    print("\tEntityId:\t" + str(instance_id))
-
-    #    # test if relationship connects two routed entities
-    #    if hasattr(rel, 'RelatingObject') and hasattr(rel, 'RelatedObjects'):
-    #        relatedElement = rel[4]
-    #        relatingElements = rel[5]
-    #        print('-> Related Object:')
-    #        print(relatedElement)
-    #        print('-> Relating Objects:')
-    #        print(relatingElements)
-
-    #        for i in range(0, len(relatingElements)-1):
-    #            elemId = relatingElements[i].get_info()['id']
-
-    #            cypher = ""
-    #            cypher = cypher + 'MATCH(n) WHERE n.EntityId = "{}" \n'.format(relatedElement.get_info()['id'])
-    #            cypher = cypher + 'MATCH(m) WHERE m.EntityId = "{}" \n'.format(elemId)
-    #            cypher = cypher + 'merge (n) -[rel:IfcRelationship]->(m)'.format(class_name)
-
-    #            database.run_cypher_statement(cypher)
-
-    #def format_json(obj_dict):
-    #    res_str = "{"
-    #    for key, value in obj_dict.items():
-    #        # try:
-    #        #     res_str = res_str + key + ":" + value + ", "
-    #        # except:
-    #        res_str = res_str + key + ": '" + str(value) + "', "
-
-    #    # remove last comma
-    #    res_str = res_str[:-2]
-    #    res_str = res_str + "}"
-    #    return res_str
 
