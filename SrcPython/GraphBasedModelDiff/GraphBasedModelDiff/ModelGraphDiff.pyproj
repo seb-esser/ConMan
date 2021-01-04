@@ -36,7 +36,7 @@
     </Compile>
     <Compile Include="script_GraphBasedModelDiff.py" />
     <Compile Include="grGen_middleware\ifcGrGen_SchemaMapper.py" />
-    <Compile Include="neo4j_middleware\DiffIgnore_parser.py" />
+    <Compile Include="neo4jGraphDiff\DiffIgnore_parser.py" />
     <Compile Include="neo4j_middleware\ifcGrGen_SchemaMapper.py" />
     <Compile Include="neo4j_middleware\IFCjson_neo4jMapper.py" />
     <Compile Include="neo4j_middleware\IFCp21_neo4jMapper.py">
@@ -81,7 +81,7 @@
     <Content Include="00_sampleData\IFC_stepP21\sampleModel4x3.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\spatial_initial.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\spatial_updated.ifc" />
-    <Content Include="neo4j_middleware\diffIgnore.json" />
+    <Content Include="neo4jGraphDiff\diffIgnore.json" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|ConsistencyManager" />

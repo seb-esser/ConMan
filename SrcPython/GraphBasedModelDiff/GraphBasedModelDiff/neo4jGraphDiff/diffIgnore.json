@@ -1,11 +1,12 @@
 {
   "IgnoreNodeLabels": [
-    "IfcOwnerHistory"
+    
     ],
 
   "IgnoreNodeAttributes": 
   [
-    "globalId"
+    "globalId", 
+    "p21_id"
   ]
 
 
