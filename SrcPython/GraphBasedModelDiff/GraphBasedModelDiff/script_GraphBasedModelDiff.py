@@ -58,12 +58,14 @@ cypher = []
 subgraphDiff = DirectedSubgraphDiff(label_init, label_updated)
 
 # DEBUG only, implement a for loop over all rooted nodes to query their nodeIDs
-siteId_initial = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_init), 'ID(n)')
-siteId_updated = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_updated), 'ID(n)')
+#siteId_initial = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_init), 'ID(n)')
+#siteId_updated = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_updated), 'ID(n)')
+siteId_initial = connector.run_cypher_statement('MATCH (n:IfcBuildingElementProxy:{}) WHERE n.Name = "linear positioned: 1" RETURN ID(n)'.format(label_init), 'ID(n)')
+siteId_updated = connector.run_cypher_statement('MATCH (n:IfcBuildingElementProxy:{}) WHERE n.Name = "linear positioned: 1" RETURN ID(n)'.format(label_updated), 'ID(n)')
 
 similar = subgraphDiff.compareChildren(connector, siteId_initial[0], siteId_updated[0], True, 0)
 
-print('Similar subgraphs: {}'.format(similar))
+print('Similar: {}'.format(similar))
 
 # 3: 
 

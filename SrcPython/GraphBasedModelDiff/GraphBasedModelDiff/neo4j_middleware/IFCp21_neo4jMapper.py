@@ -81,7 +81,8 @@ class IFCp21_neo4jMapper(IfcMapper):
                 for tuple_val in range(len(val)): 
                     cur_key = 'value{}'.format(tuple_val)
                     cur_val = val[tuple_val]
-                    filtered_attrs[cur_key] = cur_val
+                    # ToDo: numeric issue here!
+                    filtered_attrs[cur_key] = filtered_attrs[key] = float("{:.2f}".format(cur_val))
             
             # detecting a list of child entities (again encapsulated as a list)
             elif isinstance(val, tuple) and len(val) > 1 and key not in special_key_names: 
