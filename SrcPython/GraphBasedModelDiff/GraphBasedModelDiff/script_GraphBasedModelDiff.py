@@ -44,8 +44,8 @@ def GetSubGraphOfNode():
 connector = Neo4jConnector(False, False)
 connector.connect_driver()
 
-label_init = "ts20210106T101528"
-label_updated = "ts20210106T101608"
+label_init = "ts20210106T110329"
+label_updated = "ts20210106T110250"
 
 cypher = []
 
@@ -55,18 +55,21 @@ rootedNodeDiff.compareRootedNodes(connector, label_init, label_updated)
 
 
 # 2: Check sub-graphs for each rooted node
-subgraphDiff = DirectedSubgraphDiff(label_init, label_updated)
+subgraphDiff = DirectedSubgraphDiff(connector, label_init, label_updated)
 
 # DEBUG only, implement a for loop over all rooted nodes to query their nodeIDs
 #siteId_initial = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_init), 'ID(n)')
 #siteId_updated = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_updated), 'ID(n)')
-proxies_init = connector.run_cypher_statement('MATCH (n:IfcBuildingElementProxy:{}) RETURN ID(n)'.format(label_init), 'ID(n)')
-proxies_updated = connector.run_cypher_statement('MATCH (n:IfcBuildingElementProxy:{}) RETURN ID(n)'.format(label_updated), 'ID(n)')
 
+id_init = 477
+id_update = 502
 
-for id in zip(proxies_init, proxies_updated): 
-	similar = subgraphDiff.compareChildren(connector, id[0], id[0], True, 0)
-	print('Object with rootNodeId {} is similar: {}'.format(id, similar))
+print('comparing subgraphs of root node {} with {}'.format(id_init, id_update))
+
+# compares the subgraphs of two nodes that should contain the same data
+similar = subgraphDiff.diffSubgraphsOnHash(id_init, id_update)
+
+print('[RESULT] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(id_init, id_update, similar))
 
 # 3: 
 

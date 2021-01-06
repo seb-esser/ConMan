@@ -9,23 +9,38 @@ class DirectedSubgraphDiff:
     """description of class"""
 
 
-    def __init__(self, label_init, label_updated): 
+    def __init__(self, connector, label_init, label_updated): 
+
         self.utils = DiffUtilities()
+        
+        self.connector = connector
         self.label_init = label_init
         self.label_updated = label_updated
         
+    
+    """ compares two directed subgraphs based on the fingerprint of nodes and recursively analyses the entire subgraph """ 
+    def diffSubgraphsOnHash(self, nodeId_init, nodeId_updated):
+        
+        isSimilar = True
+        isSimilar = self.compareChildren(nodeId_init, nodeId_updated, isSimilar, 0)
+        return isSimilar
 
 
-    def compareChildren(self, connector, nodeId_init, nodeId_updated, isSimilar, indent = 0 ): 
+    """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
+    def diffSubgraphsOnCompare(): 
+        pass
+
+
+    def compareChildren(self, nodeId_init, nodeId_updated, isSimilar, indent = 0 ): 
 
         # get children data
-        children_init = self.getChildren(connector, self.label_init, nodeId_init, indent +1)
-        children_updated = self.getChildren(connector, self.label_updated,nodeId_updated, indent +1)
+        children_init = self.getChildren(self.label_init, nodeId_init, indent +1)
+        children_updated = self.getChildren(self.label_updated, nodeId_updated, indent +1)
 
         # leave node
         if len(children_init) == 0 and len(children_updated) == 0: 
             print('- - - ')
-            return 
+            return isSimilar
 
         # compare children and raise an unsimilarity if necessary.
         init_dict = {}
@@ -46,13 +61,13 @@ class DirectedSubgraphDiff:
 
         # loop over all (similar) children
         for similarChild in similarity[0]: 
-            isSimilar = self.compareChildren(connector, similarChild[0], similarChild[1], isSimilar, indent + 1)
+            isSimilar = self.compareChildren(similarChild[0], similarChild[1], isSimilar, indent + 1)
             if isSimilar == False:
                 return isSimilar
 
         return isSimilar
 
-    def getChildren(self, connector, label, parentNodeId, indent = 0): 
+    def getChildren(self, label, parentNodeId, indent = 0): 
 
         # queries all directed neighbors, their relType and their node hashes
 
@@ -62,7 +77,7 @@ class DirectedSubgraphDiff:
 
         cypher = neo4jUtils.BuildMultiStatement([match, where, ret])
 
-        res_raw = connector.run_cypher_statement(cypher)
+        res_raw = self.connector.run_cypher_statement(cypher)
 
         res = self.unpackChildren(res_raw)
 
@@ -73,7 +88,7 @@ class DirectedSubgraphDiff:
             relType = node[1]
             # calc hash of current node
             cypher_hash = neo4jUtils.BuildMultiStatement(self.utils.GetHashByNodeId(label, child_node_id))
-            hash = connector.run_cypher_statement(cypher_hash)[0][0]
+            hash = self.connector.run_cypher_statement(cypher_hash)[0][0]
             ret_obj = {}
             ret_obj['nodeId'] = child_node_id
             ret_obj['relType'] = relType
