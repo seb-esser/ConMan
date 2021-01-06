@@ -27,7 +27,10 @@ class DirectedSubgraphDiff:
 
 
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
-    def diffSubgraphsOnCompare(): 
+    def diffSubgraphsOnCompare(self,  nodeId_init, nodeId_updated): 
+
+
+
         pass
 
 
@@ -42,12 +45,16 @@ class DirectedSubgraphDiff:
             print('- - - ')
             return isSimilar
 
+        # calc hashes for init and updated
+        hashes_ch_init = self.getHashesOfNodes(self.label_init, children_init)
+        hashes_ch_updated = self.getHashesOfNodes(self.label_updated, children_updated)
+
         # compare children and raise an unsimilarity if necessary.
         init_dict = {}
         updated_dict = {}
-        for ch in children_init: 
+        for ch in hashes_ch_init: 
             init_dict[ch['hash'] ] = ch['nodeId']
-        for ch in children_updated: 
+        for ch in hashes_ch_updated: 
             updated_dict[ch['hash'] ] = ch['nodeId']
 
         similarity = self.utils.CompareNodesByHash(init_dict, updated_dict)
@@ -81,9 +88,17 @@ class DirectedSubgraphDiff:
 
         res = self.unpackChildren(res_raw)
 
+       
+        # check if leave node got touched
+        if len(res) == 0:            
+            return []
+        else:
+            return res
+
+    def getHashesOfNodes(self, label, nodeList):
         return_val = []
         # calc corresponding hash
-        for node in res: 
+        for node in nodeList: 
             child_node_id = node[0]
             relType = node[1]
             # calc hash of current node
@@ -95,12 +110,7 @@ class DirectedSubgraphDiff:
             ret_obj['hash'] = hash
             return_val.append(ret_obj)
 
-        # check if leave node got touched
-        if len(res) == 0:            
-            return []
-        else:
-            return return_val
-
+        return return_val
 
 # -- Helper Functions --- 
     def unpackChildren(self, result): 
