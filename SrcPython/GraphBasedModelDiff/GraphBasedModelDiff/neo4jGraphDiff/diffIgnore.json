@@ -1,13 +1,8 @@
 {
-  "IgnoreNodeLabels": [
-    
-    ],
-
-  "IgnoreNodeAttributes": 
-  [
-    "globalId", 
+  "IgnoreNodeAttributes": [
+    "GlobalId",
     "p21_id"
-  ]
+  ],
 
-
+  "IgnoreNodeLabels": []
 }

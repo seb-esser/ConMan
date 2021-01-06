@@ -12,9 +12,9 @@ class DiffIgnore:
 	@classmethod
 	def from_json(cls, jsonfile): 
 
-		json_content = []
+		json_content = None
 		with open(jsonfile) as f: 
-			json_content = json.loads(f)
+			json_content = json.load(f)
 
 		ignore_labels = json_content["IgnoreNodeLabels"]
 		ignore_attrs = json_content["IgnoreNodeAttributes"]
@@ -25,6 +25,6 @@ class DiffIgnore:
 
 		attrs_list = []
 		for ignore_attr in ignore_attrs: 
-			ignore_attr.append(ignore_label)
+			attrs_list.append(ignore_attr)
 
 		return cls(attrs_list, labels_list)
