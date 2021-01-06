@@ -68,7 +68,7 @@ id_update = 502
 print('comparing subgraphs of root node {} with {}'.format(id_init, id_update))
 
 # compares the subgraphs of two nodes that should contain the same data
-# similarHash = subgraphDiff.diffSubgraphsOnHash(id_init, id_update)
+similarHash = subgraphDiff.diffSubgraphsOnHash(id_init, id_update)
 
 
 # print('[RESULT] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(id_init, id_update, similarHash))

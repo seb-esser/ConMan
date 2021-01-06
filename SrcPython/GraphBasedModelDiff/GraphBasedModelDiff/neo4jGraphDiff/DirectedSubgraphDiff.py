@@ -34,14 +34,40 @@ class DirectedSubgraphDiff:
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
     def diffSubgraphsOnCompare(self,  nodeId_init, nodeId_updated): 
 
-        # compare two nodes
-        cypher = neo4jQueryFactory.DiffNodes(nodeId_init, nodeId_updated)
-        raw = self.connector.run_cypher_statement(cypher)
-        diff = self.unpackNodeDiff(raw)
+        self.compareChildrenOnDiff(nodeId_init, nodeId_updated)
 
-        # apply DiffIgnore
-        ignoreAttrs = self.utils.diffIngore.ignore_attrs
-        diff_wouIgnore = self.applyDiffIgnoreOnNodeDiff(diff, ignoreAttrs)
+        
+
+
+    def compareChildrenOnDiff(self, nodeId_init, nodeId_updated, indent=0): 
+
+        # get children data
+        children_init = self.getChildren(self.label_init, nodeId_init, indent +1)
+        children_updated = self.getChildren(self.label_updated, nodeId_updated, indent +1)
+
+        # match possible similar nodes based on relType and children nodeType:
+        all_options = [(x, y) for x in children_init for y in children_updated]
+
+        match = []
+
+        # - note 2021-01-06: continue here
+
+        for candidate in all_options:
+            if ( candidate[0] == candidate[1] ):
+                # same node type and same relationship
+                match.append(candidate)
+
+
+        # check the nodes that have the same relationship and the same node type: 
+        for candidate in match: 
+            # compare two nodes
+            cypher = neo4jQueryFactory.DiffNodes(nodeId_init, nodeId_updated)
+            raw = self.connector.run_cypher_statement(cypher)
+            diff = self.unpackNodeDiff(raw)
+
+            # apply DiffIgnore on diff result 
+            ignoreAttrs = self.utils.diffIngore.ignore_attrs
+            diff_wouIgnore = self.applyDiffIgnoreOnNodeDiff(diff, ignoreAttrs)
 
 
 
@@ -57,18 +83,12 @@ class DirectedSubgraphDiff:
             return isSimilar
 
         # calc hashes for init and updated
-        hashes_ch_init = self.getHashesOfNodes(self.label_init, children_init)
-        hashes_ch_updated = self.getHashesOfNodes(self.label_updated, children_updated)
+        childs_init = self.getHashesOfNodes(self.label_init, children_init)
+        childs_updated = self.getHashesOfNodes(self.label_updated, children_updated)
 
         # compare children and raise an unsimilarity if necessary.
-        init_dict = {}
-        updated_dict = {}
-        for ch in hashes_ch_init: 
-            init_dict[ch['hash'] ] = ch['nodeId']
-        for ch in hashes_ch_updated: 
-            updated_dict[ch['hash'] ] = ch['nodeId']
+        similarity = self.utils.CompareNodesByHash(childs_init, childs_updated)
 
-        similarity = self.utils.CompareNodesByHash(init_dict, updated_dict)
         print("".ljust(indent*4) + 'children unchanged: {}'.format(similarity[0]))
         print("".ljust(indent*4) + 'children added: {}'.format(similarity[1]))
         print("".ljust(indent*4) + 'children deleted: {}'.format(similarity[2]))
@@ -110,35 +130,32 @@ class DirectedSubgraphDiff:
         return_val = []
         # calc corresponding hash
         for node in nodeList: 
-            child_node_id = node[0]
-            relType = node[1]
+            child_node_id = node.id
+            relType = node.type
             # calc hash of current node
             cypher_hash = neo4jUtils.BuildMultiStatement(self.utils.GetHashByNodeId(label, child_node_id))
             hash = self.connector.run_cypher_statement(cypher_hash)[0][0]
-            ret_obj = {}
-            ret_obj['nodeId'] = child_node_id
-            ret_obj['relType'] = relType
-            ret_obj['hash'] = hash
-            return_val.append(ret_obj)
 
-        return return_val
+            node.setHash(hash)
+
+            #ret_obj = {}
+            #ret_obj['nodeId'] = child_node_id
+            #ret_obj['relType'] = relType
+            #ret_obj['hash'] = hash
+            #return_val.append(ret_obj)
+
+        return nodeList
 
 # -- Helper Functions --- 
     def unpackChildren(self, result): 
         ret_val = []
         for res in result: 
-            childId = res[0]
-            relType = res[1]
-            ret_val.append( (childId, relType) )
+            child = ChildData(res[0], res[1]) 
+            ret_val.append(child)
         return ret_val
 
     def unpackNodeDiff(self, result):
-        ret_val = {}
-        ret_val['AttrsUnchanged'] = result[0][0]['inCommon']
-        ret_val['AttrsModified']  = result[0][0]['different']
-        ret_val['AttrsAdded']  =    result[0][0]['rightOnly']
-        ret_val['AttrsDeleted']  =  result[0][0]['leftOnly']
-
+        ret_val = NodeDiff(result[0][0]['inCommon'], result[0][0]['different'],result[0][0]['rightOnly'], result[0][0]['leftOnly'] )
         return ret_val
 
     def applyDiffIgnoreOnNodeDiff(self, diff, IgnoreAttrs): 
@@ -151,3 +168,24 @@ class DirectedSubgraphDiff:
 
 
         return diff
+
+
+class ChildData(): 
+    def __init__(self, id, type):
+        self.id = id
+        self.type = type
+        self.hash = None
+        
+    def setHash(self, hash): 
+        self.hash = hash
+
+    def __repr__(self):
+        return 'ChildData: id: {} type: {} hash: {}'.format(self.id, self.type, self.hash)
+
+
+class NodeDiff(): 
+    def __init__(self, unchanged, modified, added, deleted): 
+        self.AttrsUnchanged = unchanged
+        self.AttrsModified = modified
+        self.AttrsAdded = added
+        self.AttrsDeleted = deleted

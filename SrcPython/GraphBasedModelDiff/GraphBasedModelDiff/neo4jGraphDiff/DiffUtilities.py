@@ -5,7 +5,7 @@
 
 """ modules """
 from .DiffIgnore_parser import DiffIgnore
-
+# from .DirectedSubgraphDiff import ChildData
 
 class DiffUtilities:
 	""" """ 
@@ -59,12 +59,16 @@ class DiffUtilities:
 
 		# loop over all initial nodes
 		
-		for key, val in nodes_init.items():
+		all_hashes_init = [n.hash for n in nodes_init]
+		all_hashes_updated = [n.hash for n in nodes_updated]
+
+		for node in nodes_init:
 			# print('\t hash: {}'.format(key))
-			if key in nodes_updated.keys():
+			if node.hash in all_hashes_updated:
 				# print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_updated[key], key))
 
-				res = ((val, nodes_updated[key]))
+				index = all_hashes_updated.index(node.hash)
+				res = ((node.id, nodes_updated[index].id))
 
 				if res not in nodes_unchanged: 
 					nodes_unchanged.append( res )
@@ -73,22 +77,24 @@ class DiffUtilities:
 				# connector.run_cypher_statement(neo4jUtils.BuildMultiStatement(cypher_connect))
 			else: 
 				# print('\t[RESULT] No match for hashsum {}. Node {} from the initial graph has no matching partner in the updated graph.'.format(key, val))
-				nodes_deleted.append(val);
+				nodes_deleted.append(node.id);
 
 		
 		
 		# loop over updated nodes
-		for key, val in nodes_updated.items():
+		for node in nodes_updated:
 			
-			if key in nodes_init.keys():
+			if node.hash in all_hashes_init:
 				# print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_init[key], key))
-				res = ((nodes_init[key], val))
+				
+				index = all_hashes_init.index(node.hash)
+				res = ((nodes_init[index].id, node.id))
 
 				if res not in nodes_unchanged: 
 					nodes_unchanged.append( res )
 		
 			else: 
 				# print('\t[RESULT] No match for hashsum {}. Node {} from the updated graph has no matching partner in the initial graph.'.format(key, val))
-				nodes_added.append(val)
+				nodes_added.append(node.id)
 
 		return nodes_unchanged, nodes_added, nodes_deleted
