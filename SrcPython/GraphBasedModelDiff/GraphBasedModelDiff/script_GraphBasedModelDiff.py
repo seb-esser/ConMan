@@ -44,14 +44,14 @@ def GetSubGraphOfNode():
 connector = Neo4jConnector(False, False)
 connector.connect_driver()
 
-label_init = "ts20200202T105551"
-label_updated = "ts20200204T105551"
+label_init = "ts20210106T101528"
+label_updated = "ts20210106T101608"
 
 cypher = []
 
 # 1: Check base structure of rooted nodes
-#rootedNodeDiff = RootedNodeDiff()
-#rootedNodeDiff.compareRootedNodes(connector, label_init, label_updated)
+rootedNodeDiff = RootedNodeDiff()
+rootedNodeDiff.compareRootedNodes(connector, label_init, label_updated)
 
 
 # 2: Check sub-graphs for each rooted node
@@ -60,12 +60,13 @@ subgraphDiff = DirectedSubgraphDiff(label_init, label_updated)
 # DEBUG only, implement a for loop over all rooted nodes to query their nodeIDs
 #siteId_initial = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_init), 'ID(n)')
 #siteId_updated = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_updated), 'ID(n)')
-siteId_initial = connector.run_cypher_statement('MATCH (n:IfcBuildingElementProxy:{}) WHERE n.Name = "linear positioned: 1" RETURN ID(n)'.format(label_init), 'ID(n)')
-siteId_updated = connector.run_cypher_statement('MATCH (n:IfcBuildingElementProxy:{}) WHERE n.Name = "linear positioned: 1" RETURN ID(n)'.format(label_updated), 'ID(n)')
+proxies_init = connector.run_cypher_statement('MATCH (n:IfcBuildingElementProxy:{}) RETURN ID(n)'.format(label_init), 'ID(n)')
+proxies_updated = connector.run_cypher_statement('MATCH (n:IfcBuildingElementProxy:{}) RETURN ID(n)'.format(label_updated), 'ID(n)')
 
-similar = subgraphDiff.compareChildren(connector, siteId_initial[0], siteId_updated[0], True, 0)
 
-print('Similar: {}'.format(similar))
+for id in zip(proxies_init, proxies_updated): 
+	similar = subgraphDiff.compareChildren(connector, id[0], id[0], True, 0)
+	print('Object with rootNodeId {} is similar: {}'.format(id, similar))
 
 # 3: 
 
