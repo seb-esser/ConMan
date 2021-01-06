@@ -9,8 +9,8 @@ class neo4jQueryFactory:
 
 	@classmethod
 	def DiffNodes(cls, nodeIDleft, nodeIDright):
-		query_left = 'MATCH l WHERE ID(l) = {}'.format(nodeIDleft)
-		query_right = 'MATCH r WHERE ID(r) = {}'.format(nodeIDright)
+		query_left = 'MATCH (l) WHERE ID(l) = {}'.format(nodeIDleft)
+		query_right = 'MATCH (r) WHERE ID(r) = {}'.format(nodeIDright)
 		ret_statement = 'RETURN apoc.diff.nodes(l,r)'
 		return neo4jUtils.BuildMultiStatement([query_left, query_right, ret_statement])
 

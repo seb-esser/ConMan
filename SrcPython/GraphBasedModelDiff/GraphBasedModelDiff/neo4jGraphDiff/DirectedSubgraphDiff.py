@@ -2,6 +2,7 @@
 
 from .DiffUtilities import DiffUtilities
 from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
+from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 
 
 
@@ -9,10 +10,14 @@ class DirectedSubgraphDiff:
     """description of class"""
 
 
-    def __init__(self, connector, label_init, label_updated): 
+    def __init__(self, connector, label_init, label_updated, diffIgnorePath = None): 
 
-        self.utils = DiffUtilities()
-        
+        if diffIgnorePath != None:
+            self.utils = DiffUtilities(diffIgnorePath)
+            self.UseDiffIgnore = True
+        else: 
+            self.UseDiffIgnore = False
+
         self.connector = connector
         self.label_init = label_init
         self.label_updated = label_updated
@@ -29,9 +34,15 @@ class DirectedSubgraphDiff:
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
     def diffSubgraphsOnCompare(self,  nodeId_init, nodeId_updated): 
 
+        # compare two nodes
+        cypher = neo4jQueryFactory.DiffNodes(nodeId_init, nodeId_updated)
+        raw = self.connector.run_cypher_statement(cypher)
+        diff = self.unpackNodeDiff(raw)
 
+        # apply DiffIgnore
+        ignoreAttrs = self.utils.diffIngore.ignore_attrs
+        diff_wouIgnore = self.applyDiffIgnoreOnNodeDiff(diff, ignoreAttrs)
 
-        pass
 
 
     def compareChildren(self, nodeId_init, nodeId_updated, isSimilar, indent = 0 ): 
@@ -114,9 +125,29 @@ class DirectedSubgraphDiff:
 
 # -- Helper Functions --- 
     def unpackChildren(self, result): 
-        return_val = []
+        ret_val = []
         for res in result: 
             childId = res[0]
             relType = res[1]
-            return_val.append( (childId, relType) )
-        return return_val
+            ret_val.append( (childId, relType) )
+        return ret_val
+
+    def unpackNodeDiff(self, result):
+        ret_val = {}
+        ret_val['AttrsUnchanged'] = result[0][0]['inCommon']
+        ret_val['AttrsModified']  = result[0][0]['different']
+        ret_val['AttrsAdded']  =    result[0][0]['rightOnly']
+        ret_val['AttrsDeleted']  =  result[0][0]['leftOnly']
+
+        return ret_val
+
+    def applyDiffIgnoreOnNodeDiff(self, diff, IgnoreAttrs): 
+
+        for ignore in IgnoreAttrs:
+            if ignore in diff['AttrsUnchanged'].keys(): del diff['AttrsUnchanged'][ignore]
+            if ignore in diff['AttrsAdded'].keys(): del diff['AttrsAdded'][ignore]
+            if ignore in diff['AttrsDeleted'].keys(): del diff['AttrsDeleted'][ignore]
+            if ignore in diff['AttrsModified'].keys(): del diff['AttrsModified'][ignore]
+
+
+        return diff
