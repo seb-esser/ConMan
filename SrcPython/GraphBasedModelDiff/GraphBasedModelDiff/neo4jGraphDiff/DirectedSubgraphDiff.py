@@ -32,20 +32,26 @@ class DirectedSubgraphDiff:
 
 
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
-    def diffSubgraphsOnCompare(self,  nodeId_init, nodeId_updated): 
+    def diffSubgraphsOnCompare(self, nodeId_init, nodeId_updated): 
 
-        self.compareChildrenOnDiff(nodeId_init, nodeId_updated)
-
+        # ToDo: return diff results and not only True/False in case of a spotted difference between init and updated
+        isSimilar = True
+        isSimilar = self.compareChildrenOnDiff(nodeId_init, nodeId_updated, isSimilar)
+        return isSimilar
         
 
 
-    def compareChildrenOnDiff(self, nodeId_init, nodeId_updated, indent=0): 
-
+    def compareChildrenOnDiff(self, nodeId_init, nodeId_updated, isSimilar, indent=0): 
+        """ queries the all child nodes of a node and compares the results between the initial and the updated graph based on AttrDiff"""
         # get children data
         children_init = self.__getChildren(self.label_init, nodeId_init, indent +1)
         children_updated = self.__getChildren(self.label_updated, nodeId_updated, indent +1)
 
-        
+        # leave node?
+        if len(children_init) == 0 and len(children_updated) == 0: 
+            print('- - - ')
+            return isSimilar
+
         matchOnRelType = []
         matchOnChildNodeType = []
 
@@ -70,10 +76,25 @@ class DirectedSubgraphDiff:
             diff_wouIgnore = self.__applyDiffIgnoreOnNodeDiff(diff, ignoreAttrs)
 
             print('comparing node {} to node {} after applying DiffIgnore:'.format(nodeId_init, nodeId_updated))
-            print(diff_wouIgnore)
+           
+            if diff_wouIgnore: 
+                # nodes are similar
+                print('[RESULT]: child nodes match')
+
+                # run recursion
+                self.compareChildrenOnDiff(candidate[0].id, candidate[1].id, isSimilar)
+
+            else: 
+                print('[RESULT]: detected unsimilarity between nodes {} and {}').format(nodeId_init, nodeId_updated)
+                print(diff_wouIgnore)
+                isSimilar = False
+                return False
+            
+        return isSimilar
 
 
     def compareChildren(self, nodeId_init, nodeId_updated, isSimilar, indent = 0 ): 
+        """  queries the all child nodes of a node and compares the results between the initial and the updated graph based on hash comparison """
 
         # get children data
         children_init = self.__getChildren(self.label_init, nodeId_init, indent +1)
@@ -258,3 +279,10 @@ class NodeDiff():
         print('added: {}'.format(self.AttrsAdded))
         print('deleted: {}'.format(self.AttrsDeleted))
         
+
+    def nodesAreSimilar(self): 
+        """ reports if the diffed nodes are similar based in their attributes """
+        if (self.AttrsAdded == {} and self.AttrsDeleted == {} and self.AttrsModified == {} ):
+            return True
+        else:
+            return False
