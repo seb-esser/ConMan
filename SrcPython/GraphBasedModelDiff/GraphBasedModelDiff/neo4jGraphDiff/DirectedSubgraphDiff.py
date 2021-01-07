@@ -42,23 +42,23 @@ class DirectedSubgraphDiff:
     def compareChildrenOnDiff(self, nodeId_init, nodeId_updated, indent=0): 
 
         # get children data
-        children_init = self.getChildren(self.label_init, nodeId_init, indent +1)
-        children_updated = self.getChildren(self.label_updated, nodeId_updated, indent +1)
+        children_init = self.__getChildren(self.label_init, nodeId_init, indent +1)
+        children_updated = self.__getChildren(self.label_updated, nodeId_updated, indent +1)
 
-        # match possible similar nodes based on relType and children nodeType:
-        all_options = [(x, y) for x in children_init for y in children_updated]
+        
+        matchOnRelType = []
+        matchOnChildNodeType = []
 
-        match = []
+        # option 1: match on relType and ignore nodeType
+        matchOnRelType = self.__matchNodesOnRelType(children_init, children_updated)
 
-        # - note 2021-01-06: continue here
+        # option 2: match on nodeType and ignore relType (relevant for data models where the relType is not set)
+        matchOnChildNodeType = self.__matchNodesOnEntityType(children_init, children_updated)
+       
+        # ToDo: implement some config options in the class constructor to trigger, which child matching method should be chosen
+        match = matchOnRelType
 
-        for candidate in all_options:
-            if ( candidate[0] == candidate[1] ):
-                # same node type and same relationship
-                match.append(candidate)
-
-
-        # check the nodes that have the same relationship and the same node type: 
+        # check the nodes that have the same relationship OR the same EntityType and the same node type: 
         for candidate in match: 
             # compare two nodes
             cypher = neo4jQueryFactory.DiffNodes(nodeId_init, nodeId_updated)
@@ -67,15 +67,17 @@ class DirectedSubgraphDiff:
 
             # apply DiffIgnore on diff result 
             ignoreAttrs = self.utils.diffIngore.ignore_attrs
-            diff_wouIgnore = self.applyDiffIgnoreOnNodeDiff(diff, ignoreAttrs)
+            diff_wouIgnore = self.__applyDiffIgnoreOnNodeDiff(diff, ignoreAttrs)
 
+            print('comparing node {} to node {} after applying DiffIgnore:'.format(nodeId_init, nodeId_updated))
+            print(diff_wouIgnore)
 
 
     def compareChildren(self, nodeId_init, nodeId_updated, isSimilar, indent = 0 ): 
 
         # get children data
-        children_init = self.getChildren(self.label_init, nodeId_init, indent +1)
-        children_updated = self.getChildren(self.label_updated, nodeId_updated, indent +1)
+        children_init = self.__getChildren(self.label_init, nodeId_init, indent +1)
+        children_updated = self.__getChildren(self.label_updated, nodeId_updated, indent +1)
 
         # leave node
         if len(children_init) == 0 and len(children_updated) == 0: 
@@ -83,8 +85,8 @@ class DirectedSubgraphDiff:
             return isSimilar
 
         # calc hashes for init and updated
-        childs_init = self.getHashesOfNodes(self.label_init, children_init)
-        childs_updated = self.getHashesOfNodes(self.label_updated, children_updated)
+        childs_init = self.__getHashesOfNodes(self.label_init, children_init)
+        childs_updated = self.__getHashesOfNodes(self.label_updated, children_updated)
 
         # compare children and raise an unsimilarity if necessary.
         similarity = self.utils.CompareNodesByHash(childs_init, childs_updated)
@@ -105,19 +107,19 @@ class DirectedSubgraphDiff:
 
         return isSimilar
 
-    def getChildren(self, label, parentNodeId, indent = 0): 
+    def __getChildren(self, label, parentNodeId, indent = 0): 
 
         # queries all directed neighbors, their relType and their node hashes
 
         match = 'MATCH (n:{}) -[r]->(c)'.format(label)
         where = 'WHERE ID(n) = {}'.format(parentNodeId)
-        ret = 'RETURN ID(c), type(r)'
+        ret = 'RETURN ID(c), type(r), c.entityType'
 
         cypher = neo4jUtils.BuildMultiStatement([match, where, ret])
 
         res_raw = self.connector.run_cypher_statement(cypher)
 
-        res = self.unpackChildren(res_raw)
+        res = self.__unpackChildren(res_raw)
 
        
         # check if leave node got touched
@@ -126,31 +128,89 @@ class DirectedSubgraphDiff:
         else:
             return res
 
-    def getHashesOfNodes(self, label, nodeList):
+    def __getHashesOfNodes(self, label, nodeList):
         return_val = []
         # calc corresponding hash
         for node in nodeList: 
             child_node_id = node.id
-            relType = node.type
+            relType = node.relType
             # calc hash of current node
             cypher_hash = neo4jUtils.BuildMultiStatement(self.utils.GetHashByNodeId(label, child_node_id))
             hash = self.connector.run_cypher_statement(cypher_hash)[0][0]
 
             node.setHash(hash)
 
-            #ret_obj = {}
-            #ret_obj['nodeId'] = child_node_id
-            #ret_obj['relType'] = relType
-            #ret_obj['hash'] = hash
-            #return_val.append(ret_obj)
-
+           
         return nodeList
 
+    def __matchNodesOnRelType(self, children_init, children_updated):
+        """ compares two lists of ChildNodes and returns tuples of possible similar childs based on the same relType to the parent node """
+
+        # init return list
+        matchOnRelType = []
+
+        # extract all relTypes
+        all_relTypes_init = [x.relType for x in children_init] 
+        all_relTypes_updated = [x.relType for x in children_updated] 
+
+        # find relTypes used to connect initial child nodes in updated relTypes
+        for ch in children_init:
+            match_in_updated = ch.relType in all_relTypes_updated
+            if match_in_updated == True: 
+                ind = all_relTypes_updated.index(ch.relType)
+                candidate = (ch, children_updated[ind])
+                if candidate not in matchOnRelType:
+                    matchOnRelType.append(candidate)
+
+        # find relTypes used to connect updated child nodes in initial relTypes       
+        for ch in children_updated:
+            match_in_initial = ch.relType in all_relTypes_init
+            if match_in_initial == True: 
+                ind = all_relTypes_init.index(ch.relType)
+                candidate = (children_init[ind], ch)
+
+                if candidate not in matchOnRelType:
+                    matchOnRelType.append(candidate)
+
+        return matchOnRelType
+
+    def __matchNodesOnEntityType(self, children_init, children_updated): 
+        """ compares two lists of ChildNodes and returns tuples of possible similar childs based on the same entityType """
+
+        # init return list
+        matchOnEntityType = []
+        
+         # extract all relTypes
+        all_EntityTypes_init = [x.entityType for x in children_init] 
+        all_EntityTypes_updated = [x.entityType for x in children_updated] 
+
+        # find relTypes used to connect initial child nodes in updated relTypes
+        for ch in children_init:
+            match_in_updated = ch.entityType in all_EntityTypes_updated
+            if match_in_updated == True: 
+                ind = all_EntityTypes_updated.index(ch.entityType)
+                candidate = (ch, children_updated[ind])
+
+                if candidate not in matchOnEntityType:
+                    matchOnEntityType.append(candidate)
+
+        # find relTypes used to connect updated child nodes in initial relTypes       
+        for ch in children_updated:
+            match_in_initial = ch.entityType in all_EntityTypes_init
+            if match_in_initial == True: 
+                ind = all_EntityTypes_init.index(ch.entityType)
+                candidate = (children_init[ind], ch)
+
+                if candidate not in matchOnEntityType:
+                    matchOnEntityType.append(candidate)
+
+        return matchOnEntityType
+
 # -- Helper Functions --- 
-    def unpackChildren(self, result): 
+    def __unpackChildren(self, result): 
         ret_val = []
         for res in result: 
-            child = ChildData(res[0], res[1]) 
+            child = ChildData(res[0], res[1], res[2]) 
             ret_val.append(child)
         return ret_val
 
@@ -158,29 +218,30 @@ class DirectedSubgraphDiff:
         ret_val = NodeDiff(result[0][0]['inCommon'], result[0][0]['different'],result[0][0]['rightOnly'], result[0][0]['leftOnly'] )
         return ret_val
 
-    def applyDiffIgnoreOnNodeDiff(self, diff, IgnoreAttrs): 
+    def __applyDiffIgnoreOnNodeDiff(self, diff, IgnoreAttrs): 
 
         for ignore in IgnoreAttrs:
-            if ignore in diff['AttrsUnchanged'].keys(): del diff['AttrsUnchanged'][ignore]
-            if ignore in diff['AttrsAdded'].keys(): del diff['AttrsAdded'][ignore]
-            if ignore in diff['AttrsDeleted'].keys(): del diff['AttrsDeleted'][ignore]
-            if ignore in diff['AttrsModified'].keys(): del diff['AttrsModified'][ignore]
+            if ignore in diff.AttrsUnchanged:       del diff.AttrsUnchanged[ignore]
+            if ignore in diff.AttrsAdded:           del diff.AttrsAdded[ignore]
+            if ignore in diff.AttrsDeleted:         del diff.AttrsDeleted[ignore]
+            if ignore in diff.AttrsModified:        del diff.AttrsModified[ignore]
 
 
         return diff
 
 
 class ChildData(): 
-    def __init__(self, id, type):
+    def __init__(self, id, relType, entityType= None):
         self.id = id
-        self.type = type
+        self.entityType = entityType
         self.hash = None
+        self.relType = relType
         
     def setHash(self, hash): 
         self.hash = hash
 
     def __repr__(self):
-        return 'ChildData: id: {} type: {} hash: {}'.format(self.id, self.type, self.hash)
+        return 'ChildData: id: {} nodeType: {} relType = {} hash: {}'.format(self.id, self.NodeType, self.relType, self.hash)
 
 
 class NodeDiff(): 
@@ -189,3 +250,11 @@ class NodeDiff():
         self.AttrsModified = modified
         self.AttrsAdded = added
         self.AttrsDeleted = deleted
+
+
+    def __str__(self): 
+        print('unchanged: {}'.format(self.AttrsUnchanged))
+        print('modified: {}'.format(self.AttrsModified))
+        print('added: {}'.format(self.AttrsAdded))
+        print('deleted: {}'.format(self.AttrsDeleted))
+        
