@@ -7,7 +7,9 @@ from neo4j_middleware.neo4jConnector import Neo4jConnector
 from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
 
 from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
-from neo4jGraphDiff.DirectedSubgraphDiff import DirectedSubgraphDiff
+
+from neo4jGraphDiff.CompareDiff import CompareDiff
+from neo4jGraphDiff.HashDiff import HashDiff
 
 
 # defs
@@ -56,7 +58,8 @@ rootedNodeDiff.compareRootedNodes(connector, label_init, label_updated)
 
 # 2: Check sub-graphs for each rooted node
 diffIgnoreFile = './neo4jGraphDiff/diffIgnore.json'
-subgraphDiff = DirectedSubgraphDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile)
+Diff_onHash = HashDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile)
+Diff_onCompare = CompareDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile)
 
 # DEBUG only, implement a for loop over all rooted nodes to query their nodeIDs
 #siteId_initial = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_init), 'ID(n)')
@@ -68,10 +71,10 @@ id_update = 502
 print('comparing subgraphs of root node {} with {}'.format(id_init, id_update))
 
 # compares the subgraphs of two nodes that should contain the same data
-similarHash = subgraphDiff.diffSubgraphsOnHash(id_init, id_update)
+similarHash = Diff_onHash.diffSubgraphsOnHash(id_init, id_update)
 print('[RESULT HASH-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(id_init, id_update, similarHash))
 
-similarDiff = subgraphDiff.diffSubgraphsOnCompare(id_init, id_update)
+similarDiff = Diff_onCompare.diffSubgraphsOnCompare(id_init, id_update)
 print('[RESULT AttrDiff-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(id_init, id_update, similarDiff))
 
 # 3: 

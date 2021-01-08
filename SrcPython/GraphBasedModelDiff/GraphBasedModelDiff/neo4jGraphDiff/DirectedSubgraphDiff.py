@@ -1,4 +1,5 @@
 
+import abc
 
 from .DiffUtilities import DiffUtilities
 from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
@@ -6,10 +7,10 @@ from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 
 
 
-class DirectedSubgraphDiff:
+class DirectedSubgraphDiff(abc.ABC):
     """description of class"""
 
-
+    @abc.abstractmethod
     def __init__(self, connector, label_init, label_updated, diffIgnorePath = None): 
 
         if diffIgnorePath != None:
@@ -22,112 +23,13 @@ class DirectedSubgraphDiff:
         self.label_init = label_init
         self.label_updated = label_updated
         
-    
-    """ compares two directed subgraphs based on the fingerprint of nodes and recursively analyses the entire subgraph """ 
-    def diffSubgraphsOnHash(self, nodeId_init, nodeId_updated):
-        
-        isSimilar = True
-        isSimilar = self.compareChildren(nodeId_init, nodeId_updated, isSimilar, 0)
-        return isSimilar
 
+    # abstract definition of diffSubgraphs() method, implemented in HashDiff and CompareDiff classes
+    @abc.abstractclassmethod
+    def diffSubgraphs(self, nodeId_init, nodeId_updated):
+        pass
 
-    """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
-    def diffSubgraphsOnCompare(self, nodeId_init, nodeId_updated): 
-
-        # ToDo: return diff results and not only True/False in case of a spotted difference between init and updated
-        isSimilar = True
-        isSimilar = self.compareChildrenOnDiff(nodeId_init, nodeId_updated, isSimilar)
-        return isSimilar
-        
-
-
-    def compareChildrenOnDiff(self, nodeId_init, nodeId_updated, isSimilar, indent=0): 
-        """ queries the all child nodes of a node and compares the results between the initial and the updated graph based on AttrDiff"""
-        # get children data
-        children_init = self.__getChildren(self.label_init, nodeId_init, indent +1)
-        children_updated = self.__getChildren(self.label_updated, nodeId_updated, indent +1)
-
-        # leave node?
-        if len(children_init) == 0 and len(children_updated) == 0: 
-            print('- - - ')
-            return isSimilar
-
-        matchOnRelType = []
-        matchOnChildNodeType = []
-
-        # option 1: match on relType and ignore nodeType
-        matchOnRelType = self.__matchNodesOnRelType(children_init, children_updated)
-
-        # option 2: match on nodeType and ignore relType (relevant for data models where the relType is not set)
-        matchOnChildNodeType = self.__matchNodesOnEntityType(children_init, children_updated)
-       
-        # ToDo: implement some config options in the class constructor to trigger, which child matching method should be chosen
-        match = matchOnRelType
-
-        # check the nodes that have the same relationship OR the same EntityType and the same node type: 
-        for candidate in match: 
-            # compare two nodes
-            cypher = neo4jQueryFactory.DiffNodes(nodeId_init, nodeId_updated)
-            raw = self.connector.run_cypher_statement(cypher)
-            diff = self.unpackNodeDiff(raw)
-
-            # apply DiffIgnore on diff result 
-            ignoreAttrs = self.utils.diffIngore.ignore_attrs
-            diff_wouIgnore = self.__applyDiffIgnoreOnNodeDiff(diff, ignoreAttrs)
-
-            print('comparing node {} to node {} after applying DiffIgnore:'.format(nodeId_init, nodeId_updated))
-           
-            if diff_wouIgnore: 
-                # nodes are similar
-                print('[RESULT]: child nodes match')
-
-                # run recursion
-                self.compareChildrenOnDiff(candidate[0].id, candidate[1].id, isSimilar)
-
-            else: 
-                print('[RESULT]: detected unsimilarity between nodes {} and {}').format(nodeId_init, nodeId_updated)
-                print(diff_wouIgnore)
-                isSimilar = False
-                return False
-            
-        return isSimilar
-
-
-    def compareChildren(self, nodeId_init, nodeId_updated, isSimilar, indent = 0 ): 
-        """  queries the all child nodes of a node and compares the results between the initial and the updated graph based on hash comparison """
-
-        # get children data
-        children_init = self.__getChildren(self.label_init, nodeId_init, indent +1)
-        children_updated = self.__getChildren(self.label_updated, nodeId_updated, indent +1)
-
-        # leave node
-        if len(children_init) == 0 and len(children_updated) == 0: 
-            print('- - - ')
-            return isSimilar
-
-        # calc hashes for init and updated
-        childs_init = self.__getHashesOfNodes(self.label_init, children_init)
-        childs_updated = self.__getHashesOfNodes(self.label_updated, children_updated)
-
-        # compare children and raise an unsimilarity if necessary.
-        similarity = self.utils.CompareNodesByHash(childs_init, childs_updated)
-
-        print("".ljust(indent*4) + 'children unchanged: {}'.format(similarity[0]))
-        print("".ljust(indent*4) + 'children added: {}'.format(similarity[1]))
-        print("".ljust(indent*4) + 'children deleted: {}'.format(similarity[2]))
-
-        if (len(similarity[1]) != 0 or len(similarity[2]) != 0):
-            isSimilar = False
-            return isSimilar
-
-        # loop over all (similar) children
-        for similarChild in similarity[0]: 
-            isSimilar = self.compareChildren(similarChild[0], similarChild[1], isSimilar, indent + 1)
-            if isSimilar == False:
-                return isSimilar
-
-        return isSimilar
-
+    # common method for all subclasses
     def __getChildren(self, label, parentNodeId, indent = 0): 
 
         # queries all directed neighbors, their relType and their node hashes
@@ -149,83 +51,8 @@ class DirectedSubgraphDiff:
         else:
             return res
 
-    def __getHashesOfNodes(self, label, nodeList):
-        return_val = []
-        # calc corresponding hash
-        for node in nodeList: 
-            child_node_id = node.id
-            relType = node.relType
-            # calc hash of current node
-            cypher_hash = neo4jUtils.BuildMultiStatement(self.utils.GetHashByNodeId(label, child_node_id))
-            hash = self.connector.run_cypher_statement(cypher_hash)[0][0]
+   
 
-            node.setHash(hash)
-
-           
-        return nodeList
-
-    def __matchNodesOnRelType(self, children_init, children_updated):
-        """ compares two lists of ChildNodes and returns tuples of possible similar childs based on the same relType to the parent node """
-
-        # init return list
-        matchOnRelType = []
-
-        # extract all relTypes
-        all_relTypes_init = [x.relType for x in children_init] 
-        all_relTypes_updated = [x.relType for x in children_updated] 
-
-        # find relTypes used to connect initial child nodes in updated relTypes
-        for ch in children_init:
-            match_in_updated = ch.relType in all_relTypes_updated
-            if match_in_updated == True: 
-                ind = all_relTypes_updated.index(ch.relType)
-                candidate = (ch, children_updated[ind])
-                if candidate not in matchOnRelType:
-                    matchOnRelType.append(candidate)
-
-        # find relTypes used to connect updated child nodes in initial relTypes       
-        for ch in children_updated:
-            match_in_initial = ch.relType in all_relTypes_init
-            if match_in_initial == True: 
-                ind = all_relTypes_init.index(ch.relType)
-                candidate = (children_init[ind], ch)
-
-                if candidate not in matchOnRelType:
-                    matchOnRelType.append(candidate)
-
-        return matchOnRelType
-
-    def __matchNodesOnEntityType(self, children_init, children_updated): 
-        """ compares two lists of ChildNodes and returns tuples of possible similar childs based on the same entityType """
-
-        # init return list
-        matchOnEntityType = []
-        
-         # extract all relTypes
-        all_EntityTypes_init = [x.entityType for x in children_init] 
-        all_EntityTypes_updated = [x.entityType for x in children_updated] 
-
-        # find relTypes used to connect initial child nodes in updated relTypes
-        for ch in children_init:
-            match_in_updated = ch.entityType in all_EntityTypes_updated
-            if match_in_updated == True: 
-                ind = all_EntityTypes_updated.index(ch.entityType)
-                candidate = (ch, children_updated[ind])
-
-                if candidate not in matchOnEntityType:
-                    matchOnEntityType.append(candidate)
-
-        # find relTypes used to connect updated child nodes in initial relTypes       
-        for ch in children_updated:
-            match_in_initial = ch.entityType in all_EntityTypes_init
-            if match_in_initial == True: 
-                ind = all_EntityTypes_init.index(ch.entityType)
-                candidate = (children_init[ind], ch)
-
-                if candidate not in matchOnEntityType:
-                    matchOnEntityType.append(candidate)
-
-        return matchOnEntityType
 
 # -- Helper Functions --- 
     def __unpackChildren(self, result): 

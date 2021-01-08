@@ -25,10 +25,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="common_base\ifcMapper.py" />
+    <Compile Include="neo4jGraphDiff\CompareDiff.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="neo4jGraphDiff\DirectedSubgraphDiff.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphDiff\DiffUtilities.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="neo4jGraphDiff\HashDiff.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphDiff\RootedNodeDiff.py">
