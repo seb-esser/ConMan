@@ -12,6 +12,7 @@ class CompareDiff(DirectedSubgraphDiff):
     def __init__(self, connector, label_init, label_updated, diffIgnorePath=None):
         return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath)
     
+    # public overwrite method requested by abstract superclass DirectedSubgraphDiff
     def diffSubgraphs(self, nodeId_init, nodeId_updated): 
 
         # ToDo: return diff results and not only True/False in case of a spotted difference between init and updated

@@ -5,7 +5,7 @@
     <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>script_GraphBasedModelDiff.py</StartupFile>
+    <StartupFile>script_testSCC.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -25,6 +25,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="common_base\ifcMapper.py" />
+    <Compile Include="neo4jGraphAnalysis\SCC.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="neo4jGraphDiff\CompareDiff.py">
       <SubType>Code</SubType>
     </Compile>
@@ -65,6 +68,9 @@
     <Compile Include="script_parseIFCjson.py" />
     <Compile Include="script_nxMapper.py" />
     <Compile Include="script_parseIFCp21.py" />
+    <Compile Include="script_testSCC.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="00_sampleData\IFC_stepP21\" />
@@ -77,6 +83,7 @@
     <Folder Include="networkX_middleware\" />
     <Folder Include="00_sampleData\" />
     <Folder Include="neo4jGraphDiff\" />
+    <Folder Include="neo4jGraphAnalysis\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="00_sampleData\IFC_json\output_model01_v4.json" />
