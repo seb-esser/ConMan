@@ -3,6 +3,7 @@
 import abc
 
 from .DirectedSubgraphDiff import DirectedSubgraphDiff
+from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
 
 
 class HashDiff(DirectedSubgraphDiff):
@@ -24,8 +25,9 @@ class HashDiff(DirectedSubgraphDiff):
         """  queries the all child nodes of a node and compares the results between the initial and the updated graph based on hash comparison """
 
         # get children data
-        children_init = self.__getChildren(self.label_init, nodeId_init, indent +1)
-        children_updated = self.__getChildren(self.label_updated, nodeId_updated, indent +1)
+        self._DirectedSubgraphDiff__getChildren
+        children_init =     self._DirectedSubgraphDiff__getChildren(self.label_init, nodeId_init, indent +1)
+        children_updated =  self._DirectedSubgraphDiff__getChildren(self.label_updated, nodeId_updated, indent +1)
 
         # leave node
         if len(children_init) == 0 and len(children_updated) == 0: 

@@ -2,7 +2,7 @@
 import abc
 
 from .DirectedSubgraphDiff import DirectedSubgraphDiff
-
+from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 
 
 class CompareDiff(DirectedSubgraphDiff):
@@ -22,8 +22,9 @@ class CompareDiff(DirectedSubgraphDiff):
     def __compareChildren(self, nodeId_init, nodeId_updated, isSimilar, indent=0): 
         """ queries the all child nodes of a node and compares the results between the initial and the updated graph based on AttrDiff"""
         # get children data
-        children_init = self.__getChildren(self.label_init, nodeId_init, indent +1)
-        children_updated = self.__getChildren(self.label_updated, nodeId_updated, indent +1)
+        self._DirectedSubgraphDiff__getChildren
+        children_init =     self._DirectedSubgraphDiff__getChildren(self.label_init,    nodeId_init, indent +1)
+        children_updated =  self._DirectedSubgraphDiff__getChildren(self.label_updated, nodeId_updated, indent +1)
 
         # leave node?
         if len(children_init) == 0 and len(children_updated) == 0: 
@@ -132,3 +133,14 @@ class CompareDiff(DirectedSubgraphDiff):
                     matchOnEntityType.append(candidate)
 
         return matchOnEntityType
+
+    def __applyDiffIgnoreOnNodeDiff(self, diff, IgnoreAttrs): 
+        """ removes the attributes stated in the used DiffIgnore file from the diff result of apoc """ 
+        for ignore in IgnoreAttrs:
+            if ignore in diff.AttrsUnchanged:       del diff.AttrsUnchanged[ignore]
+            if ignore in diff.AttrsAdded:           del diff.AttrsAdded[ignore]
+            if ignore in diff.AttrsDeleted:         del diff.AttrsDeleted[ignore]
+            if ignore in diff.AttrsModified:        del diff.AttrsModified[ignore]
+
+
+        return diff

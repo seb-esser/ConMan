@@ -51,8 +51,6 @@ class DirectedSubgraphDiff(abc.ABC):
         else:
             return res
 
-   
-
 
 # -- Helper Functions --- 
     def __unpackChildren(self, result): 
@@ -66,17 +64,7 @@ class DirectedSubgraphDiff(abc.ABC):
         ret_val = NodeDiff(result[0][0]['inCommon'], result[0][0]['different'],result[0][0]['rightOnly'], result[0][0]['leftOnly'] )
         return ret_val
 
-    def __applyDiffIgnoreOnNodeDiff(self, diff, IgnoreAttrs): 
-
-        for ignore in IgnoreAttrs:
-            if ignore in diff.AttrsUnchanged:       del diff.AttrsUnchanged[ignore]
-            if ignore in diff.AttrsAdded:           del diff.AttrsAdded[ignore]
-            if ignore in diff.AttrsDeleted:         del diff.AttrsDeleted[ignore]
-            if ignore in diff.AttrsModified:        del diff.AttrsModified[ignore]
-
-
-        return diff
-
+    
 
 class ChildData(): 
     def __init__(self, id, relType, entityType= None):
