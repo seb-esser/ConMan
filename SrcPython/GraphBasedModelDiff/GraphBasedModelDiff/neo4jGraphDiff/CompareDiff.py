@@ -9,7 +9,8 @@ from neo4j_middleware.NodeDiffData import NodeDiffData
 class CompareDiff(DirectedSubgraphDiff):
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
     
-    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None):
+    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, toConsole = False):
+        self.toConsole = False
         return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath)
     
     # public overwrite method requested by abstract superclass DirectedSubgraphDiff
@@ -30,7 +31,8 @@ class CompareDiff(DirectedSubgraphDiff):
 
         # leave node?
         if len(children_init) == 0 and len(children_updated) == 0: 
-            print('- - - ')
+            if self.toConsole:
+                print('- - - ')
             return isSimilar
 
         matchOnRelType = []
@@ -57,18 +59,22 @@ class CompareDiff(DirectedSubgraphDiff):
             ignoreAttrs = self.utils.diffIngore.ignore_attrs
             diff_wouIgnore = self.__applyDiffIgnoreOnNodeDiff(diff, ignoreAttrs)
 
-            print('comparing node {} to node {} after applying DiffIgnore:'.format(nodeId_init, nodeId_updated))
+            if self.toConsole:
+                print('comparing node {} to node {} after applying DiffIgnore:'.format(nodeId_init, nodeId_updated))
            
             if diff_wouIgnore: 
                 # nodes are similar
-                print('[RESULT]: child nodes match')
+                if self.toConsole:
+                    print('[RESULT]: child nodes match')
 
                 # run recursion
                 self.__compareChildren(candidate[0].id, candidate[1].id, isSimilar)
 
-            else: 
-                print('[RESULT]: detected unsimilarity between nodes {} and {}').format(nodeId_init, nodeId_updated)
-                print(diff_wouIgnore)
+            else:
+                if self.toConsole:
+                    print('[RESULT]: detected unsimilarity between nodes {} and {}').format(nodeId_init, nodeId_updated)
+                    print(diff_wouIgnore)
+
                 isSimilar = False
                 return False
             

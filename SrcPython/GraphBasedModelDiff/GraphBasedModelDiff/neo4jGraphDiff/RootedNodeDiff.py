@@ -1,103 +1,35 @@
 
 from .DiffUtilities import DiffUtilities
-from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
+from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jQueryUtils
+from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory 
+from neo4j_middleware.NodeData import NodeData 
+
 
 class RootedNodeDiff:
-	
-	def __init__(self, toConsole = True): 
+	""" """
+	def __init__(self, connector, toConsole = True): 
 		self.toConsole = toConsole
+		self.utils = DiffUtilities()
+		self.connector = connector
 		pass
 
-	def compareRootedNodes(self, connector, label_init, label_updated):
-		hash_statement_init = DiffUtilities.GetHashes(label_init)
-		hash_statement_updated = DiffUtilities.GetHashes(label_updated)
-
-		cypher_hash_init = neo4jUtils.BuildMultiStatement(hash_statement_init)
-		cypher_hash_updated = neo4jUtils.BuildMultiStatement(hash_statement_updated)
-
-		res_init = connector.run_cypher_statement(cypher_hash_init)
-		res_updated = connector.run_cypher_statement(cypher_hash_updated)
-
-		hashes_init = self.extractHashes(res_init)
-		hashes_updated = self.extractHashes(res_updated)
-
-
-		# output
-		if self.toConsole:
-			print('\n')
-			print('[DiffCalc] HASHES for initial model: ')
-			for res in res_init:
-				print(res)
-			print('\n')
-			print('[DiffCalc] HASHES for updated model: ')
-			for res in res_updated:
-				print(res)
-
-
-		# compare hashes: 
-
-		# loop over initial nodes
-		if self.toConsole:
-			print('\n[DiffCalc] Mapping the hashcodes between initial and updated: ')
-
-		# ToDo: Replace this part by common method from DiffUtilities
-		nodes_unchanged = {}
-		nodes_deleted = []
-		nodes_added = []
-
-		# loop over all initial nodes
-		if self.toConsole:
-			print('\n[TASK] Looking for hashes from the initial graph... \n')
-		for key, val in hashes_init.items():
-			# print('\t hash: {}'.format(key))
-			if key in hashes_updated.keys():
-				# print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_updated[key], key))
+	def compareRootedNodes(self, label_init, label_updated):
+		""" """
 		
-				if key not in nodes_unchanged: 
-					nodes_unchanged[key] = (val, hashes_updated[key])
+		nodes_init = self.__getHashesOfRootedNodes(label_init)
+		nodes_updated = self.__getHashesOfRootedNodes(label_updated)
+
+		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodesByHash(nodes_init, nodes_updated)
 		
-				
-				# connector.run_cypher_statement(neo4jUtils.BuildMultiStatement(cypher_connect))
-			else: 
-				# print('\t[RESULT] No match for hashsum {}. Node {} from the initial graph has no matching partner in the updated graph.'.format(key, val))
-				nodes_deleted.append(val);
+		if self.toConsole: 
+			print('Detected unchanged rooted nodes: '.format(nodes_unchanged))
+			print('Added nodes:'.format(nodes_added))
+			print('Deleted nodes: '.format(nodes_deleted))
 
-		
-		if self.toConsole:
-			print('\n[TASK] Looking for hashes from the updated graph... \n')
-		# loop over updated nodes
-		for key, val in hashes_updated.items():
-			if self.toConsole:
-				print('\t hash: {}'.format(key))
-
-			if key in hashes_init.keys():
-				# print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_init[key], key))
-		
-				if key not in nodes_unchanged: 
-					nodes_unchanged[key] = (val, hashes_updated[key])
-
-				
-			else: 
-				# print('\t[RESULT] No match for hashsum {}. Node {} from the updated graph has no matching partner in the initial graph.'.format(key, val))
-				nodes_added.append(val)
-		if self.toConsole:
-			print('Results:')
-			print('\t Deleted nodes: ')
-			for node in nodes_deleted: 
-				print('\t Node {}'.format(node))
-
-			print('\n \t Added nodes: ')
-			for node in nodes_added: 
-				print('\t Node {}'.format(node))
-
-			print('\n \t Unchanged nodes: ')
-			for key, val in nodes_unchanged.items(): 
-				print('\t Hash {:<25} \t Node_Id {:<5} \t NodeId: {}'.format( key, val[0], val[1]))
-
-
-
+		return nodes_unchanged
 
 	def compareRootedNodeRelationships(self):
+		""" """
 		hash_statement_init = DiffUtilities.GetHashes(label_init)
 		hash_statement_updated = DiffUtilities.GetHashes(label_updated)
 
@@ -174,22 +106,22 @@ class RootedNodeDiff:
 			i +=1
 		print()
 		print_grid(adj_updated, hashes_updated_list)
+		
 
 
+	def __getHashesOfRootedNodes(self, label):
+		cy = neo4jQueryFactory.GetHashesByLabel(label)
+		raw = self.connector.run_cypher_statement(cy)
+		return self.__extractHashes(raw)
+		
 
-
-	# private helper functions
-	def extractHashes(self, result): 
-		hashes = []
-		nodeIds = []
+	def __extractHashes(self, result): 
+		nodes = []
 		for res in result: 
-			hash = res[0]
-			nodeId = res[2]
-			hashes.append(hash)
-			nodeIds.append(nodeId)
+			node = NodeData(res[0],None, res[1])
+			node.setHash(res[2])
+			nodes.append(node)
 	
-		return_dict = dict(zip(hashes, nodeIds))
-
-		return return_dict
+		return nodes
 
 

@@ -1,4 +1,4 @@
-class ChildData:
+class NodeData:
     """description of class"""
 
     def __init__(self, id, relType, entityType= None):
@@ -11,7 +11,7 @@ class ChildData:
         self.hash = hash
 
     def __repr__(self):
-        return 'ChildData: id: {} nodeType: {} relType = {} hash: {}'.format(self.id, self.NodeType, self.relType, self.hash)
+        return 'NodeData: id: {} nodeType: {} relType = {} hash: {}'.format(self.id, self.NodeType, self.relType, self.hash)
 
     @classmethod
     def fromNeo4jResponse(cls, raw):

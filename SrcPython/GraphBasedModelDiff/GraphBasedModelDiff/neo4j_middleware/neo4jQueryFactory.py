@@ -29,3 +29,14 @@ class neo4jQueryFactory:
 		ret_statement = 'RETURN ID(n)'
 		return neo4jUtils.BuildMultiStatement([query, wh, ret_statement])
 
+	@classmethod
+	def GetHashesByLabel(cls, label):
+		getModel = 'MATCH(n:rootedNode:{})'.format(label)
+		open_sub = 'CALL {WITH n'
+		removeLabel = 'REMOVE n:{}'.format(label)
+		calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash RETURN hash'.format('["p21_id"]')
+		close_sub = '}'
+		add_label_again = 'SET n:{}'.format(label)
+		return_results = 'RETURN ID(n), n.entityType, hash'
+		
+		return neo4jUtils.BuildMultiStatement([getModel, open_sub, removeLabel, calc_fingerprint, close_sub, add_label_again, return_results])

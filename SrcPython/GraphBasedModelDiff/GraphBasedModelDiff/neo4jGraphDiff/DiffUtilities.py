@@ -5,7 +5,7 @@
 
 """ modules """
 from .DiffIgnore_parser import DiffIgnore
-# from .DirectedSubgraphDiff import ChildData
+
 
 class DiffUtilities:
 	""" """ 
@@ -16,16 +16,6 @@ class DiffUtilities:
 			self.diffIngore = DiffIgnore.from_json(diffIgnorePath)
 
 		
-	def GetHashes(label):
-		getModel = 'MATCH(n:rootedNode:{})'.format(label)
-		open_sub = 'CALL {WITH n'
-		removeLabel = 'REMOVE n:{}'.format(label)
-		calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash RETURN hash'.format('["p21_id"]')
-		close_sub = '}'
-		add_label_again = 'SET n:{}'.format(label)
-		return_results = 'RETURN hash, n.entityType, ID(n)'
-		return [getModel, open_sub, removeLabel, calc_fingerprint, close_sub, add_label_again, return_results]
-
 	def GetHashByNodeId(self, label, nodeId):
 		getModel = 'MATCH(n:{})'.format(label)
 		where = 'WHERE ID(n) = {}'.format(nodeId)
@@ -44,7 +34,7 @@ class DiffUtilities:
 		return [getModel, where, open_sub, removeLabel, fingerprint_with_ign, close_sub, add_label_again, return_results]
 
 
-	def ConnectNodesWithSameHash(NodeIdFrom, NodeIdTo):
+	def ConnectNodesWithSameHash(self, NodeIdFrom, NodeIdTo):
 		fromNode = 'MATCH (s) WHERE ID(s) = {}'.format(NodeIdFrom)
 		toNode = 'MATCH (t) WHERE ID(t) = {}'.format(NodeIdTo)
 		merge = 'MERGE (s)-[r:{}]->(t)'.format('IS_EQUAL_TO')

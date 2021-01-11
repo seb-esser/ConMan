@@ -5,7 +5,7 @@
     <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>script_testSCC.py</StartupFile>
+    <StartupFile>script_GraphBasedModelDiff.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -43,7 +43,7 @@
     <Compile Include="neo4jGraphDiff\RootedNodeDiff.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="neo4j_middleware\ChildData.py">
+    <Compile Include="neo4j_middleware\NodeData.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4j_middleware\NodeDiffData.py">

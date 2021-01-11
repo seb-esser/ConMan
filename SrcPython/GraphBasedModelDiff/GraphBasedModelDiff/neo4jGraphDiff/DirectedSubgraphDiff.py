@@ -6,7 +6,7 @@ from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUti
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 
 # classes to decode neo4j query responses
-from neo4j_middleware.ChildData import ChildData
+from neo4j_middleware.NodeData import NodeData
 from neo4j_middleware.NodeDiffData import NodeDiffData
 
 
@@ -45,8 +45,8 @@ class DirectedSubgraphDiff(abc.ABC):
 
         raw = self.connector.run_cypher_statement(cypher)
         
-        # unpack neo4j response into a list if ChildData instances
-        res = ChildData.fromNeo4jResponse(raw)
+        # unpack neo4j response into a list if NodeData instances
+        res = NodeData.fromNeo4jResponse(raw)
 
        
         # check if leave node got touched

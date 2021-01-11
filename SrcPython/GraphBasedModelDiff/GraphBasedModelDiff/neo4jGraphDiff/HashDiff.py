@@ -9,7 +9,8 @@ from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUti
 class HashDiff(DirectedSubgraphDiff):
     """description of class"""
 
-    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None):
+    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, toConsole = False):
+        self.toConsole = toConsole
         return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath)
     
     def diffSubgraphs(self, nodeId_init, nodeId_updated): 
@@ -25,13 +26,13 @@ class HashDiff(DirectedSubgraphDiff):
         """  queries the all child nodes of a node and compares the results between the initial and the updated graph based on hash comparison """
 
         # get children data
-        self._DirectedSubgraphDiff__getChildren
         children_init =     self._DirectedSubgraphDiff__getChildren(self.label_init, nodeId_init, indent +1)
         children_updated =  self._DirectedSubgraphDiff__getChildren(self.label_updated, nodeId_updated, indent +1)
 
         # leave node
         if len(children_init) == 0 and len(children_updated) == 0: 
-            print('- - - ')
+            if self.toConsole:
+                print('- - - ')
             return isSimilar
 
         # calc hashes for init and updated
@@ -40,10 +41,10 @@ class HashDiff(DirectedSubgraphDiff):
 
         # compare children and raise an unsimilarity if necessary.
         similarity = self.utils.CompareNodesByHash(childs_init, childs_updated)
-
-        print("".ljust(indent*4) + 'children unchanged: {}'.format(similarity[0]))
-        print("".ljust(indent*4) + 'children added: {}'.format(similarity[1]))
-        print("".ljust(indent*4) + 'children deleted: {}'.format(similarity[2]))
+        if self.toConsole:
+            print("".ljust(indent*4) + 'children unchanged: {}'.format(similarity[0]))
+            print("".ljust(indent*4) + 'children added: {}'.format(similarity[1]))
+            print("".ljust(indent*4) + 'children deleted: {}'.format(similarity[2]))
 
         if (len(similarity[1]) != 0 or len(similarity[2]) != 0):
             isSimilar = False
