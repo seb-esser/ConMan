@@ -4,12 +4,14 @@ import abc
 from .DiffUtilities import DiffUtilities
 from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
+
+# classes to decode neo4j query responses
 from neo4j_middleware.ChildData import ChildData
 from neo4j_middleware.NodeDiffData import NodeDiffData
 
 
 class DirectedSubgraphDiff(abc.ABC):
-    """description of class"""
+    """abstract super class for all subgraph diff methods """
 
     @abc.abstractmethod
     def __init__(self, connector, label_init, label_updated, diffIgnorePath = None): 
@@ -41,9 +43,10 @@ class DirectedSubgraphDiff(abc.ABC):
 
         cypher = neo4jUtils.BuildMultiStatement([match, where, ret])
 
-        res_raw = self.connector.run_cypher_statement(cypher)
-
-        res = self.__unpackChildren(res_raw)
+        raw = self.connector.run_cypher_statement(cypher)
+        
+        # unpack neo4j response into a list if ChildData instances
+        res = ChildData.fromNeo4jResponse(raw)
 
        
         # check if leave node got touched
@@ -51,15 +54,4 @@ class DirectedSubgraphDiff(abc.ABC):
             return []
         else:
             return res
-
-
-# -- Helper Functions --- 
-    def __unpackChildren(self, result): 
-        ret_val = []
-        for res in result: 
-            child = ChildData(res[0], res[1], res[2]) 
-            ret_val.append(child)
-        return ret_val
-
-
 

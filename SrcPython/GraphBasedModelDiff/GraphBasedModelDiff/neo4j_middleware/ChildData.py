@@ -13,4 +13,10 @@ class ChildData:
     def __repr__(self):
         return 'ChildData: id: {} nodeType: {} relType = {} hash: {}'.format(self.id, self.NodeType, self.relType, self.hash)
 
-
+    @classmethod
+    def fromNeo4jResponse(cls, raw):
+        ret_val = []
+        for inst in raw: 
+            child = cls(inst[0], inst[1], inst[2]) 
+            ret_val.append(child)
+        return ret_val
