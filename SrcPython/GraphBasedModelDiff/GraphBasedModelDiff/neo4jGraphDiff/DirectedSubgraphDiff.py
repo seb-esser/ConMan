@@ -4,7 +4,8 @@ import abc
 from .DiffUtilities import DiffUtilities
 from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
-
+from neo4j_middleware.ChildData import ChildData
+from neo4j_middleware.NodeDiffData import NodeDiffData
 
 
 class DirectedSubgraphDiff(abc.ABC):
@@ -60,44 +61,5 @@ class DirectedSubgraphDiff(abc.ABC):
             ret_val.append(child)
         return ret_val
 
-    def unpackNodeDiff(self, result):
-        ret_val = NodeDiff(result[0][0]['inCommon'], result[0][0]['different'],result[0][0]['rightOnly'], result[0][0]['leftOnly'] )
-        return ret_val
-
-    
-
-class ChildData(): 
-    def __init__(self, id, relType, entityType= None):
-        self.id = id
-        self.entityType = entityType
-        self.hash = None
-        self.relType = relType
-        
-    def setHash(self, hash): 
-        self.hash = hash
-
-    def __repr__(self):
-        return 'ChildData: id: {} nodeType: {} relType = {} hash: {}'.format(self.id, self.NodeType, self.relType, self.hash)
 
 
-class NodeDiff(): 
-    def __init__(self, unchanged, modified, added, deleted): 
-        self.AttrsUnchanged = unchanged
-        self.AttrsModified = modified
-        self.AttrsAdded = added
-        self.AttrsDeleted = deleted
-
-
-    def __str__(self): 
-        print('unchanged: {}'.format(self.AttrsUnchanged))
-        print('modified: {}'.format(self.AttrsModified))
-        print('added: {}'.format(self.AttrsAdded))
-        print('deleted: {}'.format(self.AttrsDeleted))
-        
-
-    def nodesAreSimilar(self): 
-        """ reports if the diffed nodes are similar based in their attributes """
-        if (self.AttrsAdded == {} and self.AttrsDeleted == {} and self.AttrsModified == {} ):
-            return True
-        else:
-            return False

@@ -3,6 +3,7 @@ import abc
 
 from .DirectedSubgraphDiff import DirectedSubgraphDiff
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
+from neo4j_middleware.NodeDiffData import NodeDiffData
 
 
 class CompareDiff(DirectedSubgraphDiff):
@@ -48,7 +49,8 @@ class CompareDiff(DirectedSubgraphDiff):
             # compare two nodes
             cypher = neo4jQueryFactory.DiffNodes(nodeId_init, nodeId_updated)
             raw = self.connector.run_cypher_statement(cypher)
-            diff = self.unpackNodeDiff(raw)
+            #diff = self.unpackNodeDiff(raw)
+            diff = NodeDiffData.fromNeo4jResponse(raw)
 
             # apply DiffIgnore on diff result 
             ignoreAttrs = self.utils.diffIngore.ignore_attrs

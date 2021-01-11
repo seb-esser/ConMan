@@ -40,6 +40,12 @@
     <Compile Include="neo4jGraphDiff\RootedNodeDiff.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="neo4j_middleware\ChildData.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="neo4j_middleware\NodeDiffData.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="script_GraphBasedModelDiff.py" />
     <Compile Include="grGen_middleware\ifcGrGen_SchemaMapper.py" />
     <Compile Include="neo4jGraphDiff\DiffIgnore_parser.py" />
