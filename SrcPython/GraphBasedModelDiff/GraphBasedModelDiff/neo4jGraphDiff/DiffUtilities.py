@@ -42,6 +42,7 @@ class DiffUtilities:
 
 
 	def CompareNodesByHash(self, nodes_init, nodes_updated):
+		# ToDo: react if hashes occure multiple times in the nodes_lists
 
 		nodes_unchanged = []
 		nodes_deleted = []
