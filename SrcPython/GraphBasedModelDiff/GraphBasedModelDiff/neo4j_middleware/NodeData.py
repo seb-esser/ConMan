@@ -11,7 +11,7 @@ class NodeData:
         self.hash = hash
 
     def __repr__(self):
-        return 'NodeData: id: {} nodeType: {} relType = {} hash: {}'.format(self.id, self.NodeType, self.relType, self.hash)
+        return 'NodeData: id: {} entityType: {}'.format(self.id, self.entityType)
 
     @classmethod
     def fromNeo4jResponse(cls, raw):

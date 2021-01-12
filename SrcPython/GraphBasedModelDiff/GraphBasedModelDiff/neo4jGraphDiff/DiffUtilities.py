@@ -1,7 +1,7 @@
 
 
 """ package """
-
+import itertools
 
 """ modules """
 from .DiffIgnore_parser import DiffIgnore
@@ -41,51 +41,47 @@ class DiffUtilities:
 		return [fromNode, toNode, merge]
 
 
-	def CompareNodesByHash(self, nodes_init, nodes_updated):
+	def CompareNodesByHash(self, nodes_init, nodes_updated, considerRelType = True):
 		# ToDo: react if hashes occure multiple times in the nodes_lists
 
 		nodes_unchanged = []
 		nodes_deleted = []
 		nodes_added = []
 
-		# loop over all initial nodes
 		
-		all_hashes_init = [n.hash for n in nodes_init]
-		all_hashes_updated = [n.hash for n in nodes_updated]
+		if considerRelType == False:
+			# match nodes based on hash and reltype
+			A=nodes_init
+			B=nodes_updated
+			matched_pairs = ((x,y) for x,y in itertools.product(A, B) if x.hash == y.hash)
+						
+			nodes_added = nodes_updated
+			nodes_deleted = nodes_init
 
-		for node in nodes_init:
-			# print('\t hash: {}'.format(key))
-			if node.hash in all_hashes_updated:
-				# print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_updated[key], key))
+			for pair in matched_pairs:
+				nodes_added.remove(pair[1])
+				nodes_deleted.remove(pair[0])
+				nodes_unchanged.append((pair[0].id, pair[1].id ))
 
-				index = all_hashes_updated.index(node.hash)
-				res = ((node.id, nodes_updated[index].id))
-
-				if res not in nodes_unchanged: 
-					nodes_unchanged.append( res )
+			nodes_added = [x.id for x in nodes_added]
+			nodes_deleted = [x.id for x in nodes_deleted]
 		
-				
-				# connector.run_cypher_statement(neo4jUtils.BuildMultiStatement(cypher_connect))
-			else: 
-				# print('\t[RESULT] No match for hashsum {}. Node {} from the initial graph has no matching partner in the updated graph.'.format(key, val))
-				nodes_deleted.append(node.id);
+		else:
+					
+			# match nodes based on hash and reltype
+			A=nodes_init
+			B=nodes_updated
+			matched_pairs = ((x,y) for x,y in itertools.product(A, B) if x.hash == y.hash and x.relType == y.relType)
+						
+			nodes_added = nodes_updated
+			nodes_deleted = nodes_init
 
-		
-		
-		# loop over updated nodes
-		for node in nodes_updated:
-			
-			if node.hash in all_hashes_init:
-				# print('\t[RESULT] Link {} with {} based on common hashsum {}'.format(val, hashes_init[key], key))
-				
-				index = all_hashes_init.index(node.hash)
-				res = ((nodes_init[index].id, node.id))
+			for pair in matched_pairs:
+				nodes_added.remove(pair[1])
+				nodes_deleted.remove(pair[0])
+				nodes_unchanged.append((pair[0].id, pair[1].id ))
 
-				if res not in nodes_unchanged: 
-					nodes_unchanged.append( res )
-		
-			else: 
-				# print('\t[RESULT] No match for hashsum {}. Node {} from the updated graph has no matching partner in the initial graph.'.format(key, val))
-				nodes_added.append(node.id)
+			nodes_added = [x.id for x in nodes_added]
+			nodes_deleted = [x.id for x in nodes_deleted]
 
 		return nodes_unchanged, nodes_added, nodes_deleted
