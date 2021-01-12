@@ -89,8 +89,10 @@ class IFCp21_neo4jMapper(IfcMapper):
 
                 # reserve suitable names for the relationships between parent and children
                 for i in range(len(val)):
-                    complex_attrs.append(key)
-            
+                    # append the list item index to the relationship type 
+                    rel_type = key + '__listItem_' + str(i)
+                    complex_attrs.append(rel_type)
+                    
             # detecting a simple child node
             else: 
                 if val != None: 
