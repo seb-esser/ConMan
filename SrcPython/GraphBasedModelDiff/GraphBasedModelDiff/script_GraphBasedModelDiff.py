@@ -19,8 +19,14 @@ from neo4jGraphDiff.HashDiff import HashDiff
 connector = Neo4jConnector(False, False)
 connector.connect_driver()
 
-label_init = "ts20210106T110329"
-label_updated = "ts20210106T110250"
+# sleeper sample
+label_init = "ts20200202T105551"
+label_updated = "ts20200204T105551"
+
+
+## cuboid sample
+#label_init = "ts20210106T110329"
+#label_updated = "ts20210106T110250"
 
 cypher = []
 
