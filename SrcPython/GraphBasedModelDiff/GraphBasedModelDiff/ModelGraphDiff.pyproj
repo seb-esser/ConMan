@@ -104,6 +104,7 @@
     <Content Include="00_sampleData\IFC_stepP21\spatial_initial.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\spatial_updated.ifc" />
     <Content Include="neo4jGraphDiff\diffIgnore.json" />
+    <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="CondaEnv|CondaEnv|ConsistencyManager" />
