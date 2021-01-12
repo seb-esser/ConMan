@@ -62,8 +62,8 @@ connector = Neo4jConnector(False, True)
 connector.connect_driver()
 
 
-model_path_init =		'./00_sampleData/IFC_stepP21/shapeRepr_01/sameRepr.ifc'
-model_path_updated =	'./00_sampleData/IFC_stepP21/shapeRepr_01/separatedRepr.ifc'
+model_path_init =		'./00_sampleData/IFC_stepP21/sampleModel4x1_init.ifc'
+model_path_updated =	'./00_sampleData/IFC_stepP21/sampleModel4x1_updated.ifc'
 
 # parse model
 parseModel(connector, model_path_init)

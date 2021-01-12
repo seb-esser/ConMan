@@ -62,8 +62,9 @@ for pair in unchanged_rootedNodeIds:
 	elapsed_time_diff = time.process_time() - t_diff
 	times_diff.append(elapsed_time_diff)
 
-
+print('elapsed time for HASH based comparison: {}'.format(sum(times_hash)))
 print(times_hash)
+print('elapsed time for DIFF based comparison: {}'.format(sum(times_diff)))
 print(times_diff)
 
 ## DEBUG only, implement a for loop over all rooted nodes to query their nodeIDs
