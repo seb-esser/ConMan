@@ -9,9 +9,9 @@ from neo4j_middleware.NodeDiffData import NodeDiffData
 class CompareDiff(DirectedSubgraphDiff):
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
     
-    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, toConsole = False):
-        self.toConsole = False
-        return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath)
+    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, LogtoConsole = False):
+        
+        return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath, toConsole = LogtoConsole)
     
     # public overwrite method requested by abstract superclass DirectedSubgraphDiff
     def diffSubgraphs(self, nodeId_init, nodeId_updated): 
@@ -34,6 +34,12 @@ class CompareDiff(DirectedSubgraphDiff):
             if self.toConsole:
                 print('- - - ')
             return isSimilar
+
+        # apply DiffIgnore -> Ingore nodes if requested
+        if self.UseDiffIgnore: 
+            children_init = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_init)
+            children_updated = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_updated)
+
 
         matchOnRelType = []
         matchOnChildNodeType = []

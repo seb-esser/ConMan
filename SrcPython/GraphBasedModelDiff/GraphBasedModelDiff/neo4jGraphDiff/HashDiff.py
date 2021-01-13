@@ -9,9 +9,9 @@ from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUti
 class HashDiff(DirectedSubgraphDiff):
     """description of class"""
 
-    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, toConsole = False):
-        self.toConsole = toConsole
-        return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath)
+    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, LogtoConsole = False):
+        
+        return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath, toConsole=LogtoConsole)
     
     def diffSubgraphs(self, nodeId_init, nodeId_updated): 
 
@@ -38,6 +38,12 @@ class HashDiff(DirectedSubgraphDiff):
         # calc hashes for init and updated
         childs_init = self.__getHashesOfNodes(self.label_init, children_init)
         childs_updated = self.__getHashesOfNodes(self.label_updated, children_updated)
+
+        # apply DiffIgnore -> Ingore nodes if requested
+        if self.UseDiffIgnore: 
+            children_init = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_init)
+            children_updated = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_updated)
+
 
         # compare children and raise an unsimilarity if necessary.
         similarity = self.utils.CompareNodesByHash(childs_init, childs_updated)

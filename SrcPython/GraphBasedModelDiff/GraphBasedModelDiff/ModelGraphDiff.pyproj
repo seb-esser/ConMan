@@ -75,6 +75,7 @@
   <ItemGroup>
     <Folder Include="00_sampleData\IFC_stepP21\" />
     <Folder Include="00_sampleData\IFC_json\" />
+    <Folder Include="00_sampleData\IFC_stepP21\wall-column\" />
     <Folder Include="00_sampleData\IFC_stepP21\shapeRepr_01\" />
     <Folder Include="neo4j_middleware\" />
     <Folder Include="common_base\" />
@@ -103,6 +104,8 @@
     <Content Include="00_sampleData\IFC_stepP21\shapeRepr_01\separatedRepr.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\spatial_initial.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\spatial_updated.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\wall-column\Column-Wall.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\wall-column\Wall-Column.ifc" />
     <Content Include="neo4jGraphDiff\diffIgnore.json" />
     <Content Include="requirements.txt" />
   </ItemGroup>

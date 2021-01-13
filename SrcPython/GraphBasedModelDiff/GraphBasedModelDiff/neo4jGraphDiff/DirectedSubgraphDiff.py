@@ -14,7 +14,9 @@ class DirectedSubgraphDiff(abc.ABC):
     """abstract super class for all subgraph diff methods """
 
     @abc.abstractmethod
-    def __init__(self, connector, label_init, label_updated, diffIgnorePath = None): 
+    def __init__(self, connector, label_init, label_updated, diffIgnorePath = None, toConsole = False): 
+
+        self.toConsole = toConsole
 
         if diffIgnorePath != None:
             self.utils = DiffUtilities(diffIgnorePath)
@@ -55,3 +57,21 @@ class DirectedSubgraphDiff(abc.ABC):
         else:
             return res
 
+    def __applyDiffIgnore_Nodes(self, node_list):
+        """ removes nodes from a list if their type is set to be ignored """
+        if self.UseDiffIgnore == False:
+            raise Exception('UseDiffIgnore was set to false. You have tried to apply it anyway. Please check your settings')
+
+        # ToDo: Logging: Add info statement that ingoreNodes got applied. 
+
+        # get entity types that shall be ignored in the subgraph diff
+        ignore_entityTypes = self.utils.diffIngore.ignore_node_tpes
+
+        return_list = node_list
+
+        for node in node_list: 
+            if node.entityType in ignore_entityTypes:
+                return_list.remove(node)
+
+        # ToDo: Logging: Add info statement if nodes got removed or not
+        return return_list

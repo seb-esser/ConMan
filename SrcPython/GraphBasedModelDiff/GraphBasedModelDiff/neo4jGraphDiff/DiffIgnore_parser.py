@@ -16,7 +16,7 @@ class DiffIgnore:
 		with open(jsonfile) as f: 
 			json_content = json.load(f)
 
-		ignore_labels = json_content["IgnoreNodeLabels"]
+		ignore_labels = json_content["IgnoreNodeTypes"]
 		ignore_attrs = json_content["IgnoreNodeAttributes"]
 
 		labels_list = []

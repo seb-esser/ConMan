@@ -19,26 +19,31 @@ from neo4jGraphDiff.HashDiff import HashDiff
 connector = Neo4jConnector(False, False)
 connector.connect_driver()
 
-# sleeper sample
-label_init = "ts20200202T105551"
-label_updated = "ts20200204T105551"
+## sleeper sample
+#label_init = "ts20200202T105551"
+#label_updated = "ts20200204T105551"
 
 
 ## cuboid sample
 #label_init = "ts20210106T110329"
 #label_updated = "ts20210106T110250"
 
+
+# wall column sample
+label_init = "ts20200713T083450"
+label_updated = "ts20200713T083447"
+
 cypher = []
 
 # 1: Check base structure of rooted nodes
-rootedNodeDiff = RootedNodeDiff(connector)
+rootedNodeDiff = RootedNodeDiff(connector, toConsole=True)
 unchanged_rootedNodeIds = rootedNodeDiff.compareRootedNodes(label_init, label_updated)
 
 
 # 2: Check sub-graphs for each rooted node
 diffIgnoreFile = './neo4jGraphDiff/diffIgnore.json'
-Diff_onHash = HashDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile)
-Diff_onCompare = CompareDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile)
+Diff_onHash = HashDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile, LogtoConsole=True)
+Diff_onCompare = CompareDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile, LogtoConsole=True)
 
 times_hash = []
 for pair in unchanged_rootedNodeIds: 
