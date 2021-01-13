@@ -16,7 +16,7 @@ class DiffUtilities:
 			self.diffIngore = DiffIgnore.from_json(diffIgnorePath)
 
 		
-	def GetHashByNodeId(self, label, nodeId):
+	def GetHashByNodeId(self, label, nodeId, attrIgnoreList = None):
 		getModel = 'MATCH(n:{})'.format(label)
 		where = 'WHERE ID(n) = {}'.format(nodeId)
 
@@ -24,14 +24,16 @@ class DiffUtilities:
 		# ToDo: implement DiffIgnore labels here
 		# ToDo: implement DiffIgnore attributes here
 		removeLabel = 'REMOVE n:{}'.format(label)
-		# calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash RETURN hash'
-
-		fingerprint_with_ign = 'with apoc.hashing.fingerprint(n, {}) as hash RETURN hash'.format('["p21_id"]')
+		if attrIgnoreList == None:
+			calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash RETURN hash'
+		else:
+			ignoreString = self.__buildIgnoreString(attrIgnoreList)
+			calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash RETURN hash'.format(ignoreString)
 
 		close_sub = '}'
 		add_label_again = 'SET n:{}'.format(label)
 		return_results = 'RETURN hash, n.entityType, ID(n)'
-		return [getModel, where, open_sub, removeLabel, fingerprint_with_ign, close_sub, add_label_again, return_results]
+		return [getModel, where, open_sub, removeLabel, calc_fingerprint, close_sub, add_label_again, return_results]
 
 
 	def ConnectNodesWithSameHash(self, NodeIdFrom, NodeIdTo):
@@ -85,3 +87,20 @@ class DiffUtilities:
 			nodes_deleted = [x.id for x in nodes_deleted]
 
 		return nodes_unchanged, nodes_added, nodes_deleted
+
+	def __buildIgnoreString(self, attr_ignore_list):
+		""" generates the necessary string to exclude a given list of attributes that should not taken into account when calculating the hashsum""" 
+		
+		# open 
+		my_string = '['
+
+		# all attrs
+		for attr in attr_ignore_list:
+			my_string = my_string + '"{}", '.format(attr)
+
+		# remove last comma
+		my_string = my_string[:-2]
+		# close
+		my_string = my_string + ']'
+
+		return my_string

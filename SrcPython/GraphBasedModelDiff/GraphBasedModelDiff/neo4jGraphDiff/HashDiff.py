@@ -67,15 +67,23 @@ class HashDiff(DirectedSubgraphDiff):
 
     def __getHashesOfNodes(self, label, nodeList):
         return_val = []
+
+        ignore_attrs = self.utils.diffIngore.ignore_attrs
+
         # calc corresponding hash
         for node in nodeList: 
             child_node_id = node.id
             relType = node.relType
             # calc hash of current node
-            cypher_hash = neo4jUtils.BuildMultiStatement(self.utils.GetHashByNodeId(label, child_node_id))
+            cypher_hash = neo4jUtils.BuildMultiStatement(self.utils.GetHashByNodeId(label, child_node_id, ignore_attrs ))
             hash = self.connector.run_cypher_statement(cypher_hash)[0][0]
 
             node.setHash(hash)
 
-           
+        if self.toConsole: 
+            print('Calculated hashes for model >> {} <<:'.format(label))
+            for node in nodeList:
+                print('\t NodeID: {:<4} \t hash: {}'.format(node.id, node.hash))
+
+
         return nodeList
