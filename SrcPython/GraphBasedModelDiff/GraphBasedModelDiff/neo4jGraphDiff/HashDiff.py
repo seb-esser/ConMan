@@ -46,7 +46,7 @@ class HashDiff(DirectedSubgraphDiff):
 
 
         # compare children and raise an unsimilarity if necessary.
-        similarity = self.utils.CompareNodesByHash(childs_init, childs_updated)
+        similarity = self.utils.CompareNodesByHash(childs_init, childs_updated, considerRelType=False)
         if self.toConsole:
             print("".ljust(indent*4) + 'children unchanged: {}'.format(similarity[0]))
             print("".ljust(indent*4) + 'children added: {}'.format(similarity[1]))
