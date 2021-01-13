@@ -5,7 +5,7 @@
     <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>script_GraphBasedModelDiff.py</StartupFile>
+    <StartupFile>script_GraphDiff-withConfig.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -25,10 +25,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="common_base\ifcMapper.py" />
+    <Compile Include="script_GraphDiff-withConfig.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="neo4jGraphAnalysis\SCC.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphDiff\CompareDiff.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="neo4jGraphDiff\Configurator.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphDiff\DirectedSubgraphDiff.py">
@@ -38,6 +44,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphDiff\HashDiff.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="neo4jGraphDiff\Reporter.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="neo4jGraphDiff\Result.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphDiff\RootedNodeDiff.py">
@@ -106,6 +118,7 @@
     <Content Include="00_sampleData\IFC_stepP21\spatial_updated.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\wall-column\Column-Wall.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\wall-column\Wall-Column.ifc" />
+    <Content Include="neo4jGraphDiff\defaultConfig.json" />
     <Content Include="neo4jGraphDiff\diffIgnore.json" />
     <Content Include="requirements.txt" />
   </ItemGroup>

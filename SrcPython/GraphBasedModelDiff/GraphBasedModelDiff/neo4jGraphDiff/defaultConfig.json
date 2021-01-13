@@ -1,0 +1,39 @@
+{
+  "loggingSettings": {
+    "logToFile": true,
+    "logToConsole": true,
+
+    "loggingFilePath": "logging/defaultLog.log",
+
+    "loggingLevelConsole": "simple",
+    "loggingLevelFile": "simple"
+  },
+
+  "diffSettings": {
+
+    "diffMethods": [ "hash", "nodeDiff" ],
+
+    "hashBased_settings": {
+      "compareSettings": {
+        "considerRelType": true,
+        "considerChildNodeType": true
+      }
+    },
+
+    "nodeDiffBased_settings": {
+      "compareSettings": {
+        "considerRelType": true,
+        "considerChildNodeType": true
+      }
+    },
+
+    "diffIgnoreSettings": {
+      "IgnoreNodeAttributes": [
+        "GlobalId",
+        "p21_id"
+      ],
+      "IgnoreNodeTypes": [ "IfcOwnerHistory" ]
+    }
+  }
+
+}
