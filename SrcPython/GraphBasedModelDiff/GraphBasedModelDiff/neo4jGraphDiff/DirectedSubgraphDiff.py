@@ -48,7 +48,7 @@ class DirectedSubgraphDiff(abc.ABC):
         raw = self.connector.run_cypher_statement(cypher)
         
         # unpack neo4j response into a list if NodeData instances
-        res = NodeData.fromNeo4jResponse(raw)
+        res = NodeData.fromNeo4jResponseWithRel(raw)
 
        
         # check if leave node got touched

@@ -3,14 +3,14 @@
 import abc
 
 from .DirectedSubgraphDiff import DirectedSubgraphDiff
-from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
+from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 
 
 class HashDiff(DirectedSubgraphDiff):
     """description of class"""
 
-    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, LogtoConsole = False):
-        
+    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, LogtoConsole = False , considerRelType = False):
+        self.considerRelType = considerRelType
         return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath, toConsole=LogtoConsole)
     
     def diffSubgraphs(self, nodeId_init, nodeId_updated): 
@@ -22,7 +22,7 @@ class HashDiff(DirectedSubgraphDiff):
 
     # compare children method. recursive usage
 
-    def __compareChildren(self, nodeId_init, nodeId_updated, isSimilar, indent = 0 ): 
+    def __compareChildren(self, nodeId_init, nodeId_updated, isSimilar, indent = 0, considerRelType = False ): 
         """  queries the all child nodes of a node and compares the results between the initial and the updated graph based on hash comparison """
 
         # get children data
@@ -46,7 +46,8 @@ class HashDiff(DirectedSubgraphDiff):
 
 
         # compare children and raise an unsimilarity if necessary.
-        similarity = self.utils.CompareNodesByHash(childs_init, childs_updated, considerRelType=False)
+        similarity = self.utils.CompareNodesByHash(childs_init, childs_updated, self.considerRelType)
+
         if self.toConsole:
             print("".ljust(indent*4) + 'children unchanged: {}'.format(similarity[0]))
             print("".ljust(indent*4) + 'children added: {}'.format(similarity[1]))
@@ -75,7 +76,7 @@ class HashDiff(DirectedSubgraphDiff):
             child_node_id = node.id
             relType = node.relType
             # calc hash of current node
-            cypher_hash = neo4jUtils.BuildMultiStatement(self.utils.GetHashByNodeId(label, child_node_id, ignore_attrs ))
+            cypher_hash = neo4jQueryFactory.GetHashByNodeId(label, child_node_id, ignore_attrs )
             hash = self.connector.run_cypher_statement(cypher_hash)[0][0]
 
             node.setHash(hash)

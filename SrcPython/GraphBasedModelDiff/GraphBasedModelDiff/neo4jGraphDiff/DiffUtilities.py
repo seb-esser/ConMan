@@ -5,6 +5,7 @@ import itertools
 
 """ modules """
 from .DiffIgnore_parser import DiffIgnore
+from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities
 
 
 class DiffUtilities:
@@ -16,25 +17,7 @@ class DiffUtilities:
 			self.diffIngore = DiffIgnore.from_json(diffIgnorePath)
 
 		
-	def GetHashByNodeId(self, label, nodeId, attrIgnoreList = None):
-		getModel = 'MATCH(n:{})'.format(label)
-		where = 'WHERE ID(n) = {}'.format(nodeId)
-
-		open_sub = 'CALL {WITH n'
-		# ToDo: implement DiffIgnore labels here
-		# ToDo: implement DiffIgnore attributes here
-		removeLabel = 'REMOVE n:{}'.format(label)
-		if attrIgnoreList == None:
-			calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash RETURN hash'
-		else:
-			ignoreString = self.__buildIgnoreString(attrIgnoreList)
-			calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash RETURN hash'.format(ignoreString)
-
-		close_sub = '}'
-		add_label_again = 'SET n:{}'.format(label)
-		return_results = 'RETURN hash, n.entityType, ID(n)'
-		return [getModel, where, open_sub, removeLabel, calc_fingerprint, close_sub, add_label_again, return_results]
-
+	
 
 	def ConnectNodesWithSameHash(self, NodeIdFrom, NodeIdTo):
 		fromNode = 'MATCH (s) WHERE ID(s) = {}'.format(NodeIdFrom)
@@ -61,6 +44,7 @@ class DiffUtilities:
 			nodes_deleted = nodes_init
 
 			for pair in matched_pairs:
+				print(pair)
 				nodes_added.remove(pair[1])
 				nodes_deleted.remove(pair[0])
 				nodes_unchanged.append((pair[0].id, pair[1].id ))
@@ -88,19 +72,4 @@ class DiffUtilities:
 
 		return nodes_unchanged, nodes_added, nodes_deleted
 
-	def __buildIgnoreString(self, attr_ignore_list):
-		""" generates the necessary string to exclude a given list of attributes that should not taken into account when calculating the hashsum""" 
-		
-		# open 
-		my_string = '['
-
-		# all attrs
-		for attr in attr_ignore_list:
-			my_string = my_string + '"{}", '.format(attr)
-
-		# remove last comma
-		my_string = my_string[:-2]
-		# close
-		my_string = my_string + ']'
-
-		return my_string
+	

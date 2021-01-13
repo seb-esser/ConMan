@@ -13,20 +13,32 @@ class RootedNodeDiff:
 		self.connector = connector
 		pass
 
-	def compareRootedNodes(self, label_init, label_updated):
+	def diffRootedNodes(self, label_init, label_updated):
 		""" """
 		
-		nodes_init = self.__getHashesOfRootedNodes(label_init)
-		nodes_updated = self.__getHashesOfRootedNodes(label_updated)
+		# retrieve nodes
+		nodes_init = self.__getRootedNodes(label_init)
+		nodes_updated = self.__getRootedNodes(label_updated)
 
-		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodesByHash(nodes_init, nodes_updated)
+		for node in nodes_init: 
+			cy = neo4jQueryFactory.GetHashByNodeId(label_init, node.id, ["p21_id", "GlobalId"])
+			res = self.connector.run_cypher_statement(cy)
+			node.hash = res[0][0]
+
+		for node in nodes_updated: 
+			cy = neo4jQueryFactory.GetHashByNodeId(label_updated, node.id, ["p21_id", "GlobalId"])
+			res = self.connector.run_cypher_statement(cy)
+			node.hash = res[0][0]
+
+
+		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodesByHash(nodes_init, nodes_updated, considerRelType=False)
 		
 		if self.toConsole: 
-			print('Detected unchanged rooted nodes: '.format(nodes_unchanged))
-			print('Added nodes:'.format(nodes_added))
-			print('Deleted nodes: '.format(nodes_deleted))
+			print('Detected unchanged rooted nodes: {}'.format(nodes_unchanged))
+			print('Added nodes: {}'.format(nodes_added))
+			print('Deleted nodes: {}'.format(nodes_deleted))
 
-		return nodes_unchanged
+		return [nodes_unchanged, nodes_added, nodes_deleted]
 
 	def compareRootedNodeRelationships(self):
 		""" """
@@ -124,4 +136,12 @@ class RootedNodeDiff:
 	
 		return nodes
 
+	def __getRootedNodes(self, label): 
+		cy = neo4jQueryFactory.GetRootedNodes(label)
+		raw = self.connector.run_cypher_statement(cy)
+
+		# unpack neo4j response into a list if NodeData instances
+		res = NodeData.fromNeo4jResponseWouRel(raw)
+
+		return res
 

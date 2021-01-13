@@ -14,9 +14,17 @@ class NodeData:
         return 'NodeData: id: {} entityType: {}'.format(self.id, self.entityType)
 
     @classmethod
-    def fromNeo4jResponse(cls, raw):
+    def fromNeo4jResponseWithRel(cls, raw):
         ret_val = []
         for inst in raw: 
             child = cls(inst[0], inst[1], inst[2]) 
+            ret_val.append(child)
+        return ret_val
+
+    @classmethod
+    def fromNeo4jResponseWouRel(cls, raw):
+        ret_val = []
+        for inst in raw: 
+            child = cls(id= inst[0], relType = None, entityType=inst[1]) 
             ret_val.append(child)
         return ret_val

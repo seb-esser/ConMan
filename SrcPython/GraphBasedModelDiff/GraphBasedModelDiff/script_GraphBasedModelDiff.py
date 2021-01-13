@@ -37,16 +37,16 @@ cypher = []
 
 # 1: Check base structure of rooted nodes
 rootedNodeDiff = RootedNodeDiff(connector, toConsole=True)
-unchanged_rootedNodeIds = rootedNodeDiff.compareRootedNodes(label_init, label_updated)
+[nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated)
 
 
 # 2: Check sub-graphs for each rooted node
 diffIgnoreFile = './neo4jGraphDiff/diffIgnore.json'
-Diff_onHash = HashDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile, LogtoConsole=False)
+Diff_onHash = HashDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile, LogtoConsole=False, considerRelType=True)
 Diff_onCompare = CompareDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile, LogtoConsole=False)
 
 times_hash = []
-for pair in unchanged_rootedNodeIds: 
+for pair in nodeIDs_unchanged: 
 	nodeId_init = pair[0]
 	nodeId_updated = pair[1]
 
@@ -57,7 +57,7 @@ for pair in unchanged_rootedNodeIds:
 	times_hash.append(elapsed_time_hash)
 
 times_diff = []
-for pair in unchanged_rootedNodeIds: 
+for pair in nodeIDs_unchanged: 
 	nodeId_init = pair[0]
 	nodeId_updated = pair[1]
 
