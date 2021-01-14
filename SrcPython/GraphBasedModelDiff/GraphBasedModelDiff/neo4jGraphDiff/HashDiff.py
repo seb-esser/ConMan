@@ -25,6 +25,9 @@ class HashDiff(DirectedSubgraphDiff):
     def __compareChildren(self, nodeId_init, nodeId_updated, isSimilar, indent = 0, considerRelType = False ): 
         """  queries the all child nodes of a node and compares the results between the initial and the updated graph based on hash comparison """
 
+        if self.toConsole:
+            print("".ljust(indent*4) + 'Check children of NodeId {} and NodeId {}'.format(nodeId_init, nodeId_updated))
+
         # get children data
         children_init =     self._DirectedSubgraphDiff__getChildren(self.label_init, nodeId_init, indent +1)
         children_updated =  self._DirectedSubgraphDiff__getChildren(self.label_updated, nodeId_updated, indent +1)
@@ -32,12 +35,12 @@ class HashDiff(DirectedSubgraphDiff):
         # leave node
         if len(children_init) == 0 and len(children_updated) == 0: 
             if self.toConsole:
-                print('- - - ')
+                print("".ljust(indent*4) + ' leaf node.')
             return isSimilar
 
         # calc hashes for init and updated
-        childs_init = self.__getHashesOfNodes(self.label_init, children_init)
-        childs_updated = self.__getHashesOfNodes(self.label_updated, children_updated)
+        childs_init = self.__getHashesOfNodes(self.label_init, children_init, indent)
+        childs_updated = self.__getHashesOfNodes(self.label_updated, children_updated, indent)
 
         # apply DiffIgnore -> Ingore nodes if requested
         if self.UseDiffIgnore: 
@@ -49,9 +52,10 @@ class HashDiff(DirectedSubgraphDiff):
         similarity = self.utils.CompareNodesByHash(childs_init, childs_updated, self.considerRelType)
 
         if self.toConsole:
+            print('')
             print("".ljust(indent*4) + 'children unchanged: {}'.format(similarity[0]))
             print("".ljust(indent*4) + 'children added: {}'.format(similarity[1]))
-            print("".ljust(indent*4) + 'children deleted: {}'.format(similarity[2]))
+            print("".ljust(indent*4) + 'children deleted: {} \n'.format(similarity[2]))
 
         if (len(similarity[1]) != 0 or len(similarity[2]) != 0):
             isSimilar = False
@@ -66,7 +70,7 @@ class HashDiff(DirectedSubgraphDiff):
         return isSimilar
 
 
-    def __getHashesOfNodes(self, label, nodeList):
+    def __getHashesOfNodes(self, label, nodeList, indent = 0):
         return_val = []
 
         ignore_attrs = self.utils.diffIngore.ignore_attrs
@@ -82,9 +86,9 @@ class HashDiff(DirectedSubgraphDiff):
             node.setHash(hash)
 
         if self.toConsole: 
-            print('Calculated hashes for model >> {} <<:'.format(label))
+            print("".ljust(indent*4) + 'Calculated hashes for model >> {} <<:'.format(label))
             for node in nodeList:
-                print('\t NodeID: {:<4} \t hash: {}'.format(node.id, node.hash))
+                print("".ljust(indent*4) + '\t NodeID: {:<4} \t hash: {}'.format(node.id, node.hash))
 
 
         return nodeList

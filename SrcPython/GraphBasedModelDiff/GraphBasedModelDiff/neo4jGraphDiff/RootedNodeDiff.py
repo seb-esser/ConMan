@@ -34,7 +34,7 @@ class RootedNodeDiff:
 		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodesByHash(nodes_init, nodes_updated, considerRelType=False)
 		
 		if self.toConsole: 
-			print('Detected unchanged rooted nodes: {}'.format(nodes_unchanged))
+			print('Unchanged rooted nodes: {}'.format(nodes_unchanged))
 			print('Added nodes: {}'.format(nodes_added))
 			print('Deleted nodes: {}'.format(nodes_deleted))
 

@@ -24,34 +24,38 @@ connector.connect_driver()
 #label_updated = "ts20200204T105551"
 
 
-## cuboid sample
-#label_init = "ts20210106T110329"
-#label_updated = "ts20210106T110250"
+# cuboid sample
+label_init = "ts20210106T110329"
+label_updated = "ts20210106T110250"
 
 
-# wall column sample
-label_init = "ts20200713T083450"
-label_updated = "ts20200713T083447"
+## wall column sample
+#label_init = "ts20200713T083450"
+#label_updated = "ts20200713T083447"
 
 cypher = []
 
 # 1: Check base structure of rooted nodes
+
+print('----------------- [1] ------------------------\n')
+
 rootedNodeDiff = RootedNodeDiff(connector, toConsole=True)
 
 attrIgnore = ["p21_id", "GlobalId"]
 [nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated, attrIgnore)
 
 
+print('\n----------------- [2] ------------------------\n')
 # 2: Check sub-graphs for each rooted node
 diffIgnoreFile = './neo4jGraphDiff/diffIgnore.json'
-Diff_onHash = HashDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile, LogtoConsole=False, considerRelType=True)
+Diff_onHash = HashDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile, LogtoConsole=True, considerRelType=True)
 Diff_onCompare = CompareDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile, LogtoConsole=False)
 
 times_hash = []
 for pair in nodeIDs_unchanged: 
 	nodeId_init = pair[0]
 	nodeId_updated = pair[1]
-
+	print('[TASK HASH-comp] Compare objects with root nodeIDs {}\n'.format(pair))
 	t_hash = time.process_time()
 	similarHash = Diff_onHash.diffSubgraphs(nodeId_init, nodeId_updated)
 	print('[RESULT HASH-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(nodeId_init, nodeId_updated, similarHash))

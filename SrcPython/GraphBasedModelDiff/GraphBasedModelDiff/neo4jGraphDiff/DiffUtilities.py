@@ -34,7 +34,6 @@ class DiffUtilities:
 			nodes_deleted = nodes_init
 
 			for pair in matched_pairs:
-				print(pair)
 				nodes_added.remove(pair[1])
 				nodes_deleted.remove(pair[0])
 				nodes_unchanged.append((pair[0].id, pair[1].id ))
