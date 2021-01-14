@@ -73,8 +73,13 @@ class neo4jQueryFactory:
 		return_results = 'RETURN hash, n.entityType, ID(n)'
 		return neo4jUtils.BuildMultiStatement([getModel, where, open_sub, removeLabel, calc_fingerprint, close_sub, add_label_again, return_results])
 		
-	
-	def __buildIgnoreString(self, attr_ignore_list):
-		""" generates the necessary string to exclude a given list of attributes that should not taken into account when calculating the hashsum""" 
-		
+	@classmethod
+	def GetChildNodesByParentNodeId(cls, label, parentNodeId): 
+
+		match = 'MATCH (n:{}) -[r]->(c)'.format(label)
+		where = 'WHERE ID(n) = {}'.format(parentNodeId)
+		ret = 'RETURN ID(c), type(r), c.entityType'
+		return neo4jUtils.BuildMultiStatement([match, where, ret])
+
+
 		

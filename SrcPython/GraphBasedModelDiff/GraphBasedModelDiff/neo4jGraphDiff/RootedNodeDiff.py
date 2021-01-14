@@ -13,7 +13,7 @@ class RootedNodeDiff:
 		self.connector = connector
 		pass
 
-	def diffRootedNodes(self, label_init, label_updated):
+	def diffRootedNodes(self, label_init, label_updated, attr_ignore_list):
 		""" """
 		
 		# retrieve nodes
@@ -21,12 +21,12 @@ class RootedNodeDiff:
 		nodes_updated = self.__getRootedNodes(label_updated)
 
 		for node in nodes_init: 
-			cy = neo4jQueryFactory.GetHashByNodeId(label_init, node.id, ["p21_id", "GlobalId"])
+			cy = neo4jQueryFactory.GetHashByNodeId(label_init, node.id, attr_ignore_list) 
 			res = self.connector.run_cypher_statement(cy)
 			node.hash = res[0][0]
 
 		for node in nodes_updated: 
-			cy = neo4jQueryFactory.GetHashByNodeId(label_updated, node.id, ["p21_id", "GlobalId"])
+			cy = neo4jQueryFactory.GetHashByNodeId(label_updated, node.id, attr_ignore_list)
 			res = self.connector.run_cypher_statement(cy)
 			node.hash = res[0][0]
 

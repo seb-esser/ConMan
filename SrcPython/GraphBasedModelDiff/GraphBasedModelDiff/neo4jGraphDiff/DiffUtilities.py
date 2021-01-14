@@ -16,16 +16,6 @@ class DiffUtilities:
 		if diffIgnorePath != None: 
 			self.diffIngore = DiffIgnore.from_json(diffIgnorePath)
 
-		
-	
-
-	def ConnectNodesWithSameHash(self, NodeIdFrom, NodeIdTo):
-		fromNode = 'MATCH (s) WHERE ID(s) = {}'.format(NodeIdFrom)
-		toNode = 'MATCH (t) WHERE ID(t) = {}'.format(NodeIdTo)
-		merge = 'MERGE (s)-[r:{}]->(t)'.format('IS_EQUAL_TO')
-		return [fromNode, toNode, merge]
-
-
 	def CompareNodesByHash(self, nodes_init, nodes_updated, considerRelType = True):
 		# ToDo: react if hashes occure multiple times in the nodes_lists
 

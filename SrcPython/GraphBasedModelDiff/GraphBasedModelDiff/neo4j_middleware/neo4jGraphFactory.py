@@ -3,7 +3,7 @@
 from .neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
 
 class neo4jGraphFactory:
-
+	""" provides methods to create cypher statements that add/modify/delete graph components """
 	def __init__(self):
 		pass
 
@@ -86,11 +86,19 @@ class neo4jGraphFactory:
 		returnID = 'RETURN ID(source), ID(target)'
 		return neo4jUtils.BuildMultiStatement([from_node, to_node, merge, returnID])
 
-
 	@classmethod
-	def DeleteNode(self, nodeId):
+	def DeleteNodeByNodeId(self, nodeId):
 		match = 'MATCH (n) WHERE ID(n) = {}'.format(nodeId)
 		detach = 'DETACH'
 		delete = 'DELETE n'
 		return neo4jUtils.BuildMultiStatement([match, detach, delete])
+
+	@classmethod
+	def MergeNodesByNodeIDs(self, NodeIdFrom, NodeIdTo, relType = 'DEFAULT_CONNECTION'):
+		""" merge two nodes by their nodeIDs using a directed edge """
+		fromNode = 'MATCH (s) WHERE ID(s) = {}'.format(NodeIdFrom)
+		toNode = 'MATCH (t) WHERE ID(t) = {}'.format(NodeIdTo)
+		merge = 'MERGE (s)-[r:{}]->(t)'.format(relType)
+		return neo4jUtils.BuildMultiStatement([fromNode, toNode, merge])
+
 

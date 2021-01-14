@@ -2,7 +2,6 @@
 import abc
 
 from .DiffUtilities import DiffUtilities
-from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 
 # classes to decode neo4j query responses
@@ -37,20 +36,14 @@ class DirectedSubgraphDiff(abc.ABC):
     # common method for all subclasses
     def __getChildren(self, label, parentNodeId, indent = 0): 
 
-        # queries all directed neighbors, their relType and their node hashes
+        # queries all directed children, their relType and their node hashes
 
-        match = 'MATCH (n:{}) -[r]->(c)'.format(label)
-        where = 'WHERE ID(n) = {}'.format(parentNodeId)
-        ret = 'RETURN ID(c), type(r), c.entityType'
-
-        cypher = neo4jUtils.BuildMultiStatement([match, where, ret])
-
+        cypher = neo4jQueryFactory.GetChildNodesByParentNodeId(label, parentNodeId)
         raw = self.connector.run_cypher_statement(cypher)
         
         # unpack neo4j response into a list if NodeData instances
         res = NodeData.fromNeo4jResponseWithRel(raw)
-
-       
+               
         # check if leave node got touched
         if len(res) == 0:            
             return []

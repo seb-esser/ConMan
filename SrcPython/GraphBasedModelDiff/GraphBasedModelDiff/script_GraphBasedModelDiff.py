@@ -37,7 +37,9 @@ cypher = []
 
 # 1: Check base structure of rooted nodes
 rootedNodeDiff = RootedNodeDiff(connector, toConsole=True)
-[nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated)
+
+attrIgnore = ["p21_id", "GlobalId"]
+[nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated, attrIgnore)
 
 
 # 2: Check sub-graphs for each rooted node
