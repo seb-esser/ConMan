@@ -24,8 +24,8 @@ class DiffUtilities:
 		nodes_added = []
 
 		
-		if considerRelType == False:
-			# match nodes based on hash and reltype
+		if not considerRelType:
+			# match nodes based on child node hash
 			A=nodes_init
 			B=nodes_updated
 			matched_pairs = ((x,y) for x,y in itertools.product(A, B) if x.hash == y.hash)
@@ -36,16 +36,13 @@ class DiffUtilities:
 			for pair in matched_pairs:
 				nodes_added.remove(pair[1])
 				nodes_deleted.remove(pair[0])
-				nodes_unchanged.append((pair[0].id, pair[1].id ))
+				nodes_unchanged.append((pair[0], pair[1]))
 
-			nodes_added = [x.id for x in nodes_added]
-			nodes_deleted = [x.id for x in nodes_deleted]
-		
 		else:
 					
 			# match nodes based on hash and reltype
-			A=nodes_init
-			B=nodes_updated
+			A = nodes_init
+			B = nodes_updated
 			matched_pairs = ((x,y) for x,y in itertools.product(A, B) if x.hash == y.hash and x.relType == y.relType)
 						
 			nodes_added = nodes_updated
@@ -54,11 +51,8 @@ class DiffUtilities:
 			for pair in matched_pairs:
 				nodes_added.remove(pair[1])
 				nodes_deleted.remove(pair[0])
-				nodes_unchanged.append((pair[0].id, pair[1].id ))
-
-			nodes_added = [x.id for x in nodes_added]
-			nodes_deleted = [x.id for x in nodes_deleted]
+				nodes_unchanged.append((pair[0], pair[1]))
 
 		return nodes_unchanged, nodes_added, nodes_deleted
 
-	
+

@@ -81,5 +81,11 @@ class neo4jQueryFactory:
 		ret = 'RETURN ID(c), type(r), c.entityType'
 		return neo4jUtils.BuildMultiStatement([match, where, ret])
 
+	@classmethod
+	def GetNodeDataById(cls, nodeId): 
+		match = 'MATCH (n)'
+		where = 'WHERE ID(n) = {}'.format(nodeId)
+		ret = 'RETURN ID(n), n.entityType'
+		return neo4jUtils.BuildMultiStatement([match, where, ret])
 
 		

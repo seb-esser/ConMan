@@ -54,23 +54,22 @@ times_hash = []
 times_diff = []
 
 for pair in nodeIDs_unchanged:
-	nodeId_init = pair[0]
-	nodeId_updated = pair[1]
-	print('[TASK HASH-comp] Compare objects with root nodeIDs {}'.format(pair))
+	node_init = pair[0]
+	node_updated = pair[1]
+	print('[TASK] Compare objects with root nodeIDs {}'.format(pair))
 
 	t_hash = time.process_time()
-	HashResult = Diff_onHash.diffSubgraphs(nodeId_init, nodeId_updated)
+	HashResult = Diff_onHash.diffSubgraphs(node_init, node_updated)
 	elapsed_time_hash = time.process_time() - t_hash
 	times_hash.append(elapsed_time_hash)
 
 	t_diff = time.process_time()
-	DiffResult = Diff_onCompare.diffSubgraphs(nodeId_init, nodeId_updated)
+	DiffResult = Diff_onCompare.diffSubgraphs(node_init, node_updated)
 
 	elapsed_time_diff = time.process_time() - t_diff
 	times_diff.append(elapsed_time_diff)
 
-	print('[RESULT HASH-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(nodeId_init,
-																								 nodeId_updated,
+	print('[RESULT HASH-comp] Object with rootNodeId {} is similar to {}: {}'.format(node_init.id, node_updated.id,
 																								 HashResult.isSimilar))
 	if not HashResult.isSimilar:
 		print('\t Detected changes in DIFF comparison:')
@@ -80,8 +79,7 @@ for pair in nodeIDs_unchanged:
 		for res in HashResult.StructureModifications:
 			print(res)
 
-	print('[RESULT DIFF-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(nodeId_init,
-																								 nodeId_updated,
+	print('[RESULT DIFF-comp] Object with rootNodeId {} is similar to {}: {}'.format(node_init.id, node_updated.id,
 																								 DiffResult.isSimilar))
 
 	if not DiffResult.isSimilar:

@@ -4,6 +4,7 @@ import abc
 from .DirectedSubgraphDiff import DirectedSubgraphDiff
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 from neo4j_middleware.NodeDiffData import NodeDiffData
+from neo4j_middleware.NodeData import NodeData
 from .DiffResult import DiffResult
 
 from neo4jGraphDiff.DiffResult import DiffResult 
@@ -17,20 +18,22 @@ class CompareDiff(DirectedSubgraphDiff):
         return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath, toConsole = LogtoConsole)
     
     # public overwrite method requested by abstract superclass DirectedSubgraphDiff
-    def diffSubgraphs(self, nodeId_init, nodeId_updated): 
+    def diffSubgraphs(self, node_init, node_updated): 
 
         # ToDo: return diff results and not only True/False in case of a spotted difference between init and updated
         diffContainer = DiffResult(method = "Node-Diff")
-        diffContainer = self.__compareChildren(nodeId_init, nodeId_updated, diffContainer)
+      
+        # start recursion
+        diffContainer = self.__compareChildren(node_init, node_updated, diffContainer)
         return diffContainer
 
 
-    def __compareChildren(self, nodeId_init, nodeId_updated, diffResultContainer, indent=0): 
+    def __compareChildren(self, node_init, node_updated, diffResultContainer, indent=0): 
         """ queries the all child nodes of a node and compares the results between the initial and the updated graph based on AttrDiff"""
         # get children data
-        self._DirectedSubgraphDiff__getChildren
-        children_init =     self._DirectedSubgraphDiff__getChildren(self.label_init,    nodeId_init,    indent +1)
-        children_updated =  self._DirectedSubgraphDiff__getChildren(self.label_updated, nodeId_updated, indent +1)
+
+        children_init =     self._DirectedSubgraphDiff__getChildren(self.label_init, node_init.id,    indent +1)
+        children_updated =  self._DirectedSubgraphDiff__getChildren(self.label_updated, node_updated.id, indent +1)
 
         # leave node?
         if len(children_init) == 0 and len(children_updated) == 0: 
@@ -59,7 +62,7 @@ class CompareDiff(DirectedSubgraphDiff):
         # check the nodes that have the same relationship OR the same EntityType and the same node type: 
         for candidate in match: 
             # compare two nodes
-            cypher = neo4jQueryFactory.DiffNodes(nodeId_init, nodeId_updated)
+            cypher = neo4jQueryFactory.DiffNodes(node_init.id, node_updated.id)
             raw = self.connector.run_cypher_statement(cypher)
             #diff = self.unpackNodeDiff(raw)
             nodeDifference = NodeDiffData.fromNeo4jResponse(raw)
@@ -69,7 +72,7 @@ class CompareDiff(DirectedSubgraphDiff):
             cleared_nodeDifference = self.__applyDiffIgnoreOnNodeDiff(nodeDifference, ignoreAttrs)
 
             if self.toConsole:
-                print('comparing node {} to node {} after applying DiffIgnore:'.format(nodeId_init, nodeId_updated))
+                print('comparing node {} to node {} after applying DiffIgnore:'.format(node_init.id, node_updated.id))
            
             # case 1: no modifications
             if cleared_nodeDifference.nodesAreSimilar() == True: 
@@ -78,7 +81,7 @@ class CompareDiff(DirectedSubgraphDiff):
                     print('[RESULT]: child nodes match')
 
                 # run recursion
-                diffResultContainer = self.__compareChildren(candidate[0].id, candidate[1].id, diffResultContainer)
+                diffResultContainer = self.__compareChildren(candidate[0], candidate[1], diffResultContainer)
             
             # case 2: modified attrs but no added/deleted attrs
             elif cleared_nodeDifference.nodesHaveUpdatedAttrs() == True: 
@@ -90,7 +93,7 @@ class CompareDiff(DirectedSubgraphDiff):
                     val_old = 'val_old'
                     val_new = 'val_new'
 
-                    diffResultContainer.logNodeModification(nodeId_init, "", 'modified', val_old, val_new)
+                    diffResultContainer.logNodeModification(node_init.id, "", 'modified', val_old, val_new)
                 
                 # run recursion
                 diffResultContainer = self.__compareChildren(candidate[0].id, candidate[1].id, diffResultContainer)
@@ -99,7 +102,7 @@ class CompareDiff(DirectedSubgraphDiff):
             # case 3: added/deleted attrs. Break recursion
             else:
                 if self.toConsole:
-                    print('[RESULT]: detected unsimilarity between nodes {} and {}').format(nodeId_init, nodeId_updated)
+                    print('[RESULT]: detected unsimilarity between nodes {} and {}').format(node_init.id, node_updated.id)
                     print(cleared_nodeDifference)
                 # log result
                 diffResultContainer.isSimilar = False
