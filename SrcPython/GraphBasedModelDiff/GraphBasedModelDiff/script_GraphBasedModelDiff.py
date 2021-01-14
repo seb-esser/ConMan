@@ -1,4 +1,3 @@
-
 ""
 
 # import numpy as np
@@ -12,21 +11,19 @@ from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
 from neo4jGraphDiff.CompareDiff import CompareDiff
 from neo4jGraphDiff.HashDiff import HashDiff
 
-
-
 # -- ... --
 
 connector = Neo4jConnector(False, False)
 connector.connect_driver()
 
 ## sleeper sample
-#label_init = "ts20200202T105551"
-#label_updated = "ts20200204T105551"
+# label_init = "ts20200202T105551"
+# label_updated = "ts20200204T105551"
 
 
 ## cuboid sample
-#label_init = "ts20210106T110329"
-#label_updated = "ts20210106T110250"
+# label_init = "ts20210106T110329"
+# label_updated = "ts20210106T110250"
 
 
 # wall column sample
@@ -42,49 +39,59 @@ print('----------------- [1] ------------------------\n')
 rootedNodeDiff = RootedNodeDiff(connector, toConsole=True)
 
 attrIgnore = ["p21_id", "GlobalId"]
-[nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated, attrIgnore)
-
+[nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated,
+																					 attrIgnore)
 
 print('\n----------------- [2] ------------------------\n')
 # 2: Check sub-graphs for each rooted node
 diffIgnoreFile = './neo4jGraphDiff/diffIgnore.json'
-Diff_onHash = HashDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile, LogtoConsole=False, considerRelType=True)
-Diff_onCompare = CompareDiff(connector, label_init, label_updated, diffIgnorePath = diffIgnoreFile, LogtoConsole=False, considerRelType=True)
+Diff_onHash = HashDiff(connector, label_init, label_updated, diffIgnorePath=diffIgnoreFile, LogtoConsole=False,
+					   considerRelType=True)
+Diff_onCompare = CompareDiff(connector, label_init, label_updated, diffIgnorePath=diffIgnoreFile, LogtoConsole=False,
+							 considerRelType=True)
 
 times_hash = []
-for pair in nodeIDs_unchanged: 
+times_diff = []
+
+for pair in nodeIDs_unchanged:
 	nodeId_init = pair[0]
 	nodeId_updated = pair[1]
-	print('[TASK HASH-comp] Compare objects with root nodeIDs {}\n'.format(pair))
+	print('[TASK HASH-comp] Compare objects with root nodeIDs {}'.format(pair))
+
 	t_hash = time.process_time()
 	HashResult = Diff_onHash.diffSubgraphs(nodeId_init, nodeId_updated)
-	print('[RESULT HASH-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(nodeId_init, nodeId_updated, HashResult.isSimilar))
 	elapsed_time_hash = time.process_time() - t_hash
-	
-	for res in HashResult.propertyModifications:
-		print(res)
-
-	for res in HashResult.StructureModifications:
-		print(res)	
-	
 	times_hash.append(elapsed_time_hash)
-
-times_diff = []
-for pair in nodeIDs_unchanged: 
-	nodeId_init = pair[0]
-	nodeId_updated = pair[1]
 
 	t_diff = time.process_time()
 	DiffResult = Diff_onCompare.diffSubgraphs(nodeId_init, nodeId_updated)
-	print('[RESULT DIFF-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(nodeId_init, nodeId_updated, DiffResult.isSimilar))
+
 	elapsed_time_diff = time.process_time() - t_diff
 	times_diff.append(elapsed_time_diff)
 
-	for res in DiffResult.propertyModifications:
-		print(res)
+	print('[RESULT HASH-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(nodeId_init,
+																								 nodeId_updated,
+																								 HashResult.isSimilar))
+	if not HashResult.isSimilar:
+		print('\t Detected changes in DIFF comparison:')
+		for res in HashResult.propertyModifications:
+			print(res)
 
-	for res in DiffResult.StructureModifications:
-		print(res)
+		for res in HashResult.StructureModifications:
+			print(res)
+
+	print('[RESULT DIFF-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(nodeId_init,
+																								 nodeId_updated,
+																								 DiffResult.isSimilar))
+
+	if not DiffResult.isSimilar:
+		print('\t Detected changes in DIFF comparison:')
+		for res in DiffResult.propertyModifications:
+			print(res)
+
+		for res in DiffResult.StructureModifications:
+			print(res)
+	print()
 
 print('Overview computational times: ')
 print('elapsed time for HASH based comparison: {}'.format(sum(times_hash)))
@@ -93,23 +100,19 @@ print('elapsed time for DIFF based comparison: {}'.format(sum(times_diff)))
 print(times_diff)
 
 ## DEBUG only, implement a for loop over all rooted nodes to query their nodeIDs
-#siteId_initial = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_init), 'ID(n)')
-#siteId_updated = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_updated), 'ID(n)')
+# siteId_initial = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_init), 'ID(n)')
+# siteId_updated = connector.run_cypher_statement('MATCH (n:IfcSite:{}) RETURN ID(n)'.format(label_updated), 'ID(n)')
 
-#id_init = 477
-#id_update = 502
+# id_init = 477
+# id_update = 502
 
-#print('comparing subgraphs of root node {} with {}'.format(id_init, id_update))
+# print('comparing subgraphs of root node {} with {}'.format(id_init, id_update))
 
 ## compares the subgraphs of two nodes that should contain the same data
-#similarHash = Diff_onHash.diffSubgraphs(id_init, id_update)
-#print('[RESULT HASH-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(id_init, id_update, similarHash))
+# similarHash = Diff_onHash.diffSubgraphs(id_init, id_update)
+# print('[RESULT HASH-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(id_init, id_update, similarHash))
 
-#similarDiff = Diff_onCompare.diffSubgraphs(id_init, id_update)
-#print('[RESULT AttrDiff-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(id_init, id_update, similarDiff))
+# similarDiff = Diff_onCompare.diffSubgraphs(id_init, id_update)
+# print('[RESULT AttrDiff-comp] Object (=Subgraph) with rootNodeId {} is similar to {}: {}'.format(id_init, id_update, similarDiff))
 
-# 3: 
-
-
-
-
+# 3:
