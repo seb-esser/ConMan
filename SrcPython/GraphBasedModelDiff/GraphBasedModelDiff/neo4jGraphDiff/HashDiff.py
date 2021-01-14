@@ -5,6 +5,7 @@ import abc
 from .DirectedSubgraphDiff import DirectedSubgraphDiff
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 
+from neo4jGraphDiff.DiffResult import DiffResult 
 
 class HashDiff(DirectedSubgraphDiff):
     """description of class"""
@@ -16,13 +17,13 @@ class HashDiff(DirectedSubgraphDiff):
     def diffSubgraphs(self, nodeId_init, nodeId_updated): 
 
         # ToDo: return diff results and not only True/False in case of a spotted difference between init and updated
-        isSimilar = True
-        isSimilar = self.__compareChildren(nodeId_init, nodeId_updated, isSimilar)
-        return isSimilar
+        diffContainer = DiffResult(method = "Hash-Diff")
+        diffContainer = self.__compareChildren(nodeId_init, nodeId_updated, diffContainer)
+        return diffContainer
 
     # compare children method. recursive usage
 
-    def __compareChildren(self, nodeId_init, nodeId_updated, isSimilar, indent = 0, considerRelType = False ): 
+    def __compareChildren(self, nodeId_init, nodeId_updated, diffContainer, indent = 0, considerRelType = False ): 
         """  queries the all child nodes of a node and compares the results between the initial and the updated graph based on hash comparison """
 
         if self.toConsole:
@@ -36,7 +37,7 @@ class HashDiff(DirectedSubgraphDiff):
         if len(children_init) == 0 and len(children_updated) == 0: 
             if self.toConsole:
                 print("".ljust(indent*4) + ' leaf node.')
-            return isSimilar
+            return diffContainer
 
         # calc hashes for init and updated
         childs_init = self.__getHashesOfNodes(self.label_init, children_init, indent)
@@ -58,16 +59,25 @@ class HashDiff(DirectedSubgraphDiff):
             print("".ljust(indent*4) + 'children deleted: {} \n'.format(similarity[2]))
 
         if (len(similarity[1]) != 0 or len(similarity[2]) != 0):
-            isSimilar = False
-            return isSimilar
+            diffContainer.isSimilar = False
+            # log unsimilarities
+            for addedNodeId in similarity[1]:
+                diffContainer.logStructureModification(nodeId_init, addedNodeId, "added")
+            for deletedNodeId in similarity[2]:
+                diffContainer.logStructureModification(nodeId_updated, deletedNodeId, "deleted")
+
+            return diffContainer
 
         # loop over all (similar) children
         for similarChild in similarity[0]: 
-            isSimilar = self.__compareChildren(similarChild[0], similarChild[1], isSimilar, indent + 1)
-            if isSimilar == False:
-                return isSimilar
+            # ToDo: log unchanged nodes if requested
 
-        return isSimilar
+            # trigger recursion
+            diffContainer = self.__compareChildren(similarChild[0], similarChild[1], diffContainer, indent + 1)
+            if diffContainer.isSimilar == False:
+                return diffContainer
+
+        return diffContainer
 
 
     def __getHashesOfNodes(self, label, nodeList, indent = 0):

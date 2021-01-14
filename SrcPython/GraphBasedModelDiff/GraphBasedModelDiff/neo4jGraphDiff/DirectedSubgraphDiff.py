@@ -8,7 +8,6 @@ from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 from neo4j_middleware.NodeData import NodeData
 from neo4j_middleware.NodeDiffData import NodeDiffData
 
-
 class DirectedSubgraphDiff(abc.ABC):
     """abstract super class for all subgraph diff methods """
 

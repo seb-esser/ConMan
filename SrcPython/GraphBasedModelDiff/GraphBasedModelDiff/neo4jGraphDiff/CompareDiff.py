@@ -4,12 +4,15 @@ import abc
 from .DirectedSubgraphDiff import DirectedSubgraphDiff
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 from neo4j_middleware.NodeDiffData import NodeDiffData
+from .DiffResult import DiffResult
+
+from neo4jGraphDiff.DiffResult import DiffResult 
 
 
 class CompareDiff(DirectedSubgraphDiff):
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
     
-    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, LogtoConsole = False):
+    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, LogtoConsole = False, considerRelType=False):
         
         return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath, toConsole = LogtoConsole)
     
@@ -17,23 +20,23 @@ class CompareDiff(DirectedSubgraphDiff):
     def diffSubgraphs(self, nodeId_init, nodeId_updated): 
 
         # ToDo: return diff results and not only True/False in case of a spotted difference between init and updated
-        isSimilar = True
-        isSimilar = self.__compareChildren(nodeId_init, nodeId_updated, isSimilar)
-        return isSimilar
+        diffContainer = DiffResult(method = "Node-Diff")
+        diffContainer = self.__compareChildren(nodeId_init, nodeId_updated, diffContainer)
+        return diffContainer
 
 
-    def __compareChildren(self, nodeId_init, nodeId_updated, isSimilar, indent=0): 
+    def __compareChildren(self, nodeId_init, nodeId_updated, diffResultContainer, indent=0): 
         """ queries the all child nodes of a node and compares the results between the initial and the updated graph based on AttrDiff"""
         # get children data
         self._DirectedSubgraphDiff__getChildren
-        children_init =     self._DirectedSubgraphDiff__getChildren(self.label_init,    nodeId_init, indent +1)
+        children_init =     self._DirectedSubgraphDiff__getChildren(self.label_init,    nodeId_init,    indent +1)
         children_updated =  self._DirectedSubgraphDiff__getChildren(self.label_updated, nodeId_updated, indent +1)
 
         # leave node?
         if len(children_init) == 0 and len(children_updated) == 0: 
             if self.toConsole:
                 print('- - - ')
-            return isSimilar
+            return diffResultContainer
 
         # apply DiffIgnore -> Ingore nodes if requested
         if self.UseDiffIgnore: 
@@ -51,7 +54,7 @@ class CompareDiff(DirectedSubgraphDiff):
         matchOnChildNodeType = self.__matchNodesOnEntityType(children_init, children_updated)
        
         # ToDo: implement some config options in the class constructor to trigger, which child matching method should be chosen
-        match = matchOnRelType
+        match = matchOnChildNodeType
 
         # check the nodes that have the same relationship OR the same EntityType and the same node type: 
         for candidate in match: 
@@ -59,32 +62,50 @@ class CompareDiff(DirectedSubgraphDiff):
             cypher = neo4jQueryFactory.DiffNodes(nodeId_init, nodeId_updated)
             raw = self.connector.run_cypher_statement(cypher)
             #diff = self.unpackNodeDiff(raw)
-            diff = NodeDiffData.fromNeo4jResponse(raw)
+            nodeDifference = NodeDiffData.fromNeo4jResponse(raw)
 
             # apply DiffIgnore on diff result 
             ignoreAttrs = self.utils.diffIngore.ignore_attrs
-            diff_wouIgnore = self.__applyDiffIgnoreOnNodeDiff(diff, ignoreAttrs)
+            cleared_nodeDifference = self.__applyDiffIgnoreOnNodeDiff(nodeDifference, ignoreAttrs)
 
             if self.toConsole:
                 print('comparing node {} to node {} after applying DiffIgnore:'.format(nodeId_init, nodeId_updated))
            
-            if diff_wouIgnore: 
+            # case 1: no modifications
+            if cleared_nodeDifference.nodesAreSimilar() == True: 
                 # nodes are similar
                 if self.toConsole:
                     print('[RESULT]: child nodes match')
 
                 # run recursion
-                self.__compareChildren(candidate[0].id, candidate[1].id, isSimilar)
+                diffResultContainer = self.__compareChildren(candidate[0].id, candidate[1].id, diffResultContainer)
+            
+            # case 2: modified attrs but no added/deleted attrs
+            elif cleared_nodeDifference.nodesHaveUpdatedAttrs() == True: 
+                diffResultContainer.isSimilar = False
 
+                for modifiedAttr in cleared_nodeDifference:
+                    print(modifiedAttr)
+                    attr_name = 'myAttribute'
+                    val_old = 'val_old'
+                    val_new = 'val_new'
+
+                    diffResultContainer.logNodeModification(nodeId_init, "", 'modified', val_old, val_new)
+                
+                # run recursion
+                diffResultContainer = self.__compareChildren(candidate[0].id, candidate[1].id, diffResultContainer)
+            
+
+            # case 3: added/deleted attrs. Break recursion
             else:
                 if self.toConsole:
                     print('[RESULT]: detected unsimilarity between nodes {} and {}').format(nodeId_init, nodeId_updated)
-                    print(diff_wouIgnore)
-
-                isSimilar = False
-                return False
+                    print(cleared_nodeDifference)
+                # log result
+                diffResultContainer.isSimilar = False
+                return diffResultContainer
             
-        return isSimilar
+        return diffResultContainer
 
     def __matchNodesOnRelType(self, children_init, children_updated):
         """ compares two lists of ChildNodes and returns tuples of possible similar childs based on the same relType to the parent node """
