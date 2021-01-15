@@ -90,8 +90,9 @@
   <ItemGroup>
     <Folder Include="00_sampleData\IFC_stepP21\" />
     <Folder Include="00_sampleData\IFC_json\" />
+    <Folder Include="00_sampleData\IFC_stepP21\GeomRepresentation_01\" />
+    <Folder Include="00_sampleData\IFC_stepP21\GeomRepresentation_02\" />
     <Folder Include="00_sampleData\IFC_stepP21\wall-column\" />
-    <Folder Include="00_sampleData\IFC_stepP21\shapeRepr_01\" />
     <Folder Include="neo4j_middleware\" />
     <Folder Include="common_base\" />
     <Folder Include="grGen_middleware\" />
@@ -110,14 +111,15 @@
     <Content Include="00_sampleData\IFC_json\spatial_initial_old.json" />
     <Content Include="00_sampleData\IFC_json\spatial_updated.json" />
     <Content Include="00_sampleData\IFC_json\spatial_updated_old.json" />
-    <Content Include="00_sampleData\IFC_stepP21\shapeRepr_01\sameRepr.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\GeomRepresentation_01\sameRepr.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\GeomRepresentation_01\separatedRepr.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\GeomRepresentation_02\sameRepr.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\GeomRepresentation_02\separatedRepr_elevated.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\sampleModel2x3.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\sampleModel4x1_updated.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\sampleModel4x1_init.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\sampleModel4x2.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\sampleModel4x3.ifc" />
-    <Content Include="00_sampleData\IFC_stepP21\shapeRepr_01\separatedRepr_elevated.ifc" />
-    <Content Include="00_sampleData\IFC_stepP21\shapeRepr_01\separatedRepr.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\spatial_initial.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\spatial_updated.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\wall-column\Column-Wall.ifc" />
