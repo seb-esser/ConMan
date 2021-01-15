@@ -102,10 +102,13 @@ class CompareDiff(DirectedSubgraphDiff):
             # case 3: added/deleted attrs. Break recursion
             else:
                 if self.toConsole:
-                    print('[RESULT]: detected unsimilarity between nodes {} and {}').format(node_init.id, node_updated.id)
+                    print('[RESULT]: detected unsimilarity between nodes {} and {}'.format(node_init.id, node_updated.id))
                     print(cleared_nodeDifference)
                 # log result
                 diffResultContainer.isSimilar = False
+                # toDo: log detected unsimilarity
+                # cleared_nodeDifference.AttrsModified
+
                 return diffResultContainer
             
         return diffResultContainer
