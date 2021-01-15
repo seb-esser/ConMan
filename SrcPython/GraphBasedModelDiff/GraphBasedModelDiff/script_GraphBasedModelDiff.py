@@ -22,13 +22,17 @@ connector.connect_driver()
 
 
 ## cuboid sample
-# label_init = "ts20210106T110329"
-# label_updated = "ts20210106T110250"
+#label_init = "ts20210106T110329"
+#label_updated = "ts20210106T110250"
+
+## cuboid sample with height elevation
+label_init = "ts20210106T110329"
+label_updated = "ts20210115T132735"
 
 
-# wall column sample
-label_init = "ts20200713T083450"
-label_updated = "ts20200713T083447"
+## wall column sample
+#label_init = "ts20200713T083450"
+#label_updated = "ts20200713T083447"
 
 cypher = []
 

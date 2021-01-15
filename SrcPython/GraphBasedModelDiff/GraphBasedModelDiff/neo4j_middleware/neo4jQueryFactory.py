@@ -23,7 +23,7 @@ class neo4jQueryFactory:
 		""" returns a cypher statement to query a node by its P21_id and a given (optional) label. """ 
 		
 		query = ''
-		if timestamp != None: 
+		if label != None: 
 			query = 'MATCH (n:{})'.format(label)
 		else: 
 			query = 'MATCH (n)'

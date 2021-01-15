@@ -62,12 +62,12 @@ connector = Neo4jConnector(False, True)
 connector.connect_driver()
 
 
-model_path_init =		'./00_sampleData/IFC_stepP21/wall-column/Column-Wall.ifc'
-model_path_updated =	'./00_sampleData/IFC_stepP21/wall-column/Wall-Column.ifc'
+model_path_init =		'./00_sampleData/IFC_stepP21/GeomRepresentation_02/separatedRepr_elevated.ifc'
+# model_path_updated =	'./00_sampleData/IFC_stepP21/wall-column/Wall-Column.ifc'
 
 # parse model
 parseModel(connector, model_path_init)
-parseModel(connector, model_path_updated)
+# parseModel(connector, model_path_updated)
 
 
 # disconnect from database
