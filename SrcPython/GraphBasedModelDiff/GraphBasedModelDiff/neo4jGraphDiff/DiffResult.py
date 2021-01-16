@@ -26,7 +26,7 @@ class DiffResult(Result):
 
 class PropertyModification: 
 
-    def __init__(self, id, attrName, modType, value_old = None, value_new = None ):
+    def __init__(self, id, attrName, modificationType, value_old = None, value_new = None ):
         self.nodeId = id
         self.attrName = attrName
         self.valueOld = value_old
@@ -37,7 +37,7 @@ class PropertyModification:
         self.modificationType = sw[modificationType]
 
     def __repr__(self):
-        return 'Property Modification: node: {} attr: {} action: {}'.format(self.nodeId, self.attrName, self.modType)
+        return 'Property Modification: node: {} attr: {} action: {}'.format(self.nodeId, self.attrName, self.modificationType)
 
 class PropertyModificationTypeEnum(Enum): 
     ADDED = 1

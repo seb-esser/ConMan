@@ -20,7 +20,6 @@ class CompareDiff(DirectedSubgraphDiff):
     # public overwrite method requested by abstract superclass DirectedSubgraphDiff
     def diffSubgraphs(self, node_init, node_updated): 
 
-        # ToDo: return diff results and not only True/False in case of a spotted difference between init and updated
         diffContainer = DiffResult(method = "Node-Diff")
       
         # start recursion
@@ -87,16 +86,20 @@ class CompareDiff(DirectedSubgraphDiff):
             elif cleared_nodeDifference.nodesHaveUpdatedAttrs() == True: 
                 diffResultContainer.isSimilar = False
 
-                for modifiedAttr in cleared_nodeDifference:
-                    print(modifiedAttr)
-                    attr_name = 'myAttribute'
-                    val_old = 'val_old'
-                    val_new = 'val_new'
+                for modifiedAttr in cleared_nodeDifference.AttrsModified.items():
+                    if self.toConsole:
+                        print(modifiedAttr)
 
-                    diffResultContainer.logNodeModification(node_init.id, "", 'modified', val_old, val_new)
+                    # ToDo: move extraction of data from tuple to higher representation
+                    attr_name = modifiedAttr[0]
+                    val_old = modifiedAttr[1]['left']
+                    val_new = modifiedAttr[1]['right']
+
+                    diffResultContainer.logNodeModification(node_init.id, attr_name, 'modified', val_old, val_new)
+                    diffResultContainer.logNodeModification(node_updated.id, attr_name, 'modified', val_old, val_new)
                 
                 # run recursion
-                diffResultContainer = self.__compareChildren(candidate[0].id, candidate[1].id, diffResultContainer)
+                diffResultContainer = self.__compareChildren(candidate[0], candidate[1], diffResultContainer)
             
 
             # case 3: added/deleted attrs. Break recursion
@@ -106,6 +109,7 @@ class CompareDiff(DirectedSubgraphDiff):
                     print(cleared_nodeDifference)
                 # log result
                 diffResultContainer.isSimilar = False
+                print(cleared_nodeDifference)
                 # toDo: log detected unsimilarity
                 # cleared_nodeDifference.AttrsModified
 

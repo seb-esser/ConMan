@@ -61,6 +61,7 @@ class Neo4jConnector:
 
         except :
             print('[neo4j_connector] something went wrong. Check the neo4j connector. ')
+            print('[neo4j_connector] Tried to execute cypher statement >> {} <<'.format(statement) )
             print('[neo4j_connector] Possible issues: ' + 
                     '\t Incorrect cypher statement' + 
                     '\t Missing packages inside the graph database \n')
