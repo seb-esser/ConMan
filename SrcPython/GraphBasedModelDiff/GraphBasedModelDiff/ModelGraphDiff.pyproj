@@ -5,7 +5,7 @@
     <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>script_GraphBasedModelDiff.py</StartupFile>
+    <StartupFile>script_parseIFCp21.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -92,6 +92,7 @@
     <Folder Include="00_sampleData\IFC_json\" />
     <Folder Include="00_sampleData\IFC_stepP21\GeomRepresentation_01\" />
     <Folder Include="00_sampleData\IFC_stepP21\GeomRepresentation_02\" />
+    <Folder Include="00_sampleData\IFC_stepP21\SleeperSample\" />
     <Folder Include="00_sampleData\IFC_stepP21\wall-column\" />
     <Folder Include="neo4j_middleware\" />
     <Folder Include="common_base\" />
@@ -116,8 +117,8 @@
     <Content Include="00_sampleData\IFC_stepP21\GeomRepresentation_02\sameRepr.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\GeomRepresentation_02\separatedRepr_elevated.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\sampleModel2x3.ifc" />
-    <Content Include="00_sampleData\IFC_stepP21\sampleModel4x1_updated.ifc" />
-    <Content Include="00_sampleData\IFC_stepP21\sampleModel4x1_init.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\SleeperSample\sleeper_updated.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\SleeperSample\sleeper_init.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\sampleModel4x2.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\sampleModel4x3.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\spatial_initial.ifc" />

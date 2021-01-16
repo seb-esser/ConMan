@@ -18,7 +18,7 @@ class neo4jGraphFactory:
 
 	@classmethod
 	def CreateRootedNode(cls, entityId, entityType, timestamp):
-		create = 'CREATE(n:{}:rootedNode:{})'.format(entityType, timestamp)
+		create = 'CREATE(n:{}:rootedNode)'.format(timestamp)
 		setGuid = 'SET n.GlobalId = "{}"'.format(entityId)
 		setEntityType = 'SET n.entityType = "{}"'.format(entityType)
 		returnID = 'RETURN ID(n)'
@@ -46,7 +46,7 @@ class neo4jGraphFactory:
 	@classmethod
 	def CreateAttributeNode(self, ParentId, entityType, RelationshipLabel, timestamp):
 		match = 'MATCH (p) WHERE ID(p) = {}'.format(ParentId)
-		create = 'CREATE (n: {}:attrNode:{})'.format(entityType, timestamp) 
+		create = 'CREATE (n:attrNode:{})'.format(timestamp) 
 		setEntityType = 'SET n.entityType = "{}"'.format(entityType)
 		merge = 'MERGE (p)-[:{}]->(n)'.format(RelationshipLabel)
 		returnID = 'RETURN ID(n)'
@@ -63,7 +63,7 @@ class neo4jGraphFactory:
 
 	@classmethod 
 	def CreateObjectifiedRelNode(self, relGuid, relType, timestamp):
-		create = 'CREATE(n:{}:objRelNode:{})'.format(relType, timestamp)
+		create = 'CREATE(n:objRelNode:{})'.format(timestamp)
 		setGuid = 'SET n.globalId = "{}"'.format(relGuid)
 		setEntityType = 'SET n.entityType = "{}"'.format(relType)
 		returnID = 'RETURN ID(n)'

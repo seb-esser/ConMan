@@ -61,12 +61,19 @@ print('connecting to neo4j database... ')
 connector = Neo4jConnector(False, True)
 connector.connect_driver()
 
+paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/sameRepr.ifc', 
+		 './00_sampleData/IFC_stepP21/GeomRepresentation_01/separatedRepr.ifc', 
+		 './00_sampleData/IFC_stepP21/GeomRepresentation_02/separatedRepr_elevated.ifc',
+		 './00_sampleData/IFC_stepP21/wall-column/Wall-Column.ifc', 
+		 './00_sampleData/IFC_stepP21/wall-column/Column-Wall.ifc', 
+		 './00_sampleData/IFC_stepP21/SleeperSample/sleeper_init.ifc', 
+		 './00_sampleData/IFC_stepP21/SleeperSample/sleeper_updated.ifc'
+		 '']
 
-model_path_init =		'./00_sampleData/IFC_stepP21/GeomRepresentation_02/separatedRepr_elevated.ifc'
-# model_path_updated =	'./00_sampleData/IFC_stepP21/wall-column/Wall-Column.ifc'
+for path in paths: 
+	# parse model
+	parseModel(connector, path)
 
-# parse model
-parseModel(connector, model_path_init)
 # parseModel(connector, model_path_updated)
 
 
