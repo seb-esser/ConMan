@@ -75,13 +75,13 @@ for pair in nodeIDs_unchanged:
 
 	print('[RESULT HASH-comp] Object with rootNodeId {} is similar to {}: {}'.format(node_init.id, node_updated.id,
 																								 HashResult.isSimilar))
-	if not HashResult.isSimilar:
-		print('\t Detected changes in DIFF comparison:')
-		for res in HashResult.propertyModifications:
-			print(res)
+	#if not HashResult.isSimilar:
+	#	print('\t Detected changes in HASH comparison:')
+	#	for res in HashResult.propertyModifications:
+	#		print(res)
 
-		for res in HashResult.StructureModifications:
-			print(res)
+	#	for res in HashResult.StructureModifications:
+	#		print(res)
 
 	print('[RESULT DIFF-comp] Object with rootNodeId {} is similar to {}: {}'.format(node_init.id, node_updated.id,
 																								 DiffResult.isSimilar))

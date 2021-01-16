@@ -31,6 +31,7 @@ class CompareDiff(DirectedSubgraphDiff):
         """ queries the all child nodes of a node and compares the results between the initial and the updated graph based on AttrDiff"""
         # get children data
 
+        # --- 1 --- query all childs of current node 
         children_init =     self._DirectedSubgraphDiff__getChildren(self.label_init, node_init.id,    indent +1)
         children_updated =  self._DirectedSubgraphDiff__getChildren(self.label_updated, node_updated.id, indent +1)
 
@@ -45,7 +46,7 @@ class CompareDiff(DirectedSubgraphDiff):
             children_init = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_init)
             children_updated = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_updated)
 
-
+        # --- 2 --- match detected child nodes based on a chosen method 
         matchOnRelType = []
         matchOnChildNodeType = []
 
@@ -58,10 +59,12 @@ class CompareDiff(DirectedSubgraphDiff):
         # ToDo: implement some config options in the class constructor to trigger, which child matching method should be chosen
         match = matchOnChildNodeType
 
+        # --- 3 --- loop over all matching child pairs and detect their similarities and differences
+
         # check the nodes that have the same relationship OR the same EntityType and the same node type: 
-        for candidate in match: 
+        for matchingChilds in match: 
             # compare two nodes
-            cypher = neo4jQueryFactory.DiffNodes(node_init.id, node_updated.id)
+            cypher = neo4jQueryFactory.DiffNodes(matchingChilds[0].id, matchingChilds[1].id) # compare childs? or current node?
             raw = self.connector.run_cypher_statement(cypher)
             #diff = self.unpackNodeDiff(raw)
             nodeDifference = NodeDiffData.fromNeo4jResponse(raw)
@@ -73,16 +76,14 @@ class CompareDiff(DirectedSubgraphDiff):
             if self.toConsole:
                 print('comparing node {} to node {} after applying DiffIgnore:'.format(node_init.id, node_updated.id))
            
-            # case 1: no modifications
+            # case 1: no modifications on pair
             if cleared_nodeDifference.nodesAreSimilar() == True: 
                 # nodes are similar
                 if self.toConsole:
                     print('[RESULT]: child nodes match')
-
-                # run recursion
-                diffResultContainer = self.__compareChildren(candidate[0], candidate[1], diffResultContainer)
+               
             
-            # case 2: modified attrs but no added/deleted attrs
+            # case 2: modified attrs on pair but no added/deleted attrs
             elif cleared_nodeDifference.nodesHaveUpdatedAttrs() == True: 
                 diffResultContainer.isSimilar = False
 
@@ -95,12 +96,7 @@ class CompareDiff(DirectedSubgraphDiff):
                     val_old = modifiedAttr[1]['left']
                     val_new = modifiedAttr[1]['right']
 
-                    diffResultContainer.logNodeModification(node_init.id, attr_name, 'modified', val_old, val_new)
-                    diffResultContainer.logNodeModification(node_updated.id, attr_name, 'modified', val_old, val_new)
-                
-                # run recursion
-                diffResultContainer = self.__compareChildren(candidate[0], candidate[1], diffResultContainer)
-            
+                    diffResultContainer.logNodeModification(node_init.id,node_updated.id , attr_name, 'modified', val_old, val_new)                           
 
             # case 3: added/deleted attrs. Break recursion
             else:
@@ -114,7 +110,13 @@ class CompareDiff(DirectedSubgraphDiff):
                 # cleared_nodeDifference.AttrsModified
 
                 return diffResultContainer
+
+
+            # run recursion for children if "NoChange" or "Modified" happened
+            diffResultContainer = self.__compareChildren(matchingChilds[0], matchingChilds[1], diffResultContainer)
             
+            # end for loop 
+
         return diffResultContainer
 
     def __matchNodesOnRelType(self, children_init, children_updated):

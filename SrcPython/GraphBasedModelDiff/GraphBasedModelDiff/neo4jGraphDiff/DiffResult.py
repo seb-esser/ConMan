@@ -14,9 +14,9 @@ class DiffResult(Result):
         self.propertyModifications = []
         self.StructureModifications = []
 
-    def logNodeModification(self, nodeId, attrName, modType, value_old, value_new):
+    def logNodeModification(self, nodeId_init, nodeId_updated, attrName, modType, value_old, value_new):
         """ logs a modification applied on properties """
-        modification = PropertyModification(nodeId, attrName, modType, value_old, value_new)
+        modification = PropertyModification(nodeId_init, nodeId_updated, attrName, modType, value_old, value_new)
         self.propertyModifications.append(modification)
 
     def logStructureModification(self, parentNodeId, childNodeId, modType):
@@ -26,8 +26,9 @@ class DiffResult(Result):
 
 class PropertyModification: 
 
-    def __init__(self, id, attrName, modificationType, value_old = None, value_new = None ):
-        self.nodeId = id
+    def __init__(self, id_init, id_updated, attrName, modificationType, value_old = None, value_new = None ):
+        self.nodeId_init = id_init
+        self.nodeId_updated = id_updated
         self.attrName = attrName
         self.valueOld = value_old
         self.valueNew = value_new
@@ -37,7 +38,7 @@ class PropertyModification:
         self.modificationType = sw[modificationType]
 
     def __repr__(self):
-        return 'Property Modification: node: {} attr: {} action: {}'.format(self.nodeId, self.attrName, self.modificationType)
+        return 'PMod: node_init: {} node_updated: {} attr: {} action: {} oldVal: {} newVal: {}'.format(self.nodeId_init, self.nodeId_updated, self.attrName, self.modificationType, self.valueOld, self.valueNew)
 
 class PropertyModificationTypeEnum(Enum): 
     ADDED = 1
