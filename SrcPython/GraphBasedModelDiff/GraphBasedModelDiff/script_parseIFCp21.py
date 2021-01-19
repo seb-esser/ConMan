@@ -61,6 +61,7 @@ print('connecting to neo4j database... ')
 connector = Neo4jConnector(False, True)
 connector.connect_driver()
 
+# ToDo: automate loading of unit tests. See ticket #16 in the Gitlab repo. 
 paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/sameRepr.ifc', 
 		 './00_sampleData/IFC_stepP21/GeomRepresentation_01/separatedRepr.ifc', 
 		 './00_sampleData/IFC_stepP21/GeomRepresentation_02/separatedRepr_elevated.ifc',
