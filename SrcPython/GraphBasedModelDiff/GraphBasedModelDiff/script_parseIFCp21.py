@@ -62,9 +62,9 @@ connector = Neo4jConnector(False, True)
 connector.connect_driver()
 
 # ToDo: automate loading of unit tests. See ticket #16 in the Gitlab repo. 
-paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/sameRepr.ifc', 
-		 './00_sampleData/IFC_stepP21/GeomRepresentation_01/separatedRepr.ifc', 
-		 './00_sampleData/IFC_stepP21/GeomRepresentation_02/separatedRepr_elevated.ifc',
+paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresentation_01.ifc', 
+		 './00_sampleData/IFC_stepP21/GeomRepresentation_01/Update_GeomRepresentation_01.ifc', 
+		 './00_sampleData/IFC_stepP21/GeomRepresentation_02/Update_GeomRepresentation_02.ifc',
 		 './00_sampleData/IFC_stepP21/wall-column/Wall-Column.ifc', 
 		 './00_sampleData/IFC_stepP21/wall-column/Column-Wall.ifc', 
 		 './00_sampleData/IFC_stepP21/SleeperSample/sleeper_init.ifc', 
