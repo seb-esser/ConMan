@@ -57,7 +57,8 @@ class CompareDiff(DirectedSubgraphDiff):
         matchOnChildNodeType = self.__matchNodesOnEntityType(children_init, children_updated)
        
         # ToDo: implement some config options in the class constructor to trigger, which child matching method should be chosen
-        match = matchOnChildNodeType
+        # match = matchOnChildNodeType
+        match = matchOnRelType
 
         # --- 3 --- loop over all matching child pairs and detect their similarities and differences
 
@@ -105,9 +106,25 @@ class CompareDiff(DirectedSubgraphDiff):
                     print(cleared_nodeDifference)
                 # log result
                 diffResultContainer.isSimilar = False
-                print(cleared_nodeDifference)
-                # toDo: log detected unsimilarity
-                # cleared_nodeDifference.AttrsModified
+                
+                # log modified
+                for modAttr in cleared_nodeDifference.AttrsModified.items(): 
+                    attr_name = modAttr[0]
+                    val_old = modAttr[1]['left']
+                    val_new = modAttr[1]['right']
+                    diffResultContainer.logNodeModification(node_init.id, node_updated.id , attr_name, 'modified', val_old, val_new)    
+
+                # log added
+                for addedAttr in cleared_nodeDifference.AttrsAdded.items():
+                    attr_name = addedAttr[0]
+                    val_new = addedAttr[1]
+                    diffResultContainer.logNodeModification(None, node_updated.id , attr_name, 'added', None, val_new)  
+                
+                # log deleted
+                for delAttr in cleared_nodeDifference.AttrsDeleted.items():
+                    attr_name = delAttr[0]
+                    val_new = delAttr[1]
+                    diffResultContainer.logNodeModification(node_init.id, None , attr_name, 'deleted', val_old, None)  
 
                 return diffResultContainer
 

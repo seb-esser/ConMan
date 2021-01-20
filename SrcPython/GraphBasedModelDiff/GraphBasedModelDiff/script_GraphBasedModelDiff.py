@@ -21,14 +21,21 @@ connector.connect_driver()
 # label_updated = "ts20200204T105551"
 
 
-## cuboid sample
-#label_init = "ts20210106T110329"
-#label_updated = "ts20210106T110250"
+## cuboid sample with different subgraph structures
+#label_init = "ts20210119T085406"	# same rep
+#label_updated = "ts20210119T085407" # different rep
 
-## cuboid sample with height elevation
-label_init = "ts20210106T110329"
-label_updated = "ts20210115T132735"
+## cuboid sample with height elevation 
+# label_init = "ts20210119T085408" # different rep
+#label_updated = "ts20210119T085409"	# different rep, modified height
 
+## cuboid sample with cuboid vs cylinder
+label_init = "ts20210119T085410"	# cuboid
+label_updated = "ts20210119T085411"	# cylinder
+
+## cuboid sample with extrudedArea vs BRep
+#label_init = "ts20210119T085412"	# extrudedArea
+#label_updated = "ts20210119T085413"	# BRep
 
 ## wall column sample
 #label_init = "ts20200713T083450"

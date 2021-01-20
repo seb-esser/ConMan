@@ -16,10 +16,8 @@ class NodeDiffData:
         return ret_val
 
     def __str__(self): 
-        print('unchanged: {}'.format(self.AttrsUnchanged))
-        print('modified: {}'.format(self.AttrsModified))
-        print('added: {}'.format(self.AttrsAdded))
-        print('deleted: {}'.format(self.AttrsDeleted))
+        return 'unchanged: {}, modified: {}, added: {}, deleted: {}'.format(self.AttrsUnchanged, self.AttrsModified, self.AttrsAdded, self.AttrsDeleted)
+
     
     def __repr__(self):
         return 'NodeDiffData object'
