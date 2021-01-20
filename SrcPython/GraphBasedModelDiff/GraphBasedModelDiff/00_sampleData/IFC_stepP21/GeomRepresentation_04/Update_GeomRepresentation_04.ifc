@@ -3,7 +3,7 @@ HEADER;
 FILE_DESCRIPTION(('ViewDefinition [Ifc4NotAssigned]'),'2;1');
 FILE_NAME(
 /* name */ '.\\Unittest\\Update_GeomRepresentation_04.ifc',
-/* time_stamp */ '2021-01-19T08:54:05',
+/* time_stamp */ '2021-01-19T08:54:13',
 /* author */ ('Sebastian Esser'),
 /* organization */ ('Unknown'),
 /* preprocessor_version */ 'GeometryGymIFC v0.1.6.0 by Geometry Gym Pty Ltd built 2020-12-16T04:57:54',
@@ -41,7 +41,7 @@ DATA;
 #29= IFCGEOMETRICREPRESENTATIONSUBCONTEXT('Body','Model',*,*,*,*,#25,$,.MODEL_VIEW.,$);
 #30= IFCSHAPEREPRESENTATION(#29,'Body','SweptSolid',(#23));
 #31= IFCPRODUCTDEFINITIONSHAPE($,$,(#30));
-#32= IFCBUILDINGELEMENTPROXY('3xowIo77q008Yxqwlj5Rkg',$,'Cuboid_extrudedArea',$,$,#9,#63,$,$);
+#32= IFCBUILDINGELEMENTPROXY('3xowIo77q008Yxqwlj5Rkg',$,'Cuboid_BRep',$,$,#9,#63,$,$);
 #33= IFCRELCONTAINEDINSPATIALSTRUCTURE('000H8Y4pT8TK92qH5AlDKn',$,'Site','Site Container for Elements',(#32),#4);
 #34= IFCCARTESIANPOINT((-2.0,-3.0,0.0));
 #35= IFCCARTESIANPOINT((-2.0,3.0,0.0));
