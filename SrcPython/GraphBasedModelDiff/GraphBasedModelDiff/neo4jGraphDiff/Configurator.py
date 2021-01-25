@@ -1,6 +1,6 @@
 
 import json
-
+import enum
 
 
 class Configurator:
@@ -10,7 +10,14 @@ class Configurator:
         self.LogSettings = logSettings
         self.DiffSettings = diffSettings
         
+    @classmethod
+    def basicConfig(cls):
+        
+        logSettings = LoggingSettings(False, False, None, None, None)
+        diffSettings = DiffSettings(None, None, None, None)
 
+        classObj = cls(logSettings, diffSettings)
+        return classObj
 
     @classmethod
     def from_json(cls, jsonPath): 
@@ -153,3 +160,13 @@ class IgnoreSettings:
 			attrs_list.append(ignore_attr)
 
 		return cls(attrs_list, labels_list)
+
+class MatchCriteriaEnum(enum.Enum): 
+    OnGuid = 1
+    OnNodeType = 2
+    OnRelType = 3
+    OnEntityType = 4
+    OnRelTypeAndOnNodeType = 5
+    OnHash = 6
+    OnHashWithDiffIgnore = 7
+

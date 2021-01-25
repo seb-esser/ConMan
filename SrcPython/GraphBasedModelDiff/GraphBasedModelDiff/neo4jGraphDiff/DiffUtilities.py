@@ -55,4 +55,14 @@ class DiffUtilities:
 
 		return nodes_unchanged, nodes_added, nodes_deleted
 
+	def CompareNodesByGUID(self, nodes_init, nodes_updated):
+		raise Exception('Method CompareNodesByGUID is not implemented yet')
 
+	def CompareNodesByRelType(self, nodes_init, nodes_updated):
+		raise Exception('Method CompareNodesByRelType is not implemented yet')
+
+	def CompareNodesByNodeType(self, nodes_init, nodes_updated):
+		raise Exception('Method CompareNodesByNodeType is not implemented yet')
+
+	def CompareNodesByNodeTypeAndRelType(self, nodes_init, nodes_updated):
+		raise Exception('Method CompareNodesByNodeTypeAndRelType is not implemented yet')
