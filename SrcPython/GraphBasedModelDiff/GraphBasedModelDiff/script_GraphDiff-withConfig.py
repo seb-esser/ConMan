@@ -8,8 +8,9 @@ from neo4jGraphDiff.Configurator import Configurator
 from neo4jGraphDiff.Reporter import Reporter
 
 """ script """
-configPath = './neo4jGraphDiff/defaultConfig.json'
-config = Configurator.from_json(configPath)
+
+
+config = Configurator.basicConfig()
 
 print(config.LogSettings)
 print(config.DiffSettings)

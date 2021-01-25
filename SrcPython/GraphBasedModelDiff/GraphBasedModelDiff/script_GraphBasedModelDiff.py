@@ -11,6 +11,8 @@ from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
 from neo4jGraphDiff.CompareDiff import CompareDiff
 from neo4jGraphDiff.HashDiff import HashDiff
 
+from neo4jGraphDiff.Configurator import Configurator
+
 # -- ... --
 
 connector = Neo4jConnector(False, False)
@@ -26,7 +28,7 @@ connector.connect_driver()
 #label_updated = "ts20210119T085407" # different rep
 
 ## cuboid sample with height elevation 
-# label_init = "ts20210119T085408" # different rep
+#label_init = "ts20210119T085408" # different rep
 #label_updated = "ts20210119T085409"	# different rep, modified height
 
 ## cuboid sample with cuboid vs cylinder
@@ -40,6 +42,9 @@ label_updated = "ts20210119T085411"	# cylinder
 ## wall column sample
 #label_init = "ts20200713T083450"
 #label_updated = "ts20200713T083447"
+
+
+config = Configurator.basicConfig()
 
 cypher = []
 

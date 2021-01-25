@@ -1,7 +1,10 @@
 
+""" packages """
 import json
 import enum
 
+""" modules """
+from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum, LoggingLevelEnum
 
 class Configurator:
     """global configurator for everything related to the subgraph Diff in Neo4j"""
@@ -13,8 +16,8 @@ class Configurator:
     @classmethod
     def basicConfig(cls):
         
-        logSettings = LoggingSettings(False, False, None, None, None)
-        diffSettings = DiffSettings(None, None, None, None)
+        logSettings = LoggingSettings.defaultSettings()
+        diffSettings = DiffSettings()
 
         classObj = cls(logSettings, diffSettings)
         return classObj
@@ -23,6 +26,8 @@ class Configurator:
     def from_json(cls, jsonPath): 
         """ loads the config from a specified json file and returns a Configurator instance """
         
+        raise Warning('not implemented properly. Check ToDos')
+
         # ToDo: prepare everything to use this method with file-based jsons as well as HTTP request bodies
 
        
@@ -36,9 +41,9 @@ class Configurator:
         except :
             raise Exception('Staged an invalid config file. please check. ')
                
-        # create class instances
-        logSettings = LoggingSettings.from_json(logSettings_json)      
-        diffSettings = DiffSettings.from_json(diffSettings_json)      
+        ## create class instances
+        #logSettings = LoggingSettings.from_json(logSettings_json)      
+        #diffSettings = DiffSettings.from_json(diffSettings_json)      
         
         return cls(logSettings, diffSettings)
 
@@ -61,6 +66,9 @@ class LoggingSettings:
         self.logConsoleLevel = logConsoleLevel
         self.logFileLevel = logFileLevel
 
+    @classmethod
+    def defaultSettings(cls): 
+        return cls(False, False, '/logging', LoggingLevelEnum.NONE, LoggingLevelEnum.NONE)
 
     @classmethod
     def from_json(cls, obj):
@@ -68,8 +76,9 @@ class LoggingSettings:
         bool_file = obj['logToFile']
         bool_console = obj['logToConsole']
         logPath = obj['loggingFilePath']
-        levelConsole = obj['loggingLevelConsole']
-        levelFile = obj['loggingLevelFile']
+        levelConsole = obj['loggingLevelConsole'] # ToDo: Implement cast to LoggingLevelEnum
+        levelFile = obj['loggingLevelFile'] # ToDo: Implement cast to LoggingLevelEnum
+         
 
         return cls(bool_console, bool_file, logPath, levelConsole, levelFile)
 
@@ -85,31 +94,27 @@ class LoggingSettings:
     def __str__(self):
         return 'LoggingSettings: ToConsole: {} ToFile: {}'.format(self.logToConsole, self.logToFile)
 
+
+
+
 class DiffSettings: 
     """ """
 
-    def __init__(self, diffMethods, hashSettings, diffSettings, ignoreSettings): 
-
-        # list of methods that should be applied
-        self.diffMethods = diffMethods
-        
-        # settings for each individual DIFF method
-        self.hashSettings = hashSettings
-        self.diffSettings = diffSettings
-
+    def __init__(self):                 
         # ignore settings
-        self.diffIgnoreSettings = ignoreSettings
+        self.diffIgnoreAttrs = ["P21_id", "GlobalId"]
+        self.diffIgnoreEntityTypes = ["IfcOwnerHistory"]
+        self.MatchingType_RootedNodes = MatchCriteriaEnum.OnGuid # sets how rooted nodes get matched
+        self.MatchingType_Childs = MatchCriteriaEnum.OnEntityType # sets how child nodes get matched
+
+    @classmethod
+    def defaultSettings(cls):
+        return cls()
 
     @classmethod
     def from_json(cls, obj):
         """ generate instance from JSON """
-
-        diff_methods = obj['diffMethods']
-        hash_config = CompareSettings.from_json(obj['hashBased_settings'])
-        nodeDiff_config = CompareSettings.from_json(obj['nodeDiffBased_settings'])
-        diffIgnore_config = IgnoreSettings.from_json(obj['diffIgnoreSettings'])
-
-        return cls(diff_methods, hash_config, nodeDiff_config, diffIgnore_config )
+        raise Exception('This method is not implemented yet')   
 
     def ToJson(self): 
         """ write instance to JSON """ 
@@ -117,56 +122,10 @@ class DiffSettings:
 
      # --- dunder ---
     def __repr__(self):
-        return 'DIFF Settings: Methods: {} '.format(self.diffMethods)
+        return 'DiffSettings: IgnoreAttrs: {} IgnoreEntityTypes: {}'.format(self.diffIgnoreAttrs, self.diffIgnoreEntityTypes)
 
     def __str__(self):
-        return 'DIFF Settings: Methods: {} '.format(self.diffMethods)
+        return 'DiffSettings: IgnoreAttrs: {} IgnoreEntityTypes: {}'.format(self.diffIgnoreAttrs, self.diffIgnoreEntityTypes)
 
 
-class CompareSettings: 
-
-    def __init__(self, considerRelType, considerChildNodeType): 
-        self.considerRelType = considerRelType
-        self.considerChildNodeType = considerChildNodeType
-
-    @classmethod
-    def from_json(cls, obj): 
-
-        relType = obj['compareSettings']['considerRelType']
-        childType = obj['compareSettings']['considerChildNodeType']
-
-        return cls(relType, childType)
-
-class IgnoreSettings: 
-
-    # default constructor
-	def __init__(self, ignoreAttrs, ignoreNodeTypes):
-		self.ignore_attrs = ignoreAttrs
-		self.ignore_node_tpes = ignoreNodeTypes
-
-	# from json factory
-	@classmethod
-	def from_json(cls, json_obj): 
-
-		ignore_labels = json_obj["IgnoreNodeTypes"]
-		ignore_attrs = json_obj["IgnoreNodeAttributes"]
-
-		labels_list = []
-		for ignore_label in ignore_labels: 
-			labels_list.append(ignore_label)
-
-		attrs_list = []
-		for ignore_attr in ignore_attrs: 
-			attrs_list.append(ignore_attr)
-
-		return cls(attrs_list, labels_list)
-
-class MatchCriteriaEnum(enum.Enum): 
-    OnGuid = 1
-    OnNodeType = 2
-    OnRelType = 3
-    OnEntityType = 4
-    OnRelTypeAndOnNodeType = 5
-    OnHash = 6
-    OnHashWithDiffIgnore = 7
 
