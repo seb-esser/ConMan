@@ -49,9 +49,6 @@
     <Compile Include="neo4jGraphDiff\DiffUtilities.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="neo4jGraphDiff\HashDiff.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="neo4jGraphDiff\Reporter.py">
       <SubType>Code</SubType>
     </Compile>

@@ -10,7 +10,7 @@ from .DiffResult import DiffResult
 from neo4jGraphDiff.DiffResult import DiffResult 
 from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum
 
-class CompareDiff(DirectedSubgraphDiff):
+class DepthFirstSearchComparison(DirectedSubgraphDiff):
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
     
     def __init__(self, connector, label_init, label_updated, config):
@@ -48,19 +48,18 @@ class CompareDiff(DirectedSubgraphDiff):
                 print("".ljust(indent*4) + ' leaf node.')
             return diffResultContainer
 
+        # calc hashes if necessary for matching method
         if desiredMatchMethod == MatchCriteriaEnum.OnHash:
             # calc hashes for init and updated
             childs_init = self.__getHashesOfNodes(self.label_init, children_init, indent)
             childs_updated = self.__getHashesOfNodes(self.label_updated, children_updated, indent)
 
-
         # apply DiffIgnore -> Ignore nodes if requested        
         children_init = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_init)
         children_updated = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_updated)
 
-        
         # compare children and raise an unsimilarity if necessary.
-        [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodes(children_init, children_updated, MatchCriteriaEnum.OnEntityType) 
+        [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodes(children_init, children_updated, desiredMatchMethod) 
         
         if self.toConsole():
             print('')
@@ -170,3 +169,26 @@ class CompareDiff(DirectedSubgraphDiff):
     	        diffResultContainer.logNodeModification(node_init.id, None , attr_name, 'deleted', val_old, None)
 
     	return diffResultContainer
+
+
+    def __getHashesOfNodes(self, label, nodeList, indent = 0):
+        return_val = []
+
+        ignore_attrs = self.configuration.DiffSettings.diffIgnoreAttrs # list of strings
+        # calc corresponding hash
+        for node in nodeList: 
+            child_node_id = node.id
+            relType = node.relType
+            # calc hash of current node
+            cypher_hash = neo4jQueryFactory.GetHashByNodeId(label, child_node_id, ignore_attrs )
+            hash = self.connector.run_cypher_statement(cypher_hash)[0][0]
+
+            node.setHash(hash)
+
+        if self.toConsole(): 
+            print("".ljust(indent*4) + 'Calculated hashes for model >> {} <<:'.format(label))
+            for node in nodeList:
+                print("".ljust(indent*4) + '\t NodeID: {:<4} \t hash: {}'.format(node.id, node.hash))
+
+
+        return nodeList

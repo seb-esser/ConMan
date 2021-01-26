@@ -23,6 +23,27 @@ class Configurator:
         return classObj
 
     @classmethod
+    def relTypeConfig(cls):
+        
+        logSettings = LoggingSettings.defaultSettings()
+        diffSettings = DiffSettings()
+        diffSettings.MatchingType_Childs = MatchCriteriaEnum.OnRelType
+
+        classObj = cls(logSettings, diffSettings)
+        return classObj
+
+    @classmethod
+    def EntityTypeConfig(cls):
+        
+        logSettings = LoggingSettings.defaultSettings()
+        diffSettings = DiffSettings()
+        diffSettings.MatchingType_Childs = MatchCriteriaEnum.OnEntityType
+
+        classObj = cls(logSettings, diffSettings)
+        return classObj
+
+
+    @classmethod
     def from_json(cls, jsonPath): 
         """ loads the config from a specified json file and returns a Configurator instance """
         
@@ -54,7 +75,8 @@ class Configurator:
 
 
     # dunder
-    
+    def __repr__(self):
+        return 'Config: matchingType RootedNodes: {} matchingType Subgraph: {}'.format(self.DiffSettings.MatchingType_RootedNodes, self.DiffSettings.MatchingType_Childs)
 
     
 class LoggingSettings:
@@ -104,8 +126,8 @@ class DiffSettings:
         # ignore settings
         self.diffIgnoreAttrs = ["p21_id", "GlobalId"]
         self.diffIgnoreEntityTypes = ["IfcOwnerHistory"]
-        self.MatchingType_RootedNodes = MatchCriteriaEnum.OnGuid # sets how rooted nodes get matched
-        self.MatchingType_Childs = MatchCriteriaEnum.OnEntityType # sets how child nodes get matched
+        self.MatchingType_RootedNodes = MatchCriteriaEnum.OnHash # sets how rooted nodes get matched
+        self.MatchingType_Childs = MatchCriteriaEnum.OnHash # sets how child nodes get matched
 
     @classmethod
     def defaultSettings(cls):
