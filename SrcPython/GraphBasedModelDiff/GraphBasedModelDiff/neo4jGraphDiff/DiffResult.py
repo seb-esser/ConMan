@@ -18,11 +18,13 @@ class DiffResult(Result):
         """ logs a modification applied on properties """
         modification = PropertyModification(nodeId_init, nodeId_updated, attrName, modType, value_old, value_new)
         self.propertyModifications.append(modification)
+        self.isSimilar = False
 
     def logStructureModification(self, parentNodeId, childNodeId, modType):
         """ logs a new modification to the DiffResult.modifiedNodes container """
         modification = StructureModification(parentNodeId, childNodeId, modType)
         self.StructureModifications.append(modification)
+        self.isSimilar = False
 
 class PropertyModification: 
 

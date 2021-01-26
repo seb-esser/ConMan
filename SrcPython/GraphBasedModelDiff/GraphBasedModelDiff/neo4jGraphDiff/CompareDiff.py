@@ -63,10 +63,10 @@ class CompareDiff(DirectedSubgraphDiff):
         # log structural modifications
         for ch in childs_added:
             diffResultContainer.logStructureModification(node_updated.id, ch.id, 'added')
-            diffResultContainer.isSimilar = False
+            
         for ch in childs_deleted:
             diffResultContainer.logStructureModification(node_init.id, ch.id, 'deleted')
-            diffResultContainer.isSimilar = False
+            
 
 
         # --- 3 --- loop over all matching child pairs and detect their similarities and differences
@@ -95,8 +95,8 @@ class CompareDiff(DirectedSubgraphDiff):
             
             # case 2: modified attrs on pair but no added/deleted attrs
             elif cleared_nodeDifference.nodesHaveUpdatedAttrs() == True: 
-                diffResultContainer.isSimilar = False
-
+                
+                # log modification
                 for modifiedAttr in cleared_nodeDifference.AttrsModified.items():
                     if self.toConsole():
                         print(modifiedAttr)
@@ -113,9 +113,9 @@ class CompareDiff(DirectedSubgraphDiff):
                 if self.toConsole():
                     print('[RESULT]: detected unsimilarity between nodes {} and {}'.format(node_init.id, node_updated.id))
                     print(cleared_nodeDifference)
-                # log result
-                diffResultContainer.isSimilar = False
                 
+                # -- log result --
+                                
                 # log modified
                 for modAttr in cleared_nodeDifference.AttrsModified.items(): 
                     attr_name = modAttr[0]

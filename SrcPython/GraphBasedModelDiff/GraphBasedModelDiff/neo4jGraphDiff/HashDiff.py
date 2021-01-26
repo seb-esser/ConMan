@@ -27,7 +27,7 @@ class HashDiff(DirectedSubgraphDiff):
 
 
 
-    def __compareChildren(self, node_init, node_updated, diff_container, indent = 0, considerRelType = False):
+    def __compareChildren(self, node_init, node_updated, diff_container, indent = 0):
         """  queries the all child nodes of a node and compares the results between the initial and the updated graph based on hash comparison """
 
         if self.toConsole():
@@ -64,7 +64,7 @@ class HashDiff(DirectedSubgraphDiff):
             print("".ljust(indent*4) + 'children deleted: {} \n'.format(nodes_deleted))
 
         if (len(nodes_added) != 0 or len(nodes_deleted) != 0):
-            diff_container.isSimilar = False
+            
             # log unsimilarities
             for addedNode in nodes_added:
                 diff_container.logStructureModification(node_init.id, addedNode.id, "added")
