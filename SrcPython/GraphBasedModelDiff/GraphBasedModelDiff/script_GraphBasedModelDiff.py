@@ -54,9 +54,8 @@ print('----------------- [1] ------------------------\n')
 
 rootedNodeDiff = RootedNodeDiff(connector, config)
 
-attrIgnore = ["p21_id", "GlobalId"]
-[nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated,
-																					 attrIgnore)
+attrIgnore = config.DiffSettings.diffIgnoreAttrs
+[nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated)
 
 print('\n----------------- [2] ------------------------\n')
 # 2: Check sub-graphs for each rooted node

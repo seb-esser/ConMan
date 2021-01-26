@@ -5,12 +5,10 @@ import enum
 
 class MatchCriteriaEnum(enum.Enum): 
     OnGuid = 1
-    OnNodeType = 2
-    OnRelType = 3
-    OnEntityType = 4
-    OnRelTypeAndOnNodeType = 5
-    OnHash = 6
-    OnHashWithDiffIgnore = 7
+    OnRelType = 2
+    OnEntityType = 3
+    OnHash = 4
+    OnHashAndOnRelType = 5
 
 
 

@@ -3,7 +3,7 @@ from .DiffUtilities import DiffUtilities
 from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jQueryUtils
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory 
 from neo4j_middleware.NodeData import NodeData 
-
+from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum
 
 class RootedNodeDiff:
 	""" """
@@ -20,26 +20,32 @@ class RootedNodeDiff:
 			return False
 		
 
-	def diffRootedNodes(self, label_init, label_updated, attr_ignore_list):
+	def diffRootedNodes(self, label_init, label_updated):
 		""" """
 		
 		# retrieve nodes
 		nodes_init = self.__getRootedNodes(label_init)
 		nodes_updated = self.__getRootedNodes(label_updated)
 
+		# load attrIgnore list from config
+		attr_ignore_list = self.configuration.DiffSettings.diffIgnoreAttrs
+
 		for node in nodes_init: 
+			# load hash value
 			cy = neo4jQueryFactory.GetHashByNodeId(label_init, node.id, attr_ignore_list) 
 			res = self.connector.run_cypher_statement(cy)
 			node.hash = res[0][0]
+			# load attributes
 
 		for node in nodes_updated: 
 			cy = neo4jQueryFactory.GetHashByNodeId(label_updated, node.id, attr_ignore_list)
 			res = self.connector.run_cypher_statement(cy)
 			node.hash = res[0][0]
+			# load attributes
+
 
 		# ToDo: consider config match criteria here
-		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodesByHash(nodes_init, nodes_updated, considerRelType=False)
-		
+		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodes(nodes_init, nodes_updated, MatchCriteriaEnum.OnHash)
 		if self.toConsole(): 
 			print('Unchanged rooted nodes: {}'.format(nodes_unchanged))
 			print('Added nodes: {}'.format(nodes_added))

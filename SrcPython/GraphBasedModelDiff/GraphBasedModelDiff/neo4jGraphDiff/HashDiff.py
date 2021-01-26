@@ -7,6 +7,8 @@ from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 
 from neo4jGraphDiff.DiffResult import DiffResult 
 
+from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum
+
 class HashDiff(DirectedSubgraphDiff):
     """description of class"""
 
@@ -53,7 +55,7 @@ class HashDiff(DirectedSubgraphDiff):
         # ToDo switch here to apply the correct method
 
         # compare children and raise an unsimilarity if necessary.
-        [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodesByHash(childs_init, childs_updated, considerRelType)
+        [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodes(childs_init, childs_updated, MatchCriteriaEnum.OnHash)
 
         if self.toConsole():
             print('')

@@ -22,7 +22,7 @@ class DiffResult(Result):
     def logStructureModification(self, parentNodeId, childNodeId, modType):
         """ logs a new modification to the DiffResult.modifiedNodes container """
         modification = StructureModification(parentNodeId, childNodeId, modType)
-        self.propertyModifications.append(modification)
+        self.StructureModifications.append(modification)
 
 class PropertyModification: 
 

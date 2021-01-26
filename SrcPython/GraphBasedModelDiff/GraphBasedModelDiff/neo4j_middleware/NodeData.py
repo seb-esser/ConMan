@@ -28,3 +28,7 @@ class NodeData:
             child = cls(id= inst[0], relType = None, entityType=inst[1]) 
             ret_val.append(child)
         return ret_val
+
+    def setNodeAttributes(self, attrs):
+        self.attrs = attrs
+

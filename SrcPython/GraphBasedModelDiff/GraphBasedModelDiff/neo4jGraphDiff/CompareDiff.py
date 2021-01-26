@@ -8,7 +8,7 @@ from neo4j_middleware.NodeData import NodeData
 from .DiffResult import DiffResult
 
 from neo4jGraphDiff.DiffResult import DiffResult 
-
+from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum
 
 class CompareDiff(DirectedSubgraphDiff):
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
@@ -54,19 +54,25 @@ class CompareDiff(DirectedSubgraphDiff):
         matchOnChildNodeType = []
 
         # option 1: match on relType and ignore nodeType
-        matchOnRelType = self.__matchNodesOnRelType(children_init, children_updated)
+        matchResult = self.utils.CompareNodes(children_init, children_updated, MatchCriteriaEnum.OnEntityType) 
+        # unpack calculation result
+        childPairs_unchanged = matchResult[0]
+        childs_added = matchResult[1]
+        childs_deleted = matchResult[2]
 
-        # option 2: match on nodeType and ignore relType (relevant for data models where the relType is not set)
-        matchOnChildNodeType = self.__matchNodesOnEntityType(children_init, children_updated)
-       
-        # ToDo: implement some config options in the class constructor to trigger, which child matching method should be chosen
-        # match = matchOnChildNodeType
-        match = matchOnRelType
+        # log structural modifications
+        for ch in childs_added:
+            diffResultContainer.logStructureModification(node_updated.id, ch.id, 'added')
+            diffResultContainer.isSimilar = False
+        for ch in childs_deleted:
+            diffResultContainer.logStructureModification(node_init.id, ch.id, 'deleted')
+            diffResultContainer.isSimilar = False
+
 
         # --- 3 --- loop over all matching child pairs and detect their similarities and differences
 
         # check the nodes that have the same relationship OR the same EntityType and the same node type: 
-        for matchingChilds in match: 
+        for matchingChilds in childPairs_unchanged: 
             # compare two nodes
             cypher = neo4jQueryFactory.DiffNodes(matchingChilds[0].id, matchingChilds[1].id) # compare childs? or current node?
             raw = self.connector.run_cypher_statement(cypher)
@@ -139,68 +145,6 @@ class CompareDiff(DirectedSubgraphDiff):
 
         return diffResultContainer
 
-    def __matchNodesOnRelType(self, children_init, children_updated):
-        """ compares two lists of ChildNodes and returns tuples of possible similar childs based on the same relType to the parent node """
-
-        # init return list
-        matchOnRelType = []
-
-        # extract all relTypes
-        all_relTypes_init = [x.relType for x in children_init] 
-        all_relTypes_updated = [x.relType for x in children_updated] 
-
-        # find relTypes used to connect initial child nodes in updated relTypes
-        for ch in children_init:
-            match_in_updated = ch.relType in all_relTypes_updated
-            if match_in_updated == True: 
-                ind = all_relTypes_updated.index(ch.relType)
-                candidate = (ch, children_updated[ind])
-                if candidate not in matchOnRelType:
-                    matchOnRelType.append(candidate)
-
-        # find relTypes used to connect updated child nodes in initial relTypes       
-        for ch in children_updated:
-            match_in_initial = ch.relType in all_relTypes_init
-            if match_in_initial == True: 
-                ind = all_relTypes_init.index(ch.relType)
-                candidate = (children_init[ind], ch)
-
-                if candidate not in matchOnRelType:
-                    matchOnRelType.append(candidate)
-
-        return matchOnRelType
-
-    def __matchNodesOnEntityType(self, children_init, children_updated): 
-        """ compares two lists of ChildNodes and returns tuples of possible similar childs based on the same entityType """
-
-        # init return list
-        matchOnEntityType = []
-        
-         # extract all relTypes
-        all_EntityTypes_init = [x.entityType for x in children_init] 
-        all_EntityTypes_updated = [x.entityType for x in children_updated] 
-
-        # find relTypes used to connect initial child nodes in updated relTypes
-        for ch in children_init:
-            match_in_updated = ch.entityType in all_EntityTypes_updated
-            if match_in_updated == True: 
-                ind = all_EntityTypes_updated.index(ch.entityType)
-                candidate = (ch, children_updated[ind])
-
-                if candidate not in matchOnEntityType:
-                    matchOnEntityType.append(candidate)
-
-        # find relTypes used to connect updated child nodes in initial relTypes       
-        for ch in children_updated:
-            match_in_initial = ch.entityType in all_EntityTypes_init
-            if match_in_initial == True: 
-                ind = all_EntityTypes_init.index(ch.entityType)
-                candidate = (children_init[ind], ch)
-
-                if candidate not in matchOnEntityType:
-                    matchOnEntityType.append(candidate)
-
-        return matchOnEntityType
 
     def __applyDiffIgnoreOnNodeDiff(self, diff, IgnoreAttrs): 
         """ removes the attributes stated in the used DiffIgnore file from the diff result of apoc """ 
