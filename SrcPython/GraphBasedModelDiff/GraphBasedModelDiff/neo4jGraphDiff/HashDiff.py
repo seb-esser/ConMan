@@ -29,6 +29,8 @@ class HashDiff(DirectedSubgraphDiff):
 
     def __compareChildren(self, node_init, node_updated, diff_container, indent = 0):
         """  queries the all child nodes of a node and compares the results between the initial and the updated graph based on hash comparison """
+        
+        desiredMatchMethod = self.configuration.DiffSettings.MatchingType_Childs
 
         if self.toConsole():
             print("".ljust(indent*4) + 'Check children of NodeId {} and NodeId {}'.format(node_init.id, node_updated.id))
@@ -51,11 +53,10 @@ class HashDiff(DirectedSubgraphDiff):
         children_init = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_init)
         children_updated = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_updated)
 
-        desiredMatchMethod = self.configuration.DiffSettings.MatchingType_Childs
-        # ToDo switch here to apply the correct method
-
+        
+        
         # compare children and raise an unsimilarity if necessary.
-        [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodes(childs_init, childs_updated, MatchCriteriaEnum.OnHash)
+        [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodes(childs_init, childs_updated, desiredMatchMethod)
 
         if self.toConsole():
             print('')
