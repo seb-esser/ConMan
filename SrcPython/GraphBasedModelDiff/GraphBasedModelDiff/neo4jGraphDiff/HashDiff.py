@@ -10,9 +10,9 @@ from neo4jGraphDiff.DiffResult import DiffResult
 class HashDiff(DirectedSubgraphDiff):
     """description of class"""
 
-    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, LogtoConsole = False , considerRelType = False):
-        self.considerRelType = considerRelType
-        return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath, toConsole=LogtoConsole)
+    def __init__(self, connector, label_init, label_updated, config):
+        
+        return super().__init__(connector, label_init, label_updated, config)
     
     def diffSubgraphs(self, node_init, node_updated): 
 
@@ -28,7 +28,7 @@ class HashDiff(DirectedSubgraphDiff):
     def __compareChildren(self, node_init, node_updated, diff_container, indent = 0, considerRelType = False):
         """  queries the all child nodes of a node and compares the results between the initial and the updated graph based on hash comparison """
 
-        if self.toConsole:
+        if self.toConsole():
             print("".ljust(indent*4) + 'Check children of NodeId {} and NodeId {}'.format(node_init.id, node_updated.id))
 
         # get children data
@@ -37,7 +37,7 @@ class HashDiff(DirectedSubgraphDiff):
 
         # leave node
         if len(children_init) == 0 and len(children_updated) == 0: 
-            if self.toConsole:
+            if self.toConsole():
                 print("".ljust(indent*4) + ' leaf node.')
             return diff_container
 
@@ -46,15 +46,16 @@ class HashDiff(DirectedSubgraphDiff):
         childs_updated = self.__getHashesOfNodes(self.label_updated, children_updated, indent)
 
         # apply DiffIgnore -> Ingore nodes if requested
-        if self.UseDiffIgnore:
-            children_init = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_init)
-            children_updated = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_updated)
+        children_init = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_init)
+        children_updated = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_updated)
 
+        desiredMatchMethod = self.configuration.DiffSettings.MatchingType_Childs
+        # ToDo switch here to apply the correct method
 
         # compare children and raise an unsimilarity if necessary.
-        [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodesByHash(childs_init, childs_updated, self.considerRelType)
+        [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodesByHash(childs_init, childs_updated, considerRelType)
 
-        if self.toConsole:
+        if self.toConsole():
             print('')
             print("".ljust(indent*4) + 'children unchanged: {}'.format(nodes_unchanged))
             print("".ljust(indent*4) + 'children added: {}'.format(nodes_added))
@@ -85,8 +86,7 @@ class HashDiff(DirectedSubgraphDiff):
     def __getHashesOfNodes(self, label, nodeList, indent = 0):
         return_val = []
 
-        ignore_attrs = self.utils.diffIngore.ignore_attrs
-
+        ignore_attrs = self.configuration.DiffSettings.diffIgnoreAttrs # list of strings
         # calc corresponding hash
         for node in nodeList: 
             child_node_id = node.id
@@ -97,7 +97,7 @@ class HashDiff(DirectedSubgraphDiff):
 
             node.setHash(hash)
 
-        if self.toConsole: 
+        if self.toConsole(): 
             print("".ljust(indent*4) + 'Calculated hashes for model >> {} <<:'.format(label))
             for node in nodeList:
                 print("".ljust(indent*4) + '\t NodeID: {:<4} \t hash: {}'.format(node.id, node.hash))

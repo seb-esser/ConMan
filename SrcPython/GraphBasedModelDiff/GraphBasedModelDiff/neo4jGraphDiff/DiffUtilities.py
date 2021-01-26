@@ -11,10 +11,8 @@ from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities
 class DiffUtilities:
 	""" """ 
 	
-	def __init__(self, diffIgnorePath = None):
-
-		if diffIgnorePath != None: 
-			self.diffIngore = DiffIgnore.from_json(diffIgnorePath)
+	def __init__(self):
+		pass
 
 	def CompareNodesByHash(self, nodes_init, nodes_updated, considerRelType = True):
 		# ToDo: react if hashes occure multiple times in the nodes_lists

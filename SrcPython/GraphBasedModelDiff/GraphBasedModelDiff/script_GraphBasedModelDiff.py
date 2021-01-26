@@ -52,7 +52,7 @@ cypher = []
 
 print('----------------- [1] ------------------------\n')
 
-rootedNodeDiff = RootedNodeDiff(connector, toConsole=True)
+rootedNodeDiff = RootedNodeDiff(connector, config)
 
 attrIgnore = ["p21_id", "GlobalId"]
 [nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated,
@@ -61,10 +61,8 @@ attrIgnore = ["p21_id", "GlobalId"]
 print('\n----------------- [2] ------------------------\n')
 # 2: Check sub-graphs for each rooted node
 diffIgnoreFile = './neo4jGraphDiff/diffIgnore.json'
-Diff_onHash = HashDiff(connector, label_init, label_updated, diffIgnorePath=diffIgnoreFile, LogtoConsole=False,
-					   considerRelType=True)
-Diff_onCompare = CompareDiff(connector, label_init, label_updated, diffIgnorePath=diffIgnoreFile, LogtoConsole=False,
-							 considerRelType=True)
+Diff_onHash = HashDiff(connector, label_init, label_updated, config)
+Diff_onCompare = CompareDiff(connector, label_init, label_updated, config)
 
 times_hash = []
 times_diff = []

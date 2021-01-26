@@ -12,19 +12,28 @@ class DirectedSubgraphDiff(abc.ABC):
     """abstract super class for all subgraph diff methods """
 
     @abc.abstractmethod
-    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, toConsole=False):
+    def __init__(self, connector, label_init, label_updated, configuration):
 
-        self.toConsole = toConsole
+        # config contains basic settings about logging and console behavior
+        self.configuration = configuration
 
-        if diffIgnorePath != None:
-            self.utils = DiffUtilities(diffIgnorePath)
-            self.UseDiffIgnore = True
-        else:
-            self.UseDiffIgnore = False
+        # utils provides methods to compare two sets of nodes based on specified criteria
+        self.utils = DiffUtilities()
 
+        # the connector is used to perform cypher queries on the neo4j database
         self.connector = connector
+
+        # labels to identify two graphs resp models
         self.label_init = label_init
         self.label_updated = label_updated
+
+    def toConsole(self):
+        """ helper method to trigger printToConsole """ 
+        if self.configuration.LogSettings.logToConsole == True:
+            return True
+        else:
+            return False
+
 
     # abstract definition of diffSubgraphs() method, implemented in HashDiff and CompareDiff classes
     @abc.abstractmethod
@@ -50,14 +59,15 @@ class DirectedSubgraphDiff(abc.ABC):
 
     def __applyDiffIgnore_Nodes(self, node_list):
         """ removes nodes from a list if their type is set to be ignored """
-        if self.UseDiffIgnore == False:
-            raise Exception(
-                'UseDiffIgnore was set to false. You have tried to apply it anyway. Please check your settings')
-
+        
         # ToDo: Logging: Add info statement that ingoreNodes got applied. 
 
         # get entity types that shall be ignored in the subgraph diff
-        ignore_entityTypes = self.utils.diffIngore.ignore_node_tpes
+        ignore_entityTypes = self.configuration.DiffSettings.diffIgnoreEntityTypes # list of strings
+
+        # stop here if no entityTypes should be ignored
+        if len(ignore_entityTypes) == 0:
+            return node_list
 
         return_list = node_list
 

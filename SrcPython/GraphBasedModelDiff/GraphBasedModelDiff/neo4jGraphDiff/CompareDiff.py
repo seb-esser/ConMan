@@ -13,9 +13,9 @@ from neo4jGraphDiff.DiffResult import DiffResult
 class CompareDiff(DirectedSubgraphDiff):
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """ 
     
-    def __init__(self, connector, label_init, label_updated, diffIgnorePath=None, LogtoConsole = False, considerRelType=False):
+    def __init__(self, connector, label_init, label_updated, config):
         
-        return super().__init__(connector, label_init, label_updated, diffIgnorePath=diffIgnorePath, toConsole = LogtoConsole)
+        return super().__init__(connector, label_init, label_updated, config)
     
     # public overwrite method requested by abstract superclass DirectedSubgraphDiff
     def diffSubgraphs(self, node_init, node_updated): 
@@ -37,16 +37,19 @@ class CompareDiff(DirectedSubgraphDiff):
 
         # leave node?
         if len(children_init) == 0 and len(children_updated) == 0: 
-            if self.toConsole:
-                print('- - - ')
+            if self.toConsole():
+                print("".ljust(indent*4) + ' leaf node.')
             return diffResultContainer
 
-        # apply DiffIgnore -> Ingore nodes if requested
-        if self.UseDiffIgnore: 
-            children_init = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_init)
-            children_updated = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_updated)
+        # apply DiffIgnore -> Ignore nodes if requested        
+        children_init = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_init)
+        children_updated = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_updated)
 
         # --- 2 --- match detected child nodes based on a chosen method 
+
+        desiredMatchMethod = self.configuration.DiffSettings.MatchingType_Childs
+        # ToDo switch here to apply the correct method
+
         matchOnRelType = []
         matchOnChildNodeType = []
 
@@ -71,16 +74,16 @@ class CompareDiff(DirectedSubgraphDiff):
             nodeDifference = NodeDiffData.fromNeo4jResponse(raw)
 
             # apply DiffIgnore on diff result 
-            ignoreAttrs = self.utils.diffIngore.ignore_attrs
+            ignoreAttrs = self.configuration.DiffSettings.diffIgnoreAttrs
             cleared_nodeDifference = self.__applyDiffIgnoreOnNodeDiff(nodeDifference, ignoreAttrs)
 
-            if self.toConsole:
+            if self.toConsole():
                 print('comparing node {} to node {} after applying DiffIgnore:'.format(node_init.id, node_updated.id))
            
             # case 1: no modifications on pair
             if cleared_nodeDifference.nodesAreSimilar() == True: 
                 # nodes are similar
-                if self.toConsole:
+                if self.toConsole():
                     print('[RESULT]: child nodes match')
                
             
@@ -89,7 +92,7 @@ class CompareDiff(DirectedSubgraphDiff):
                 diffResultContainer.isSimilar = False
 
                 for modifiedAttr in cleared_nodeDifference.AttrsModified.items():
-                    if self.toConsole:
+                    if self.toConsole():
                         print(modifiedAttr)
 
                     # ToDo: move extraction of data from tuple to higher representation
@@ -101,7 +104,7 @@ class CompareDiff(DirectedSubgraphDiff):
 
             # case 3: added/deleted attrs. Break recursion
             else:
-                if self.toConsole:
+                if self.toConsole():
                     print('[RESULT]: detected unsimilarity between nodes {} and {}'.format(node_init.id, node_updated.id))
                     print(cleared_nodeDifference)
                 # log result
