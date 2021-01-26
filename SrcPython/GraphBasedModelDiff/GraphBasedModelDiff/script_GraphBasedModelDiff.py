@@ -8,7 +8,7 @@ from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUti
 
 from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
 
-from neo4jGraphDiff.CompareDiff import DepthFirstSearchComparison
+from neo4jGraphDiff.DepthFirstSearchComparison import DepthFirstSearchComparison
 
 from neo4jGraphDiff.Configurator import Configurator
 

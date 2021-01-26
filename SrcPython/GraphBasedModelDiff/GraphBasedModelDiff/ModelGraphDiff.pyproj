@@ -37,7 +37,7 @@
     <Compile Include="neo4jGraphAnalysis\SCC.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="neo4jGraphDiff\CompareDiff.py">
+    <Compile Include="neo4jGraphDiff\DepthFirstSearchComparison.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphDiff\Configurator.py">
