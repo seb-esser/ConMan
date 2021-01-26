@@ -35,17 +35,30 @@ class RootedNodeDiff:
 			cy = neo4jQueryFactory.GetHashByNodeId(label_init, node.id, attr_ignore_list) 
 			res = self.connector.run_cypher_statement(cy)
 			node.hash = res[0][0]
+
 			# load attributes
+			cy = neo4jQueryFactory.GetNodePropertiesById(node.id)
+			res = self.connector.run_cypher_statement(cy)
+			node.setNodeAttributes(res[0][0])
 
 		for node in nodes_updated: 
 			cy = neo4jQueryFactory.GetHashByNodeId(label_updated, node.id, attr_ignore_list)
 			res = self.connector.run_cypher_statement(cy)
 			node.hash = res[0][0]
+
 			# load attributes
+			cy = neo4jQueryFactory.GetNodePropertiesById(node.id)
+			res = self.connector.run_cypher_statement(cy)
+			node.setNodeAttributes(res[0][0])
 
+		# calc matching of node sets
+		matchingMethod = self.configuration.DiffSettings.MatchingType_RootedNodes
 
-		# ToDo: consider config match criteria here
-		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodes(nodes_init, nodes_updated, MatchCriteriaEnum.OnHash)
+		if self.toConsole():
+			print('Matching Method for rooted nodes: {}'.format(matchingMethod))
+
+		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodes(nodes_init, nodes_updated, matchingMethod)
+
 		if self.toConsole(): 
 			print('Unchanged rooted nodes: {}'.format(nodes_unchanged))
 			print('Added nodes: {}'.format(nodes_added))
