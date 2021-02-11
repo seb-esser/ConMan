@@ -108,6 +108,8 @@
     <Folder Include="00_sampleData\IFC_stepP21\SleeperSample\" />
     <Folder Include="00_sampleData\IFC_stepP21\wall-column\" />
     <Folder Include="00_sampleData\RailML_xml\" />
+    <Folder Include="00_sampleData\RailML_xml\schema\" />
+    <Folder Include="00_sampleData\RailML_xml\schema\railML3-1\" />
     <Folder Include="neo4j_middleware\" />
     <Folder Include="common_base\" />
     <Folder Include="grGen_middleware\" />
@@ -154,6 +156,13 @@
     <Content Include="00_sampleData\RailML_xml\railML_SimpleExample_v11_railML2-3_01.xml" />
     <Content Include="00_sampleData\RailML_xml\railML_SimpleExample_v11_railML2-4_01.xml" />
     <Content Include="00_sampleData\RailML_xml\railML_SimpleExample_v11_railML3-1_04.xml" />
+    <Content Include="00_sampleData\RailML_xml\schema\railML3-1\common3.xsd" />
+    <Content Include="00_sampleData\RailML_xml\schema\railML3-1\infrastructure3.xsd" />
+    <Content Include="00_sampleData\RailML_xml\schema\railML3-1\interlocking3.xsd" />
+    <Content Include="00_sampleData\RailML_xml\schema\railML3-1\railml3.xsd" />
+    <Content Include="00_sampleData\RailML_xml\schema\railML3-1\rollingstock3.xsd" />
+    <Content Include="00_sampleData\RailML_xml\schema\railML3-1\rtm4railml3.xsd" />
+    <Content Include="00_sampleData\RailML_xml\schema\railML3-1\timetable3.xsd" />
     <Content Include="neo4jGraphDiff\defaultConfig.json" />
     <Content Include="neo4jGraphDiff\diffIgnore.json" />
     <Content Include="requirements.txt" />
