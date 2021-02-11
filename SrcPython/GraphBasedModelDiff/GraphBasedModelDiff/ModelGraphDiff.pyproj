@@ -5,7 +5,7 @@
     <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>script_GraphBasedModelDiff.py</StartupFile>
+    <StartupFile>script_parseRailML.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -83,6 +83,9 @@
     <Compile Include="script_parseIFCjson.py" />
     <Compile Include="script_nxMapper.py" />
     <Compile Include="script_parseIFCp21.py" />
+    <Compile Include="script_parseRailML.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="script_testSCC.py">
       <SubType>Code</SubType>
     </Compile>
@@ -101,6 +104,7 @@
     <Folder Include="00_sampleData\IFC_stepP21\SpatialStructure_01\" />
     <Folder Include="00_sampleData\IFC_stepP21\SleeperSample\" />
     <Folder Include="00_sampleData\IFC_stepP21\wall-column\" />
+    <Folder Include="00_sampleData\RailML_xml\" />
     <Folder Include="neo4j_middleware\" />
     <Folder Include="common_base\" />
     <Folder Include="grGen_middleware\" />
@@ -144,6 +148,9 @@
     <Content Include="00_sampleData\IFC_stepP21\SpatialStructure_02\Update_SpatialZone_spatial.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\wall-column\Column-Wall.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\wall-column\Wall-Column.ifc" />
+    <Content Include="00_sampleData\RailML_xml\railML_SimpleExample_v11_railML2-3_01.xml" />
+    <Content Include="00_sampleData\RailML_xml\railML_SimpleExample_v11_railML2-4_01.xml" />
+    <Content Include="00_sampleData\RailML_xml\railML_SimpleExample_v11_railML3-1_04.xml" />
     <Content Include="neo4jGraphDiff\defaultConfig.json" />
     <Content Include="neo4jGraphDiff\diffIgnore.json" />
     <Content Include="requirements.txt" />
