@@ -1,0 +1,8 @@
+(n: rootedNode) -
+[edge1] - > (c1: resourceNode) -
+[edge2] - > (c2: resourceNode) -
+[edge3] - > (c3: resourceNode) {.... } -
+[edgeN] - > (cN: resourceNode)
+
+
+SET cN.param1 = "newValue"
