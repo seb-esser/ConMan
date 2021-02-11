@@ -6,7 +6,7 @@
         xsi:schemaLocation="https://www.railml.org/schemas/3.1 https://www.railml.org/schemas/3.1/railml3.xsd"
         version="3.1">
         
-  <metadata>
+  <metadata id="md_01">
     <dc:format>3.1</dc:format>
     <dc:identifier>3</dc:identifier>
     <dc:source>railML.org</dc:source>
@@ -851,7 +851,7 @@
     
   </infrastructure>
   
-  <interlocking>
+  <interlocking id="il_01">
 		<assetsForIL id="ass_simpex_v0.9">
 			<designator register="_SimpleRegister" entry="simple example v0.9"/>
 			<tvdSections>
