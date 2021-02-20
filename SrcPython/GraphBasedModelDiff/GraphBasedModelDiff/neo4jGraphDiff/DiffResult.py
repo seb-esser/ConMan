@@ -15,7 +15,7 @@ class DiffResult(Result):
         self.StructureModifications = []
         self.time = 0.0
         self.RootNode_init = root_init
-        self.RooteNode_updated = root_updated
+        self.RootNode_updated = root_updated
 
     def logNodeModification(self, nodeId_init, nodeId_updated, attrName, modType, value_old, value_new):
         """ logs a modification applied on properties """

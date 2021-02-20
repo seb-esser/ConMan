@@ -39,8 +39,8 @@ class Report:
 
 
     def printResultToConsole(self):
-        print('--- --- --- --- --- --- --- --- --- ')
-        print('--- --- REPORT  --- --- --- --- --- \n')
+        print('--- --- --- --- --- --- --- --  --- --- --- --- --- --- ')
+        print('--- --- --- --- --- --- REPORT  --- --- --- --- --- --- \n')
     
         print('Applied Config: ')
         print(self.config)
@@ -69,13 +69,14 @@ class Report:
             print('\t  EMPTY')
 
         
-        #print('\nROOT RELATIONSHIPS:')
+        print('\nROOT OBJ RELATIONSHIPS:')
+        print()
 
         
         print('\n _______ COMPONENT STRUCTURE ____________')
 
         for item in self.ResultComponentDiff:
-            print('\t NodePair: init: {:<5} updated: {:<5}'.format(item.RootNode_init.id, item.RooteNode_updated.id))
+            print('\t NodePair: init: {:<5} updated: {:<5}'.format(item.RootNode_init.id, item.RootNode_updated.id))
             print('\t  Time: {}'.format(item.time))
             if item.isSimilar:
                 print('\t  Unchanged: TRUE')
@@ -85,7 +86,7 @@ class Report:
             if not item.isSimilar:
                 for res in item.propertyModifications:
                     print('\t   PropertyMod: NodeId_INIT: {:<5} NodeId_UPDATED: {:<5}'.format(res.nodeId_init, res.nodeId_updated))
-                    print('\t    |-> ModificationType: {:<15} oldValue: {:<10} newValue: {:<10}'.format(res.modificationType, res.valueOld, res.valueNew))
+                    print('\t    |-> ModificationType: {:<15} attrName: {:<12} oldValue: {:<10} newValue: {:<10}'.format(res.modificationType, res.attrName, .valueOld, res.valueNew))
                 
                 for res in item.StructureModifications:
                     print('\t   StructuralMod: NodeId_PARENT: {:<5} NodeId_Child: {:<5}'.format(res.parentId, res.childId))
