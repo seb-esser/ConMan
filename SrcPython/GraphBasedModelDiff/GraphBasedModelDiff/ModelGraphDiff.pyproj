@@ -103,6 +103,7 @@
     <Folder Include="00_sampleData\IFC_stepP21\LinearPlacement_02\" />
     <Folder Include="00_sampleData\IFC_stepP21\LocalPlacement_01\" />
     <Folder Include="00_sampleData\IFC_stepP21\LocalPlacement_02\" />
+    <Folder Include="00_sampleData\IFC_stepP21\Residential_01\" />
     <Folder Include="00_sampleData\IFC_stepP21\SpatialStructure_02\" />
     <Folder Include="00_sampleData\IFC_stepP21\SpatialStructure_01\" />
     <Folder Include="00_sampleData\IFC_stepP21\SleeperSample\" />
@@ -142,6 +143,8 @@
     <Content Include="00_sampleData\IFC_stepP21\LocalPlacement_01\Update_LocalPlacement_01.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\LocalPlacement_02\Initial_Placement_Local.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\LocalPlacement_02\Update_Placement_Local.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\Residential_01\residential_init.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\Residential_01\residential_updated.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\sampleModel2x3.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\SleeperSample\sleeper_updated.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\SleeperSample\sleeper_init.ifc" />

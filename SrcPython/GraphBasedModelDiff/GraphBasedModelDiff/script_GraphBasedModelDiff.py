@@ -31,8 +31,8 @@ connector.connect_driver()
 #label_updated = "ts20210119T085409"	# different rep, modified height
 
 ## cuboid sample with cuboid vs cylinder
-label_init = "ts20210119T085410"	# cuboid
-label_updated = "ts20210119T085411"	# cylinder
+#label_init = "ts20210119T085410"	# cuboid
+#label_updated = "ts20210119T085411"	# cylinder
 
 ## cuboid sample with extrudedArea vs BRep
 #label_init = "ts20210119T085412"	# extrudedArea
@@ -42,6 +42,9 @@ label_updated = "ts20210119T085411"	# cylinder
 #label_init = "ts20200713T083450"
 #label_updated = "ts20200713T083447"
 
+## Residential
+label_init = "ts20210219T121203"
+label_updated = "ts20210219T121608"
 
 config = Configurator.relTypeConfig()
 print(config)
