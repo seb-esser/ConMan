@@ -20,7 +20,7 @@ class DepthFirstSearchComparison(DirectedSubgraphDiff):
     # public overwrite method requested by abstract superclass DirectedSubgraphDiff
     def diffSubgraphs(self, node_init, node_updated): 
 
-        diffContainer = DiffResult(method = "Node-Diff")
+        diffContainer = DiffResult(method = "Node-Diff", root_init = node_init, root_updated=node_updated)
       
         # start recursion
         diffContainer = self.__compareChildren(node_init, node_updated, diffContainer)

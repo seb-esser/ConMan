@@ -8,11 +8,14 @@ from neo4jGraphDiff.Result import Result
 class DiffResult(Result):
     """carries the diff result """
 
-    def __init__(self, method = None):
+    def __init__(self, root_init, root_updated, method = None):
         self.isSimilar = True
         self.method = method
         self.propertyModifications = []
         self.StructureModifications = []
+        self.time = 0.0
+        self.RootNode_init = root_init
+        self.RooteNode_updated = root_updated
 
     def logNodeModification(self, nodeId_init, nodeId_updated, attrName, modType, value_old, value_new):
         """ logs a modification applied on properties """
@@ -25,6 +28,10 @@ class DiffResult(Result):
         modification = StructureModification(parentNodeId, childNodeId, modType)
         self.StructureModifications.append(modification)
         self.isSimilar = False
+
+    def setComputeTime(self, time):
+        self.time = time
+
 
 class PropertyModification: 
 

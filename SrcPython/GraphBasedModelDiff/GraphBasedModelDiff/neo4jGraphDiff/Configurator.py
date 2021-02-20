@@ -76,7 +76,7 @@ class Configurator:
 
     # dunder
     def __repr__(self):
-        return 'Config: matchingType RootedNodes: {} matchingType Subgraph: {}'.format(self.DiffSettings.MatchingType_RootedNodes, self.DiffSettings.MatchingType_Childs)
+        return 'Config: matchingType_rootedNodes: {} matchingType_components: {}'.format(self.DiffSettings.MatchingType_RootedNodes, self.DiffSettings.MatchingType_Childs)
 
     
 class LoggingSettings:

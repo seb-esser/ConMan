@@ -11,6 +11,7 @@ from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
 from neo4jGraphDiff.DepthFirstSearchComparison import DepthFirstSearchComparison
 
 from neo4jGraphDiff.Configurator import Configurator
+from neo4jGraphDiff.Reporter import Report
 
 # -- ... --
 
@@ -46,8 +47,13 @@ connector.connect_driver()
 label_init = "ts20210219T121203"
 label_updated = "ts20210219T121608"
 
+# set config
 config = Configurator.relTypeConfig()
 print(config)
+
+# init report 
+report = Report(None, config)
+
 cypher = []
 
 # 1: Check base structure of rooted nodes
@@ -59,13 +65,14 @@ rootedNodeDiff = RootedNodeDiff(connector, config)
 attrIgnore = config.DiffSettings.diffIgnoreAttrs
 [nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated)
 
-print('\n----------------- [2] ------------------------\n')
-# 2: Check sub-graphs for each rooted node
+# save results to report
+report.CaptureResult_RootedDiff([nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted])
 
+print('\n----------------- [2] ------------------------\n')
+
+# 2: Check sub-graphs for each rooted node
 DiffEngine = DepthFirstSearchComparison(connector, label_init, label_updated, config)
 
-times_hash = []
-times_diff = []
 
 for pair in nodeIDs_unchanged:
 	node_init = pair[0]
@@ -77,7 +84,12 @@ for pair in nodeIDs_unchanged:
 	DiffResult = DiffEngine.diffSubgraphs(node_init, node_updated)
 
 	elapsed_time_diff = time.process_time() - t_diff
-	times_diff.append(elapsed_time_diff)
+	
+	# add computational time to diff result
+	DiffResult.setComputeTime(elapsed_time_diff)
+
+	# save diffResult to report
+	report.CaptureResult_ComponentDiff(DiffResult)
 
 	print('[RESULT DIFF-comp] Object with rootNodeId {} is similar to {}: {}'.format(node_init.id, node_updated.id, DiffResult.isSimilar))
 
@@ -88,8 +100,8 @@ for pair in nodeIDs_unchanged:
 
 		for res in DiffResult.StructureModifications:
 			print(res)
-	print()
+	
 
-print('Overview computational times: ')
-print('elapsed time for DIFF based comparison: {}'.format(sum(times_diff)))
-print(times_diff)
+
+report.printResultToConsole()
+
