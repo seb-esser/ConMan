@@ -21,7 +21,7 @@ class DepthFirstSearchComparison(DirectedSubgraphDiff):
     def diffSubgraphs(self, node_init, node_updated): 
 
         diffContainer = DiffResult(method = "Node-Diff", root_init = node_init, root_updated=node_updated)
-      
+               
         # start recursion
         diffContainer = self.__compareChildren(node_init, node_updated, diffContainer)
         return diffContainer
@@ -33,7 +33,9 @@ class DepthFirstSearchComparison(DirectedSubgraphDiff):
         """ queries the all child nodes of a node and compares the results between the initial and the updated graph based on AttrDiff"""
         
         desiredMatchMethod = self.configuration.DiffSettings.MatchingType_Childs
-        
+
+        diffResultContainer.increaseRecursionCounter()
+
         if self.toConsole():
             print("".ljust(indent*4) + 'Check children of NodeId {} and NodeId {}'.format(node_init.id, node_updated.id))
 

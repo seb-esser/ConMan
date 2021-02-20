@@ -16,6 +16,7 @@ class DiffResult(Result):
         self.time = 0.0
         self.RootNode_init = root_init
         self.RootNode_updated = root_updated
+        self.recursionCounter = 0
 
     def logNodeModification(self, nodeId_init, nodeId_updated, attrName, modType, value_old, value_new):
         """ logs a modification applied on properties """
@@ -30,7 +31,13 @@ class DiffResult(Result):
         self.isSimilar = False
 
     def setComputeTime(self, time):
-        self.time = time
+        self.time = time       
+
+    def increaseRecursionCounter(self):
+        self.recursionCounter += 1 
+
+
+        
 
 
 class PropertyModification: 

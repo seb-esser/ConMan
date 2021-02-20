@@ -43,7 +43,7 @@ connector.connect_driver()
 #label_init = "ts20200713T083450"
 #label_updated = "ts20200713T083447"
 
-## Residential
+### Residential
 label_init = "ts20210219T121203"
 label_updated = "ts20210219T121608"
 
@@ -79,10 +79,13 @@ for pair in nodeIDs_unchanged:
 	node_updated = pair[1]
 	print('[TASK] Compare objects with root nodeIDs {}'.format(pair))
 	
-
+	# measure time
 	t_diff = time.process_time()
+
+	# run component diff
 	DiffResult = DiffEngine.diffSubgraphs(node_init, node_updated)
 
+	# stop time
 	elapsed_time_diff = time.process_time() - t_diff
 	
 	# add computational time to diff result
@@ -90,18 +93,9 @@ for pair in nodeIDs_unchanged:
 
 	# save diffResult to report
 	report.CaptureResult_ComponentDiff(DiffResult)
+	print('[TASK] DONE')
+		
 
-	print('[RESULT DIFF-comp] Object with rootNodeId {} is similar to {}: {}'.format(node_init.id, node_updated.id, DiffResult.isSimilar))
-
-	if not DiffResult.isSimilar:
-		print('\t Detected changes in subgraph comparison:')
-		for res in DiffResult.propertyModifications:
-			print(res)
-
-		for res in DiffResult.StructureModifications:
-			print(res)
-	
-
-
-report.printResultToConsole()
-
+# show result on console
+# report.printResultToConsole()
+report.printTimeFigures()
