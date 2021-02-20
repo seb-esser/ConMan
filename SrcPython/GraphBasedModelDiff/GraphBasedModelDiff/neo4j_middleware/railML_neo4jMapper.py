@@ -1,6 +1,6 @@
 """ package import """
-import xml.etree.ElementTree as ET 
 from lxml import etree
+from io import StringIO, BytesIO
 
 """ file import """
 from neo4j_middleware.neo4jConnector import Neo4jConnector
@@ -31,7 +31,7 @@ class railML_neo4jmapper:
         for ns in namespaces:
             # load schema definition       
             with open(xsd_file_path + ns + '.xsd') as f:
-                xmlschema_doc = etree.parse(f)
+                schema = etree.XMLSchema(file=f)
                 # store schema for namespace
                 self.subschemas[ns] = xmlschema_doc
 
@@ -40,28 +40,16 @@ class railML_neo4jmapper:
         # xmlschema = etree.XMLSchema(xmlschema_doc)
 
         # load instance data
-        self.tree = ET.parse(filepath)
+        parser = etree.XMLParser(ns_clean=True)
+        with open(filepath, encoding="UTF-8") as f:
+            self.tree = etree.parse(f, parser)        
 
     def mapRootedEntities(self):
         
         # builds the objRel to group all subtrees
         root = self.tree.getroot()
-        print(root)
         
-        # characteristics of root
-        root_tag = root.tag
-        print(root_tag)
-
-        root_attrs = root.attrib
-        print(root_attrs)
-
         rootedNodeIds = []
-
-        #iter = root.iter()
-        
-        #for i in iter:
-        #    print(i)
-
         # rooted entities
         for child in root: 
             print('\t{} : {}'.format(child.tag, child.attrib))
