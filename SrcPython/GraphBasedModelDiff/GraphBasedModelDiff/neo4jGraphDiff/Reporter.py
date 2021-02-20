@@ -108,7 +108,7 @@ class Report:
         ratios = np.divide(times_vec, recursionSteps)
 
         plt.subplot(3, 1, 1)
-        plt.plot(pairs, times_vec, '-')
+        plt.plot(pairs, times_vec, 'o-', color='blue', markerfacecolor='lightgrey')
         plt.grid(True)
         plt.xlabel('component Tuple')
         plt.ylabel('time [s]')
@@ -116,7 +116,7 @@ class Report:
 
         plt.subplot(3, 1, 2)
 
-        plt.plot(pairs, recursionSteps, '-')
+        plt.plot(pairs, recursionSteps, 'o-', color='blue', markerfacecolor='lightgrey')
 
         plt.xlabel('component Tuple')
         plt.ylabel('recursion steps')
@@ -125,7 +125,7 @@ class Report:
 
         plt.subplot(3, 1, 3)
         
-        plt.plot(pairs, ratios, '-', lw=2)
+        plt.plot(pairs, ratios, 'o-', color='blue', markerfacecolor='lightgrey')
 
         plt.title('Ratio')
 
