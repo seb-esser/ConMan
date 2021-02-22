@@ -42,6 +42,16 @@ class Configurator:
         classObj = cls(logSettings, diffSettings)
         return classObj
 
+    @classmethod
+    def onGuidConfig(cls):
+        logSettings = LoggingSettings.defaultSettings()
+        diffSettings = DiffSettings()
+        diffSettings.MatchingType_RootedNodes = MatchCriteriaEnum.OnGuid
+        diffSettings.MatchingType_Childs = MatchCriteriaEnum.OnRelType
+
+        classObj = cls(logSettings, diffSettings)
+        return classObj
+
 
     @classmethod
     def from_json(cls, jsonPath): 

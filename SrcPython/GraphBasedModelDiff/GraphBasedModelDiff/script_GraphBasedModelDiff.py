@@ -40,16 +40,18 @@ connector.connect_driver()
 #label_updated = "ts20210119T085413"	# BRep
 
 ## wall column sample
-#label_init = "ts20200713T083450"
-#label_updated = "ts20200713T083447"
+label_init = "ts20200713T083450"
+label_updated = "ts20200713T083447"
 
 ### Residential
-label_init = "ts20210219T121203"
-label_updated = "ts20210219T121608"
+#label_init = "ts20210219T121203"
+#label_updated = "ts20210219T121608"
 
 # set config
-config = Configurator.relTypeConfig()
+#config = Configurator.relTypeConfig()
+config = Configurator.onGuidConfig()
 print(config)
+print(config.DiffSettings)
 
 # init report 
 report = Report(None, config)
@@ -58,7 +60,7 @@ cypher = []
 
 # 1: Check base structure of rooted nodes
 
-print('----------------- [1] ------------------------\n')
+print(' ROOT DIFF \n')
 
 rootedNodeDiff = RootedNodeDiff(connector, config)
 
@@ -68,7 +70,7 @@ attrIgnore = config.DiffSettings.diffIgnoreAttrs
 # save results to report
 report.CaptureResult_RootedDiff([nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted])
 
-print('\n----------------- [2] ------------------------\n')
+print('\nCOMPONENT DIFF \n')
 
 # 2: Check sub-graphs for each rooted node
 DiffEngine = DepthFirstSearchComparison(connector, label_init, label_updated, config)
@@ -97,5 +99,5 @@ for pair in nodeIDs_unchanged:
 		
 
 # show result on console
-# report.printResultToConsole()
+report.printResultToConsole()
 report.printTimeFigures()
