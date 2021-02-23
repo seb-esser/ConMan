@@ -10,48 +10,6 @@ from neo4j_middleware.neo4jGraphFactory import neo4jGraphFactory
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
-# --- defs ---
-def parseModel(connector, model_path):
-	# open model
-	model = ifcopenshell.open(model_path)
-	# extract time stamp and use it as the identifier inside the resulting graph
-	label = 'ts' + model.wrapped_data.header.file_name.time_stamp
-	label = label.replace('-','')
-	label = label.replace(':','')
-		
-	print('{} \t {} '.format(model_path, label))
-
-	## DEBUG ONLY! delete entire graph: 
-	print('DEBUG INFO: entire graph labeled with >> {} << gets deleted'.format(label))
-	connector.run_cypher_statement('MATCH(n:{}) DETACH DELETE n'.format(label))
-
-	print('Parsing IFC model. Label: {}'.format(label))
-
-	# extract model data
-	obj_definitions =  model.by_type('IfcObjectDefinition')
-	obj_relationships = model.by_type('IfcRelationship')
-	props = model.by_type('IfcPropertyDefinition')
-	
-	# init mapper
-	mapper = IFCp21_neo4jMapper(connector, label, model)
-
-	# parse rooted node + subgraphs
-	mapper.mapEntities(obj_definitions)
-	
-	# parse objectified relationships
-	mapper.mapObjRelationships(obj_relationships)
-
-	# parse properties
-	# ToDo 
-	
-	# post processing: remove all p21 ids
-	cypher = 'MATCH(n:{}) REMOVE n.p21_id '.format(label)
-
-	# tests
-	# 1: check num_entities vs. num_nodes created in the graph. 
-
-
-
 # --- Script --- 
 
 # init logging
@@ -64,8 +22,8 @@ connector = Neo4jConnector(False, True)
 connector.connect_driver()
 
 # ToDo: automate loading of unit tests. See ticket #16 in the Gitlab repo. 
-#paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresentation_01.ifc', # same representation
-#		 './00_sampleData/IFC_stepP21/GeomRepresentation_01/Update_GeomRepresentation_01.ifc',  # two representations
+paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresentation_01.ifc', # same representation
+		 './00_sampleData/IFC_stepP21/GeomRepresentation_01/Update_GeomRepresentation_01.ifc',  # two representations
 #		 './00_sampleData/IFC_stepP21/GeomRepresentation_02/Initial_GeomRepresentation_02.ifc',	# two representations
 #		 './00_sampleData/IFC_stepP21/GeomRepresentation_02/Update_GeomRepresentation_02.ifc',	# elevated cuboid height -> PMod
 #		 './00_sampleData/IFC_stepP21/GeomRepresentation_03/Initial_GeomRepresentation_03.ifc',	# 1 proxy as cuboid 
@@ -75,19 +33,17 @@ connector.connect_driver()
 #		 './00_sampleData/IFC_stepP21/wall-column/Wall-Column.ifc', 
 #		 './00_sampleData/IFC_stepP21/wall-column/Column-Wall.ifc', 
 #		 './00_sampleData/IFC_stepP21/SleeperSample/sleeper_init.ifc', 
-#		 './00_sampleData/IFC_stepP21/SleeperSample/sleeper_updated.ifc'
-#		 ]
-
-paths = ['./00_sampleData/IFC_stepP21/Residential_01/residential_init.ifc', 
-		 './00_sampleData/IFC_stepP21/Residential_01/residential_updated.ifc']
+#		 './00_sampleData/IFC_stepP21/SleeperSample/sleeper_updated.ifc', 
+		 './00_sampleData/IFC_stepP21/Residential_01/residential_init.ifc', 
+		 './00_sampleData/IFC_stepP21/Residential_01/residential_updated.ifc'
+		 ]
 
 for path in paths: 
 	# parse model
-	parseModel(connector, path)
 
-# parseModel(connector, model_path_updated)
-
-
+	graphGenerator = IFCp21_neo4jMapper(connector, path, None)
+	graphGenerator.generateGraph()
+	
 # disconnect from database
 connector.disconnect_driver()
 

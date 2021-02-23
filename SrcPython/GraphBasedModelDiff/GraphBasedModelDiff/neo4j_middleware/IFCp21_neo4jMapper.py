@@ -19,19 +19,53 @@ class IFCp21_neo4jMapper(IfcMapper):
     Public constructor for IFCP21_neo4jMapper
     trigger console output while parsing using the ToConsole boolean
     """
-    def __init__(self, myConnector, timestamp, my_model, ToConsole = False, ToLog = True): 
+    def __init__(self, connector, model_path, ParserConfig): 
        
-        self.connector = myConnector
-        self.timeStamp = timestamp
-        self.model = my_model
-        self.printToConsole = ToConsole
-        self.printToLog = ToLog
+        
+        # try to open the ifc model and load the content into the model variable
+        try:
+            self.model = ifcopenshell.open(model_path)
+        except :
+            raise Exception('Unable to open IFC model on given file path')
+
+        # define the label (i.e., the model timestamp)
+        my_label = 'ts' + self.model.wrapped_data.header.file_name.time_stamp
+        my_label = my_label.replace('-','')
+        my_label = my_label.replace(':','')
+        self.label = my_label
+
+        # set the connector
+        self.connector = connector
+       
+        # set output 
+        self.parserConfig = ParserConfig
+        self.printToConsole = False
+        self.printToLog = True
+
         super().__init__()
 
     # public entry method to generate the graph out of a given IFC model
-    def parseModel(self): 
-        pass
+    def generateGraph(self): 
+        # delete entire graph if label already exists
+        print('DEBUG INFO: entire graph labeled with >> {} << gets deleted'.format(self.label))
+        self.connector.run_cypher_statement('MATCH(n:{}) DETACH DELETE n'.format(self.label))
 
+        print('[IFC_P21 > {} < ]: Generating graph... '.format(self.label))
+
+        # extract model data
+        obj_definitions =  self.model.by_type('IfcObjectDefinition')
+        obj_relationships = self.model.by_type('IfcRelationship')
+        props = self.model.by_type('IfcPropertyDefinition')      
+
+        # parse rooted node + subgraphs
+        self.mapEntities(obj_definitions)
+
+        # parse objectified relationships
+        self.mapObjRelationships(obj_relationships)
+
+        # ToDo: handle IfcPropertyDefinition
+
+        print('[IFC_P21 > {} < ]: Generating graph - DONE. \n '.format(self.label))
 
     def validateParsingResult(self):
         # ticket_PostEvent-VerifyParsedModel
@@ -64,7 +98,7 @@ class IFCp21_neo4jMapper(IfcMapper):
             entityType = info['type']
 
             # neo4j: build rooted node
-            cypher_statement = neo4jGraphFactory.CreateRootedNode(entityId, entityType, self.timeStamp)
+            cypher_statement = neo4jGraphFactory.CreateRootedNode(entityId, entityType, self.label)
             node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
             
             # get all attrs and children
@@ -134,7 +168,7 @@ class IFCp21_neo4jMapper(IfcMapper):
             # append atomic attrs to current node
             if parent_NodeId != None: 
                 # atomic attrs exist on current node -> map to node 
-                cypher_statement = neo4jGraphFactory.AddAttributesToNode(parent_NodeId, filtered_attrs, self.timeStamp)
+                cypher_statement = neo4jGraphFactory.AddAttributesToNode(parent_NodeId, filtered_attrs, self.label)
                 self.connector.run_cypher_statement(cypher_statement)
        
         # query all traversal entities -> subnodes 
@@ -155,14 +189,14 @@ class IFCp21_neo4jMapper(IfcMapper):
                 ## check if child is already existing in the graph. otherwise create new node
                
                 cypher_statement = ''
-                cypher_statement = neo4jQueryFactory.GetNodeIdByP21(child[1].__dict__['id'], self.timeStamp)
+                cypher_statement = neo4jQueryFactory.GetNodeIdByP21(child[1].__dict__['id'], self.label)
                 res = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
                 if len(res) == 0:
                     # node doesnt exist yet, continue with creating a new attr node
                     
                     cypher_statement = ''
-                    cypher_statement = neo4jGraphFactory.CreateAttributeNode(parent_NodeId, child[1].__dict__['type'], child[0], self.timeStamp)
+                    cypher_statement = neo4jGraphFactory.CreateAttributeNode(parent_NodeId, child[1].__dict__['type'], child[0], self.label)
                     node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
                     # recursively call the function again but update the node id. 
@@ -173,7 +207,7 @@ class IFCp21_neo4jMapper(IfcMapper):
                     # node already exists, run merge command
 
                     cypher_statement = ''
-                    cypher_statement = neo4jGraphFactory.MergeOnP21(p21_id, child[1].__dict__['id'], child[0], self.timeStamp)
+                    cypher_statement = neo4jGraphFactory.MergeOnP21(p21_id, child[1].__dict__['id'], child[0], self.label)
                     node_id = self.connector.run_cypher_statement(cypher_statement)
 
                 elif len(res) > 1: 
@@ -194,7 +228,7 @@ class IFCp21_neo4jMapper(IfcMapper):
             entityType = info['type']
 
             # neo4j: build rooted node
-            cypher_statement = neo4jGraphFactory.CreateObjectifiedRelNode(entityId, entityType, self.timeStamp)
+            cypher_statement = neo4jGraphFactory.CreateObjectifiedRelNode(entityId, entityType, self.label)
             node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
             
             # get all attrs and children
