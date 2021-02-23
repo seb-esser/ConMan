@@ -94,3 +94,7 @@ class neo4jQueryFactory:
 		where = 'WHERE ID(n) = {}'.format(nodeId)
 		ret = 'RETURN properties(n)'
 		return neo4jUtils.BuildMultiStatement([match, where, ret])
+
+	# ticket_PostEvent-VerifyParsedModel
+	# -- create a new method GetNumberOfNodesInGraph(cls, label) here --
+

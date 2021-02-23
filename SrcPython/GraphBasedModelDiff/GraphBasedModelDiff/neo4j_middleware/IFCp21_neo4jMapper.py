@@ -28,6 +28,31 @@ class IFCp21_neo4jMapper(IfcMapper):
         self.printToLog = ToLog
         super().__init__()
 
+    # public entry method to generate the graph out of a given IFC model
+    def parseModel(self): 
+        pass
+
+
+    def validateParsingResult(self):
+        # ticket_PostEvent-VerifyParsedModel
+
+        # step 1: count entities in IFC model
+
+        # step 2: count number of nodes created in the related graph structure
+        # step 2a: identify the graph by its label (i.e., timestamp)
+        # step 2b: create a new method in the class neo4jQueryFactory
+        # step 2c: implement a suitable cypher statement into the recently created method in neo4jQueryFactory
+        # step 2d: run the cypher query using the self.connector.run_cypher_statement() 
+        # step 2e: access the database response
+
+        # step 3: compare num_entities from the IFC model with the number of nodes detected in the graph
+
+        # step 4: print the test result to console. 
+
+        pass
+
+
+
     # public entry
     def mapEntities(self, rootedEntities): 
         # loop over all rooted entites 
