@@ -58,10 +58,10 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
         props = self.model.by_type('IfcPropertyDefinition')      
 
         # parse rooted node + subgraphs
-        self.mapEntities(obj_definitions)
+        self.__mapEntities(obj_definitions)
 
         # parse objectified relationships
-        self.mapObjRelationships(obj_relationships)
+        self.__mapObjRelationships(obj_relationships)
 
         # ToDo: handle IfcPropertyDefinition
 
@@ -88,7 +88,7 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
 
 
     # public entry
-    def mapEntities(self, rootedEntities): 
+    def __mapEntities(self, rootedEntities): 
         # loop over all rooted entites 
         for entity in rootedEntities: 
         
@@ -102,10 +102,10 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
             node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
             
             # get all attrs and children
-            self.getDirectChildren(entity, 0, node_id[0])
+            self.__getDirectChildren(entity, 0, node_id[0])
 
     # private recursive function
-    def getDirectChildren(self, entity, indent, parent_NodeId=None): 
+    def __getDirectChildren(self, entity, indent, parent_NodeId=None): 
         
         if self.printToConsole: 
             print("".ljust(indent*4) + '{}'.format(entity))
@@ -201,7 +201,7 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
 
                     # recursively call the function again but update the node id. 
                     # It will append the atomic properties and creates the nested child nodes again
-                    children = self.getDirectChildren(child[1], indent + 1, node_id[0])
+                    children = self.__getDirectChildren(child[1], indent + 1, node_id[0])
 
                 elif len(res) == 1:
                     # node already exists, run merge command
@@ -217,7 +217,7 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
         return children
 
     # public entry
-    def mapObjRelationships(self, objRels): 
+    def __mapObjRelationships(self, objRels): 
 
         # loop over all relationships
         for entity in objRels: 
@@ -232,7 +232,7 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
             node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
             
             # get all attrs and children
-            self.getDirectChildren(entity, 0, node_id[0])
+            self.__getDirectChildren(entity, 0, node_id[0])
 
 
 
