@@ -5,7 +5,7 @@ import logging
 import datetime
 
 """ class import """
-from neo4j_middleware.IFCp21_neo4jMapper import IFCp21_neo4jMapper
+from neo4j_middleware.IFCp21_MetaGraphGenerator import IFCp21_MetaGraphGenerator
 from neo4j_middleware.neo4jGraphFactory import neo4jGraphFactory
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -41,7 +41,7 @@ paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresen
 for path in paths: 
 	# parse model
 
-	graphGenerator = IFCp21_neo4jMapper(connector, path, None)
+	graphGenerator = IFCp21_MetaGraphGenerator(connector, path, None)
 	graphGenerator.generateGraph()
 	
 # disconnect from database
