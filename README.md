@@ -1,6 +1,6 @@
-* Versioning Manager as BIM Level 3 CDE
+# Versioning Manager as BIM Level 3 CDE
 
-** Installation and Setup
+## Installation and Setup
 
 - clone repository
 - download neo4j
