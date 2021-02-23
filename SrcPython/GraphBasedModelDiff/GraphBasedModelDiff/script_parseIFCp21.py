@@ -43,6 +43,7 @@ for path in paths:
 
 	graphGenerator = IFCp21_MetaGraphGenerator(connector, path, None)
 	graphGenerator.generateGraph()
+	graphGenerator.validateParsingResult()
 	
 # disconnect from database
 connector.disconnect_driver()
