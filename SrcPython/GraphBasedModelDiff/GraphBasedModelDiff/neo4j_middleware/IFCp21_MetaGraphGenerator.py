@@ -129,6 +129,7 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
 
             # some special tuples that have to be treated differently from pure lists
             special_key_names = ['Coordinates', 'DirectionRatios']
+            nestedLists_key_names = ['CoordList', 'segments']
 
             # detecting atomic attribute -> map to existing node
             if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) : 

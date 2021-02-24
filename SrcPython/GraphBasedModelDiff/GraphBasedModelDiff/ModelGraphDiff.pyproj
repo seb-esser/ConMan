@@ -5,7 +5,7 @@
     <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>script_GraphBasedModelDiff.py</StartupFile>
+    <StartupFile>script_testingAround.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -89,6 +89,9 @@
     <Compile Include="script_parseRailML.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="script_testingAround.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="script_testSCC.py">
       <SubType>Code</SubType>
     </Compile>
@@ -96,6 +99,7 @@
   <ItemGroup>
     <Folder Include="00_sampleData\IFC_stepP21\" />
     <Folder Include="00_sampleData\IFC_json\" />
+    <Folder Include="00_sampleData\IFC_stepP21\Beam_extrudedGeom\" />
     <Folder Include="00_sampleData\IFC_stepP21\GeomRepresentation_01\" />
     <Folder Include="00_sampleData\IFC_stepP21\GeomRepresentation_02\" />
     <Folder Include="00_sampleData\IFC_stepP21\GeomRepresentation_03\" />
@@ -129,6 +133,8 @@
     <Content Include="00_sampleData\IFC_json\spatial_initial_old.json" />
     <Content Include="00_sampleData\IFC_json\spatial_updated.json" />
     <Content Include="00_sampleData\IFC_json\spatial_updated_old.json" />
+    <Content Include="00_sampleData\IFC_stepP21\Beam_extrudedGeom\beam-extruded-solid_updated.ifc" />
+    <Content Include="00_sampleData\IFC_stepP21\Beam_extrudedGeom\beam-extruded-solid_initial.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\GeomRepresentation_01\Initial_GeomRepresentation_01.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\GeomRepresentation_01\Update_GeomRepresentation_01.ifc" />
     <Content Include="00_sampleData\IFC_stepP21\GeomRepresentation_02\Initial_GeomRepresentation_02.ifc" />
