@@ -5,7 +5,7 @@
     <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>script_testingAround.py</StartupFile>
+    <StartupFile>script_SimilarityDiscussion.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -89,6 +89,7 @@
     <Compile Include="script_parseRailML.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="script_SimilarityDiscussion.py" />
     <Compile Include="script_testingAround.py">
       <SubType>Code</SubType>
     </Compile>
