@@ -1,17 +1,17 @@
 
 import ifcopenshell
 
-path = './00_sampleData/IFC_stepP21/Beam_extrudedGeom/beam-extruded-solid_initial.ifc'
+path = './00_sampleData/IFC_stepP21/4x3Bridge/f-bru_enriched_testing_export_select.ifc'
 
 model = ifcopenshell.open(path)
 
-ptList = model.by_type('IfcCartesianPointList')[0]
-indexedPolyCurve = model.by_type('IfcIndexedPolyCurve')[0]
+objDefs = model.by_type('IfcFacilityPart')
 
-for key, val in ptList.__dict__:
-	print('{} : {}'.format(key, val))
+for entity in objDefs:
+	print('{}'.format(entity))
+	for key,val in entity.get_info().items():
+		print('{} \t {}'.format(key, val))
+	print('\n')
 
-print()
-for key, val in indexedPolyCurve.__dict__:
-	print('{} : {}'.format(key, val))
+
 

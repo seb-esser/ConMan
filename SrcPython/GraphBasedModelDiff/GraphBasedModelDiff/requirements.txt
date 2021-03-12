@@ -20,3 +20,5 @@ six==1.15.0
 urllib3==1.26.2
 wheel==0.36.2
 wincertstore==0.2
+lxml==4.6.2
+termcolor==1.1.0

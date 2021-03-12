@@ -37,8 +37,12 @@ paths = [
 #		 './00_sampleData/IFC_stepP21/SleeperSample/sleeper_updated.ifc', 
 #		 './00_sampleData/IFC_stepP21/Residential_01/residential_init.ifc', 
 #		 './00_sampleData/IFC_stepP21/Residential_01/residential_updated.ifc',
-		 './00_sampleData/IFC_stepP21/Beam_extrudedGeom/beam-extruded-solid_initial.ifc', 
-		 './00_sampleData/IFC_stepP21/Beam_extrudedGeom/beam-extruded-solid_updated.ifc'
+		 #'./00_sampleData/IFC_stepP21/Beam_extrudedGeom/beam-extruded-solid_initial.ifc', 
+		 #'./00_sampleData/IFC_stepP21/Beam_extrudedGeom/beam-extruded-solid_updated.ifc'
+		 './00_sampleData/IFC_stepP21/4x3Bridge/f-bru_enriched.ifc',
+		 './00_sampleData/IFC_stepP21/4x3Bridge/f-bru_enriched_testing_export_select.ifc'
+
+
 		 ]
 
 for path in paths: 
