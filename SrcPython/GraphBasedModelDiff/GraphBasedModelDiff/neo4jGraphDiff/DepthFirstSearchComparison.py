@@ -1,5 +1,7 @@
 
 import abc
+import asyncio
+import time
 
 from .DirectedSubgraphDiff import DirectedSubgraphDiff
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
@@ -26,7 +28,18 @@ class DepthFirstSearchComparison(DirectedSubgraphDiff):
         diffContainer = self.__compareChildren(node_init, node_updated, diffContainer)
         return diffContainer
 
-
+    async def diffSubgraphsAsync(self, node_init, node_updated): 
+        """
+        :node_init:
+        :node_updated:
+        :return:
+        """
+        diffContainer = DiffResult(method = "Node-Diff", root_init = node_init, root_updated=node_updated)
+               
+        # start recursion
+        diffContainer = self.__compareChildren(node_init, node_updated, diffContainer)
+        
+        return diffContainer
     
 
     def __compareChildren(self, node_init, node_updated, diffResultContainer, indent=0): 
