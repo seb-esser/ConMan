@@ -10,7 +10,7 @@ objDefs = model.by_type('IfcFacilityPart')
 for entity in objDefs:
 	print('{}'.format(entity))
 	for key,val in entity.get_info().items():
-		print('{} \t {}'.format(key, val))
+		print('{} \t {} \t {}'.format(key, val, type(val) ))
 	print('\n')
 
 

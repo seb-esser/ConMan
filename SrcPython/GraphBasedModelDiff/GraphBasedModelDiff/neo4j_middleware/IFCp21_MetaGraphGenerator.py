@@ -130,10 +130,14 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
             # some special tuples that have to be treated differently from pure lists
             special_key_names = ['Coordinates', 'DirectionRatios']
             nestedLists_key_names = ['CoordList', 'segments']
+            pdt_key_names = ['PredefinedType']
 
             # detecting atomic attribute -> map to existing node
             if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) : 
                 filtered_attrs[key] = val
+
+            elif key in pdt_key_names:
+                filtered_attrs[key] = str(val)
             
             # detecting atomic attribute but encapsulated in tuple
             elif isinstance(val, tuple) and key in special_key_names:
