@@ -219,7 +219,7 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
                     # node exist multiple times. 
                     raise Exception('Detected nodes with same p21 id. ERROR!')
                                 
-        return children
+        return None
 
     # public entry
     def __mapObjRelationships(self, objRels): 
