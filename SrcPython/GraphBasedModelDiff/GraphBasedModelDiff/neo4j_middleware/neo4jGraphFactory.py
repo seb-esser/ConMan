@@ -54,6 +54,31 @@ class neo4jGraphFactory:
 		return neo4jUtils.BuildMultiStatement([match, create, setEntityType, merge, returnID])
 
 	@classmethod
+	def CreateAttributeNode_wouParent(self, entityType, timestamp):		
+		create = 'CREATE (n:ResourceNode:{})'.format(timestamp) 
+		setEntityType = 'SET n.entityType = "{}"'.format(entityType)		
+		returnID = 'RETURN ID(n)'
+		return neo4jUtils.BuildMultiStatement([create, setEntityType, returnID])
+
+	@classmethod
+	def CreateListNode(self, ParentId, relType, timestamp):		
+		match = 'MATCH (p) WHERE ID(p) = {}'.format(ParentId)
+		create = 'CREATE (n:ListNode:{})'.format(timestamp) 
+		setEntityType = 'SET n.entityType = "{}"'.format("NestedList")	
+		merge = 'MERGE (p)-[:{}]->(n)'.format(relType)
+		returnID = 'RETURN ID(n)'
+		return neo4jUtils.BuildMultiStatement([match, create, setEntityType, merge, returnID])
+
+	@classmethod
+	def CreateListItemNode(self, ParentId, ItemNo, timestamp):		
+		match = 'MATCH (p) WHERE ID(p) = {}'.format(ParentId)
+		create = 'CREATE (n:ListItemNode:{})'.format(timestamp) 
+		setEntityType = 'SET n.entityType = "{}"'.format("ListItem")	
+		merge = 'MERGE (p)-[:ListItem{}]->(n)'.format(ItemNo)
+		returnID = 'RETURN ID(n)'
+		return neo4jUtils.BuildMultiStatement([match, create, setEntityType, merge, returnID])
+
+	@classmethod
 	def MergeRootedNodeWithOwnerHistory(self, ownerHistoryGuid, myNodeId, timeStamp):
 		match = 'MATCH (p:{}) WHERE p.globalId = "{}"'.format(timeStamp, ownerHistoryGuid)
 		matchOwn = 'MATCH (me) WHERE ID(me) = {}'.format(myNodeId)
