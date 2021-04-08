@@ -1,7 +1,7 @@
 
 
 
-""" This class provides common tools to construct complex cypher request. """
+""" This class provides common tools to construct complex cypher queries. """
 class neo4jQueryUtilities:
 
 	def __init__(self):
