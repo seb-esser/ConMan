@@ -4,6 +4,7 @@ import ifcopenshell
 import logging
 import datetime
 import os
+import progressbar
 
 """ class import """
 from neo4j_middleware.IFCp21_neo4jMapper import IFCp21_neo4jMapper
@@ -45,13 +46,19 @@ for path in os.listdir(dir):
 #		 './00_sampleData/IFC_stepP21/Residential_01/residential_init.ifc', 
 #		 './00_sampleData/IFC_stepP21/Residential_01/residential_updated.ifc'
 #		 ]
-
+increment = 100/len(paths)
+percent = 0
+print('Starting to generate graphs...')
 for path in paths: 
-	# parse model
+    progressbar.printbar(percent)
+    # parse model
+    graphGenerator = IFCp21_neo4jMapper(connector, path, None)
 
-	graphGenerator = IFCp21_neo4jMapper(connector, path, None)
-	graphGenerator.generateGraph()
+    graphGenerator.generateGraph()
+
+    percent += increment
 	
+print('100% done.')	
 # disconnect from database
 connector.disconnect_driver()
 
