@@ -3,7 +3,7 @@
 import ifcopenshell
 import logging
 import datetime
-import os
+import glob
 import progressbar
 
 """ class import """
@@ -25,12 +25,11 @@ connector.connect_driver()
 
 # ToDo: automate loading of unit tests. See ticket #16 in the Gitlab repo.
 # These lines all filepaths in the directory 'dir'
-dir = './00_sampleData/IFC_stepP21/GeomRepresentation_01' 
+dir = './00_sampleData/IFC_stepP21/**/*.ifc' 
 paths = []
-for path in os.listdir(dir):
-    full_path = os.path.join(dir, path)
-    if os.path.isfile(full_path):
-        paths.append(full_path)
+for filepath in glob.glob(dir, recursive=True):
+    paths.append(filepath)
+print(paths)
 
 #paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresentation_01.ifc' # same representation
 #		 './00_sampleData/IFC_stepP21/GeomRepresentation_01/Update_GeomRepresentation_01.ifc',  # two representations
