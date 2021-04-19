@@ -24,14 +24,15 @@ connector = Neo4jConnector(False, True)
 connector.connect_driver()
 
 # ToDo: automate loading of unit tests. See ticket #16 in the Gitlab repo.
-dir = '/home/finradon/repos/ifc_file_repository/ProductData' 
+# These lines all filepaths in the directory 'dir'
+dir = './00_sampleData/IFC_stepP21/GeomRepresentation_01' 
 paths = []
 for path in os.listdir(dir):
     full_path = os.path.join(dir, path)
     if os.path.isfile(full_path):
         paths.append(full_path)
 
-#paths = ['/home/finradon/repos/ifc_file_repository/OpenShellTestFiles/288--wall--segfault--augmented.ifc' # same representation
+#paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresentation_01.ifc' # same representation
 #		 './00_sampleData/IFC_stepP21/GeomRepresentation_01/Update_GeomRepresentation_01.ifc',  # two representations
 #		 './00_sampleData/IFC_stepP21/GeomRepresentation_02/Initial_GeomRepresentation_02.ifc',	# two representations
 #		 './00_sampleData/IFC_stepP21/GeomRepresentation_02/Update_GeomRepresentation_02.ifc',	# elevated cuboid height -> PMod
@@ -46,6 +47,7 @@ for path in os.listdir(dir):
 #		 './00_sampleData/IFC_stepP21/Residential_01/residential_init.ifc', 
 #		 './00_sampleData/IFC_stepP21/Residential_01/residential_updated.ifc'
 #		 ]
+
 increment = 100/len(paths)
 percent = 0
 print('Starting to generate graphs...')
@@ -57,8 +59,7 @@ for path in paths:
     graphGenerator.generateGraph()
 
     percent += increment
-	
-print('100% done.')	
+print('\n 100% done. Graphs generated.')	
 # disconnect from database
 connector.disconnect_driver()
 
