@@ -1,0 +1,12 @@
+./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresentation_01.ifc      ts20210119T085406	  # same representation
+./00_sampleData/IFC_stepP21/GeomRepresentation_01/Update_GeomRepresentation_01.ifc       ts20210119T085407    # two representations
+./00_sampleData/IFC_stepP21/GeomRepresentation_02/Initial_GeomRepresentation_02.ifc      ts20210119T085408    # two representations
+./00_sampleData/IFC_stepP21/GeomRepresentation_02/Update_GeomRepresentation_02.ifc       ts20210119T085409    # elevated cuboid height -> PMod
+./00_sampleData/IFC_stepP21/GeomRepresentation_03/Initial_GeomRepresentation_03.ifc      ts20210119T085410    # 1 proxy as cuboid 
+./00_sampleData/IFC_stepP21/GeomRepresentation_03/Update_GeomRepresentation_03.ifc       ts20210119T085411    # 1 proxy as cylinder -> mainly PMod, 
+./00_sampleData/IFC_stepP21/GeomRepresentation_04/Initial_GeomRepresentation_04.ifc      ts20210119T085412    # extrudedArea
+./00_sampleData/IFC_stepP21/GeomRepresentation_04/Update_GeomRepresentation_04.ifc       ts20210119T085413    # BRep -> structural Mod
+./00_sampleData/IFC_stepP21/wall-column/Wall-Column.ifc          			 ts20200713T083447
+./00_sampleData/IFC_stepP21/wall-column/Column-Wall.ifc          			 ts20200713T083450
+./00_sampleData/IFC_stepP21/SleeperSample/sleeper_init.ifc       			 ts20200202T105551
+./00_sampleData/IFC_stepP21/SleeperSample/sleeper_updated.ifc    			 ts20200204T105551
