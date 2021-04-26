@@ -1,4 +1,4 @@
-from neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
+from .neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
 
 
 class Neo4jGraphFactory:

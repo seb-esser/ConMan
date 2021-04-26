@@ -55,7 +55,7 @@ label_updated = "ts20210219T121608"
 async def main():
 	# set config
 	#config = Configurator.relTypeConfig()
-	config = Configurator.onGuidConfig()
+	config = Configurator.on_guid_config()
 	print(config)
 	print(config.DiffSettings)
 

@@ -140,7 +140,7 @@ class DepthFirstSearchComparison(DirectedSubgraphDiff):
     	    # nodes are similar
     	    if self.toConsole():
     	        print('[RESULT]: child nodes match')
-    	    	
+
     	# case 2: modified attrs on pair but no added/deleted attrs
     	elif cleared_nodeDifference.nodesHaveUpdatedAttrs() == True: 
     	    

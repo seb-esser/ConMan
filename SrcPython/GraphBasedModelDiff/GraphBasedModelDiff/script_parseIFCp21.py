@@ -6,7 +6,7 @@ import glob
 import progressbar
 
 """ class import """
-from neo4j_middleware.IFCp21_MetaGraphGenerator import IFCp21_MetaGraphGenerator
+from neo4j_middleware.IFCGraphGenerator import IFCGraphGenerator
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 # --- Script ---
@@ -49,7 +49,7 @@ print('Starting to generate graphs...')
 for path in paths:
     progressbar.printbar(percent)
     # parse model
-    graphGenerator = IFCp21_MetaGraphGenerator(connector, path, None)
+    graphGenerator = IFCGraphGenerator(connector, path, None)
 
     graphGenerator.generateGraph()
 

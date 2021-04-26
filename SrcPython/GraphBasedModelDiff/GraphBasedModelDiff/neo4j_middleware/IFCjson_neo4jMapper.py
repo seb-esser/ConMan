@@ -175,7 +175,7 @@ class IfcJsonNeo4jMapper(IfcMapper):
             for outs in objRel.outgoing_Rels:                
                 # print('\t type: {} \t ref: {}'.format(outs.type, outs.target_guid))
                 cypher_statement = factory.merge_con_with_primary_node(objRel.globalId, outs.target_guid,
-                                                                       type_from_rel_to_node, outs.inverseType,
+                                                                       outs.type_from_rel_to_node, outs.inverseType,
                                                                        self.timeStamp)
                 self.connector.run_cypher_statement(cypher_statement)
 

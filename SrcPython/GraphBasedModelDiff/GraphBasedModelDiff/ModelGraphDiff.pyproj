@@ -72,7 +72,7 @@
     <Compile Include="neo4jGraphDiff\DiffIgnore_parser.py" />
     <Compile Include="neo4j_middleware\ifcGrGen_SchemaMapper.py" />
     <Compile Include="neo4j_middleware\IFCjson_neo4jMapper.py" />
-    <Compile Include="neo4j_middleware\IFCp21_MetaGraphGenerator.py">
+    <Compile Include="neo4j_middleware\IFCGraphGenerator.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4j_middleware\IfcRelHelper\IfcObjRelCacher.py" />

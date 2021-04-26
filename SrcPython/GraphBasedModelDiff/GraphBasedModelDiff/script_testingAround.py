@@ -47,7 +47,7 @@ for key, val in cartesianPtList2D.get_info().items():
                 itm = connector.run_cypher_statement(cy, 'ID(n)')[0]
 
                 attrs = {'ItemValue1': nVal[0], 'ItemValue2': nVal[1]}
-				cy = Neo4jGraphFactory.add_attributes_by_node_id(itm, attrs, ts)
+                cy = Neo4jGraphFactory.add_attributes_by_node_id(itm, attrs, ts)
 
                 connector.run_cypher_statement(cy)
                 i = i + 1

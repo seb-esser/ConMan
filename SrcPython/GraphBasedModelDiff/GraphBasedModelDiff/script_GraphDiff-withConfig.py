@@ -10,7 +10,7 @@ from neo4jGraphDiff.Reporter import Reporter
 """ script """
 
 
-config = Configurator.basicConfig()
+config = Configurator.basic_config()
 
 print(config.LogSettings)
 print(config.DiffSettings)
