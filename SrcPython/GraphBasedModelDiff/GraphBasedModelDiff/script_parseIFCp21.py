@@ -3,9 +3,11 @@
 import ifcopenshell
 import logging
 import datetime
+import glob
+import progressbar
 
 """ class import """
-from neo4j_middleware.IFCp21_MetaGraphGenerator import IFCp21_MetaGraphGenerator
+from neo4j_middleware.IFCp21_neo4jMapper import IFCp21_neo4jMapper
 from neo4j_middleware.neo4jGraphFactory import neo4jGraphFactory
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -21,9 +23,15 @@ print('connecting to neo4j database... ')
 connector = Neo4jConnector(False, True)
 connector.connect_driver()
 
-# ToDo: automate loading of unit tests. See ticket #16 in the Gitlab repo. 
-paths = [
-#		 './00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresentation_01.ifc', # same representation
+# ToDo: automate loading of unit tests. See ticket #16 in the Gitlab repo.
+# These lines all filepaths in the directory 'dir'
+dir = './00_sampleData/IFC_stepP21/**/*.ifc' 
+paths = []
+for filepath in glob.glob(dir, recursive=True):
+    paths.append(filepath)
+print(paths)
+
+#paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresentation_01.ifc' # same representation
 #		 './00_sampleData/IFC_stepP21/GeomRepresentation_01/Update_GeomRepresentation_01.ifc',  # two representations
 #		 './00_sampleData/IFC_stepP21/GeomRepresentation_02/Initial_GeomRepresentation_02.ifc',	# two representations
 #		 './00_sampleData/IFC_stepP21/GeomRepresentation_02/Update_GeomRepresentation_02.ifc',	# elevated cuboid height -> PMod
@@ -36,22 +44,21 @@ paths = [
 #		 './00_sampleData/IFC_stepP21/SleeperSample/sleeper_init.ifc', 
 #		 './00_sampleData/IFC_stepP21/SleeperSample/sleeper_updated.ifc', 
 #		 './00_sampleData/IFC_stepP21/Residential_01/residential_init.ifc', 
-#		 './00_sampleData/IFC_stepP21/Residential_01/residential_updated.ifc',
-		 #'./00_sampleData/IFC_stepP21/Beam_extrudedGeom/beam-extruded-solid_initial.ifc', 
-		 #'./00_sampleData/IFC_stepP21/Beam_extrudedGeom/beam-extruded-solid_updated.ifc'
-		 './00_sampleData/IFC_stepP21/4x3Bridge/f-bru_enriched.ifc',
-		 './00_sampleData/IFC_stepP21/4x3Bridge/f-bru_enriched_testing_export_select.ifc'
+#		 './00_sampleData/IFC_stepP21/Residential_01/residential_updated.ifc'
+#		 ]
 
-
-		 ]
-
+increment = 100/len(paths)
+percent = 0
+print('Starting to generate graphs...')
 for path in paths: 
-	# parse model
+    progressbar.printbar(percent)
+    # parse model
+    graphGenerator = IFCp21_neo4jMapper(connector, path, None)
 
-	graphGenerator = IFCp21_MetaGraphGenerator(connector, path, None)
-	graphGenerator.generateGraph()
-	graphGenerator.validateParsingResult()
-	
+    graphGenerator.generateGraph()
+
+    percent += increment
+print('\n 100% done. Graphs generated.')	
 # disconnect from database
 connector.disconnect_driver()
 
