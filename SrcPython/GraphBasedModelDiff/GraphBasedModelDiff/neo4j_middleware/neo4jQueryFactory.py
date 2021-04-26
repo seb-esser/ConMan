@@ -9,8 +9,18 @@ class neo4jQueryFactory:
 
 	@classmethod
 	def DiffNodes(cls, nodeIDleft, nodeIDright):
-		""" returns a cypher statement to to diff two nodes specified by their node IDs """ 
+		"""Calculates the attribute diff between two nodes. 
+				
+		Parameters
+		----------
+		nodeIDlef : left node to be compared
+		nodeIdright: right node to be compared
 		
+		Returns
+		-------
+		cypher string to be executed using a connector instance. 
+        
+		"""
 		query_left = 'MATCH (l) WHERE ID(l) = {}'.format(nodeIDleft)
 		query_right = 'MATCH (r) WHERE ID(r) = {}'.format(nodeIDright)
 		ret_statement = 'RETURN apoc.diff.nodes(l,r)'

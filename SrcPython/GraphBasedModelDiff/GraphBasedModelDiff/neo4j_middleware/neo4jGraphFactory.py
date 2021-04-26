@@ -9,16 +9,28 @@ class neo4jGraphFactory:
 
 
 	@classmethod
-	def CreateRelationship(cls, sourceNodeId, targetNodeId, qualifier, rel_type, ref):
+	def CreateRelationship(cls, sourceNodeId, targetNodeId, qualifier, rel_type):
+		"""Creates a directed graph edge between two nodes specified by their node ids. 
+				
+		Parameters
+		----------
+		sourceNodeId : node ID in the neo4j graph, on which the edge should start
+		targetNodeId: node ID in the neo4j graph, which the edge is pointing to
+		qualifier: UNUSED 
+		rel_type: edge type
+		Returns
+		-------
+		cypher string to be executed using a connector instance. 
+        
+		"""
 		match_source = 'MATCH(s) where ID(s) = {}'.format(sourceNodeId)
 		match_target = 'MATCH(t) where ID(t) = "{}"'.format(targetNodeId)
-		merge = 'MERGE (s)-[r.{}]->(t)'.format(rel_type)
-		#set_qualifier = 'SET r.Qualifier = {}'.format(qualifier)
+		merge = 'MERGE (s)-[r.{}]->(t)'.format(rel_type)		
 		return neo4jUtils.BuildMultiStatement([match_source, match_target, merge, set_qualifier])
 
 	@classmethod
 	def CreateRootedNode(cls, entityId, entityType, timestamp):
-		create = 'CREATE(n:{}:rootedNode)'.format(timestamp)
+		create = 'CREATE(n:{}:PrimaryNode)'.format(timestamp)
 		setGuid = 'SET n.GlobalId = "{}"'.format(entityId)
 		setEntityType = 'SET n.entityType = "{}"'.format(entityType)
 		returnID = 'RETURN ID(n)'
@@ -46,7 +58,7 @@ class neo4jGraphFactory:
 	@classmethod
 	def CreateAttributeNode(self, ParentId, entityType, RelationshipLabel, timestamp):
 		match = 'MATCH (p) WHERE ID(p) = {}'.format(ParentId)
-		create = 'CREATE (n:ResourceNode:{})'.format(timestamp) 
+		create = 'CREATE (n:SecondaryNode:{})'.format(timestamp) 
 		setEntityType = 'SET n.entityType = "{}"'.format(entityType)
 		merge = 'MERGE (p)-[:{}]->(n)'.format(RelationshipLabel)
 		returnID = 'RETURN ID(n)'
@@ -55,7 +67,7 @@ class neo4jGraphFactory:
 
 	@classmethod
 	def CreateAttributeNode_wouParent(self, entityType, timestamp):		
-		create = 'CREATE (n:ResourceNode:{})'.format(timestamp) 
+		create = 'CREATE (n:SecondaryNode:{})'.format(timestamp) 
 		setEntityType = 'SET n.entityType = "{}"'.format(entityType)		
 		returnID = 'RETURN ID(n)'
 		return neo4jUtils.BuildMultiStatement([create, setEntityType, returnID])
@@ -88,7 +100,7 @@ class neo4jGraphFactory:
 
 	@classmethod 
 	def CreateObjectifiedRelNode(self, relGuid, relType, timestamp):
-		create = 'CREATE(n:ObjRelNode:{})'.format(timestamp)
+		create = 'CREATE(n:ConnectionNode:{})'.format(timestamp)
 		setGuid = 'SET n.globalId = "{}"'.format(relGuid)
 		setEntityType = 'SET n.entityType = "{}"'.format(relType)
 		returnID = 'RETURN ID(n)'
