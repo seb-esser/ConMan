@@ -4,7 +4,7 @@ from io import StringIO, BytesIO
 
 """ file import """
 from neo4j_middleware.neo4jConnector import Neo4jConnector
-from neo4j_middleware.neo4jGraphFactory import neo4jGraphFactory
+from neo4j_middleware.neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 
 
@@ -53,17 +53,17 @@ class railML_neo4jmapper:
         # rooted entities
         for child in root: 
             print('\t{} : {}'.format(child.tag, child.attrib))
-            cypher = neo4jGraphFactory.CreateRootedNode(child.attrib['id'], child.tag, self.timeStamp)
+            cypher = Neo4jGraphFactory.create_primary_node(child.attrib['id'], child.tag, self.timeStamp)
             nodeId = self.connector.run_cypher_statement(cypher, 'ID(n)')
             rootedNodeIds.append(nodeId)
 
         # build objRelNode
-        cypher = neo4jGraphFactory.CreateObjectifiedRelNode("null", "railML", self.timeStamp)
+        cypher = Neo4jGraphFactory.create_connection_node("null", "railML", self.timeStamp)
         ObjRelNodeId = self.connector.run_cypher_statement(cypher, 'ID(n)')
 
         # connect rooted nodes and objRelNode
         for rootNode in rootedNodeIds:
-            cypher = neo4jGraphFactory.MergeNodesByNodeIDs(ObjRelNodeId[0], rootNode[0])
+            cypher = Neo4jGraphFactory.merge_on_node_ids(ObjRelNodeId[0], rootNode[0])
             self.connector.run_cypher_statement(cypher)
 
 

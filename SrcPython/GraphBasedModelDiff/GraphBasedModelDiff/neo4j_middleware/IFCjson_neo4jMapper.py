@@ -9,7 +9,7 @@ from .IfcRelHelper.InverseAttrDetector import InverseAttrDectector
 from .IfcRelHelper.IfcObjRelCacher import IfcObjRelCacher, Rel
 from common_base.ifcMapper import IfcMapper
 from .neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
-from .neo4jGraphFactory import neo4jGraphFactory as factory
+from .neo4jGraphFactory import Neo4jGraphFactory as factory
 
 
 class IfcJsonNeo4jMapper(IfcMapper):
@@ -27,7 +27,7 @@ class IfcJsonNeo4jMapper(IfcMapper):
             print('Creating entity with guid {} in graph...'.format(entity['globalId']))
             # formulate cypher command
             # cypher_statement = self.CreateRootedNode(entity['globalId'], entity['type'])
-            cypher_statement = factory.CreateRootedNode(entity['globalId'], entity['type'], self.timeStamp)
+            cypher_statement = factory.create_primary_node(entity['globalId'], entity['type'], self.timeStamp)
             # run command on database
             response = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
@@ -37,7 +37,7 @@ class IfcJsonNeo4jMapper(IfcMapper):
                 parent_owner_history = entity['ownerHistory']
                 OH_guid = parent_owner_history['ref']
                 cypher_statement = ''
-                cypher_statement = factory.MergeRootedNodeWithOwnerHistory(OH_guid, response[0], self.timeStamp)
+                cypher_statement = factory.merge_rooted_node_with_owner_history(OH_guid, response[0], self.timeStamp)
                 response = self.connector.run_cypher_statement(cypher_statement, 'ID(me)')
             except :
                 pass
@@ -70,7 +70,7 @@ class IfcJsonNeo4jMapper(IfcMapper):
         if isinstance(pVal, (int, float, complex, str)):
             attribute = {pName: pVal}
             print(attribute)
-            cypher_statement = factory.AddAttributesToNode(parentId, attribute, self.timeStamp)
+            cypher_statement = factory.add_attributes_by_node_id(parentId, attribute, self.timeStamp)
             self.connector.run_cypher_statement(cypher_statement)                
             return None
 
@@ -116,7 +116,7 @@ class IfcJsonNeo4jMapper(IfcMapper):
                 self.RelCacherList.append(relCache)
                 return
 
-            cypher_statement = factory.CreateAttributeNode(parentId, nodeLabel, child_type, self.timeStamp)
+            cypher_statement = factory.create_secondary_node(parentId, nodeLabel, child_type, self.timeStamp)
             current_parent = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
             # STEP 3: take the new parent and parse the inner dict values:
@@ -169,12 +169,14 @@ class IfcJsonNeo4jMapper(IfcMapper):
 
         for objRel in sorted_rels:
             # print('{} -> {}'.format(objRel.globalId, objRel.RelType))
-            cypher_statement = factory.CreateObjectifiedRelNode(objRel.globalId, objRel.RelType, self.timeStamp)
+            cypher_statement = factory.create_connection_node(objRel.globalId, objRel.RelType, self.timeStamp)
             nodeId = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
             for outs in objRel.outgoing_Rels:                
                 # print('\t type: {} \t ref: {}'.format(outs.type, outs.target_guid))
-                cypher_statement = factory.MergeObjRelWithRootedNode(objRel.globalId, outs.target_guid, outs.type, outs.inverseType, self.timeStamp)
+                cypher_statement = factory.merge_con_with_primary_node(objRel.globalId, outs.target_guid,
+                                                                       type_from_rel_to_node, outs.inverseType,
+                                                                       self.timeStamp)
                 self.connector.run_cypher_statement(cypher_statement)
 
         return 'doSomething'

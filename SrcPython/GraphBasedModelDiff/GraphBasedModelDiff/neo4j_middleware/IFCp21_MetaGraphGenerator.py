@@ -4,7 +4,7 @@ import ifcopenshell
 
 """ file import """
 from neo4j_middleware.neo4jConnector import Neo4jConnector
-from neo4j_middleware.neo4jGraphFactory import neo4jGraphFactory
+from neo4j_middleware.neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
 from common_base.ifcMapper import IfcMapper
 
@@ -89,7 +89,7 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
 
     # public entry
     def __mapEntities(self, rootedEntities): 
-        # loop over all rooted entites 
+        # loop over all rooted entities
         for entity in rootedEntities: 
         
             # get some basic data
@@ -98,7 +98,7 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
             entityType = info['type']
 
             # neo4j: build rooted node
-            cypher_statement = neo4jGraphFactory.CreateRootedNode(entityId, entityType, self.label)
+            cypher_statement = Neo4jGraphFactory.create_primary_node(entityId, entityType, self.label)
             node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
             
             # get all attrs and children
@@ -173,7 +173,8 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
             # append atomic attrs to current node
             if parent_NodeId != None: 
                 # atomic attrs exist on current node -> map to node 
-                cypher_statement = neo4jGraphFactory.AddAttributesToNode(parent_NodeId, filtered_attrs, self.label)
+                cypher_statement = Neo4jGraphFactory.add_attributes_by_node_id(parent_NodeId, filtered_attrs,
+                                                                               self.label)
                 self.connector.run_cypher_statement(cypher_statement)
        
         # query all traversal entities -> subnodes 
@@ -201,7 +202,8 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
                     # node doesnt exist yet, continue with creating a new attr node
                     
                     cypher_statement = ''
-                    cypher_statement = neo4jGraphFactory.CreateAttributeNode(parent_NodeId, child[1].__dict__['type'], child[0], self.label)
+                    cypher_statement = Neo4jGraphFactory.create_secondary_node(parent_NodeId, child[1].__dict__['type'],
+                                                                               child[0], self.label)
                     node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
                     # recursively call the function again but update the node id. 
@@ -212,7 +214,8 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
                     # node already exists, run merge command
 
                     cypher_statement = ''
-                    cypher_statement = neo4jGraphFactory.MergeOnP21(p21_id, child[1].__dict__['id'], child[0], self.label)
+                    cypher_statement = Neo4jGraphFactory.merge_on_p21(p21_id, child[1].__dict__['id'], child[0],
+                                                                      self.label)
                     node_id = self.connector.run_cypher_statement(cypher_statement)
 
                 elif len(res) > 1: 
@@ -233,7 +236,7 @@ class IFCp21_MetaGraphGenerator(IfcMapper):
             entityType = info['type']
 
             # neo4j: build rooted node
-            cypher_statement = neo4jGraphFactory.CreateObjectifiedRelNode(entityId, entityType, self.label)
+            cypher_statement = Neo4jGraphFactory.create_connection_node(entityId, entityType, self.label)
             node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
             
             # get all attrs and children

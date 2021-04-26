@@ -5,7 +5,7 @@ import datetime
 
 """ class import """
 from neo4j_middleware.railML_neo4jMapper import railML_neo4jmapper
-from neo4j_middleware.neo4jGraphFactory import neo4jGraphFactory
+from neo4j_middleware.neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 # --- defs ---

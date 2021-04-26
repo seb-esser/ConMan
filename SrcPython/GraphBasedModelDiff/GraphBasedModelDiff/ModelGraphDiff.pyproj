@@ -78,7 +78,7 @@
     <Compile Include="neo4j_middleware\IfcRelHelper\IfcObjRelCacher.py" />
     <Compile Include="neo4j_middleware\IfcRelHelper\InverseAttrDetector.py" />
     <Compile Include="neo4j_middleware\neo4jConnector.py" />
-    <Compile Include="neo4j_middleware\neo4jGraphFactory.py" />
+    <Compile Include="neo4j_middleware\neo4jgraphfactory.py" />
     <Compile Include="neo4j_middleware\neo4jQueryFactory.py" />
     <Compile Include="neo4j_middleware\neo4jQueryUtilities.py" />
     <Compile Include="networkX_middleware\ifcNetworkXMapper.py" />
