@@ -3,8 +3,8 @@
 import ifcopenshell
 
 """ file import """
-from neo4j_middleware.neo4jGraphFactory import Neo4jGraphFactory
-from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
+from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
+from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from common_base.ifcMapper import IfcMapper
 
 class IFCGraphGenerator(IfcMapper):
@@ -25,6 +25,7 @@ class IFCGraphGenerator(IfcMapper):
         try:
             self.model = ifcopenshell.open(model_path)
         except :
+            print('file path: {}'.format(model_path))
             raise Exception('Unable to open IFC model on given file path')
 
         # define the label (i.e., the model timestamp)
@@ -46,7 +47,7 @@ class IFCGraphGenerator(IfcMapper):
     # public entry method to generate the graph out of a given IFC model
     def generateGraph(self): 
         # delete entire graph if label already exists
-        print('DEBUG INFO: entire graph labeled with >> {} << gets deleted'.format(self.label))
+        print('DEBUG INFO: entire graph labeled with >> {} << gets deleted \n'.format(self.label))
         self.connector.run_cypher_statement('MATCH(n:{}) DETACH DELETE n'.format(self.label))
 
         print('[IFC_P21 > {} < ]: Generating graph... '.format(self.label))
@@ -73,8 +74,8 @@ class IFCGraphGenerator(IfcMapper):
 
         # step 2: count number of nodes created in the related graph structure
         # step 2a: identify the graph by its label (i.e., timestamp)
-        # step 2b: create a new method in the class neo4jQueryFactory
-        # step 2c: implement a suitable cypher statement into the recently created method in neo4jQueryFactory
+        # step 2b: create a new method in the class Neo4jQueryFactory
+        # step 2c: implement a suitable cypher statement into the recently created method in Neo4jQueryFactory
         # step 2d: run the cypher query using the self.connector.run_cypher_statement() 
         # step 2e: access the database response
 
@@ -194,7 +195,7 @@ class IFCGraphGenerator(IfcMapper):
                 ## check if child is already existing in the graph. otherwise create new node
                
                 cypher_statement = ''
-                cypher_statement = neo4jQueryFactory.GetNodeIdByP21(child[1].__dict__['id'], self.label)
+                cypher_statement = Neo4jQueryFactory.get_nodeId_byP21(child[1].__dict__['id'], self.label)
                 res = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
                 if len(res) == 0:

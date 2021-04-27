@@ -8,8 +8,8 @@ from .neo4jConnector import Neo4jConnector
 from .IfcRelHelper.InverseAttrDetector import InverseAttrDectector
 from .IfcRelHelper.IfcObjRelCacher import IfcObjRelCacher, Rel
 from common_base.ifcMapper import IfcMapper
-from .neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
-from .neo4jGraphFactory import Neo4jGraphFactory as factory
+from .Neo4jQueryUtilities import Neo4jQueryUtilities as neo4jUtils
+from .Neo4jGraphFactory import Neo4jGraphFactory as factory
 
 
 class IfcJsonNeo4jMapper(IfcMapper):

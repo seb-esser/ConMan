@@ -1,5 +1,5 @@
 
-from neo4j_middleware.neo4jGraphFactory import Neo4jGraphFactory
+from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 from matplotlib import pyplot as plt

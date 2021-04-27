@@ -1,10 +1,10 @@
 import abc
 
-from .DiffUtilities import DiffUtilities
-from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory
+from .SetCalculator import SetCalculator
+from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 
 # classes to decode neo4j query responses
-from neo4j_middleware.NodeData import NodeData
+from neo4j_middleware.NodeItem import NodeItem
 from neo4j_middleware.NodeDiffData import NodeDiffData
 
 
@@ -18,7 +18,7 @@ class DirectedSubgraphDiff(abc.ABC):
         self.configuration = configuration
 
         # utils provides methods to compare two sets of nodes based on specified criteria
-        self.utils = DiffUtilities()
+        self.utils = SetCalculator()
 
         # the connector is used to perform cypher queries on the neo4j database
         self.connector = connector
@@ -37,7 +37,12 @@ class DirectedSubgraphDiff(abc.ABC):
 
     # abstract definition of diffSubgraphs() method, implemented in HashDiff and CompareDiff classes
     @abc.abstractmethod
-    def diffSubgraphs(self, nodeId_init, nodeId_updated):
+    def diff_subgraphs(self, node_init, node_updated):
+        """
+
+        @param node_init: start node for DFS initial graph
+        @param node_updated: start node for DFS updated graph
+        """
         pass
 
     # common method for all subclasses
@@ -45,11 +50,11 @@ class DirectedSubgraphDiff(abc.ABC):
 
         # queries all directed children, their relType and their node hashes
 
-        cypher = neo4jQueryFactory.GetChildNodesByParentNodeId(label, parent_node_id)
+        cypher = Neo4jQueryFactory.GetChildNodesByParentNodeId(label, parent_node_id)
         raw = self.connector.run_cypher_statement(cypher)
 
-        # unpack neo4j response into a list if NodeData instances
-        res = NodeData.fromNeo4jResponseWithRel(raw)
+        # unpack neo4j response into a list if NodeItem instances
+        res = NodeItem.fromNeo4jResponseWithRel(raw)
 
         # check if leave node got touched
         if len(res) == 0:
@@ -79,9 +84,9 @@ class DirectedSubgraphDiff(abc.ABC):
         return return_list
 
     def __getNodeDataByNodeId(self, nodeId): 
-        cypher = neo4jQueryFactory.GetNodeDataById(nodeId)
+        cypher = Neo4jQueryFactory.get_node_data_by_id(nodeId)
         raw = self.connector.run_cypher_statement(cypher)
 
-        # unpack neo4j response into a list if NodeData instances
-        res = NodeData.fromNeo4jResponseWouRel(raw)
+        # unpack neo4j response into a list if NodeItem instances
+        res = NodeItem.fromNeo4jResponseWouRel(raw)
         return res

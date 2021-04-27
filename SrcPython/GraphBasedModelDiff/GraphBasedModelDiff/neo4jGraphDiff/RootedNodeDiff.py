@@ -1,15 +1,15 @@
 
-from .DiffUtilities import DiffUtilities
-from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jQueryUtils
-from neo4j_middleware.neo4jQueryFactory import neo4jQueryFactory 
-from neo4j_middleware.NodeData import NodeData 
+from .SetCalculator import SetCalculator
+from neo4j_middleware.Neo4jQueryUtilities import Neo4jQueryUtilities as neo4jQueryUtils
+from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from neo4j_middleware.NodeItem import NodeItem
 from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum
 
 class RootedNodeDiff:
 	""" """
 	def __init__(self, connector, configuration): 
 		self.configuration = configuration
-		self.utils = DiffUtilities()
+		self.utils = SetCalculator()
 		self.connector = connector
 		pass
 
@@ -32,22 +32,22 @@ class RootedNodeDiff:
 
 		for node in nodes_init: 
 			# load hash value
-			cy = neo4jQueryFactory.GetHashByNodeId(label_init, node.id, attr_ignore_list) 
+			cy = Neo4jQueryFactory.get_hash_by_nodeId(label_init, node.id, attr_ignore_list)
 			res = self.connector.run_cypher_statement(cy)
 			node.hash = res[0][0]
 
 			# load attributes
-			cy = neo4jQueryFactory.GetNodePropertiesById(node.id)
+			cy = Neo4jQueryFactory.get_node_properties_by_id(node.id)
 			res = self.connector.run_cypher_statement(cy)
 			node.setNodeAttributes(res[0][0])
 
 		for node in nodes_updated: 
-			cy = neo4jQueryFactory.GetHashByNodeId(label_updated, node.id, attr_ignore_list)
+			cy = Neo4jQueryFactory.get_hash_by_nodeId(label_updated, node.id, attr_ignore_list)
 			res = self.connector.run_cypher_statement(cy)
 			node.hash = res[0][0]
 
 			# load attributes
-			cy = neo4jQueryFactory.GetNodePropertiesById(node.id)
+			cy = Neo4jQueryFactory.get_node_properties_by_id(node.id)
 			res = self.connector.run_cypher_statement(cy)
 			node.setNodeAttributes(res[0][0])
 
@@ -57,7 +57,8 @@ class RootedNodeDiff:
 		if self.toConsole():
 			print('Matching Method for rooted nodes: {}'.format(matchingMethod))
 
-		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.CompareNodes(nodes_init, nodes_updated, matchingMethod)
+		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.compare_nodes(nodes_init, nodes_updated,
+																				 matchingMethod)
 
 		if self.toConsole(): 
 			print('Unchanged rooted nodes: {}'.format(nodes_unchanged))
@@ -72,7 +73,7 @@ class RootedNodeDiff:
 
 
 	def __getHashesOfRootedNodes(self, label):
-		cy = neo4jQueryFactory.GetHashesByLabel(label)
+		cy = Neo4jQueryFactory.GetHashesByLabel(label)
 		raw = self.connector.run_cypher_statement(cy)
 		return self.__extractHashes(raw)
 		
@@ -80,18 +81,18 @@ class RootedNodeDiff:
 	def __extractHashes(self, result): 
 		nodes = []
 		for res in result: 
-			node = NodeData(res[0],None, res[1])
+			node = NodeItem(res[0], None, res[1])
 			node.setHash(res[2])
 			nodes.append(node)
 	
 		return nodes
 
 	def __getRootedNodes(self, label): 
-		cy = neo4jQueryFactory.GetRootedNodes(label)
+		cy = Neo4jQueryFactory.get_primary_nodes(label)
 		raw = self.connector.run_cypher_statement(cy)
 
-		# unpack neo4j response into a list if NodeData instances
-		res = NodeData.fromNeo4jResponseWouRel(raw)
+		# unpack neo4j response into a list if NodeItem instances
+		res = NodeItem.fromNeo4jResponseWouRel(raw)
 
 		return res
 

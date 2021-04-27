@@ -6,11 +6,11 @@ import queue
 import asyncio
 
 from neo4j_middleware.neo4jConnector import Neo4jConnector
-from neo4j_middleware.neo4jQueryUtilities import neo4jQueryUtilities as neo4jUtils
+from neo4j_middleware.Neo4jQueryUtilities import Neo4jQueryUtilities as neo4jUtils
 
 from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
 
-from neo4jGraphDiff.DepthFirstSearchComparison import DepthFirstSearchComparison
+from neo4jGraphDiff.DfsIsomorphismCalculator import DfsIsomorphismCalculator
 
 from neo4jGraphDiff.Configurator import Configurator
 from neo4jGraphDiff.Reporter import Report
@@ -29,8 +29,8 @@ connector.connect_driver()
 #label_updated = "ts20210119T085407" # different rep
 
 ## cuboid sample with height elevation 
-#label_init = "ts20210119T085408" # different rep
-#label_updated = "ts20210119T085409"	# different rep, modified height
+label_init = "ts20210119T085408" # different rep
+label_updated = "ts20210119T085409"	# different rep, modified height
 
 ## cuboid sample with cuboid vs cylinder
 #label_init = "ts20210119T085410"	# cuboid
@@ -44,9 +44,9 @@ connector.connect_driver()
 #label_init = "ts20200713T083450"
 #label_updated = "ts20200713T083447"
 
-### Residential
-label_init = "ts20210219T121203"
-label_updated = "ts20210219T121608"
+#### Residential
+#label_init = "ts20210219T121203"
+#label_updated = "ts20210219T121608"
 
 ## 4x3 Bridges
 #label_init = "ts20210118T211240"
@@ -54,8 +54,8 @@ label_updated = "ts20210219T121608"
 
 async def main():
 	# set config
-	#config = Configurator.relTypeConfig()
-	config = Configurator.on_guid_config()
+	config = Configurator.rel_type_config()
+	#config = Configurator.on_guid_config()
 	print(config)
 	print(config.DiffSettings)
 
@@ -79,7 +79,7 @@ async def main():
 	print('\nCOMPONENT DIFF \n')
 
 	# 2: Check sub-graphs for each rooted node
-	DiffEngine = DepthFirstSearchComparison(connector, label_init, label_updated, config)
+	DiffEngine = DfsIsomorphismCalculator(connector, label_init, label_updated, config)
 
 	all_tasks = []
 
@@ -89,7 +89,7 @@ async def main():
 		print('[TASK] Compare objects with root nodeIDs {}'.format(pair))
 	
 		# run component diff
-		task = asyncio.create_task(DiffEngine.diffSubgraphsAsync(node_init, node_updated))
+		task = asyncio.create_task(DiffEngine.diff_subgraphs_async(node_init, node_updated))
 		all_tasks.append(task)
 	
 	tic = time.process_time()

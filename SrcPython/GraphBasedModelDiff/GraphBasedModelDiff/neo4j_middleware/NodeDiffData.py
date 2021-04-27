@@ -1,6 +1,4 @@
 
-
-
 class NodeDiffData:
     """description of class"""
 
@@ -12,27 +10,25 @@ class NodeDiffData:
 
     @classmethod
     def fromNeo4jResponse(cls, raw):
-        ret_val = cls(raw[0][0]['inCommon'], raw[0][0]['different'],raw[0][0]['rightOnly'], raw[0][0]['leftOnly'] )
+        ret_val = cls(raw[0][0]['inCommon'], raw[0][0]['different'] ,raw[0][0]['rightOnly'], raw[0][0]['leftOnly'] )
         return ret_val
 
     def __str__(self): 
         return 'unchanged: {}, modified: {}, added: {}, deleted: {}'.format(self.AttrsUnchanged, self.AttrsModified, self.AttrsAdded, self.AttrsDeleted)
 
-    
     def __repr__(self):
         return 'NodeDiffData object'
 
     def nodesAreSimilar(self): 
         """ reports if the diffed nodes are similar based in their attributes """
-        if (self.AttrsAdded == {} and self.AttrsDeleted == {} and self.AttrsModified == {} ):
+        if self.AttrsAdded == {} and self.AttrsDeleted == {} and self.AttrsModified == {} :
             return True
         else:
             return False
 
-
     def nodesHaveUpdatedAttrs(self):
         """ reports if the diffed nodes share the same attributes but with different values """
-        if (self.AttrsModified != {} and self.AttrsDeleted == {} and self.AttrsAdded == {}):
+        if self.AttrsModified != {} and self.AttrsDeleted == {} and self.AttrsAdded == {}:
             return True
         else:
             return False

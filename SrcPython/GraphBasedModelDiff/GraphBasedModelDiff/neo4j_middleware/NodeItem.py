@@ -1,4 +1,4 @@
-class NodeData:
+class NodeItem:
     """description of class"""
 
     def __init__(self, id, relType, entityType= None):
@@ -6,12 +6,13 @@ class NodeData:
         self.entityType = entityType
         self.hash = None
         self.relType = relType
+        self.attrs = None
         
     def setHash(self, hash): 
         self.hash = hash
 
     def __repr__(self):
-        return 'NodeData: id: {} entityType: {}'.format(self.id, self.entityType)
+        return 'NodeItem: id: {} entityType: {}'.format(self.id, self.entityType)
 
     @classmethod
     def fromNeo4jResponseWithRel(cls, raw):
@@ -25,7 +26,7 @@ class NodeData:
     def fromNeo4jResponseWouRel(cls, raw):
         ret_val = []
         for inst in raw: 
-            child = cls(id= inst[0], relType = None, entityType=inst[1]) 
+            child = cls(id=inst[0], relType=None, entityType=inst[1])
             ret_val.append(child)
         return ret_val
 
