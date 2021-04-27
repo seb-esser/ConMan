@@ -13,7 +13,7 @@ from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
 from neo4jGraphDiff.DfsIsomorphismCalculator import DfsIsomorphismCalculator
 
 from neo4jGraphDiff.Configurator import Configurator
-from neo4jGraphDiff.Reporter import Report
+from neo4jGraphDiff.PatchGenerator import PatchGenerator
 
 # -- ... --
 connector = Neo4jConnector(False, False)
@@ -60,7 +60,7 @@ async def main():
 	print(config.DiffSettings)
 
 	# init report 
-	report = Report(None, config)
+	report = PatchGenerator(None, config)
 
 	cypher = []
 

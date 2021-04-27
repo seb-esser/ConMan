@@ -8,7 +8,7 @@ from neo4jGraphDiff.DiffResult import DiffResult
 """ class def """
 
 
-class Report:
+class PatchGenerator:
     """description of class"""
 
     def __init__(self, result=None, usedConfig=None):
