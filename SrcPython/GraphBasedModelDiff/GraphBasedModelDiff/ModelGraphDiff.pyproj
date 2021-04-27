@@ -5,7 +5,7 @@
     <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>script_GraphBasedModelDiff.py</StartupFile>
+    <StartupFile>script_calcAdjacencyOfPrimaryNodes.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -25,6 +25,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="common_base\ifcMapper.py" />
+    <Compile Include="neo4jGraphAnalysis\AdjacencyAnalyser.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="neo4jGraphDiff\DiffResult.py">
       <SubType>Code</SubType>
     </Compile>
@@ -64,6 +67,9 @@
     <Compile Include="neo4j_middleware\NodeDiffData.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="script_calcAdjacencyOfPrimaryNodes.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="script_GraphBasedModelDiff.py" />
     <Compile Include="grGen_middleware\ifcGrGen_SchemaMapper.py" />
     <Compile Include="neo4jGraphDiff\DiffIgnore_parser.py" />
@@ -79,14 +85,12 @@
     <Compile Include="neo4j_middleware\Neo4jQueryFactory.py" />
     <Compile Include="neo4j_middleware\Neo4jQueryUtilities.py" />
     <Compile Include="networkX_middleware\ifcNetworkXMapper.py" />
-    <Compile Include="script_GrGen.py" />
     <Compile Include="script_parseIFCjson.py" />
     <Compile Include="script_nxMapper.py" />
     <Compile Include="script_parseIFCp21.py" />
     <Compile Include="script_parseRailML.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="script_SimilarityDiscussion - Copy.py" />
     <Compile Include="script_SimilarityDiscussion.py" />
     <Compile Include="script_testingAround.py">
       <SubType>Code</SubType>

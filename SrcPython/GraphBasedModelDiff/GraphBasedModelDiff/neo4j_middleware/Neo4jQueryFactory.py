@@ -83,11 +83,11 @@ class Neo4jQueryFactory:
             # close
             ignore_str = ignore_str + ']'
 
-        calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash RETURN hash'.format(ignore_str)
+            calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash RETURN hash'.format(ignore_str)
 
         close_sub = '}'
         add_label_again = 'SET n:{}'.format(label)
-        return_results = 'RETURN hash, n.entityType, ID(n)'
+        return_results = 'RETURN hash'
         return neo4jUtils.BuildMultiStatement([getModel, where, open_sub, removeLabel, calc_fingerprint, close_sub, add_label_again, return_results])
 
 

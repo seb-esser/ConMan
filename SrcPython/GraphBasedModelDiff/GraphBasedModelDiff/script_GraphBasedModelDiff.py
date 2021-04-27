@@ -74,7 +74,7 @@ async def main():
 	[nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated)
 
 	# save results to report
-    report.capture_result_primary([nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted])
+	report.capture_result_primary([nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted])
 
 	print('\nCOMPONENT DIFF \n')
 

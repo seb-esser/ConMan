@@ -13,6 +13,9 @@ class NodeItem:
     def setHash(self, hash): 
         self.hash = hash
 
+    def get_hash(self):
+        return self.hash
+
     def __repr__(self):
         return 'NodeItem: id: {} entityType: {}'.format(self.id, self.entityType)
 
