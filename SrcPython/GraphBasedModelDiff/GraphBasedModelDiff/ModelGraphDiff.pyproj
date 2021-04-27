@@ -28,12 +28,14 @@
     <Compile Include="neo4jGraphAnalysis\AdjacencyAnalyser.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="neo4jGraphDiff\DiffIgnore.py" />
     <Compile Include="neo4jGraphDiff\DiffResult.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphDiff\ConfiguratorEnums.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="neo4jGraphDiff\PatchGenerator.py" />
     <Compile Include="neo4j_middleware\railML_neo4jMapper.py">
       <SubType>Code</SubType>
     </Compile>
@@ -50,9 +52,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphDiff\SetCalculator.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="neo4jGraphDiff\Reporter.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphDiff\Result.py">
@@ -72,7 +71,6 @@
     </Compile>
     <Compile Include="script_GraphBasedModelDiff.py" />
     <Compile Include="grGen_middleware\ifcGrGen_SchemaMapper.py" />
-    <Compile Include="neo4jGraphDiff\DiffIgnore_parser.py" />
     <Compile Include="neo4j_middleware\ifcGrGen_SchemaMapper.py" />
     <Compile Include="neo4j_middleware\IFCjson_neo4jMapper.py" />
     <Compile Include="neo4j_middleware\IFCGraphGenerator.py">
