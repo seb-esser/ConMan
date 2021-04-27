@@ -1,5 +1,7 @@
 class NodeItem:
-    """description of class"""
+    """
+    reflects the node structure from neo4j
+    """
 
     def __init__(self, id, relType, entityType= None):
         self.id = id

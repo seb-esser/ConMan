@@ -74,7 +74,7 @@ async def main():
 	[nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(label_init, label_updated)
 
 	# save results to report
-	report.CaptureResult_RootedDiff([nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted])
+    report.capture_result_primary([nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted])
 
 	print('\nCOMPONENT DIFF \n')
 
@@ -94,8 +94,8 @@ async def main():
 	
 	tic = time.process_time()
 	result = await asyncio.gather(*all_tasks)
-	for res in result: 
-		report.CaptureResult_ComponentDiff(res)
+	for res in result:
+		report.capture_result_secondary(res)
 	toc = time.process_time()
 	elapsed = toc - tic
 	print('\nOverall time elapsed: {}\n'.format(elapsed))

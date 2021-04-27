@@ -127,7 +127,7 @@ class LoggingSettings:
 
         return cls(bool_console, bool_file, logPath, levelConsole, levelFile)
 
-    def ToJson(self):
+    def to_json(self):
         """ write instance to JSON """
         raise Exception('This method is not implemented yet')
 

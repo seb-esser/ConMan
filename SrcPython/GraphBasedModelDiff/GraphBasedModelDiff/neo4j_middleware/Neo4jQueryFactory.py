@@ -92,7 +92,7 @@ class Neo4jQueryFactory:
 
 
     @classmethod
-    def get_child_nodes_by_parent_nodeId(cls, label: str, parent_node_id: int) -> str:
+    def get_child_nodes(cls, label: str, parent_node_id: int) -> str:
         """
         search for all nodes that have an incoming edge from the specified parent node and carries the similar label
         @param label: model identifier

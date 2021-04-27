@@ -28,12 +28,11 @@ class DirectedSubgraphDiff(abc.ABC):
         self.label_updated = label_updated
 
     def toConsole(self):
-        """ helper method to trigger printToConsole """ 
-        if self.configuration.LogSettings.logToConsole == True:
+        """ helper method to trigger printToConsole """
+        if self.configuration.LogSettings.logToConsole:
             return True
         else:
             return False
-
 
     # abstract definition of diffSubgraphs() method, implemented in HashDiff and CompareDiff classes
     @abc.abstractmethod
@@ -46,11 +45,11 @@ class DirectedSubgraphDiff(abc.ABC):
         pass
 
     # common method for all subclasses
-    def __getChildren(self, label, parent_node_id, indent=0):
+    def __get_child_nodes(self, label, parent_node_id, indent=0):
 
         # queries all directed children, their relType and their node hashes
 
-        cypher = Neo4jQueryFactory.get_child_nodes_by_parent_nodeId(label, parent_node_id)
+        cypher = Neo4jQueryFactory.get_child_nodes(label, parent_node_id)
         raw = self.connector.run_cypher_statement(cypher)
 
         # unpack neo4j response into a list if NodeItem instances
@@ -64,11 +63,11 @@ class DirectedSubgraphDiff(abc.ABC):
 
     def __applyDiffIgnore_Nodes(self, node_list):
         """ removes nodes from a list if their type is set to be ignored """
-        
+
         # ToDo: Logging: Add info statement that ingoreNodes got applied. 
 
         # get entity types that shall be ignored in the subgraph diff
-        ignore_entityTypes = self.configuration.DiffSettings.diffIgnoreEntityTypes # list of strings
+        ignore_entityTypes = self.configuration.DiffSettings.diffIgnoreEntityTypes  # list of strings
 
         # stop here if no entityTypes should be ignored
         if len(ignore_entityTypes) == 0:
@@ -83,7 +82,12 @@ class DirectedSubgraphDiff(abc.ABC):
         # ToDo: Logging: Add info statement if nodes got removed or not
         return return_list
 
-    def __getNodeDataByNodeId(self, nodeId): 
+    def __get_node_data_by_id(self, nodeId: int):
+        """
+        executes a cypher query to get some node data
+        @param nodeId:
+        @return:
+        """
         cypher = Neo4jQueryFactory.get_node_data_by_id(nodeId)
         raw = self.connector.run_cypher_statement(cypher)
 
