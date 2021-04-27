@@ -46,7 +46,7 @@ class Neo4jQueryFactory:
         @param label:
         @return: cypher query string
         """
-        match = 'MATCH (n:primaryNode:{}) '.format(label)
+        match = 'MATCH (n:PrimaryNode:{}) '.format(label)
         ret_statement = 'RETURN ID(n), n.entityType'
         return neo4jUtils.BuildMultiStatement([match, ret_statement])
 
@@ -59,6 +59,7 @@ class Neo4jQueryFactory:
         @param attrIgnoreList: attributes to be ignored in the hash calculation
         @return: cypher query string
         """
+
         getModel = 'MATCH(n:{})'.format(label)
         where = 'WHERE ID(n) = {}'.format(nodeId)
 
@@ -67,10 +68,9 @@ class Neo4jQueryFactory:
         removeLabel = 'REMOVE n:{}'.format(label)
 
         # apply diffIgnore attributes if staged
-        if attrIgnoreList is None:
-            calc_fingerprint = 'WITH APOC.hashing.fingerprint(n) as hash RETURN hash'
+        if attrIgnoreList == None:
+            calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash RETURN hash'
         else:
-
             # open
             ignore_str = '['
 
@@ -83,13 +83,13 @@ class Neo4jQueryFactory:
             # close
             ignore_str = ignore_str + ']'
 
-            calc_fingerprint = 'with APOC.hashing.fingerprint(n, {}) as hash RETURN hash'.format(ignore_str)
+        calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash RETURN hash'.format(ignore_str)
 
         close_sub = '}'
         add_label_again = 'SET n:{}'.format(label)
         return_results = 'RETURN hash, n.entityType, ID(n)'
-        return neo4jUtils.BuildMultiStatement(
-            [getModel, where, open_sub, removeLabel, calc_fingerprint, close_sub, add_label_again, return_results])
+        return neo4jUtils.BuildMultiStatement([getModel, where, open_sub, removeLabel, calc_fingerprint, close_sub, add_label_again, return_results])
+
 
     @classmethod
     def get_child_nodes_by_parent_nodeId(cls, label: str, parent_node_id: int) -> str:

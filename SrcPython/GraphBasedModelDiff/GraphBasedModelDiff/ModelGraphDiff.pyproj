@@ -5,7 +5,7 @@
     <ProjectGuid>e190234a-958c-4cfb-b85a-0940e08d9177</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>script_parseIFCp21.py</StartupFile>
+    <StartupFile>script_GraphBasedModelDiff.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -32,9 +32,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4j_middleware\railML_neo4jMapper.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="script_GraphDiff-withConfig.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="neo4jGraphAnalysis\SCC.py">

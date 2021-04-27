@@ -50,7 +50,7 @@ class DirectedSubgraphDiff(abc.ABC):
 
         # queries all directed children, their relType and their node hashes
 
-        cypher = Neo4jQueryFactory.GetChildNodesByParentNodeId(label, parent_node_id)
+        cypher = Neo4jQueryFactory.get_child_nodes_by_parent_nodeId(label, parent_node_id)
         raw = self.connector.run_cypher_statement(cypher)
 
         # unpack neo4j response into a list if NodeItem instances
