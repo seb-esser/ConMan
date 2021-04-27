@@ -51,6 +51,17 @@ class Neo4jQueryFactory:
         return neo4jUtils.BuildMultiStatement([match, ret_statement])
 
     @classmethod
+    def get_connection_nodes(cls, label: str) -> str: 
+        """
+        Queries all primary nodes, which have the given label attached.
+        @param label:
+        @return: cypher query string
+        """
+        match = 'MATCH (n:ConnectionNode:{}) '.format(label)
+        ret_statement = 'RETURN ID(n), n.entityType'
+        return neo4jUtils.BuildMultiStatement([match, ret_statement])
+
+    @classmethod
     def get_hash_by_nodeId(cls, label: str, nodeId: int, attrIgnoreList=None) -> str:
         """
         Calculates the hash sum over a given node. Use attrIgnoreList to specify attribute names that should be excluded when calculating the hash
@@ -127,6 +138,19 @@ class Neo4jQueryFactory:
         where = 'WHERE ID(n) = {}'.format(nodeId)
         ret = 'RETURN properties(n)'
         return neo4jUtils.BuildMultiStatement([match, where, ret])
+
+    @classmethod
+    def nodes_are_connected(cls, node_id_a: int, node_id_b: int) -> str:
+        """
+        checks if two given nodes have a directed edge from a to b
+        @param node_id_a: node a 
+        @param node_id_b: node b
+        @return: cypher query string
+        """
+        match_a = 'MATCH (n) WHERE ID(n) = 1'
+        match_b = 'MATCH (m) WHERE ID(m) = 2'
+        ret = 'RETURN exists((n)-[]->(m)) as are_connected'
+        return neo4jUtils.BuildMultiStatement([match_a, match_b, ret])
 
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --
