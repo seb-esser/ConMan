@@ -14,7 +14,7 @@ class SetCalculator(object):
 	def __init__(self):
 		pass
 
-	def compare_nodes(self, set_A: list, set_B: list, intersection_method: MatchCriteriaEnum):
+	def calc_intersection(self, set_A: list, set_B: list, intersection_method: MatchCriteriaEnum):
 		"""
 		Calculates the boolean intersection between two node sets and returns the intersection set + the diff sets
 		@param set_A: a (distinct) node set A
@@ -51,7 +51,16 @@ class SetCalculator(object):
 		
 		return nodes_unchanged, nodes_added, nodes_deleted
 
-	# ---- Matching rules ---- 
+	def calc_cartesian_product(self, set_a: list, set_b: list) -> list:
+		"""
+		calculates the cartesian product between two given sets
+		@param set_a:
+		@param set_b:
+		@return: a list of tuples
+		"""
+		return [(a,b) for a in set_a for b in set_b]
+
+	# ---- Matching rules ----
 
 	def __get_intersection_byHash(self, A, B):
 		"""
@@ -106,3 +115,5 @@ class SetCalculator(object):
 		@return: a list of tuples as the result of the intersection operation
 		"""
 		return ((x, y) for x, y in itertools.product(A, B) if x.attrs['GlobalId'] == y.attrs['GlobalId'])
+
+	

@@ -2,6 +2,8 @@ import numpy as np
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 from neo4j_middleware.NodeItem import NodeItem
+from neo4jGraphDiff.SetCalculator import SetCalculator
+
 
 class AdjacencyAnalyser(object):
     """description of class"""
@@ -35,17 +37,20 @@ class AdjacencyAnalyser(object):
             raw_response = self.connector.run_cypher_statement(cy, 'hash')
             n.setHash(raw_response[0])
 
-        # sort nodes by their hashsums
-        print('nodes in unsorted order: ')
-        for n in nodes: 
-            print(n.hash)
-
-        print('\nnodes in sorted order: ')
+        # sort nodes by their hashsums      
         sorted_nodes = sorted(nodes, key=lambda nodeItem: nodeItem.hash)
-        for n in sorted_nodes: 
-            print(n.hash)
-
+        
         # build adjacency matrix
+        calculator = SetCalculator()
+        cartesian_prod = calculator.calc_cartesian_product(sorted_nodes, sorted_nodes)
+
+        # query adjacency values
+        for pair in cartesian_prod: 
+            print('{} \t {}'.format(pair[0].id, pair[1].id))
+            cy = Neo4jQueryFactory.nodes_are_connected(pair[0].id, pair[1].id)
+            raw_response = self.connector.run_cypher_statement(cy)
+            print(raw_response)
+
         a = 1
 
 

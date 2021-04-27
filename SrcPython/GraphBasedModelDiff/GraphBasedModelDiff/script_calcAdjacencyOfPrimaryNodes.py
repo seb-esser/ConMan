@@ -3,7 +3,7 @@ from neo4j_middleware.neo4jConnector import Neo4jConnector
 from neo4jGraphAnalysis.AdjacencyAnalyser import AdjacencyAnalyser
 
 # init connection
-connector = Neo4jConnector()
+connector = Neo4jConnector(writeToConsole=False, writeToLogFile=False)
 connector.connect_driver()
 
 

@@ -147,8 +147,8 @@ class Neo4jQueryFactory:
         @param node_id_b: node b
         @return: cypher query string
         """
-        match_a = 'MATCH (n) WHERE ID(n) = 1'
-        match_b = 'MATCH (m) WHERE ID(m) = 2'
+        match_a = 'MATCH (n) WHERE ID(n) = {}'.format(node_id_a)
+        match_b = 'MATCH (m) WHERE ID(m) = {}'.format(node_id_b)
         ret = 'RETURN exists((n)-[]->(m)) as are_connected'
         return neo4jUtils.BuildMultiStatement([match_a, match_b, ret])
 

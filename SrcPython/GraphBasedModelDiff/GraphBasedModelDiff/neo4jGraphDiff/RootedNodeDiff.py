@@ -57,8 +57,8 @@ class RootedNodeDiff:
 		if self.toConsole():
 			print('Matching Method for rooted nodes: {}'.format(matchingMethod))
 
-		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.compare_nodes(nodes_init, nodes_updated,
-																				 matchingMethod)
+		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(nodes_init, nodes_updated,
+                                                                                     matchingMethod)
 
 		if self.toConsole(): 
 			print('Unchanged rooted nodes: {}'.format(nodes_unchanged))

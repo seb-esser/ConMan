@@ -67,8 +67,8 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
         children_updated = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_updated)
 
         # compare children and raise an unsimilarity if necessary.
-        [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.compare_nodes(children_init, children_updated,
-                                                                                 desiredMatchMethod)
+        [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(children_init, children_updated,
+                                                                                     desiredMatchMethod)
 
         if self.toConsole():
             print('')
