@@ -17,7 +17,10 @@ class AdjacencyAnalyser(object):
 
 
     def get_adjacency_matrix(self, label): 
-
+        """
+        calculates the adjacency matrix ordered by ascending hashsums
+        @label: graph identifier, which the primary and connection nodes get queried from
+        """
         # get all node ids of primary and connection nodes of one model
         cy_primary = Neo4jQueryFactory.get_primary_nodes(label)
         cy_con = Neo4jQueryFactory.get_connection_nodes(label)
@@ -44,15 +47,24 @@ class AdjacencyAnalyser(object):
         calculator = SetCalculator()
         cartesian_prod = calculator.calc_cartesian_product(sorted_nodes, sorted_nodes)
 
+        vals = []
         # query adjacency values
         for pair in cartesian_prod: 
             print('{} \t {}'.format(pair[0].id, pair[1].id))
             cy = Neo4jQueryFactory.nodes_are_connected(pair[0].id, pair[1].id)
             raw_response = self.connector.run_cypher_statement(cy)
-            print(raw_response)
+            print(raw_response[0]['are_connected'])
+            con = raw_response[0]['are_connected']
+            if con is True:
+                vals.append(1)
+            else: 
+                vals.append(0)
 
-        a = 1
+        dims = len(sorted_nodes)
+        adj_mtx = np.array(vals).reshape(dims,dims)
+        print(adj_mtx)
 
+        return adj_mtx 
 
 
 
