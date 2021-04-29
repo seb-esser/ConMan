@@ -50,10 +50,11 @@ class AdjacencyAnalyser(object):
         vals = []
         # query adjacency values
         for pair in cartesian_prod: 
-            print('{} \t {}'.format(pair[0].id, pair[1].id))
+            # check if rel exists
             cy = Neo4jQueryFactory.nodes_are_connected(pair[0].id, pair[1].id)
+            # run cypher query
             raw_response = self.connector.run_cypher_statement(cy)
-            print(raw_response[0]['are_connected'])
+            # encode response
             con = raw_response[0]['are_connected']
             if con is True:
                 vals.append(1)
