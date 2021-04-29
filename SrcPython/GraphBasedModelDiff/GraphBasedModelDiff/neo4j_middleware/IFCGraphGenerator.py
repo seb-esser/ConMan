@@ -141,13 +141,8 @@ class IFCGraphGenerator(IfcMapper):
             
             # detecting atomic attribute but encapsulated in tuple
             elif isinstance(val, tuple) and key in special_key_names:
-                
-                for tuple_val in range(len(val)): 
-                    cur_key = 'value{}'.format(tuple_val)
-                    cur_val = val[tuple_val]
-                    # ToDo: numeric issue here!
-                    filtered_attrs[cur_key] = filtered_attrs[key] = float("{:.2f}".format(cur_val))
-            
+                filtered_attrs[key] = str(val)
+
             # detecting a list of child entities (again encapsulated as a list)
             elif isinstance(val, tuple) and len(val) > 1 and key not in special_key_names: 
 

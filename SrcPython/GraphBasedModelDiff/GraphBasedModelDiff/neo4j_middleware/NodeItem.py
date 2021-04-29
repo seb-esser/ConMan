@@ -61,5 +61,9 @@ class NodeItem:
         for key, val in self.attrs.items():
             if val != 'None':
                 cleared_dict[key] = val
-
+            if key in ['Coordinates', 'DirectionRatios']:
+                cleared_dict[key] = eval(val)
         self.attrs = cleared_dict
+
+
+
