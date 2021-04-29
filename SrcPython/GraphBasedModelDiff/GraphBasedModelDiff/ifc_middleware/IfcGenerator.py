@@ -40,6 +40,22 @@ class IfcGenerator:
         except:
             raise Exception("Error in creating ifc entity. ")
 
+    def build_association(self, parent_node_id, child_node_id, association_name):
+        spf_id_parent = self.node_id_2_spf_id[parent_node_id]
+        spf_id_child = self.node_id_2_spf_id[child_node_id]
+
+        parent = self.model.by_id(spf_id_parent)
+        child = self.model.by_id(spf_id_child)
+
+
+        # classical approach
+        # parent.ObjectPlacement = child
+        # dynamic lookup of association attribute
+        try:
+            setattr(parent, association_name, child)
+        except:
+            pass
+
     def save_model(self, path) -> bool:
         """
         writes the IFC model into a file
