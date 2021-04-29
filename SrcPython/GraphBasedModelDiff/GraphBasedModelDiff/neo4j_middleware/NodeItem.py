@@ -52,8 +52,9 @@ class NodeItem:
         removes entityType and p21_id from attr dict
         @return:
         """
-        self.attrs.pop("entityType")
-        self.attrs.pop("p21_id")
+        self.attrs.pop("entityType", None)
+        self.attrs.pop("p21_id", None)
+        self.attrs.pop('relType', None)
 
         # remove attrs that have a none value assigned
         cleared_dict = {}
