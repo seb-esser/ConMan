@@ -13,7 +13,7 @@ from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
 from neo4jGraphDiff.DfsIsomorphismCalculator import DfsIsomorphismCalculator
 
 from neo4jGraphDiff.Configurator import Configurator
-from neo4jGraphDiff.PatchGenerator import PatchGenerator
+from neo4jGraphDiff.ResultGenerator import ResultGenerator
 
 # -- ... --
 connector = Neo4jConnector(False, False)
@@ -60,7 +60,7 @@ async def main():
 	print(config.DiffSettings)
 
 	# init report 
-	report = PatchGenerator(None, config)
+	report = ResultGenerator(None, config)
 
 	cypher = []
 
@@ -100,7 +100,7 @@ async def main():
 	elapsed = toc - tic
 	print('\nOverall time elapsed: {}\n'.format(elapsed))
 	# show result on console
-	report.printResultToConsole()
+	report.print_report()
 	#report.printTimeFigures()
 
 asyncio.run(main())

@@ -47,8 +47,8 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
                                                                                             node_updated.id))
 
         # get children data
-        children_init = self._DirectedSubgraphDiff__getChildren(self.label_init, node_init.id, indent + 1)
-        children_updated = self._DirectedSubgraphDiff__getChildren(self.label_updated, node_updated.id, indent + 1)
+        children_init = self.get_children_nodes(self.label_init, node_init.id, indent + 1)
+        children_updated = self.get_children_nodes(self.label_updated, node_updated.id, indent + 1)
 
         # leave node?
         if len(children_init) == 0 and len(children_updated) == 0:
@@ -59,8 +59,8 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
         # calc hashes if necessary for matching method
         if desiredMatchMethod == MatchCriteriaEnum.OnHash:
             # calc hashes for init and updated
-            childs_init = self.__getHashesOfNodes(self.label_init, children_init, indent)
-            childs_updated = self.__getHashesOfNodes(self.label_updated, children_updated, indent)
+            childs_init = self.__get_hashes_of_nodes(self.label_init, children_init, indent)
+            childs_updated = self.__get_hashes_of_nodes(self.label_updated, children_updated, indent)
 
         # apply DiffIgnore -> Ignore nodes if requested        
         children_init = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_init)
@@ -179,8 +179,14 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
 
         return diff_result_container
 
-    def __getHashesOfNodes(self, label, nodeList, indent=0):
-        return_val = []
+    def __get_hashes_of_nodes(self, label: str, nodeList: list, indent=0) -> list:
+        """
+        calculates the hash sum for each node in a given node list
+        @param label: the model identifier
+        @param nodeList:
+        @param indent:
+        @return:
+        """
 
         ignore_attrs = self.configuration.DiffSettings.diffIgnoreAttrs  # list of strings
         # calc corresponding hash

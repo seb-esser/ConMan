@@ -35,7 +35,7 @@
     <Compile Include="neo4jGraphDiff\ConfiguratorEnums.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="neo4jGraphDiff\PatchGenerator.py" />
+    <Compile Include="neo4jGraphDiff\ResultGenerator.py" />
     <Compile Include="neo4j_middleware\railML_neo4jMapper.py">
       <SubType>Code</SubType>
     </Compile>

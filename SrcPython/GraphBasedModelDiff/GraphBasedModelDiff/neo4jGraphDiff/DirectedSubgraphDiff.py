@@ -45,8 +45,14 @@ class DirectedSubgraphDiff(abc.ABC):
         pass
 
     # common method for all subclasses
-    def __get_child_nodes(self, label, parent_node_id, indent=0):
-
+    def get_children_nodes(self, label: str, parent_node_id: int, indent: int = 0) -> list:
+        """
+        Query a list of all direct child nodes to the given parent node
+        @param label: the model label
+        @param parent_node_id:
+        @param indent:
+        @return:
+        """
         # queries all directed children, their relType and their node hashes
 
         cypher = Neo4jQueryFactory.get_child_nodes(label, parent_node_id)

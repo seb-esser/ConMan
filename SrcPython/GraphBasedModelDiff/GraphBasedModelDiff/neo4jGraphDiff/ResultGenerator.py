@@ -8,7 +8,7 @@ from neo4jGraphDiff.DiffResult import DiffResult
 """ class def """
 
 
-class PatchGenerator:
+class ResultGenerator:
     """description of class"""
 
     def __init__(self, result=None, usedConfig=None):
@@ -156,9 +156,5 @@ class PatchGenerator:
         plt.show()
 
     def __str__(self):
-        """ dunder method to pretty print the Reporter object object to console. If results are intented, use print(inst.result)"""
         pass
 
-    def reportToJSON(self):
-        """ formats the result object into a nice json object and returns the json string """
-        pass
