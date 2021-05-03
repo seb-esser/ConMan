@@ -101,6 +101,6 @@ async def main():
 	print('\nOverall time elapsed: {}\n'.format(elapsed))
 	# show result on console
 	report.print_report()
-	#report.printTimeFigures()
+	# report.print_time_plot()
 
 asyncio.run(main())

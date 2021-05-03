@@ -89,8 +89,7 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
         # check the nodes that have the same relationship OR the same EntityType and the same node type: 
         for matchingChildPair in nodes_unchanged:
             # detect changes on property level between both matching nodes
-            diff_result_container = self.__calcPropertyDifference(diff_result_container, matchingChildPair, node_init,
-                                                                  node_updated)
+            diff_result_container = self.__calcPropertyDifference(diff_result_container, node_init, node_updated)
 
             # run recursion for children if "NoChange" or "Modified" happened
             diff_result_container = self.__compare_children(matchingChildPair[0], matchingChildPair[1],
@@ -110,12 +109,17 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
 
         return diff
 
-    def __calcPropertyDifference(self, diff_result_container: DiffResult, matching_child_pair, node_init, node_updated) -> DiffResult:
-        """ runs an analysis on node properties to detect property Modifications """
-
+    def __calcPropertyDifference(self, diff_result_container: DiffResult, node_init: NodeItem, node_updated: NodeItem) -> DiffResult:
+        """
+        calculates if a semantic modification was applied on two nodes
+        @param diff_result_container: reporter instance
+        @param node_init:
+        @param node_updated:
+        @return:
+        """
         # compare two nodes
-        cypher = Neo4jQueryFactory.diff_nodes(matching_child_pair[0].id,
-                                              matching_child_pair[1].id)  # compare childs? or current node?
+        cypher = Neo4jQueryFactory.diff_nodes(node_init.id,
+                                              node_updated.id)  # compare childs? or current node?
         raw = self.connector.run_cypher_statement(cypher)
 
         nodeDifference = NodeDiffData.fromNeo4jResponse(raw)
@@ -149,7 +153,7 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
                 diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
                                                           val_new)
 
-            # case 3: added/deleted attrs. Break recursion
+         # case 3: added/deleted attrs. Break recursion
         else:
             if self.toConsole():
                 print('[RESULT]: detected unsimilarity between nodes {} and {}'.format(node_init.id, node_updated.id))
@@ -165,13 +169,13 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
                 diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
                                                           val_new)
 
-                # log added
+            # log added
             for addedAttr in cleared_nodeDifference.AttrsAdded.items():
                 attr_name = addedAttr[0]
                 val_new = addedAttr[1]
                 diff_result_container.logNodeModification(None, node_updated.id, attr_name, 'added', None, val_new)
 
-                # log deleted
+            # log deleted
             for delAttr in cleared_nodeDifference.AttrsDeleted.items():
                 attr_name = delAttr[0]
                 val_new = delAttr[1]
