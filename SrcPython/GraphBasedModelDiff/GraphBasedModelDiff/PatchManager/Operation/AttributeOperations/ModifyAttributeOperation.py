@@ -1,4 +1,4 @@
-from GraphBasedModelDiff.neo4jGraphDiff.Operation.AttributeOperations.AttributeOperation import AttributeOperation
+from GraphBasedModelDiff.PatchManager.Operation.AttributeOperations.AttributeOperation import AttributeOperation
 
 
 class ModifyAttributeOperation(AttributeOperation):

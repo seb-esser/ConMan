@@ -1,4 +1,4 @@
-from GraphBasedModelDiff.neo4jGraphDiff.Operation.NodeOperations.NodeOperation import NodeOperation
+from GraphBasedModelDiff.PatchManager.Operation.NodeOperations.NodeOperation import NodeOperation
 
 
 class DeleteNodeOperation(NodeOperation):
