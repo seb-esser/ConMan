@@ -1,8 +1,10 @@
 import abc
 
+from neo4jGraphDiff.Configurator import Configurator
 from neo4jGraphDiff.SetCalculator import SetCalculator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.NodeItem import NodeItem
+from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
 class DirectedSubgraphDiff(abc.ABC):
@@ -12,17 +14,17 @@ class DirectedSubgraphDiff(abc.ABC):
     def __init__(self, connector, label_init, label_updated, configuration):
 
         # config contains basic settings about logging and console behavior
-        self.configuration = configuration
+        self.configuration: Configurator = configuration
 
         # utils provides methods to compare two sets of nodes based on specified criteria
         self.utils = SetCalculator()
 
         # the connector is used to perform cypher queries on the neo4j database
-        self.connector = connector
+        self.connector: Neo4jConnector = connector
 
         # labels to identify two graphs resp models
-        self.label_init = label_init
-        self.label_updated = label_updated
+        self.label_init: str = label_init
+        self.label_updated: str = label_updated
 
     def toConsole(self):
         """ helper method to trigger printToConsole """
@@ -33,7 +35,7 @@ class DirectedSubgraphDiff(abc.ABC):
 
     # abstract definition of diffSubgraphs() method, implemented in HashDiff and CompareDiff classes
     @abc.abstractmethod
-    def diff_subgraphs(self, node_init, node_updated):
+    def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem):
         """
 
         @param node_init: start node for DFS initial graph
@@ -42,7 +44,7 @@ class DirectedSubgraphDiff(abc.ABC):
         pass
 
     # common method for all subclasses
-    def get_children_nodes(self, label: str, parent_node_id: int, indent: int = 0) -> list:
+    def get_children_nodes(self, label: str, parent_node_id: int) -> list:
         """
         Query a list of all direct child nodes to the given parent node
         @param label: the model label
@@ -50,8 +52,8 @@ class DirectedSubgraphDiff(abc.ABC):
         @param indent:
         @return:
         """
-        # queries all directed children, their relType and their node hashes
 
+        # queries all directed children, their relType and their node hashes
         cypher = Neo4jQueryFactory.get_child_nodes(label, parent_node_id)
         raw = self.connector.run_cypher_statement(cypher)
 

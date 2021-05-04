@@ -48,8 +48,8 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
                                                                                             node_updated.id))
 
         # get children data
-        children_init = self.get_children_nodes(self.label_init, node_init.id, indent + 1)
-        children_updated = self.get_children_nodes(self.label_updated, node_updated.id, indent + 1)
+        children_init = self.get_children_nodes(self.label_init, node_init.id)
+        children_updated = self.get_children_nodes(self.label_updated, node_updated.id)
 
         # leave node?
         if len(children_init) == 0 and len(children_updated) == 0:
