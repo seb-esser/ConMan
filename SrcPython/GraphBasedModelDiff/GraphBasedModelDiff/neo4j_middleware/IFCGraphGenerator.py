@@ -6,6 +6,7 @@ import ifcopenshell
 from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from common_base.ifcMapper import IfcMapper
+import progressbar
 
 class IFCGraphGenerator(IfcMapper):
     """
@@ -89,9 +90,14 @@ class IFCGraphGenerator(IfcMapper):
 
     # public entry
     def __mapEntities(self, rootedEntities): 
+        # data for progressbar
+        increment = 100/len(rootedEntities)
+        percent = 0
         # loop over all rooted entities
         for entity in rootedEntities: 
-        
+            # print progressbar
+            progressbar.printbar(percent)
+
             # get some basic data
             info = entity.get_info()
             entityId = info['GlobalId']
@@ -100,10 +106,16 @@ class IFCGraphGenerator(IfcMapper):
             # neo4j: build rooted node
             cypher_statement = Neo4jGraphFactory.create_primary_node(entityId, entityType, self.label)
             node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
-            
+
             # get all attrs and children
             self.__getDirectChildren(entity, 0, node_id[0])
 
+            # update progressbar
+            percent += increment
+
+        #show last progressbar update
+        progressbar.printbar(percent)
+    
     # private recursive function
     def __getDirectChildren(self, entity, indent, parent_NodeId=None): 
         
