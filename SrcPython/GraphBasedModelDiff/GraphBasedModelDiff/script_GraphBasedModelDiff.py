@@ -1,19 +1,14 @@
 ""
 
+import asyncio
 # import numpy as np
 import time
-import queue
-import asyncio
-
-from neo4j_middleware.neo4jConnector import Neo4jConnector
-from neo4j_middleware.Neo4jQueryUtilities import Neo4jQueryUtilities as neo4jUtils
-
-from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
-
-from neo4jGraphDiff.DfsIsomorphismCalculator import DfsIsomorphismCalculator
 
 from neo4jGraphDiff.Configurator import Configurator
+from neo4jGraphDiff.DfsIsomorphismCalculator import DfsIsomorphismCalculator
 from neo4jGraphDiff.ResultGenerator import ResultGenerator
+from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
+from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 # -- ... --
 connector = Neo4jConnector(False, False)

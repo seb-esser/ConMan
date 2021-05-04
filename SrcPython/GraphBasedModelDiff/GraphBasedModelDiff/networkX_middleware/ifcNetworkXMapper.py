@@ -1,8 +1,9 @@
 
-from .ifcMapper import IfcMapper
-import networkx as nx
+import ifcopenshell
 import matplotlib.pyplot as plt
-import ifcopenshell 
+import networkx as nx
+
+from .ifcMapper import IfcMapper
 
 
 class IfcNetworkXMapper(IfcMapper): 

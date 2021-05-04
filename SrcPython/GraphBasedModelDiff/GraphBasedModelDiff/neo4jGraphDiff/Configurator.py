@@ -1,6 +1,5 @@
 """ packages """
 import json
-import enum
 
 """ modules """
 from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum, LoggingLevelEnum

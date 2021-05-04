@@ -1,9 +1,9 @@
 
-from .SetCalculator import SetCalculator
-from neo4j_middleware.Neo4jQueryUtilities import Neo4jQueryUtilities as neo4jQueryUtils
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.NodeItem import NodeItem
-from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum
+
+from .SetCalculator import SetCalculator
+
 
 class RootedNodeDiff:
 	""" """

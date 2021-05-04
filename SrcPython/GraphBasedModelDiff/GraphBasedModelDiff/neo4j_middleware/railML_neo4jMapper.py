@@ -1,12 +1,8 @@
 """ package import """
 from lxml import etree
-from io import StringIO, BytesIO
 
 """ file import """
-from neo4j_middleware.neo4jConnector import Neo4jConnector
 from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
-from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-
 
 
 class railML_neo4jmapper:

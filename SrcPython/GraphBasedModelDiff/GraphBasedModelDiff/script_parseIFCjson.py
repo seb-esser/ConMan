@@ -1,7 +1,6 @@
 
 """ package import """
 import json
-import os
 import logging
 
 """ class import """ 

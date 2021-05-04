@@ -1,4 +1,3 @@
-
 """ package import """
 import ifcopenshell
 
@@ -7,6 +6,7 @@ from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from common_base.ifcMapper import IfcMapper
 import progressbar
+
 
 class IFCGraphGenerator(IfcMapper):
     """
@@ -19,25 +19,25 @@ class IFCGraphGenerator(IfcMapper):
     Public constructor for IFCP21_neo4jMapper
     trigger console output while parsing using the ToConsole boolean
     """
-    def __init__(self, connector, model_path, ParserConfig): 
-       
-        
+
+    def __init__(self, connector, model_path, ParserConfig):
+
         # try to open the ifc model and load the content into the model variable
         try:
             self.model = ifcopenshell.open(model_path)
-        except :
+        except:
             print('file path: {}'.format(model_path))
             raise Exception('Unable to open IFC model on given file path')
 
         # define the label (i.e., the model timestamp)
         my_label = 'ts' + self.model.wrapped_data.header.file_name.time_stamp
-        my_label = my_label.replace('-','')
-        my_label = my_label.replace(':','')
+        my_label = my_label.replace('-', '')
+        my_label = my_label.replace(':', '')
         self.label = my_label
 
         # set the connector
         self.connector = connector
-       
+
         # set output 
         self.parserConfig = ParserConfig
         self.printToConsole = False
@@ -46,7 +46,7 @@ class IFCGraphGenerator(IfcMapper):
         super().__init__()
 
     # public entry method to generate the graph out of a given IFC model
-    def generateGraph(self): 
+    def generateGraph(self):
         # delete entire graph if label already exists
         print('DEBUG INFO: entire graph labeled with >> {} << gets deleted \n'.format(self.label))
         self.connector.run_cypher_statement('MATCH(n:{}) DETACH DELETE n'.format(self.label))
@@ -54,9 +54,9 @@ class IFCGraphGenerator(IfcMapper):
         print('[IFC_P21 > {} < ]: Generating graph... '.format(self.label))
 
         # extract model data
-        obj_definitions =  self.model.by_type('IfcObjectDefinition')
+        obj_definitions = self.model.by_type('IfcObjectDefinition')
         obj_relationships = self.model.by_type('IfcRelationship')
-        props = self.model.by_type('IfcPropertyDefinition')      
+        props = self.model.by_type('IfcPropertyDefinition')
 
         # parse rooted node + subgraphs
         self.__mapEntities(obj_definitions)
@@ -86,15 +86,13 @@ class IFCGraphGenerator(IfcMapper):
 
         pass
 
-
-
     # public entry
-    def __mapEntities(self, rootedEntities): 
+    def __mapEntities(self, rootedEntities):
         # data for progressbar
-        increment = 100/len(rootedEntities)
+        increment = 100 / len(rootedEntities)
         percent = 0
         # loop over all rooted entities
-        for entity in rootedEntities: 
+        for entity in rootedEntities:
             # print progressbar
             progressbar.printbar(percent)
 
@@ -113,23 +111,23 @@ class IFCGraphGenerator(IfcMapper):
             # update progressbar
             percent += increment
 
-        #show last progressbar update
+        # show last progressbar update
         progressbar.printbar(percent)
-    
+
     # private recursive function
-    def __getDirectChildren(self, entity, indent, parent_NodeId=None): 
-        
-        if self.printToConsole: 
-            print("".ljust(indent*4) + '{}'.format(entity))
+    def __getDirectChildren(self, entity, indent, parent_NodeId=None):
+
+        if self.printToConsole:
+            print("".ljust(indent * 4) + '{}'.format(entity))
 
         # print atomic attributes: 
         info = entity.get_info()
         p21_id = info['id']
         entityType = info['type']
         # remove type and id from attrDict
-        excludeKeys = ['id', 'type']        
-        attrs_dict = {key: val for key, val in info.items() if key not in excludeKeys }    
-        
+        excludeKeys = ['id', 'type']
+        attrs_dict = {key: val for key, val in info.items() if key not in excludeKeys}
+
         # remove complex traversal attributes
         filtered_attrs = {}
         complex_attrs = []
@@ -145,45 +143,45 @@ class IFCGraphGenerator(IfcMapper):
             pdt_key_names = ['PredefinedType']
 
             # detecting atomic attribute -> map to existing node
-            if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool) : 
+            if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool):
                 filtered_attrs[key] = val
 
             elif key in pdt_key_names:
                 filtered_attrs[key] = str(val)
-            
+
             # detecting atomic attribute but encapsulated in tuple
             elif isinstance(val, tuple) and key in special_key_names:
                 filtered_attrs[key] = str(val)
 
             # detecting a list of child entities (again encapsulated as a list)
-            elif isinstance(val, tuple) and len(val) > 1 and key not in special_key_names: 
+            elif isinstance(val, tuple) and len(val) > 1 and key not in special_key_names:
 
                 # reserve suitable names for the relationships between parent and children
                 for i in range(len(val)):
                     # append the list item index to the relationship type 
                     rel_type = key + '__listItem_' + str(i)
                     complex_attrs.append(rel_type)
-                    
+
             # detecting a simple child node
-            else: 
-                if val != None: 
+            else:
+                if val != None:
                     complex_attrs.append(key)
 
         # run the mapping of the detected data. 
         #       filtered_attrs contain atomic attributes, which gets attached as properties at the parent node
         #       complex_attrs  contain all attributes that need sub-nodes. They get zipped with the traverse children afterwards. 
 
-        if len(filtered_attrs.items()) > 0: 
+        if len(filtered_attrs.items()) > 0:
             if self.printToConsole:
-                print("\t".ljust(indent*4) + '{}'.format(filtered_attrs))
+                print("\t".ljust(indent * 4) + '{}'.format(filtered_attrs))
 
             # append atomic attrs to current node
-            if parent_NodeId != None: 
+            if parent_NodeId != None:
                 # atomic attrs exist on current node -> map to node 
                 cypher_statement = Neo4jGraphFactory.add_attributes_by_node_id(parent_NodeId, filtered_attrs,
                                                                                self.label)
                 self.connector.run_cypher_statement(cypher_statement)
-       
+
         # query all traversal entities -> subnodes 
         children = self.model.traverse(entity, 1)
 
@@ -195,19 +193,19 @@ class IFCGraphGenerator(IfcMapper):
 
         if len(children) == 0:
             pass
-        else:        
+        else:
 
             for child in complex_childs:
 
                 ## check if child is already existing in the graph. otherwise create new node
-               
+
                 cypher_statement = ''
                 cypher_statement = Neo4jQueryFactory.get_nodeId_byP21(child[1].__dict__['id'], self.label)
                 res = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
 
                 if len(res) == 0:
                     # node doesnt exist yet, continue with creating a new attr node
-                    
+
                     cypher_statement = ''
                     cypher_statement = Neo4jGraphFactory.create_secondary_node(parent_NodeId, child[1].__dict__['type'],
                                                                                child[0], self.label)
@@ -225,18 +223,17 @@ class IFCGraphGenerator(IfcMapper):
                                                                       self.label)
                     node_id = self.connector.run_cypher_statement(cypher_statement)
 
-                elif len(res) > 1: 
+                elif len(res) > 1:
                     # node exist multiple times. 
                     raise Exception('Detected nodes with same p21 id. ERROR!')
-                                
+
         return None
 
     # public entry
-    def __mapObjRelationships(self, objRels): 
+    def __mapObjRelationships(self, objRels):
 
         # loop over all relationships
-        for entity in objRels: 
-        
+        for entity in objRels:
             # get some basic data
             info = entity.get_info()
             entityId = info['GlobalId']
@@ -245,9 +242,6 @@ class IFCGraphGenerator(IfcMapper):
             # neo4j: build rooted node
             cypher_statement = Neo4jGraphFactory.create_connection_node(entityId, entityType, self.label)
             node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
-            
+
             # get all attrs and children
             self.__getDirectChildren(entity, 0, node_id[0])
-
-
-

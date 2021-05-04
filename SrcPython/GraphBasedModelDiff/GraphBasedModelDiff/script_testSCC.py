@@ -1,8 +1,8 @@
 
 
 
-from neo4j_middleware.neo4jConnector import Neo4jConnector
 from neo4jGraphAnalysis.SCC import SccDetector
+from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 connector = Neo4jConnector(False, False)
 connector.connect_driver()

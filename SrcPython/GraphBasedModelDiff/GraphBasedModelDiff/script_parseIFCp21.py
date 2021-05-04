@@ -1,8 +1,5 @@
 """ package import """
-import ifcopenshell
 import logging
-import datetime
-import glob
 
 """ class import """
 from neo4j_middleware.IFCGraphGenerator import IFCGraphGenerator

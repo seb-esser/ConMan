@@ -2,18 +2,19 @@
 from enum import Enum
 
 """ modules """
-from neo4jGraphDiff.Result import Result
+from GraphBasedModelDiff.neo4jGraphDiff.Result import Result
 
 
 class DiffResult(Result):
     """carries the diff result """
 
     def __init__(self, root_init, root_updated, method=None):
-        self.isSimilar = True
+        super().__init__()
+        self.isSimilar:bool = True
         self.method = method
-        self.propertyModifications = []
-        self.StructureModifications = []
-        self.time = 0.0
+        self.propertyModifications:list(PropertyModification) = []
+        self.StructureModifications: list(StructureModification) = []
+        self.time: float = 0.0
         self.RootNode_init = root_init
         self.RootNode_updated = root_updated
         self.recursionCounter = 0

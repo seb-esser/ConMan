@@ -1,12 +1,13 @@
 """ packages """
 
 """ modules """
-from .DirectedSubgraphDiff import DirectedSubgraphDiff
+from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum
+from neo4jGraphDiff.DiffResult import DiffResult
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.NodeDiffData import NodeDiffData
 from neo4j_middleware.NodeItem import NodeItem
-from neo4jGraphDiff.DiffResult import DiffResult
-from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum
+
+from .DirectedSubgraphDiff import DirectedSubgraphDiff
 
 
 class DfsIsomorphismCalculator(DirectedSubgraphDiff):

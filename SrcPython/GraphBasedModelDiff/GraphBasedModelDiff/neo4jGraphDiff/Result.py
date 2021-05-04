@@ -1,18 +1,11 @@
 
 
-
-
-
 class Result:
-    """assembly of model diff results """
+    """abstract class for all types of model diff results """
 
-
-    def __init__(self): 
-       
-        pass
-
-
-
-
+    def __init__(self):
+        self.timestamp_init: str
+        self.timestamp_updated: str
+        
 
 

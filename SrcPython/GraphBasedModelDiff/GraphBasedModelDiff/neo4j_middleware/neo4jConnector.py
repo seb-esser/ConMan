@@ -1,8 +1,8 @@
 
 
-from neo4j import GraphDatabase
-import json
 import logging
+
+from neo4j import GraphDatabase
 
 
 class Neo4jConnector:

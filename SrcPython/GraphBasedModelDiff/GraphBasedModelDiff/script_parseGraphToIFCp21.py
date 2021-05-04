@@ -2,8 +2,9 @@
 
 from ifc_middleware.IfcGenerator import IfcGenerator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-from neo4j_middleware.neo4jConnector import Neo4jConnector
 from neo4j_middleware.NodeItem import NodeItem
+from neo4j_middleware.neo4jConnector import Neo4jConnector
+
 
 def build_childs(n):
     # build association

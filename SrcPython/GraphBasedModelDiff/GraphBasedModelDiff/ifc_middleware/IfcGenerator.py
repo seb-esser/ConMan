@@ -1,8 +1,7 @@
 """ File content copy-pasted from: http://academy.ifcopenshell.org/creating-a-simple-wall-with-property-set-and-quantity-information/ """
 
 import uuid
-import time
-import tempfile
+
 import ifcopenshell
 
 create_guid = lambda: ifcopenshell.guid.compress(uuid.uuid1().hex)

@@ -1,12 +1,8 @@
 import abc
 
 from .SetCalculator import SetCalculator
-from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-
-# classes to decode neo4j query responses
-from neo4j_middleware.NodeItem import NodeItem
-from neo4j_middleware.NodeDiffData import NodeDiffData
-
+from ..neo4j_middleware import Neo4jQueryFactory
+from ..neo4j_middleware.NodeItem import NodeItem
 
 class DirectedSubgraphDiff(abc.ABC):
     """abstract super class for all subgraph diff methods """
