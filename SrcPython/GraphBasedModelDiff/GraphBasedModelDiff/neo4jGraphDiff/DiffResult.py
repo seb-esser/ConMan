@@ -1,8 +1,7 @@
 """ packages """
 from enum import Enum
 
-""" modules """
-from GraphBasedModelDiff.neo4jGraphDiff.Result import Result
+from neo4jGraphDiff.Result import Result
 
 
 class DiffResult(Result):
