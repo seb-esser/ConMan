@@ -3,7 +3,6 @@ import ifcopenshell
 import logging
 import datetime
 import glob
-import progressbar
 
 """ class import """
 from neo4j_middleware.IFCGraphGenerator import IFCGraphGenerator
@@ -47,17 +46,13 @@ paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresen
 for p in paths: 
     print(p)
 
-increment = 100 / len(paths)
-percent = 0
+
 print('Starting to generate graphs...')
 for path in paths:
-    progressbar.printbar(percent)
     # parse model
     graphGenerator = IFCGraphGenerator(connector, path, None)
 
     graphGenerator.generateGraph()
-
-    percent += increment
 print('\n 100% done. Graphs generated.')
 # disconnect from database
 connector.disconnect_driver()
