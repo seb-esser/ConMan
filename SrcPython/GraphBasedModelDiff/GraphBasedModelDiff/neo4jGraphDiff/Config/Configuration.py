@@ -2,10 +2,10 @@
 import json
 
 """ modules """
-from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum, LoggingLevelEnum
+from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum, LoggingLevelEnum
 
 
-class Configurator:
+class Configuration:
     """global configurator for everything related to the subgraph Diff in Neo4j"""
 
     def __init__(self, log_settings, diff_settings):
@@ -59,7 +59,7 @@ class Configurator:
     def on_guid_config(cls):
         """
         
-        @return: Configurator
+        @return: Configuration
         """
         logSettings = LoggingSettings.default_settings()
         diffSettings = DiffSettings()
@@ -71,7 +71,7 @@ class Configurator:
 
     @classmethod
     def from_json(cls, jsonPath):
-        """ loads the config from a specified json file and returns a Configurator instance """
+        """ loads the config from a specified json file and returns a Configuration instance """
 
         raise Warning('not implemented properly. Check ToDos')
 

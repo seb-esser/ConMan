@@ -1,35 +1,35 @@
 """ packages """
 
 """ modules """
-from neo4jGraphDiff.ConfiguratorEnums import MatchCriteriaEnum
-from neo4jGraphDiff.DiffResult import DiffResult
+from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
+from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-from neo4j_middleware.NodeDiffData import NodeDiffData
-from neo4j_middleware.NodeItem import NodeItem
+from neo4j_middleware.ResponseParser.NodeDiffData import NodeDiffData
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
-from .DirectedSubgraphDiff import DirectedSubgraphDiff
+from neo4jGraphDiff.AbsDirectedSubgraphDiff import AbsDirectedSubgraphDiff
 
 
-class DfsIsomorphismCalculator(DirectedSubgraphDiff):
+class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """
 
     def __init__(self, connector, label_init, label_updated, config):
         return super().__init__(connector, label_init, label_updated, config)
 
-    # public overwrite method requested by abstract superclass DirectedSubgraphDiff
-    def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem) -> DiffResult:
+    # public overwrite method requested by abstract superclass AbsDirectedSubgraphDiff
+    def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem) -> SubstructureDiffResult:
 
-        diffContainer = DiffResult(method="Node-Diff", root_init=node_init, root_updated=node_updated)
+        diffContainer = SubstructureDiffResult(method="Node-Diff", root_init=node_init, root_updated=node_updated)
 
         # start recursion
         diffContainer = self.__compare_children(node_init, node_updated, diffContainer)
         return diffContainer
 
-    async def diff_subgraphs_async(self, node_init: NodeItem, node_updated: NodeItem) -> DiffResult:
+    async def diff_subgraphs_async(self, node_init: NodeItem, node_updated: NodeItem) -> SubstructureDiffResult:
         """
 
         """
-        diffContainer = DiffResult(method="Node-Diff", root_init=node_init, root_updated=node_updated)
+        diffContainer = SubstructureDiffResult(method="Node-Diff", root_init=node_init, root_updated=node_updated)
 
         # start recursion
         diffContainer = self.__compare_children(node_init, node_updated, diffContainer)
@@ -64,10 +64,10 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
             childs_updated = self.__get_hashes_of_nodes(self.label_updated, children_updated, indent)
 
         # apply DiffIgnore -> Ignore nodes if requested        
-        children_init = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_init)
-        children_updated = self._DirectedSubgraphDiff__applyDiffIgnore_Nodes(children_updated)
+        children_init = self.apply_DiffIgnore_Nodes(children_init)
+        children_updated = self.apply_DiffIgnore_Nodes(children_updated)
 
-        # compare children and raise an unsimilarity if necessary.
+        # compare children and raise an dissimilarity if necessary.
         [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(children_init, children_updated,
                                                                                      desiredMatchMethod)
 
@@ -110,7 +110,8 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
 
         return diff
 
-    def __calcPropertyDifference(self, diff_result_container: DiffResult, node_init: NodeItem, node_updated: NodeItem) -> DiffResult:
+    def __calcPropertyDifference(self, diff_result_container: SubstructureDiffResult, node_init: NodeItem,
+                                 node_updated: NodeItem) -> SubstructureDiffResult:
         """
         calculates if a semantic modification was applied on two nodes
         @param diff_result_container: reporter instance
@@ -154,7 +155,7 @@ class DfsIsomorphismCalculator(DirectedSubgraphDiff):
                 diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
                                                           val_new)
 
-         # case 3: added/deleted attrs. Break recursion
+        # case 3: added/deleted attrs. Break recursion
         else:
             if self.toConsole():
                 print('[RESULT]: detected unsimilarity between nodes {} and {}'.format(node_init.id, node_updated.id))

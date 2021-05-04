@@ -4,11 +4,10 @@ import ifcopenshell
 """ file import """
 from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-from common_base.ifcMapper import IfcMapper
 import progressbar
 
 
-class IFCGraphGenerator(IfcMapper):
+class IFCGraphGenerator:
     """
     IfcP21 to neo4j mapper. 
     Translates a given IFC model in P21 encoding into a propertyGraph 

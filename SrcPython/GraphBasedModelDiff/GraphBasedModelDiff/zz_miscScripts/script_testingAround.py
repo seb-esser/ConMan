@@ -15,7 +15,7 @@ from neo4j_middleware.neo4jConnector import Neo4jConnector
 connector = Neo4jConnector(writeToConsole=False)
 connector.connect_driver()
 
-path = './00_sampleData/IFC_stepP21/Beam_extrudedGeom/beam-extruded-solid_initial.ifc'
+path = '../00_sampleData/IFC_stepP21/Beam_extrudedGeom/beam-extruded-solid_initial.ifc'
 ts = "testts"
 cy = 'MATCH (n:{}) DETACH DELETE n'.format(ts)
 connector.run_cypher_statement(cy)

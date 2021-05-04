@@ -6,7 +6,7 @@ from neo4j import GraphDatabase
 
 
 class Neo4jConnector:
-
+    """ handles the connection to a given neo4j database """
     # member variables
     password = "password"
     uri = "bolt://localhost:7687"

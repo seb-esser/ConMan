@@ -1,15 +1,15 @@
 """ packages """
 from enum import Enum
 
-from neo4jGraphDiff.Result import Result
+from neo4jGraphDiff.AbsResult import Result
 
 
-class DiffResult(Result):
+class SubstructureDiffResult(Result):
     """carries the diff result """
 
     def __init__(self, root_init, root_updated, method=None):
         super().__init__()
-        self.isSimilar:bool = True
+        self.isSimilar: bool = True
         self.method = method
         self.propertyModifications:list(PropertyModification) = []
         self.StructureModifications: list(StructureModification) = []
@@ -25,7 +25,7 @@ class DiffResult(Result):
         self.isSimilar = False
 
     def logStructureModification(self, parentNodeId, childNodeId, modType):
-        """ logs a new modification to the DiffResult.modifiedNodes container """
+        """ logs a new modification to the SubstructureDiffResult.modifiedNodes container """
         modification = StructureModification(parentNodeId, childNodeId, modType)
         self.StructureModifications.append(modification)
         self.isSimilar = False

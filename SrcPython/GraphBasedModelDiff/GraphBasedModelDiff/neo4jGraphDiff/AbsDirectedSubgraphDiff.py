@@ -1,20 +1,20 @@
 import abc
 
-from neo4jGraphDiff.Configurator import Configurator
+from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.SetCalculator import SetCalculator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-from neo4j_middleware.NodeItem import NodeItem
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
-class DirectedSubgraphDiff(abc.ABC):
+class AbsDirectedSubgraphDiff(abc.ABC):
     """abstract super class for all subgraph diff methods """
 
     @abc.abstractmethod
     def __init__(self, connector, label_init, label_updated, configuration):
 
         # config contains basic settings about logging and console behavior
-        self.configuration: Configurator = configuration
+        self.configuration: Configuration = configuration
 
         # utils provides methods to compare two sets of nodes based on specified criteria
         self.utils = SetCalculator()
@@ -66,7 +66,7 @@ class DirectedSubgraphDiff(abc.ABC):
         else:
             return res
 
-    def __applyDiffIgnore_Nodes(self, node_list):
+    def apply_DiffIgnore_Nodes(self, node_list):
         """ removes nodes from a list if their type is set to be ignored """
 
         # ToDo: Logging: Add info statement that ingoreNodes got applied. 

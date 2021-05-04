@@ -4,10 +4,10 @@ import asyncio
 # import numpy as np
 import time
 
-from neo4jGraphDiff.Configurator import Configurator
-from neo4jGraphDiff.DfsIsomorphismCalculator import DfsIsomorphismCalculator
-from neo4jGraphDiff.ResultGenerator import ResultGenerator
-from neo4jGraphDiff.RootedNodeDiff import RootedNodeDiff
+from neo4jGraphDiff.Config.Configuration import Configuration
+from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
+from neo4jGraphDiff.Caption.ResultGenerator import ResultGenerator
+from neo4jGraphDiff.PrimaryNodeDiff import RootedNodeDiff
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 # -- ... --
@@ -49,13 +49,13 @@ label_updated = "ts20210119T085409"	# different rep, modified height
 
 async def main():
 	# set config
-	config = Configurator.rel_type_config()
-	#config = Configurator.on_guid_config()
+	config = Configuration.rel_type_config()
+	#config = Configuration.on_guid_config()
 	print(config)
 	print(config.DiffSettings)
 
 	# init report 
-	report = ResultGenerator(None, config)
+	report = ResultGenerator(config)
 
 	cypher = []
 

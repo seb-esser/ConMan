@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 """ module import """
-from neo4jGraphDiff.DiffResult import DiffResult
+from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 
 """ class def """
 
@@ -11,9 +11,8 @@ from neo4jGraphDiff.DiffResult import DiffResult
 class ResultGenerator:
     """description of class"""
 
-    def __init__(self, result=None, usedConfig=None):
+    def __init__(self, usedConfig=None):
         """ """
-        self.result = result
         self.config = usedConfig
 
         self.ResultRooted = {}
@@ -33,12 +32,12 @@ class ResultGenerator:
         self.ResultRooted['deleted'] = nodes_deleted
 
     def capture_result_con_nodes(self):
-        """ captures DiffResult of ObjRel structure Diff """
+        """ captures SubstructureDiffResult of ObjRel structure Diff """
         pass
 
-    def capture_result_secondary(self, diffRes: DiffResult):
+    def capture_result_secondary(self, diffRes: SubstructureDiffResult):
         """
-        captures DiffResult of a componentDiff
+        captures SubstructureDiffResult of a componentDiff
         @param diffRes:
         """
         self.ResultComponentDiff.append(diffRes)

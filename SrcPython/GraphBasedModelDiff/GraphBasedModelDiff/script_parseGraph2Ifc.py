@@ -1,8 +1,8 @@
 
 
-from ifc_middleware.IfcGenerator import IfcGenerator
+from IfcGraphInterface.Graph2IfcTranslator import IfcGenerator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-from neo4j_middleware.NodeItem import NodeItem
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 

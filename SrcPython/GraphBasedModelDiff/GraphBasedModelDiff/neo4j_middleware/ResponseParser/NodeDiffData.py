@@ -1,6 +1,6 @@
 
 class NodeDiffData:
-    """description of class"""
+    """decodes the neo4j response into an object """
 
     def __init__(self, unchanged, modified, added, deleted): 
         self.AttrsUnchanged = unchanged

@@ -1,5 +1,5 @@
 
-class Neo4jQueryUtilities:
+class Neo4jFactory:
 
 	def __init__(self):
 		pass

@@ -1,6 +1,6 @@
 
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-from neo4j_middleware.NodeItem import NodeItem
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 from .SetCalculator import SetCalculator
 

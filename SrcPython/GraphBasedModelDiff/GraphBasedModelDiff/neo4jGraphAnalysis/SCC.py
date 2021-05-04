@@ -1,6 +1,6 @@
 
 
-from neo4j_middleware.Neo4jQueryUtilities import Neo4jQueryUtilities as neo4jUtils
+from neo4j_middleware.Neo4jFactory import Neo4jFactory as neo4jUtils
 
 
 class SccDetector:
