@@ -152,5 +152,19 @@ class Neo4jQueryFactory(Neo4jFactory):
         ret = 'RETURN exists((n)-[]->(m)) as are_connected'
         return Neo4jFactory.BuildMultiStatement([match_a, match_b, ret])
 
+    @classmethod
+    def get_directed_path_by_nodeId(cls, node_id_start: int, node_id_target: int) -> str:
+        """
+        queries the path between two nodes
+        @param node_id_start: node id of start node
+        @param node_id_target: node id of target node
+        @return: cypher query string
+        """
+        match_start = 'MATCH(n) WHERE ID(n) = {}'.format(node_id_start)
+        match_target = 'MATCH(m) WHERE ID(m) = {}'.format(node_id_target)
+        path = 'MATCH p = shortestPath((n)-[*..10]->(m))' # max path length is hardcoded to 10
+        ret = 'RETURN p as path, NODES(p), RELATIONSHIPS(p)'
+        return Neo4jFactory.BuildMultiStatement([match_start, match_target, path, ret])
+
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --

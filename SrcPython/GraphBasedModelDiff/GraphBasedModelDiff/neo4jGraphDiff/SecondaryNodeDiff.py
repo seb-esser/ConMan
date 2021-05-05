@@ -152,8 +152,21 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
                 val_old = modifiedAttr[1]['left']
                 val_new = modifiedAttr[1]['right']
 
+                # calculate graph path to node
+                primary_init = diff_result_container.RootNode_init.id
+                primary_updated = diff_result_container.RootNode_updated.id
+
+                cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_init, node_init.id)
+                path_init_raw = self.connector.run_cypher_statement(cy, 'path')
+
+                cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_updated, node_updated.id)
+                path_updated_raw = self.connector.run_cypher_statement(cy, 'path')
+
+                path_init = path_init_raw
+                path_updated = path_init_raw
+
                 diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
-                                                          val_new)
+                                                          val_new, path_init, path_updated)
 
         # case 3: added/deleted attrs. Break recursion
         else:

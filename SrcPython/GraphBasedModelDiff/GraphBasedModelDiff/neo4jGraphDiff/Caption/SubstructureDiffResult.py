@@ -2,25 +2,30 @@
 from enum import Enum
 
 from neo4jGraphDiff.AbsResult import Result
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 
 class SubstructureDiffResult(Result):
     """carries the diff result """
 
-    def __init__(self, root_init, root_updated, method=None):
+    def __init__(self, root_init: NodeItem, root_updated: NodeItem, method=None):
         super().__init__()
         self.isSimilar: bool = True
         self.method = method
         self.propertyModifications:list(PropertyModification) = []
         self.StructureModifications: list(StructureModification) = []
         self.time: float = 0.0
-        self.RootNode_init = root_init
-        self.RootNode_updated = root_updated
+        self.RootNode_init: NodeItem = root_init
+        self.RootNode_updated: NodeItem = root_updated
         self.recursionCounter = 0
 
-    def logNodeModification(self, nodeId_init, nodeId_updated, attrName, modType, value_old, value_new):
+    def logNodeModification(self, nodeId_init, nodeId_updated, attrName, modType, value_old, value_new, graph_path_init, graph_path_updated):
         """ logs a modification applied on properties """
         modification = PropertyModification(nodeId_init, nodeId_updated, attrName, modType, value_old, value_new)
+
+        # set exact graph path
+        modification.set_paths(graph_path_init, graph_path_updated)
+
         self.propertyModifications.append(modification)
         self.isSimilar = False
 
@@ -49,6 +54,12 @@ class PropertyModification:
               "deleted": PropertyModificationTypeEnum.DELETED,
               "modified": PropertyModificationTypeEnum.MODIFIED}
         self.modificationType = sw[modificationType]
+        self.path_init: str
+        self.path_updated: str
+
+    def set_paths(self, path_init, path_updated):
+        self.path_init = path_init
+        self.path_updated = path_updated
 
     def __repr__(self):
         return 'PMod: node_init: {} node_updated: {} attr: {} action: {} oldVal: {} newVal: {}'.format(self.nodeId_init,
