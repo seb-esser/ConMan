@@ -1,5 +1,5 @@
 import math
-def printbar(percent):
+def printbar(percent, amount, total):
     # Depending on the percentage, and adequate number of '#' and '-' are printed
     perc = math.ceil(percent)
     negative = 100-perc
