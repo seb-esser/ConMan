@@ -1,4 +1,4 @@
-from GraphBasedModelDiff.PatchManager.Operation import AbstractOperation
+from PatchManager.Operation import AbstractOperation
 
 
 class Patch(object):

@@ -1,3 +1,4 @@
+from PatchManager.Patch import Patch
 from neo4j_middleware import neo4jConnector
 
 
@@ -8,4 +9,8 @@ class PatchIntegrator(object):
         self.connector = connector
 
     def apply_patch(self, patch: Patch):
-        raise NotImplementError()
+        raise NotImplementedError("not done yet")
+
+    def from_json(self):
+        raise NotImplementedError("not done yet")
+

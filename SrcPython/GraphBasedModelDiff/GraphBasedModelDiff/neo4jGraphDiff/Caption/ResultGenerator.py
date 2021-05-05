@@ -11,12 +11,17 @@ from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 class ResultGenerator:
     """description of class"""
 
-    def __init__(self, usedConfig=None):
+    def __init__(self, ts_init: str, ts_updated: str, usedConfig=None):
         """ """
+        self.timestamp_init = ts_init
+        self.timestamp_updated = ts_updated
         self.config = usedConfig
-
+        self.timestamp_init: str
+        self.timestamp_updated: str
         self.ResultRooted = {}
         self.ResultComponentDiff = []
+
+
 
     def capture_result_primary(self, rootDiffRes: list):
         """

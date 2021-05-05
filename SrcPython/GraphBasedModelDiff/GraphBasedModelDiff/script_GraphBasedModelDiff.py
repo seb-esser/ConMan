@@ -4,6 +4,7 @@ import asyncio
 # import numpy as np
 import time
 
+import PatchManager.PatchGenerator
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
 from neo4jGraphDiff.Caption.ResultGenerator import ResultGenerator
@@ -55,7 +56,7 @@ async def main():
 	print(config.DiffSettings)
 
 	# init report 
-	report = ResultGenerator(config)
+	report = ResultGenerator(ts_init=label_init, ts_updated=label_updated, usedConfig=config)
 
 	cypher = []
 
@@ -97,5 +98,9 @@ async def main():
 	# show result on console
 	report.print_report()
 	# report.print_time_plot()
+
+	# create a patch out of the captured diff result
+	generator = PatchManager.PatchGenerator.PatchGenerator()
+	generator.create_patch_from_graph_diff(report)
 
 asyncio.run(main())
