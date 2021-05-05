@@ -1,10 +1,11 @@
 """ package import """
 import ifcopenshell
+import progressbar
 
 """ file import """
 from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-import progressbar
+
 
 
 class IFCGraphGenerator:

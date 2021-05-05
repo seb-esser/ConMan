@@ -45,10 +45,11 @@ for p in paths:
 
 
 print('Starting to generate graphs...')
-for path in paths:
+amount = len(paths)
+for idx, path in enumerate(paths):
     # parse model
     graphGenerator = IFCGraphGenerator(connector, path, None)
-
+    print('Generating Graph %d/%d' % (idx+1, amount))
     graphGenerator.generateGraph()
 print('\n 100% done. Graphs generated.')
 # disconnect from database
