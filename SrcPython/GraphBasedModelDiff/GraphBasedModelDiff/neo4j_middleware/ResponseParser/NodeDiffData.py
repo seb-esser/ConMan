@@ -28,7 +28,13 @@ class NodeDiffData:
 
     def nodesHaveUpdatedAttributeValues(self):
         """ reports if the diffed nodes share the same attributes but with different values """
-        if self.AttrsModified != {} and self.AttrsDeleted == {} and self.AttrsAdded == {}:
+        if self.AttrsModified != {}:
+            return True
+        else:
+            return False
+
+    def nodesHaveAddedDeletedAttributes(self):
+        if self.AttrsAdded != {} or self.AttrsDeleted != {}:
             return True
         else:
             return False

@@ -38,7 +38,10 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         return diffContainer
 
     def __compare_children(self, node_init, node_updated, diff_result_container, indent=0):
-        """ queries the all child nodes of a node and compares the results between the initial and the updated graph based on AttrDiff"""
+        """
+        queries the all child nodes of a node and compares the results between
+        the initial and the updated graph based on AttrDiff
+        """
 
         desiredMatchMethod = self.configuration.DiffSettings.MatchingType_Childs
 
@@ -48,7 +51,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
             print("".ljust(indent * 4) + 'Check children of NodeId {} and NodeId {}'.format(node_init.id,
                                                                                             node_updated.id))
 
-        # get children data
+        # get children nodes
         children_init = self.get_children_nodes(self.label_init, node_init.id)
         children_updated = self.get_children_nodes(self.label_updated, node_updated.id)
 
@@ -94,13 +97,16 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
             diff_result_container = self.__calcPropertyDifference(diff_result_container, node_init, node_updated)
 
             # run recursion for children if "NoChange" or "Modified" happened
-            diff_result_container = self.__compare_children(matchingChildPair[0], matchingChildPair[1], diff_result_container, indent= indent + 1)
+            diff_result_container = self.__compare_children(matchingChildPair[0],
+                                                            matchingChildPair[1],
+                                                            diff_result_container,
+                                                            indent=indent + 1)
 
             # end for loop 
 
         return diff_result_container
 
-    def __apply_diffIgnore_on_node_diff(self, diff, IgnoreAttrs):
+    def __apply_diffIgnore(self, diff, IgnoreAttrs):
         """ removes the attributes stated in the used DiffIgnore file from the diff result of apoc """
         for ignore in IgnoreAttrs:
             if ignore in diff.AttrsUnchanged:       del diff.AttrsUnchanged[ignore]
@@ -127,24 +133,23 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
 
         # apply DiffIgnore on diff result
         ignoreAttrs = self.configuration.DiffSettings.diffIgnoreAttrs
-        cleared_nodeDifference = self.__apply_diffIgnore_on_node_diff(nodeDifference, ignoreAttrs)
+        nodeDiff = self.__apply_diffIgnore(nodeDifference, ignoreAttrs)
 
         if self.toConsole():
             print('comparing node {} to node {} after applying DiffIgnore:'.format(node_init.id, node_updated.id))
 
 
         # case 1: no modifications on pair
-        if cleared_nodeDifference.nodesAreSimilar() == True:
+        if nodeDiff.nodesAreSimilar() == True:
             # nodes are similar
             if self.toConsole():
                 print('[RESULT]: child nodes match')
 
         # case 2: modified attrs on pair but no added/deleted attrs
-
-        elif cleared_nodeDifference.nodesHaveUpdatedAttributeValues() == True:
+        elif nodeDiff.nodesHaveUpdatedAttributeValues() == True:
 
             # log modification
-            for modifiedAttr in cleared_nodeDifference.AttrsModified.items():
+            for modifiedAttr in nodeDiff.AttrsModified.items():
                 if self.toConsole():
                     print(modifiedAttr)
 
@@ -173,7 +178,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         else:
             if self.toConsole():
                 print('[RESULT]: detected unsimilarity between nodes {} and {}'.format(node_init.id, node_updated.id))
-                print(cleared_nodeDifference)
+                print(nodeDiff)
 
             # -- log result --
 
@@ -191,7 +196,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
             path_updated = GraphPath.from_neo4j_response(path_updated_raw)
 
             # log modified
-            for modAttr in cleared_nodeDifference.AttrsModified.items():
+            for modAttr in nodeDiff.AttrsModified.items():
                 attr_name = modAttr[0]
                 val_old = modAttr[1]['left']
                 val_new = modAttr[1]['right']
@@ -200,13 +205,13 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
                                                           val_new, path_init, path_updated)
 
             # log added
-            for addedAttr in cleared_nodeDifference.AttrsAdded.items():
+            for addedAttr in nodeDiff.AttrsAdded.items():
                 attr_name = addedAttr[0]
                 val_new = addedAttr[1]
                 diff_result_container.logNodeModification(None, node_updated.id, attr_name, 'added', None, val_new, path_init, path_updated)
 
             # log deleted
-            for delAttr in cleared_nodeDifference.AttrsDeleted.items():
+            for delAttr in nodeDiff.AttrsDeleted.items():
                 attr_name = delAttr[0]
                 val_new = delAttr[1]
                 diff_result_container.logNodeModification(node_init.id, None, attr_name, 'deleted', val_old, None, path_init, path_updated)
