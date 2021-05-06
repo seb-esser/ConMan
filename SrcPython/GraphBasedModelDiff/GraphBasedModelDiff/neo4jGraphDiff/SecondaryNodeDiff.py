@@ -23,7 +23,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         diffContainer = SubstructureDiffResult(method="Node-Diff", root_init=node_init, root_updated=node_updated)
 
         # start recursion
-        diffContainer = self.__compare_children(node_init, node_updated, diffContainer)
+        diffContainer = self.__compare_children(node_init, node_updated, diffContainer, indent=0)
         return diffContainer
 
     async def diff_subgraphs_async(self, node_init: NodeItem, node_updated: NodeItem) -> SubstructureDiffResult:
@@ -94,8 +94,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
             diff_result_container = self.__calcPropertyDifference(diff_result_container, node_init, node_updated)
 
             # run recursion for children if "NoChange" or "Modified" happened
-            diff_result_container = self.__compare_children(matchingChildPair[0], matchingChildPair[1],
-                                                            diff_result_container)
+            diff_result_container = self.__compare_children(matchingChildPair[0], matchingChildPair[1], diff_result_container, indent= indent + 1)
 
             # end for loop 
 
@@ -121,8 +120,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         @return:
         """
         # compare two nodes
-        cypher = Neo4jQueryFactory.diff_nodes(node_init.id,
-                                              node_updated.id)  # compare childs? or current node?
+        cypher = Neo4jQueryFactory.diff_nodes(node_init.id, node_updated.id)
         raw = self.connector.run_cypher_statement(cypher)
 
         nodeDifference = NodeDiffData.fromNeo4jResponse(raw)
@@ -134,6 +132,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         if self.toConsole():
             print('comparing node {} to node {} after applying DiffIgnore:'.format(node_init.id, node_updated.id))
 
+
         # case 1: no modifications on pair
         if cleared_nodeDifference.nodesAreSimilar() == True:
             # nodes are similar
@@ -141,7 +140,8 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
                 print('[RESULT]: child nodes match')
 
         # case 2: modified attrs on pair but no added/deleted attrs
-        elif cleared_nodeDifference.nodesHaveUpdatedAttrs() == True:
+
+        elif cleared_nodeDifference.nodesHaveUpdatedAttributeValues() == True:
 
             # log modification
             for modifiedAttr in cleared_nodeDifference.AttrsModified.items():
@@ -166,8 +166,6 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
                 path_init = GraphPath.from_neo4j_response(path_init_raw)
                 path_updated = GraphPath.from_neo4j_response(path_updated_raw)
 
-                print(path_init.to_patch())
-
                 diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
                                                           val_new, path_init, path_updated)
 
@@ -179,25 +177,39 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
 
             # -- log result --
 
+            # calculate graph path to node
+            primary_init = diff_result_container.RootNode_init.id
+            primary_updated = diff_result_container.RootNode_updated.id
+
+            cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_init, node_init.id)
+            path_init_raw = self.connector.run_cypher_statement(cy)
+
+            cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_updated, node_updated.id)
+            path_updated_raw = self.connector.run_cypher_statement(cy)
+
+            path_init = GraphPath.from_neo4j_response(path_init_raw)
+            path_updated = GraphPath.from_neo4j_response(path_updated_raw)
+
             # log modified
             for modAttr in cleared_nodeDifference.AttrsModified.items():
                 attr_name = modAttr[0]
                 val_old = modAttr[1]['left']
                 val_new = modAttr[1]['right']
+
                 diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
-                                                          val_new)
+                                                          val_new, path_init, path_updated)
 
             # log added
             for addedAttr in cleared_nodeDifference.AttrsAdded.items():
                 attr_name = addedAttr[0]
                 val_new = addedAttr[1]
-                diff_result_container.logNodeModification(None, node_updated.id, attr_name, 'added', None, val_new)
+                diff_result_container.logNodeModification(None, node_updated.id, attr_name, 'added', None, val_new, path_init, path_updated)
 
             # log deleted
             for delAttr in cleared_nodeDifference.AttrsDeleted.items():
                 attr_name = delAttr[0]
                 val_new = delAttr[1]
-                diff_result_container.logNodeModification(node_init.id, None, attr_name, 'deleted', val_old, None)
+                diff_result_container.logNodeModification(node_init.id, None, attr_name, 'deleted', val_old, None, path_init, path_updated)
 
         return diff_result_container
 

@@ -13,7 +13,7 @@ import json
 class PatchGenerator:
 
     def __init__(self, connector: Neo4jConnector):
-        self.patch= Patch()
+        self.patch = Patch()
         self.connector: Neo4jConnector = connector
 
     def create_patch_from_graph_diff(self, res: ResultGenerator):
@@ -66,8 +66,7 @@ class PatchGenerator:
                 # assign operation to patch
                 self.patch.operations.append(operation)
 
-
         # --- Structural modifications ---
 
-    def to_json(self):
-        return json.dump(self)
+    def export_to_json(self):
+        return self.patch.to_json()

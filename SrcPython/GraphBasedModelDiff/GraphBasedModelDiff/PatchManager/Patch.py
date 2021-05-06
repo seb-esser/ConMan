@@ -1,7 +1,8 @@
 from PatchManager.Operation import AbstractOperation
+import jsonpickle
 
 
-class Patch:
+class Patch(object):
 
     def __init__(self):
         # an ordered list of operations that should mutate an existing graph into the updated version
@@ -13,4 +14,11 @@ class Patch:
 
     def __repr__(self):
         return 'Patch object'
+
+    def to_json(self):
+        return jsonpickle.encode(self)
+
+
+
+
 
