@@ -1,4 +1,5 @@
 """ packages """
+from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 
 """ modules """
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
@@ -157,13 +158,13 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
                 primary_updated = diff_result_container.RootNode_updated.id
 
                 cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_init, node_init.id)
-                path_init_raw = self.connector.run_cypher_statement(cy, 'path')
+                path_init_raw = self.connector.run_cypher_statement(cy)
 
                 cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_updated, node_updated.id)
-                path_updated_raw = self.connector.run_cypher_statement(cy, 'path')
+                path_updated_raw = self.connector.run_cypher_statement(cy)
 
-                path_init = path_init_raw
-                path_updated = path_init_raw
+                path_init = GraphPath.from_neo4j_response(path_init_raw)
+                path_updated = GraphPath.from_neo4j_response(path_updated_raw)
 
                 diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
                                                           val_new, path_init, path_updated)
