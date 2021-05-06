@@ -1,13 +1,19 @@
 from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
+
 class GraphPath:
 
-    def __init__(self):
-        self.segments: list(PathSegment)
+    def __init__(self, segments):
+        self.segments: list = segments
 
     @classmethod
     def from_neo4j_response(cls, raw: str):
+        """
+        creates a graph path instance from a given neo4j response
+        @param raw:
+        @return:
+        """
         # decode cypher response
         raw_path = raw[0][0]
         raw_nodes = raw[0][1]
@@ -16,18 +22,8 @@ class GraphPath:
         nodes = NodeItem.fromNeo4jResponse(raw_nodes)
         edges = EdgeItem.from_neo4j_response(raw_edges, nodes)
 
-        rels = raw[0].relationships
-        # loop over all path items
-        for rel in rels:
-            raw_startnode_id = rel.start_node.id
-            raw_endnode_id = rel.end_node.id
-            raw_type = rel.type
+        return cls(edges)
 
-            segment = PathSegment()
+    def __repr__(self):
+        return 'GraphPath instance'
 
-
-class PathSegment:
-    def __init__(self):
-        self.start: NodeItem
-        self.end: NodeItem
-        self.relType: str

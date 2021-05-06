@@ -9,6 +9,12 @@ class EdgeItem:
 
     @classmethod
     def from_neo4j_response(cls, raw: str, nodes: list):
+        """
+        returns a list of EdgeItem instances from a given neo4j response string
+        @raw: the neo4j response
+        @nodes: a list of nodeItem instances
+        @return: a list of EdgeItem instances in a list
+        """
 
         edges = []
 
