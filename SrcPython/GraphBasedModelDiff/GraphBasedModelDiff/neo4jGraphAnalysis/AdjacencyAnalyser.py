@@ -37,11 +37,11 @@ class AdjacencyAnalyser(object):
         # get hashes of all nodes
         for n in nodes: 
             cy = Neo4jQueryFactory.get_hash_by_nodeId(label, n.id)
-            raw_response = self.connector.run_cypher_statement(cy, 'hash')
-            n.setHash(raw_response[0])
+            raw_response = self.connector.run_cypher_statement(cy, 'hash_value')
+            n.set_hash(raw_response[0])
 
         # sort nodes by their hashsums      
-        sorted_nodes = sorted(nodes, key=lambda nodeItem: nodeItem.hash)
+        sorted_nodes = sorted(nodes, key=lambda nodeItem: nodeItem.hash_value)
         
         # build adjacency matrix
         calculator = SetCalculator()

@@ -25,7 +25,7 @@ class SetCalculator(object):
 
         nodes_unchanged = []
 
-        # match nodes based on child node hash
+        # match nodes based on child node hash_value
         A = set_A
         B = set_B
 
@@ -69,7 +69,7 @@ class SetCalculator(object):
         @param B: a (distinct) set of nodes
         @return: a list of tuples as the result of the intersection operation
         """
-        return ((x, y) for x, y in itertools.product(A, B) if x.hash == y.hash)
+        return ((x, y) for x, y in itertools.product(A, B) if x.hash_value == y.hash_value)
 
     def __get_intersection_byHashAnRelType(self, A, B):
         """
@@ -79,7 +79,7 @@ class SetCalculator(object):
         @param B: a (distinct) set of nodes
         @return: a list of tuples as the result of the intersection operation
         """
-        return ((x, y) for x, y in itertools.product(A, B) if x.hash == y.hash and x.relType == y.relType)
+        return ((x, y) for x, y in itertools.product(A, B) if x.hash_value == y.hash_value and x.relType == y.relType)
 
     def __get_intersection_byRelType(self, A, B):
         """

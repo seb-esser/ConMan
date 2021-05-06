@@ -31,10 +31,10 @@ class RootedNodeDiff:
 		attr_ignore_list = self.configuration.DiffSettings.diffIgnoreAttrs
 
 		for node in nodes_init: 
-			# load hash value
+			# load hash_value value
 			cy = Neo4jQueryFactory.get_hash_by_nodeId(label_init, node.id, attr_ignore_list)
 			res = self.connector.run_cypher_statement(cy)
-			node.hash = res[0][0]
+			node.hash_value = res[0][0]
 
 			# load attributes
 			cy = Neo4jQueryFactory.get_node_properties_by_id(node.id)
@@ -44,7 +44,7 @@ class RootedNodeDiff:
 		for node in nodes_updated: 
 			cy = Neo4jQueryFactory.get_hash_by_nodeId(label_updated, node.id, attr_ignore_list)
 			res = self.connector.run_cypher_statement(cy)
-			node.hash = res[0][0]
+			node.hash_value = res[0][0]
 
 			# load attributes
 			cy = Neo4jQueryFactory.get_node_properties_by_id(node.id)
@@ -82,7 +82,7 @@ class RootedNodeDiff:
 		nodes = []
 		for res in result: 
 			node = NodeItem(res[0], None, res[1])
-			node.setHash(res[2])
+			node.set_hash(res[2])
 			nodes.append(node)
 	
 		return nodes

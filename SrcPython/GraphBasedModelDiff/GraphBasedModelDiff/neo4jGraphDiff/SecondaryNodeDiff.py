@@ -203,7 +203,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
 
     def __get_hashes_of_nodes(self, label: str, nodeList: list, indent=0) -> list:
         """
-        calculates the hash sum for each node in a given node list
+        calculates the hash_value sum for each node in a given node list
         @param label: the model identifier
         @param nodeList:
         @param indent:
@@ -211,19 +211,19 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         """
 
         ignore_attrs = self.configuration.DiffSettings.diffIgnoreAttrs  # list of strings
-        # calc corresponding hash
+        # calc corresponding hash_value
         for node in nodeList:
             child_node_id = node.id
             relType = node.relType
-            # calc hash of current node
+            # calc hash_value of current node
             cypher_hash = Neo4jQueryFactory.get_hash_by_nodeId(label, child_node_id, ignore_attrs)
             hash = self.connector.run_cypher_statement(cypher_hash)[0][0]
 
-            node.setHash(hash)
+            node.set_hash(hash)
 
         if self.toConsole():
             print("".ljust(indent * 4) + 'Calculated hashes for model >> {} <<:'.format(label))
             for node in nodeList:
-                print("".ljust(indent * 4) + '\t NodeID: {:<4} \t hash: {}'.format(node.id, node.hash))
+                print("".ljust(indent * 4) + '\t NodeID: {:<4} \t hash_value: {}'.format(node.id, node.hash_value))
 
         return nodeList

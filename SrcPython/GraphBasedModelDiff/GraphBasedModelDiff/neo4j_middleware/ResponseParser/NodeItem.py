@@ -12,15 +12,15 @@ class NodeItem:
         """
         self.id = id
         self.entityType = entityType
-        self.hash = None
+        self.hash_value = None
         self.relType = relType
         self.attrs = None
 
-    def setHash(self, hash):
-        self.hash = hash
+    def set_hash(self, hash_val: str):
+        self.hash_value = hash_val
 
     def get_hash(self):
-        return self.hash
+        return self.hash_value
 
     def __repr__(self):
         return 'NodeItem: id: {} entityType: {}'.format(self.id, self.entityType)

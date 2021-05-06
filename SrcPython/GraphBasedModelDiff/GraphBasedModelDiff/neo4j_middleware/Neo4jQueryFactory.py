@@ -64,10 +64,10 @@ class Neo4jQueryFactory(Neo4jFactory):
     @classmethod
     def get_hash_by_nodeId(cls, label: str, nodeId: int, attrIgnoreList=None) -> str:
         """
-        Calculates the hash sum over a given node. Use attrIgnoreList to specify attribute names that should be excluded when calculating the hash
+        Calculates the hash_value sum over a given node. Use attrIgnoreList to specify attribute names that should be excluded when calculating the hash_value
         @param label: model label
         @param nodeId: the node ID
-        @param attrIgnoreList: attributes to be ignored in the hash calculation
+        @param attrIgnoreList: attributes to be ignored in the hash_value calculation
         @return: cypher query string
         """
 
@@ -80,7 +80,7 @@ class Neo4jQueryFactory(Neo4jFactory):
 
         # apply diffIgnore attributes if staged
         if attrIgnoreList == None:
-            calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash RETURN hash'
+            calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash_value RETURN hash_value'
         else:
             # open
             ignore_str = '['
@@ -94,11 +94,11 @@ class Neo4jQueryFactory(Neo4jFactory):
             # close
             ignore_str = ignore_str + ']'
 
-            calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash RETURN hash'.format(ignore_str)
+            calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash_value RETURN hash_value'.format(ignore_str)
 
         close_sub = '}'
         add_label_again = 'SET n:{}'.format(label)
-        return_results = 'RETURN hash'
+        return_results = 'RETURN hash_value'
         return Neo4jFactory.BuildMultiStatement([getModel, where, open_sub, removeLabel, calc_fingerprint, close_sub, add_label_again, return_results])
 
 
