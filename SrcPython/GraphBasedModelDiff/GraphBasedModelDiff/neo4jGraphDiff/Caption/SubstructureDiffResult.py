@@ -13,8 +13,8 @@ class SubstructureDiffResult(Result):
         super().__init__()
         self.isSimilar: bool = True
         self.method = method
-        self.propertyModifications:list(PropertyModification) = []
-        self.StructureModifications: list(StructureModification) = []
+        self.propertyModifications: list[PropertyModification] = []
+        self.StructureModifications: list[StructureModification] = []
         self.time: float = 0.0
         self.RootNode_init: NodeItem = root_init
         self.RootNode_updated: NodeItem = root_updated

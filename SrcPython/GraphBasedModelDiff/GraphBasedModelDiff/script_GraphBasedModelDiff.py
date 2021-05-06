@@ -100,7 +100,9 @@ async def main():
 	# report.print_time_plot()
 
 	# create a patch out of the captured diff result
-	generator = PatchManager.PatchGenerator.PatchGenerator()
+	generator = PatchManager.PatchGenerator.PatchGenerator(connector)
 	generator.create_patch_from_graph_diff(report)
+
+	js_rep = generator.to_json()
 
 asyncio.run(main())
