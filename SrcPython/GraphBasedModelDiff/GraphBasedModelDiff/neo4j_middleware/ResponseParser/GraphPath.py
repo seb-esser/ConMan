@@ -5,7 +5,7 @@ from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 class GraphPath:
 
     def __init__(self, segments):
-        self.segments: list = segments
+        self.segments = segments
 
     @classmethod
     def from_neo4j_response(cls, raw: str):
@@ -27,3 +27,18 @@ class GraphPath:
     def __repr__(self):
         return 'GraphPath instance'
 
+    def to_patch(self):
+        """
+        serializes the GraphPath object into a string representation
+        @return:
+        """
+
+        val = ''
+        for edge in self.segments:
+            start = edge.startNode.entityType
+            relType = edge.relType
+            val = val + '({})-[:{}]->'.format(start, relType)
+
+        val = val + '({})'.format(self.segments[-1].endNode.entityType)
+
+        return val

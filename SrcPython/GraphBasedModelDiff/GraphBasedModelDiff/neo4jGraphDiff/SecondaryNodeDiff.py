@@ -166,6 +166,8 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
                 path_init = GraphPath.from_neo4j_response(path_init_raw)
                 path_updated = GraphPath.from_neo4j_response(path_updated_raw)
 
+                print(path_init.to_patch())
+
                 diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
                                                           val_new, path_init, path_updated)
 

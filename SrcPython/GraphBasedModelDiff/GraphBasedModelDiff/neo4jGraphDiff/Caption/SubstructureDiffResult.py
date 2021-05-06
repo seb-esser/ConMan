@@ -2,6 +2,7 @@
 from enum import Enum
 
 from neo4jGraphDiff.AbsResult import Result
+from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 
@@ -54,8 +55,8 @@ class PropertyModification:
               "deleted": PropertyModificationTypeEnum.DELETED,
               "modified": PropertyModificationTypeEnum.MODIFIED}
         self.modificationType = sw[modificationType]
-        self.path_init: str
-        self.path_updated: str
+        self.path_init: GraphPath
+        self.path_updated: GraphPath
 
     def set_paths(self, path_init, path_updated):
         self.path_init = path_init

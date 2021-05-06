@@ -1,14 +1,14 @@
-from neo4j_middleware.ResponseParser.NodeItem import NodeItem
+from neo4j_middleware.ResponseParser import NodeItem
 
 
 class EdgeItem:
     def __init__(self, start_node: NodeItem, end_node: NodeItem, relType: str):
         self.relType: str = relType
-        self.startNode: NodeItem = start_node
-        self.endNode: NodeItem = end_node
+        self.startNode = start_node
+        self.endNode = end_node
 
     @classmethod
-    def from_neo4j_response(cls, raw: str, nodes: list):
+    def from_neo4j_response(cls, raw: str, nodes):
         """
         returns a list of EdgeItem instances from a given neo4j response string
         @raw: the neo4j response
@@ -23,8 +23,8 @@ class EdgeItem:
             raw_endnode_id = edge.end_node.id
             raw_type = edge.type
 
-            start_node = (x for x in nodes if x.id == raw_startnode_id)
-            end_node = (x for x in nodes if x.id == raw_endnode_id)
+            start_node = next(x for x in nodes if x.id == raw_startnode_id)
+            end_node = next(x for x in nodes if x.id == raw_endnode_id)
 
             e = cls(start_node, end_node, raw_type)
             edges.append(e)
