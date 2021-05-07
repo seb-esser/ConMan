@@ -146,6 +146,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
                 print('[RESULT]: child nodes match')
 
         else:
+            diff_result_container.isSimilar = False
             # log modifications
             root_init = diff_result_container.RootNode_init
             root_updated = diff_result_container.RootNode_updated

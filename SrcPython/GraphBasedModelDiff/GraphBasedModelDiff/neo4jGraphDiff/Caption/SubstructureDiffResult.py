@@ -33,7 +33,7 @@ class SubstructureDiffResult(Result):
                             graph_path_init,
                             graph_path_updated):
         """
-        captures a  
+        captures a property modification on node attributes
         @param nodeId_init:
         @param nodeId_updated:
         @param attrName:

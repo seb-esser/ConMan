@@ -80,7 +80,7 @@ class Neo4jQueryFactory(Neo4jFactory):
 
         # apply diffIgnore attributes if staged
         if attrIgnoreList == None:
-            calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash_value RETURN hash_value'
+            calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash_value RETURN hash'
         else:
             # define fucntion where quotationmarks "" or [] are added
             def surroundStrings(l):
@@ -100,7 +100,7 @@ class Neo4jQueryFactory(Neo4jFactory):
 
         close_sub = '}'
         add_label_again = 'SET n:{}'.format(label)
-        return_results = 'RETURN hash_value'
+        return_results = 'RETURN hash'
         return Neo4jFactory.BuildMultiStatement([getModel, where, open_sub, removeLabel, calc_fingerprint, close_sub, add_label_again, return_results])
 
 

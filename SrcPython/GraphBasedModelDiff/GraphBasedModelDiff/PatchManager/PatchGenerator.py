@@ -2,8 +2,9 @@ from PatchManager.Operation.AttributeOperations.AddAttributeOperation import Add
 from PatchManager.Operation.AttributeOperations.DeleteAttributeOperation import DeleteAttributeOperation
 from PatchManager.Operation.AttributeOperations.ModifyAttributeOperation import ModifyAttributeOperation
 from PatchManager.Patch import Patch
+from neo4jGraphDiff.Caption.PropertyModification import PropertyModificationTypeEnum
 from neo4jGraphDiff.Caption.ResultGenerator import ResultGenerator
-from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult, PropertyModificationTypeEnum
+from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -40,7 +41,7 @@ class PatchGenerator:
 
                 # calc hashsum
                 cy = Neo4jQueryFactory.get_hash_by_nodeId(res.timestamp_init, root_init, self.patch.ignore_attrs)
-                hashsum = self.connector.run_cypher_statement(cy, 'hash_value')[0]
+                hashsum = self.connector.run_cypher_statement(cy, 'hash')[0]
 
                 if p.modificationType == PropertyModificationTypeEnum.ADDED:
                     operation = AddAttributeOperation(prim_hash=hashsum,

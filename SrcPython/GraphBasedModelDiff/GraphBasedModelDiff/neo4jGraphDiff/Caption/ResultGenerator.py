@@ -110,15 +110,13 @@ class ResultGenerator:
 
             if not item.isSimilar:
                 for res in item.propertyModifications:
-                    print('\t   PropertyMod: NodeId_INIT: {:<5} NodeId_UPDATED: {:<5}'.format(res.nodeId_init,
-                                                                                              res.nodeId_updated))
-                    print \
-                        ('\t    |-> ModificationType: {:<15} attrName: {:<12} oldValue: {:<20} newValue: {:<20}'.format
-                         (res.modificationType, res.attrName, res.valueOld, res.valueNew))
+                    print('\t   PropertyMod: NodeId_INIT: {:<5} NodeId_UPDATED: {:<5}'.format(
+                        res.nodeId_init, res.nodeId_updated))
+                    print('\t    |-> ModificationType: {:<15} attrName: {:<12} oldValue: {:<20} newValue: {:<20}'.format(
+                        res.modificationType, res.attrName, str(res.valueOld), str(res.valueNew)))
 
                 for res in item.StructureModifications:
-                    print('\t   StructuralMod: NodeId_PARENT: {:<5} NodeId_Child: {:<5}'.format(res.parentId,
-                                                                                                res.childId))
+                    print('\t   StructuralMod: NodeId_PARENT: {:<5} NodeId_Child: {:<5}'.format(res.parentId, res.childId))
                     print('\t    |-> ModificationType: {:<15} '.format(res.modType))
             print()
 
