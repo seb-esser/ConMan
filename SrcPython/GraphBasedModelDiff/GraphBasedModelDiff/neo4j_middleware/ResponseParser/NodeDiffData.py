@@ -1,4 +1,4 @@
-from neo4jGraphDiff.Caption.SubstructureDiffResult import PropertyModification
+from neo4jGraphDiff.Caption.PropertyModification import PropertyModification
 from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 
 

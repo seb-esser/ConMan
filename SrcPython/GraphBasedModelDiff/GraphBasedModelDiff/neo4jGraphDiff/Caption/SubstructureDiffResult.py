@@ -1,8 +1,11 @@
 """ packages """
 from enum import Enum
 
+from typing import List
+
 from neo4jGraphDiff.AbsResult import Result
-from neo4j_middleware.ResponseParser.GraphPath import GraphPath
+from neo4jGraphDiff.Caption.PropertyModification import PropertyModification
+from neo4jGraphDiff.Caption.StructureModification import StructureModification
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 
@@ -13,15 +16,34 @@ class SubstructureDiffResult(Result):
         super().__init__()
         self.isSimilar: bool = True
         self.method = method
-        self.propertyModifications: list[PropertyModification] = []
-        self.StructureModifications: list[StructureModification] = []
+        self.propertyModifications: List[PropertyModification] = []
+        self.StructureModifications: List[StructureModification] = []
         self.time: float = 0.0
         self.RootNode_init: NodeItem = root_init
         self.RootNode_updated: NodeItem = root_updated
         self.recursionCounter = 0
 
-    def logNodeModification(self, nodeId_init, nodeId_updated, attrName, modType, value_old, value_new, graph_path_init, graph_path_updated):
-        """ logs a modification applied on properties """
+    def logNodeModification(self,
+                            nodeId_init: int,
+                            nodeId_updated: int,
+                            attrName: str,
+                            modType: str,
+                            value_old,
+                            value_new,
+                            graph_path_init,
+                            graph_path_updated):
+        """
+        captures a  
+        @param nodeId_init:
+        @param nodeId_updated:
+        @param attrName:
+        @param modType:
+        @param value_old:
+        @param value_new:
+        @param graph_path_init:
+        @param graph_path_updated:
+        @return:
+        """
         modification = PropertyModification(nodeId_init, nodeId_updated, attrName, modType, value_old, value_new)
 
         # set exact graph path
@@ -43,54 +65,5 @@ class SubstructureDiffResult(Result):
         self.recursionCounter += 1
 
 
-class PropertyModification:
-
-    def __init__(self, id_init, id_updated, attrName, modificationType, value_old=None, value_new=None):
-        self.nodeId_init = id_init
-        self.nodeId_updated = id_updated
-        self.attrName = attrName
-        self.valueOld = value_old
-        self.valueNew = value_new
-        sw = {"added": PropertyModificationTypeEnum.ADDED,
-              "deleted": PropertyModificationTypeEnum.DELETED,
-              "modified": PropertyModificationTypeEnum.MODIFIED}
-        self.modificationType = sw[modificationType]
-        self.path_init: GraphPath
-        self.path_updated: GraphPath
-
-    def set_paths(self, path_init, path_updated):
-        self.path_init = path_init
-        self.path_updated = path_updated
-
-    def __repr__(self):
-        return 'PMod: node_init: {} node_updated: {} attr: {} action: {} oldVal: {} newVal: {}'.format(self.nodeId_init,
-                                                                                                       self.nodeId_updated,
-                                                                                                       self.attrName,
-                                                                                                       self.modificationType,
-                                                                                                       self.valueOld,
-                                                                                                       self.valueNew)
 
 
-class PropertyModificationTypeEnum(Enum):
-    ADDED = 1
-    DELETED = 2
-    MODIFIED = 3
-
-
-class StructureModification:
-
-    def __init__(self, parentId, childId, modificationType):
-        self.parentId = parentId
-        self.childId = childId
-        sw = {"added": StructuralModificationTypeEnum.ADDED,
-              "deleted": StructuralModificationTypeEnum.DELETED}
-        self.modType = sw[modificationType]
-
-    def __repr__(self):
-        return 'Structure Modification: parentId: {} childId: {} action: {}'.format(self.parentId, self.childId,
-                                                                                    self.modType)
-
-
-class StructuralModificationTypeEnum(Enum):
-    ADDED = 1
-    DELETED = 2
