@@ -23,7 +23,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         diffContainer = SubstructureDiffResult(method="Node-Diff", root_init=node_init, root_updated=node_updated)
 
         # start recursion
-        diffContainer = self.__compare_children(node_init, node_updated, diffContainer)
+        diffContainer = self.__compare_children(node_init, node_updated, diffContainer, indent=0)
         return diffContainer
 
     async def diff_subgraphs_async(self, node_init: NodeItem, node_updated: NodeItem) -> SubstructureDiffResult:
@@ -38,17 +38,20 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         return diffContainer
 
     def __compare_children(self, node_init, node_updated, diff_result_container, indent=0):
-        """ queries the all child nodes of a node and compares the results between the initial and the updated graph based on AttrDiff"""
+        """
+        queries the all child nodes of a node and compares the results between
+        the initial and the updated graph based on AttrDiff
+        """
 
         desiredMatchMethod = self.configuration.DiffSettings.MatchingType_Childs
 
         diff_result_container.increaseRecursionCounter()
 
         if self.toConsole():
-            print("".ljust(indent * 4) + 'Check children of NodeId {} and NodeId {}'.format(node_init.id,
-                                                                                            node_updated.id))
+            print("".ljust(indent * 4) +
+                  'Check children of NodeId {} and NodeId {}'.format(node_init.id, node_updated.id))
 
-        # get children data
+        # get children nodes
         children_init = self.get_children_nodes(self.label_init, node_init.id)
         children_updated = self.get_children_nodes(self.label_updated, node_updated.id)
 
@@ -61,8 +64,8 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         # calc hashes if necessary for matching method
         if desiredMatchMethod == MatchCriteriaEnum.OnHash:
             # calc hashes for init and updated
-            childs_init = self.__get_hashes_of_nodes(self.label_init, children_init, indent)
-            childs_updated = self.__get_hashes_of_nodes(self.label_updated, children_updated, indent)
+            children_init = self.__get_hashes_of_nodes(self.label_init, children_init, indent)
+            children_updated = self.__get_hashes_of_nodes(self.label_updated, children_updated, indent)
 
         # apply DiffIgnore -> Ignore nodes if requested        
         children_init = self.apply_DiffIgnore_Nodes(children_init)
@@ -91,17 +94,20 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         # check the nodes that have the same relationship OR the same EntityType and the same node type: 
         for matchingChildPair in nodes_unchanged:
             # detect changes on property level between both matching nodes
-            diff_result_container = self.__calcPropertyDifference(diff_result_container, node_init, node_updated)
+            diff_result_container = self.__calcPropertyDifference(
+                diff_result_container, matchingChildPair[0], matchingChildPair[1])
 
             # run recursion for children if "NoChange" or "Modified" happened
-            diff_result_container = self.__compare_children(matchingChildPair[0], matchingChildPair[1],
-                                                            diff_result_container)
+            diff_result_container = self.__compare_children(matchingChildPair[0],
+                                                            matchingChildPair[1],
+                                                            diff_result_container,
+                                                            indent=indent + 1)
 
             # end for loop 
 
         return diff_result_container
 
-    def __apply_diffIgnore_on_node_diff(self, diff, IgnoreAttrs):
+    def __apply_diffIgnore(self, diff, IgnoreAttrs):
         """ removes the attributes stated in the used DiffIgnore file from the diff result of apoc """
         for ignore in IgnoreAttrs:
             if ignore in diff.AttrsUnchanged:       del diff.AttrsUnchanged[ignore]
@@ -121,89 +127,40 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         @return:
         """
         # compare two nodes
-        cypher = Neo4jQueryFactory.diff_nodes(node_init.id,
-                                              node_updated.id)  # compare childs? or current node?
+        cypher = Neo4jQueryFactory.diff_nodes(node_init.id, node_updated.id)
         raw = self.connector.run_cypher_statement(cypher)
 
         nodeDifference = NodeDiffData.fromNeo4jResponse(raw)
 
         # apply DiffIgnore on diff result
         ignoreAttrs = self.configuration.DiffSettings.diffIgnoreAttrs
-        cleared_nodeDifference = self.__apply_diffIgnore_on_node_diff(nodeDifference, ignoreAttrs)
+        nodeDiff = self.__apply_diffIgnore(nodeDifference, ignoreAttrs)
 
         if self.toConsole():
             print('comparing node {} to node {} after applying DiffIgnore:'.format(node_init.id, node_updated.id))
 
         # case 1: no modifications on pair
-        if cleared_nodeDifference.nodesAreSimilar() == True:
+        if nodeDiff.nodesAreSimilar():
             # nodes are similar
             if self.toConsole():
                 print('[RESULT]: child nodes match')
 
-        # case 2: modified attrs on pair but no added/deleted attrs
-        elif cleared_nodeDifference.nodesHaveUpdatedAttrs() == True:
-
-            # log modification
-            for modifiedAttr in cleared_nodeDifference.AttrsModified.items():
-                if self.toConsole():
-                    print(modifiedAttr)
-
-                # ToDo: move extraction of data from tuple to higher representation
-                attr_name = modifiedAttr[0]
-                val_old = modifiedAttr[1]['left']
-                val_new = modifiedAttr[1]['right']
-
-                # calculate graph path to node
-                primary_init = diff_result_container.RootNode_init.id
-                primary_updated = diff_result_container.RootNode_updated.id
-
-                cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_init, node_init.id)
-                path_init_raw = self.connector.run_cypher_statement(cy)
-
-                cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_updated, node_updated.id)
-                path_updated_raw = self.connector.run_cypher_statement(cy)
-
-                path_init = GraphPath.from_neo4j_response(path_init_raw)
-                path_updated = GraphPath.from_neo4j_response(path_updated_raw)
-
-                print(path_init.to_patch())
-
-                diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
-                                                          val_new, path_init, path_updated)
-
-        # case 3: added/deleted attrs. Break recursion
         else:
-            if self.toConsole():
-                print('[RESULT]: detected unsimilarity between nodes {} and {}'.format(node_init.id, node_updated.id))
-                print(cleared_nodeDifference)
+            # log modifications
+            root_init = diff_result_container.RootNode_init
+            root_updated = diff_result_container.RootNode_updated
 
-            # -- log result --
+            path_init = self.__get_path(root_init.id, node_init.id)
+            path_updated = self.__get_path(root_updated.id, node_updated.id)
 
-            # log modified
-            for modAttr in cleared_nodeDifference.AttrsModified.items():
-                attr_name = modAttr[0]
-                val_old = modAttr[1]['left']
-                val_new = modAttr[1]['right']
-                diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
-                                                          val_new)
-
-            # log added
-            for addedAttr in cleared_nodeDifference.AttrsAdded.items():
-                attr_name = addedAttr[0]
-                val_new = addedAttr[1]
-                diff_result_container.logNodeModification(None, node_updated.id, attr_name, 'added', None, val_new)
-
-            # log deleted
-            for delAttr in cleared_nodeDifference.AttrsDeleted.items():
-                attr_name = delAttr[0]
-                val_new = delAttr[1]
-                diff_result_container.logNodeModification(node_init.id, None, attr_name, 'deleted', val_old, None)
-
+            pmod_list = nodeDiff.createPModDefinitions(node_init.id, node_updated.id, path_init=path_init, path_updated=path_updated)
+            # append modifications to container
+            diff_result_container.propertyModifications.extend(pmod_list)
         return diff_result_container
 
     def __get_hashes_of_nodes(self, label: str, nodeList: list, indent=0) -> list:
         """
-        calculates the hash sum for each node in a given node list
+        calculates the hash_value sum for each node in a given node list
         @param label: the model identifier
         @param nodeList:
         @param indent:
@@ -211,19 +168,27 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         """
 
         ignore_attrs = self.configuration.DiffSettings.diffIgnoreAttrs  # list of strings
-        # calc corresponding hash
+        # calc corresponding hash_value
         for node in nodeList:
             child_node_id = node.id
             relType = node.relType
-            # calc hash of current node
+            # calc hash_value of current node
             cypher_hash = Neo4jQueryFactory.get_hash_by_nodeId(label, child_node_id, ignore_attrs)
             hash = self.connector.run_cypher_statement(cypher_hash)[0][0]
 
-            node.setHash(hash)
+            node.set_hash(hash)
 
         if self.toConsole():
             print("".ljust(indent * 4) + 'Calculated hashes for model >> {} <<:'.format(label))
             for node in nodeList:
-                print("".ljust(indent * 4) + '\t NodeID: {:<4} \t hash: {}'.format(node.id, node.hash))
+                print("".ljust(indent * 4) + '\t NodeID: {:<4} \t hash_value: {}'.format(node.id, node.hash_value))
 
         return nodeList
+
+    def __get_path(self, root_node_id: int, current_node_id: int) -> GraphPath:
+        cy = Neo4jQueryFactory.get_directed_path_by_nodeId(node_id_start=root_node_id, node_id_target=current_node_id)
+        res = self.connector.run_cypher_statement(cy)
+
+        path = GraphPath.from_neo4j_response(res)
+        return path
+

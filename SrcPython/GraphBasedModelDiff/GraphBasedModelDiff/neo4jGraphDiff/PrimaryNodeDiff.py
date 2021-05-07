@@ -18,7 +18,6 @@ class RootedNodeDiff:
 			return True
 		else:
 			return False
-		
 
 	def diffRootedNodes(self, label_init, label_updated):
 		""" """
@@ -31,25 +30,15 @@ class RootedNodeDiff:
 		attr_ignore_list = self.configuration.DiffSettings.diffIgnoreAttrs
 
 		for node in nodes_init: 
-			# load hash value
+			# load hash_value value
 			cy = Neo4jQueryFactory.get_hash_by_nodeId(label_init, node.id, attr_ignore_list)
 			res = self.connector.run_cypher_statement(cy)
-			node.hash = res[0][0]
-
-			# load attributes
-			cy = Neo4jQueryFactory.get_node_properties_by_id(node.id)
-			res = self.connector.run_cypher_statement(cy)
-			node.setNodeAttributes(res[0][0])
+			node.hash_value = res[0][0]
 
 		for node in nodes_updated: 
 			cy = Neo4jQueryFactory.get_hash_by_nodeId(label_updated, node.id, attr_ignore_list)
 			res = self.connector.run_cypher_statement(cy)
-			node.hash = res[0][0]
-
-			# load attributes
-			cy = Neo4jQueryFactory.get_node_properties_by_id(node.id)
-			res = self.connector.run_cypher_statement(cy)
-			node.setNodeAttributes(res[0][0])
+			node.hash_value = res[0][0]
 
 		# calc matching of node sets
 		matchingMethod = self.configuration.DiffSettings.MatchingType_RootedNodes
@@ -82,7 +71,7 @@ class RootedNodeDiff:
 		nodes = []
 		for res in result: 
 			node = NodeItem(res[0], None, res[1])
-			node.setHash(res[2])
+			node.set_hash(res[2])
 			nodes.append(node)
 	
 		return nodes

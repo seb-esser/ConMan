@@ -47,7 +47,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH (n:PrimaryNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.entityType'
+        ret_statement = 'RETURN ID(n), n.entityType, PROPERTIES(n)'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
@@ -64,10 +64,10 @@ class Neo4jQueryFactory(Neo4jFactory):
     @classmethod
     def get_hash_by_nodeId(cls, label: str, nodeId: int, attrIgnoreList=None) -> str:
         """
-        Calculates the hash sum over a given node. Use attrIgnoreList to specify attribute names that should be excluded when calculating the hash
+        Calculates the hash_value sum over a given node. Use attrIgnoreList to specify attribute names that should be excluded when calculating the hash_value
         @param label: model label
         @param nodeId: the node ID
-        @param attrIgnoreList: attributes to be ignored in the hash calculation
+        @param attrIgnoreList: attributes to be ignored in the hash_value calculation
         @return: cypher query string
         """
 
@@ -80,7 +80,7 @@ class Neo4jQueryFactory(Neo4jFactory):
 
         # apply diffIgnore attributes if staged
         if attrIgnoreList == None:
-            calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash RETURN hash'
+            calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash_value RETURN hash_value'
         else:
             # define fucntion where quotationmarks "" or [] are added
             def surroundStrings(l):
@@ -100,7 +100,7 @@ class Neo4jQueryFactory(Neo4jFactory):
 
         close_sub = '}'
         add_label_again = 'SET n:{}'.format(label)
-        return_results = 'RETURN hash'
+        return_results = 'RETURN hash_value'
         return Neo4jFactory.BuildMultiStatement([getModel, where, open_sub, removeLabel, calc_fingerprint, close_sub, add_label_again, return_results])
 
 
@@ -112,9 +112,9 @@ class Neo4jQueryFactory(Neo4jFactory):
         @param parent_node_id: the node id of the parent node
         @return: cypher query string
         """
-        match = 'MATCH (n:{}) -[r]->(c)'.format(label)
+        match = 'MATCH (n:{})-[r]->(c)'.format(label)
         where = 'WHERE ID(n) = {}'.format(parent_node_id)
-        ret = 'RETURN ID(c), type(r), c.entityType'
+        ret = 'RETURN ID(c), type(r), c.entityType, properties(c)'
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     @classmethod

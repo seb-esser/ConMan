@@ -21,16 +21,16 @@ connector.connect_driver()
 
 
 ## cuboid sample with different subgraph structures
-#label_init = "ts20210119T085406"	# same rep
-#label_updated = "ts20210119T085407" # different rep
+# label_init = "ts20210119T085406"	# same rep
+# label_updated = "ts20210119T085407" # different rep
 
 ## cuboid sample with height elevation 
-label_init = "ts20210119T085408" # different rep
-label_updated = "ts20210119T085409"	# different rep, modified height
+# label_init = "ts20210119T085408" # different rep
+# label_updated = "ts20210119T085409"	# different rep, modified height
 
 ## cuboid sample with cuboid vs cylinder
-#label_init = "ts20210119T085410"	# cuboid
-#label_updated = "ts20210119T085411"	# cylinder
+label_init = "ts20210119T085410"	# cuboid
+label_updated = "ts20210119T085411"	# cylinder
 
 ## cuboid sample with extrudedArea vs BRep
 #label_init = "ts20210119T085412"	# extrudedArea
@@ -85,22 +85,27 @@ async def main():
 		print('[TASK] Compare objects with root nodeIDs {}'.format(pair))
 	
 		# run component diff
-		task = asyncio.create_task(DiffEngine.diff_subgraphs_async(node_init, node_updated))
-		all_tasks.append(task)
-	
-	tic = time.process_time()
-	result = await asyncio.gather(*all_tasks)
-	for res in result:
+		res = DiffEngine.diff_subgraphs(node_init, node_updated)
 		report.capture_result_secondary(res)
-	toc = time.process_time()
-	elapsed = toc - tic
-	print('\nOverall time elapsed: {}\n'.format(elapsed))
+		#task = asyncio.create_task(DiffEngine.diff_subgraphs_async(node_init, node_updated))
+		#all_tasks.append(task)
+	
+	# tic = time.process_time()
+	# result = await asyncio.gather(*all_tasks)
+	# for res in result:
+	# 	report.capture_result_secondary(res)
+	# toc = time.process_time()
+	# elapsed = toc - tic
+	# print('\nOverall time elapsed: {}\n'.format(elapsed))
 	# show result on console
 	report.print_report()
 	# report.print_time_plot()
 
 	# create a patch out of the captured diff result
-	generator = PatchManager.PatchGenerator.PatchGenerator()
+	generator = PatchManager.PatchGenerator.PatchGenerator(connector)
 	generator.create_patch_from_graph_diff(report)
+
+	js_rep = generator.export_to_json()
+	print(js_rep)
 
 asyncio.run(main())
