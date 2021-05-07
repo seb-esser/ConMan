@@ -30,6 +30,8 @@ class NodeItem:
         ret_val = []
         for inst in raw:
             child = cls(int(inst[0]), inst[1], inst[2])
+            attrs = inst[3]
+            child.attrs = attrs
             ret_val.append(child)
         return ret_val
 
@@ -38,6 +40,8 @@ class NodeItem:
         ret_val = []
         for inst in raw:
             child = cls(id=int(inst[0]), relType=None, entityType=inst[1])
+            attrs = inst[2]
+            child.attrs = attrs
             ret_val.append(child)
         return ret_val
 

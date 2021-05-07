@@ -139,84 +139,23 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         if self.toConsole():
             print('comparing node {} to node {} after applying DiffIgnore:'.format(node_init.id, node_updated.id))
 
-
         # case 1: no modifications on pair
-        if nodeDiff.nodesAreSimilar() == True:
+        if nodeDiff.nodesAreSimilar():
             # nodes are similar
             if self.toConsole():
                 print('[RESULT]: child nodes match')
 
-        # case 2: modified attrs on pair but no added/deleted attrs
-        elif nodeDiff.nodesHaveUpdatedAttributeValues() == True:
-
-            # log modification
-            for modifiedAttr in nodeDiff.AttrsModified.items():
-                if self.toConsole():
-                    print(modifiedAttr)
-
-                # ToDo: move extraction of data from tuple to higher representation
-                attr_name = modifiedAttr[0]
-                val_old = modifiedAttr[1]['left']
-                val_new = modifiedAttr[1]['right']
-
-                # calculate graph path to node
-                primary_init = diff_result_container.RootNode_init.id
-                primary_updated = diff_result_container.RootNode_updated.id
-
-                cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_init, node_init.id)
-                path_init_raw = self.connector.run_cypher_statement(cy)
-
-                cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_updated, node_updated.id)
-                path_updated_raw = self.connector.run_cypher_statement(cy)
-
-                path_init = GraphPath.from_neo4j_response(path_init_raw)
-                path_updated = GraphPath.from_neo4j_response(path_updated_raw)
-
-                diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
-                                                          val_new, path_init, path_updated)
-
-        # case 3: added/deleted attrs. Break recursion
         else:
-            if self.toConsole():
-                print('[RESULT]: detected unsimilarity between nodes {} and {}'.format(node_init.id, node_updated.id))
-                print(nodeDiff)
+            # log modifications
+            root_init = diff_result_container.RootNode_init
+            root_updated = diff_result_container.RootNode_updated
 
-            # -- log result --
+            path_init = self.__get_path(root_init.id, node_init.id)
+            path_updated = self.__get_path(root_updated.id, node_updated.id)
 
-            # calculate graph path to node
-            primary_init = diff_result_container.RootNode_init.id
-            primary_updated = diff_result_container.RootNode_updated.id
-
-            cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_init, node_init.id)
-            path_init_raw = self.connector.run_cypher_statement(cy)
-
-            cy = Neo4jQueryFactory.get_directed_path_by_nodeId(primary_updated, node_updated.id)
-            path_updated_raw = self.connector.run_cypher_statement(cy)
-
-            path_init = GraphPath.from_neo4j_response(path_init_raw)
-            path_updated = GraphPath.from_neo4j_response(path_updated_raw)
-
-            # log modified
-            for modAttr in nodeDiff.AttrsModified.items():
-                attr_name = modAttr[0]
-                val_old = modAttr[1]['left']
-                val_new = modAttr[1]['right']
-
-                diff_result_container.logNodeModification(node_init.id, node_updated.id, attr_name, 'modified', val_old,
-                                                          val_new, path_init, path_updated)
-
-            # log added
-            for addedAttr in nodeDiff.AttrsAdded.items():
-                attr_name = addedAttr[0]
-                val_new = addedAttr[1]
-                diff_result_container.logNodeModification(None, node_updated.id, attr_name, 'added', None, val_new, path_init, path_updated)
-
-            # log deleted
-            for delAttr in nodeDiff.AttrsDeleted.items():
-                attr_name = delAttr[0]
-                val_new = delAttr[1]
-                diff_result_container.logNodeModification(node_init.id, None, attr_name, 'deleted', val_old, None, path_init, path_updated)
-
+            pmod_list = nodeDiff.createPModDefinitions(node_init.id, node_updated.id, path_init=path_init, path_updated=path_updated)
+            # append modifications to container
+            diff_result_container.propertyModifications.extend(pmod_list)
         return diff_result_container
 
     def __get_hashes_of_nodes(self, label: str, nodeList: list, indent=0) -> list:
@@ -245,3 +184,11 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
                 print("".ljust(indent * 4) + '\t NodeID: {:<4} \t hash_value: {}'.format(node.id, node.hash_value))
 
         return nodeList
+
+    def __get_path(self, root_node_id: int, current_node_id: int) -> GraphPath:
+        cy = Neo4jQueryFactory.get_directed_path_by_nodeId(node_id_start=root_node_id, node_id_target=current_node_id)
+        res = self.connector.run_cypher_statement(cy)
+
+        path = GraphPath.from_neo4j_response(res)
+        return path
+
