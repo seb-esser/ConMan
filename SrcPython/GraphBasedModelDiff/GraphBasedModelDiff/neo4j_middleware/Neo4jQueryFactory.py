@@ -82,19 +82,21 @@ class Neo4jQueryFactory(Neo4jFactory):
         if attrIgnoreList == None:
             calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash_value RETURN hash_value'
         else:
-            # open
-            ignore_str = '['
+            # define fucntion where quotationmarks "" or [] are added
+            def surroundStrings(l):
+                return ['"' + x + '"' for x in l]
+            
+            ignore_str = surroundStrings(attrIgnoreList)
+            # define seperator
+            seperator = ', '
 
-            # all attrs
-            for attr in attrIgnoreList:
-                ignore_str = ignore_str + '"{}", '.format(attr)
+            # join the contents of the list with the seperator
+            ignore_str = seperator.join(ignore_str)
 
-            # remove last comma
-            ignore_str = ignore_str[:-2]
-            # close
-            ignore_str = ignore_str + ']'
-
-            calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash_value RETURN hash_value'.format(ignore_str)
+            # close the string with []
+            ignore_str = '[' + ignore_str + ']'
+ 
+            calc_fingerprint = 'with apoc.hashing.fingerprint(n, {}) as hash RETURN hash'.format(ignore_str)
 
         close_sub = '}'
         add_label_again = 'SET n:{}'.format(label)
