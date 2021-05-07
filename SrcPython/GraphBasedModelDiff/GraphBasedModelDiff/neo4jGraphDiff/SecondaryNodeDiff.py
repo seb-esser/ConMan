@@ -48,8 +48,8 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         diff_result_container.increaseRecursionCounter()
 
         if self.toConsole():
-            print("".ljust(indent * 4) + 'Check children of NodeId {} and NodeId {}'.format(node_init.id,
-                                                                                            node_updated.id))
+            print("".ljust(indent * 4) +
+                  'Check children of NodeId {} and NodeId {}'.format(node_init.id, node_updated.id))
 
         # get children nodes
         children_init = self.get_children_nodes(self.label_init, node_init.id)
@@ -64,8 +64,8 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         # calc hashes if necessary for matching method
         if desiredMatchMethod == MatchCriteriaEnum.OnHash:
             # calc hashes for init and updated
-            childs_init = self.__get_hashes_of_nodes(self.label_init, children_init, indent)
-            childs_updated = self.__get_hashes_of_nodes(self.label_updated, children_updated, indent)
+            children_init = self.__get_hashes_of_nodes(self.label_init, children_init, indent)
+            children_updated = self.__get_hashes_of_nodes(self.label_updated, children_updated, indent)
 
         # apply DiffIgnore -> Ignore nodes if requested        
         children_init = self.apply_DiffIgnore_Nodes(children_init)
@@ -94,7 +94,8 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         # check the nodes that have the same relationship OR the same EntityType and the same node type: 
         for matchingChildPair in nodes_unchanged:
             # detect changes on property level between both matching nodes
-            diff_result_container = self.__calcPropertyDifference(diff_result_container, node_init, node_updated)
+            diff_result_container = self.__calcPropertyDifference(
+                diff_result_container, matchingChildPair[0], matchingChildPair[1])
 
             # run recursion for children if "NoChange" or "Modified" happened
             diff_result_container = self.__compare_children(matchingChildPair[0],
