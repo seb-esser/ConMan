@@ -22,3 +22,6 @@ wheel==0.36.2
 wincertstore==0.2
 lxml==4.6.2
 termcolor==1.1.0
+
+jsonpickle~=2.0.0
+ifcopenshell~=v0.6.0

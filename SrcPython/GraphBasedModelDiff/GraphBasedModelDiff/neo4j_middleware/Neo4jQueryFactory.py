@@ -168,5 +168,26 @@ class Neo4jQueryFactory(Neo4jFactory):
         ret = 'RETURN p as path, NODES(p), RELATIONSHIPS(p)'
         return Neo4jFactory.BuildMultiStatement([match_start, match_target, path, ret])
 
+    @classmethod
+    def get_pattern_by_node_id(cls, node_id: int):
+        """
+
+        @param node_id:
+        @return: cypher query string
+        """
+        match = 'MATCH pattern = (n)-[*..10]->(m)'
+        where = 'WHERE ID(n) = {}'.format(node_id)
+        ret = 'RETURN pattern'
+        return Neo4jFactory.BuildMultiStatement([match, where, ret])
+
+    @classmethod
+    def get_outgoing_rel_types(cls, node_id: int):
+        match1 = 'match p = (n) Where ID(n)={}'.format(node_id)
+        match2 = 'match (n)-[r]->(f)'
+        ret = 'UNWIND type(r) as mylist RETURN mylist'
+        return Neo4jFactory.BuildMultiStatement([match1, match2, ret])
+
+
+
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --
