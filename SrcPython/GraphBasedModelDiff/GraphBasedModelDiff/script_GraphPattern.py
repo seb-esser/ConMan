@@ -10,6 +10,9 @@ raw_res = connector.run_cypher_statement(cy)
 
 pattern = GraphPattern.from_neo4j_response(raw_res)
 
+cy = pattern.to_cypher_query()
+print(cy)
+
 connector.disconnect_driver()
 
 
