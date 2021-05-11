@@ -14,8 +14,9 @@ class GraphPattern:
         paths = []
 
         for path in raw_paths:
-            print(path.start)
-            path = GraphPath.from_neo4j_response(path)
+            print(path)
+            wrapper = [path]
+            path = GraphPath.from_neo4j_response(wrapper)
             paths.append(path)
 
         return cls(paths)

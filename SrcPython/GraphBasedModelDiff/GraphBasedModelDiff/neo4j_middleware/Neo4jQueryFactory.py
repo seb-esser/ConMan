@@ -169,7 +169,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         return Neo4jFactory.BuildMultiStatement([match_start, match_target, path, ret])
 
     @classmethod
-    def get_pattern_by_node_id(cls, node_id: int):
+    def get_pattern_by_node_id(cls, node_id: int) -> str:
         """
 
         @param node_id:
@@ -182,11 +182,28 @@ class Neo4jQueryFactory(Neo4jFactory):
 
     @classmethod
     def get_outgoing_rel_types(cls, node_id: int):
+        """
+        Queries
+        @param node_id:
+        @return: cypher query string
+        """
         match1 = 'match p = (n) Where ID(n)={}'.format(node_id)
         match2 = 'match (n)-[r]->(f)'
         ret = 'UNWIND type(r) as mylist RETURN mylist'
         return Neo4jFactory.BuildMultiStatement([match1, match2, ret])
 
+    @classmethod
+    def get_distinct_paths_from_node(cls, node_id: int) -> str:
+        """
+        Queries all distinct paths outgoing from a specified node
+        @param node_id:
+        @return: cypher query string
+        """
+        match1 = 'MATCH p = (n) WHERE ID(n)={}'.format(node_id)
+        match2 = 'MATCH paths = (n)-[*..12]->(leaf)' # max length is set to 12!
+        cond = 'WHERE NOT (leaf)-->()' # no outgoing edges
+        ret = 'RETURN paths, NODES(paths), RELATIONSHIPS(paths)'
+        return Neo4jFactory.BuildMultiStatement([match1, match2, cond, ret])
 
 
 # ticket_PostEvent-VerifyParsedModel
