@@ -1,9 +1,12 @@
+from typing import List
+
 from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 
 
 class GraphPattern:
     def __init__(self, paths):
-        self.paths: list[GraphPath] = paths
+        self.paths: List[GraphPath] = paths
+        self.entry_node_id: int
 
     @classmethod
     def from_neo4j_response(cls, raw):
@@ -32,7 +35,7 @@ class GraphPattern:
         path_iterator = 0
         for p in self.paths:
             cy_statement = ''
-            cy_path = p.to_patch(node_var=alphabet[path_iterator])
+            cy_path = p.to_patch(node_var=alphabet[path_iterator], entry_node_identifier='en')
             cy_statement = cy_statement + 'MATCH path{} = {} '.format(path_iterator, cy_path)
 
             print(cy_statement)

@@ -27,20 +27,27 @@ class GraphPath:
     def __repr__(self):
         return 'GraphPath instance'
 
-    def to_patch(self, node_var: str = 'n'):
+    def to_patch(self, node_var: str = 'n', entry_node_identifier: str = None):
         """
         serializes the GraphPath object into a string representation
+        @param node_var: identifier used inside a graph path
+        @type entry_node_identifier: str representation of the entry node. use cypher style
         @return:
         """
 
         val = ''
-        it = 0
+        it = 1
+
+        if entry_node_identifier is not None:
+            start_node = entry_node_identifier
+        else:
+            start_node = self.segments[0].startNode.entityType
+
+        val = '({})'.format(start_node)
+
         for edge in self.segments:
-            start = edge.startNode.entityType
             relType = edge.relType
-            val = val + '({3}{0} {{entityType: \'{1}\' }})-[:{2}]->'.format(it, start, relType, node_var)
+            end = edge.endNode.entityType
+            val = val + '-[:{3}]->({0}{1} {{entityType: \'{2}\' }})'.format(node_var, it, end, relType)
             it += 1
-
-        val = val + '({0}{1} {{entityType: \'{2}\' }})'.format(node_var, it, self.segments[-1].endNode.entityType)
-
         return val
