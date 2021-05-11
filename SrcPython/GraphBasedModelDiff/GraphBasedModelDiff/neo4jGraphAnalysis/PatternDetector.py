@@ -9,14 +9,14 @@ class PatternDetector:
     def __init__(self, connector: Neo4jConnector):
         self.connector: Neo4jConnector = connector
 
-    def search_if_pattern_exists(self, timestamp: str, pattern: GraphPattern) -> bool:
+    def search_if_pattern_exists(self, timestamp: str, entry_node_id: int, pattern: GraphPattern) -> bool:
+        cy = ""
 
-        # find entry node
-        entry_node_id: int = 141
-        cy = Neo4jQueryFactory.get_node_data_by_id(entry_node_id)
+        cy = cy + 'MATCH (en) '
+        cy = cy + pattern.to_cypher_query()
+        cy = cy + "RETURN en".format(entry_node_id)
         raw = self.connector.run_cypher_statement(cy)
-        entry_node: NodeItem = NodeItem.fromNeo4jResponse(raw)[0]
-
+        print(raw)
 
 
         # next:

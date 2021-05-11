@@ -1,12 +1,13 @@
 from typing import List
 
 from neo4j_middleware.ResponseParser.GraphPath import GraphPath
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 
 class GraphPattern:
     def __init__(self, paths):
         self.paths: List[GraphPath] = paths
-        self.entry_node_id: int
+        self.entry_node: NodeItem
 
     @classmethod
     def from_neo4j_response(cls, raw):
@@ -22,7 +23,7 @@ class GraphPattern:
 
         return cls(paths)
 
-    def to_cypher_query(self, use_one_entry_node: bool = False):
+    def to_cypher_query(self):
         """
 
         @return:
@@ -34,10 +35,8 @@ class GraphPattern:
         cy_statement: str = ""
         path_iterator = 0
         for p in self.paths:
-            cy_statement = ''
             cy_path = p.to_patch(node_var=alphabet[path_iterator], entry_node_identifier='en')
-            cy_statement = cy_statement + 'MATCH path{} = {} '.format(path_iterator, cy_path)
-
-            print(cy_statement)
+            cy_statement = cy_statement + ',{} '.format(cy_path)
             path_iterator += 1
+
         return cy_statement
