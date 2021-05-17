@@ -76,7 +76,7 @@ class Configuration:
         raise Warning('not implemented properly. Check ToDos')
 
         # ToDo: prepare everything to use this method with file-based jsons as well as HTTP request bodies
-
+        # json import working for logsettings -- Benedict Harder
         with open(jsonPath) as f:
             json_obj = json.load(f)
 
@@ -122,10 +122,22 @@ class LoggingSettings:
         bool_file = obj['logToFile']
         bool_console = obj['logToConsole']
         logPath = obj['loggingFilePath']
-        logFormat = obj['loggingFormat']
-        levelConsole = obj['loggingLevelConsole']  # ToDo: Implement cast to LoggingLevelEnum
-        levelFile = obj['loggingLevelFile']  # ToDo: Implement cast to LoggingLevelEnum
-
+        # Format
+        if obj['loggingFormat'] == "standard":
+            logFormat = logging.Formatter('%(asctime)s: %(name)s: %(message)s')
+        else:
+            raise Exception('Invalid value in defaultConfig.json')
+        # Console Level
+        if obj['loggingLevelConsole'] == "simple":
+            levelConsole = logging.INFO
+        else:
+            raise Exception('Invalid value in defaultConfig.json')
+        # File Level
+        if obj['loggingLevelFile'] =="simple":
+            levelFile = logging.INFO
+        else:
+            raise Exception('Invalid value in defaultConfig.json')
+        # ToDo: Implement cast to LoggingLevelEnum
         return cls(bool_console, bool_file, logPath, logFormat, levelConsole, levelFile)
 
     def to_json(self):

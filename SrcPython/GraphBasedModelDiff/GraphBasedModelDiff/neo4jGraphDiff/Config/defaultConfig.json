@@ -5,6 +5,8 @@
 
     "loggingFilePath": "logging/defaultLog.log",
 
+    "loggingFormat": "standard",
+
     "loggingLevelConsole": "simple",
     "loggingLevelFile": "simple"
   },
