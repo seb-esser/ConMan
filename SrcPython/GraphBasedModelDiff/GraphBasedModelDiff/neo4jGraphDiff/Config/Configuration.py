@@ -114,7 +114,7 @@ class LoggingSettings:
 
     @classmethod
     def default_settings(cls):
-        return cls(False, False, '/logging', '%(asctime)s: %(name)s: %(message)s', logging.INFO, logging.INFO)
+        return cls(True, True, 'myapp.log', logging.Formatter('%(asctime)s: %(name)s: %(message)s'), logging.INFO, logging.INFO)
 
     @classmethod
     def from_json(cls, obj):
