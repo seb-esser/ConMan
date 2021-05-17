@@ -132,7 +132,7 @@ class LoggingSettings:
         """ write instance to JSON """
         raise Exception('This method is not implemented yet')
 
-    def initialize_logger(self, logger)
+    def initialize_logger(self, logger):
         """ initialize a logger with settings from the class"""
         logger.setLevel(logging.DEBUG)
 
