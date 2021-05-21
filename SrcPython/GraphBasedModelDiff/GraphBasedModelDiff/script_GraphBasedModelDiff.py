@@ -31,7 +31,6 @@ label_init, label_updated = testcases['Storey']
 async def main():
     # set config
     config = Configuration.rel_type_config()
-    # config = Configuration.on_guid_config()
     print(config)
     print(config.DiffSettings)
 

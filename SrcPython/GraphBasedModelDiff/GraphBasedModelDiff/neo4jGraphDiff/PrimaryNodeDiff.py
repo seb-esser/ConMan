@@ -14,7 +14,7 @@ class RootedNodeDiff:
 		pass
 
 	def toConsole(self):
-		if self.configuration.LogSettings.logToConsole == True:
+		if self.configuration.LogSettings.logToConsole:
 			return True
 		else:
 			return False
@@ -23,8 +23,8 @@ class RootedNodeDiff:
 		""" """
 		
 		# retrieve nodes
-		nodes_init = self.__getRootedNodes(label_init)
-		nodes_updated = self.__getRootedNodes(label_updated)
+		nodes_init = self.__get_con_nodes(label_init)
+		nodes_updated = self.__get_con_nodes(label_updated)
 
 		# load attrIgnore list from config
 		attr_ignore_list = self.configuration.DiffSettings.diffIgnoreAttrs
@@ -46,8 +46,7 @@ class RootedNodeDiff:
 		if self.toConsole():
 			print('Matching Method for rooted nodes: {}'.format(matchingMethod))
 
-		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(nodes_init, nodes_updated,
-                                                                                     matchingMethod)
+		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(nodes_init, nodes_updated, matchingMethod)
 
 		if self.toConsole(): 
 			print('Unchanged rooted nodes: {}'.format(nodes_unchanged))
@@ -67,9 +66,19 @@ class RootedNodeDiff:
 		@param nodes_unchanged:
 		@return:
 		"""
+
+		# unpack node ids for adjacency matrix
+		nodeIds_init: list[int] = []
+		nodeIds_updated: list[int] = []
+
+		for pair in nodes_unchanged:
+			nodeIds_init.append(pair[0].id)
+			nodeIds_updated.append(pair[1].id)
+
 		# calc adjacency matrices
 		adjacency_analyser = AdjacencyAnalyser(self.connector)
-		# adj_mtx_init = adjacency_analyser.get_adjacency_matrix2(label_init)
+		adj_mtx_init = adjacency_analyser.get_adjacency_matrix_byNodeIDs(nodeIds_init)
+		print(adj_mtx_init)
 
 	def compareRootedNodeRelationships(self):
 		""" """
@@ -98,3 +107,19 @@ class RootedNodeDiff:
 
 		return res
 
+	def __get_con_nodes(self, label):
+		cy_conn = Neo4jQueryFactory.get_connection_nodes(label)
+		raw_con = self.connector.run_cypher_statement(cy_conn)
+		con_nodes = NodeItem.fromNeo4jResponseWouRel(raw_con)
+		return con_nodes
+
+	def __get_rooted_con_nodes(self, label):
+		cy_prim = Neo4jQueryFactory.get_primary_nodes(label)
+		cy_conn = Neo4jQueryFactory.get_connection_nodes(label)
+		raw_prim = self.connector.run_cypher_statement(cy_prim)
+		raw_con = self.connector.run_cypher_statement(cy_conn)
+
+		primary_nodes = NodeItem.fromNeo4jResponseWouRel(raw_prim)
+		con_nodes = NodeItem.fromNeo4jResponseWouRel(raw_con)
+
+		return primary_nodes + con_nodes

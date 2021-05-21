@@ -58,7 +58,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH (n:ConnectionNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.entityType'
+        ret_statement = 'RETURN ID(n), n.entityType, PROPERTIES(n)'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
@@ -228,5 +228,22 @@ class Neo4jQueryFactory(Neo4jFactory):
         ret = 'RETURN n.GlobalId as FromNodeGUID, m.GlobalId as ToNodeGUID, Exists((n)-->(m)) as connected'
         return Neo4jFactory.BuildMultiStatement([match1, match2, ret])
 
+    @classmethod
+    def get_adjacency_byNodeIds(cls, nodeIds) -> str:
+        """
+
+        @param nodeIds:
+        @return: cypher query string
+        """
+
+        match1 = 'MATCH (n) WHERE ID(n) in {}'.format(nodeIds)
+        match2 = 'MATCH (m) WHERE ID(m) in {}'.format(nodeIds)
+
+        unwind1 = 'UNWIND n.GlobalId as fromGuid'
+        unwind2 = 'UNWIND m.GlobalId as toGuid'
+
+        ret = 'RETURN fromGuid as fromGuid, toGuid as toGuid, Exists((m) -->(n)) as connected'
+        sort = 'Order by fromGuid ASC, toGuid ASC'
+        return Neo4jFactory.BuildMultiStatement([match1, match2, unwind1, unwind2, ret, sort])
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --
