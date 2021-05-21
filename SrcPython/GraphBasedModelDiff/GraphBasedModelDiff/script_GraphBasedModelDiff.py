@@ -22,10 +22,11 @@ testcases = {"sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
              "cuboid_extruded_vs_BRep": ("ts20210119T085412", "ts20210119T085413"),
              "wall_column": ("ts20200713T083450", "ts20200713T083447"),
              "residential": ("ts20210219T121203", "ts20210219T121608"),
-             "4x3_bridges": ("ts20210118T211240", "ts20210227T133609")
+             "4x3_bridges": ("ts20210118T211240", "ts20210227T133609"),
+             "Storey": ("ts20210521T074802", "ts20210521T074934")
              }
 
-label_init, label_updated = testcases['cuboid_vs_cylinder']
+label_init, label_updated = testcases['Storey']
 
 async def main():
     # set config
