@@ -1,4 +1,4 @@
-
+from neo4jGraphAnalysis.AdjacencyAnalyser import AdjacencyAnalyser
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
@@ -54,29 +54,42 @@ class RootedNodeDiff:
 			print('Added nodes: {}'.format(nodes_added))
 			print('Deleted nodes: {}'.format(nodes_deleted))
 
+		# check property updates of unchanged node tuples
+
+		# check adjacencies of unchanged node tuples
+		self.__check_adjacencies(nodes_unchanged)
+
 		return [nodes_unchanged, nodes_added, nodes_deleted]
+
+	def __check_adjacencies(self, nodes_unchanged):
+		"""
+
+		@param nodes_unchanged:
+		@return:
+		"""
+		# calc adjacency matrices
+		adjacency_analyser = AdjacencyAnalyser(self.connector)
+		# adj_mtx_init = adjacency_analyser.get_adjacency_matrix2(label_init)
 
 	def compareRootedNodeRelationships(self):
 		""" """
 		raise Exception('method compareRootedNodeRelationships is not implemented yet')		
 
-
 	def __getHashesOfRootedNodes(self, label):
 		cy = Neo4jQueryFactory.GetHashesByLabel(label)
 		raw = self.connector.run_cypher_statement(cy)
 		return self.__extractHashes(raw)
-		
 
-	def __extractHashes(self, result): 
+	def __extractHashes(self, result):
 		nodes = []
-		for res in result: 
+		for res in result:
 			node = NodeItem(res[0], None, res[1])
 			node.set_hash(res[2])
 			nodes.append(node)
-	
+
 		return nodes
 
-	def __getRootedNodes(self, label): 
+	def __getRootedNodes(self, label):
 		cy = Neo4jQueryFactory.get_primary_nodes(label)
 		raw = self.connector.run_cypher_statement(cy)
 

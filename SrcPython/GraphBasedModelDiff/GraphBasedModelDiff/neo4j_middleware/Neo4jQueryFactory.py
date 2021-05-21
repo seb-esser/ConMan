@@ -205,6 +205,28 @@ class Neo4jQueryFactory(Neo4jFactory):
         ret = 'RETURN paths, NODES(paths), RELATIONSHIPS(paths)'
         return Neo4jFactory.BuildMultiStatement([match1, match2, cond, ret])
 
+    @classmethod
+    def get_primary_structure(cls, label: str) -> str:
+        """
+        Queries all nodes and edges involved in the primary structure
+        @param label: model label
+        @return: cypher query string
+        """
+        pattern = 'MATCH pattern = (n:{}}:PrimaryNode)<--(con)'.format(label)
+        ret = 'RETURN pattern'
+        return Neo4jFactory.BuildMultiStatement([pattern, ret])
+
+    @classmethod
+    def get_adjacency_primary(cls, label: str) -> str:
+        """
+
+        @param label:
+        @return: cypher query string
+        """
+        match1 = 'MATCH (n:ts20210521T074802) WHERE Not n:SecondaryNode'
+        match2 = 'MATCH (m:ts20210521T074802) WHERE Not m:SecondaryNode'
+        ret = 'RETURN n.GlobalId as FromNodeGUID, m.GlobalId as ToNodeGUID, Exists((n)-->(m)) as connected'
+        return Neo4jFactory.BuildMultiStatement([match1, match2, ret])
 
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --

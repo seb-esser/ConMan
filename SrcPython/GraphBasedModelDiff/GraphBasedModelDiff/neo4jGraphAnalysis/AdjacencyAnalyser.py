@@ -15,7 +15,6 @@ class AdjacencyAnalyser(object):
         """
         self.connector = connector
 
-
     def get_adjacency_matrix(self, label): 
         """
         calculates the adjacency matrix ordered by ascending hashsums
@@ -67,7 +66,11 @@ class AdjacencyAnalyser(object):
 
         return adj_mtx 
 
+    def get_adjacency_matrix2(self, label):
+        cy = Neo4jQueryFactory.get_adjacency_primary(label)
+        raw = self.connector.run_cypher_statement(cy)
+        for it in raw:
+            print('FROM {0} TO {1}: {2}'.format(it["FromNodeGUID"], it["ToNodeGUID"], it["connected"]))
 
-
-
+        return 0
 
