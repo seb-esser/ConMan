@@ -47,7 +47,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH (n:PrimaryNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.entityType, PROPERTIES(n)'
+        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n)'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
@@ -58,7 +58,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH (n:ConnectionNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.entityType, PROPERTIES(n)'
+        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n)'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
@@ -87,11 +87,11 @@ class Neo4jQueryFactory(Neo4jFactory):
                 return ['"' + x + '"' for x in l]
             
             ignore_str = surroundStrings(attrIgnoreList)
-            # define seperator
-            seperator = ', '
+            # define separator
+            separator = ', '
 
-            # join the contents of the list with the seperator
-            ignore_str = seperator.join(ignore_str)
+            # join the contents of the list with the separator
+            ignore_str = separator.join(ignore_str)
 
             # close the string with []
             ignore_str = '[' + ignore_str + ']'
@@ -114,7 +114,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match = 'MATCH (n:{})-[r]->(c)'.format(label)
         where = 'WHERE ID(n) = {}'.format(parent_node_id)
-        ret = 'RETURN ID(c), type(r), c.entityType, properties(c)'
+        ret = 'RETURN ID(c), r.relType, c.EntityType, properties(c)'
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     @classmethod
@@ -189,7 +189,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match1 = 'match p = (n) Where ID(n)={}'.format(node_id)
         match2 = 'match (n)-[r]->(f)'
-        ret = 'UNWIND type(r) as mylist RETURN mylist'
+        ret = 'UNWIND r.relType as mylist RETURN mylist'
         return Neo4jFactory.BuildMultiStatement([match1, match2, ret])
 
     @classmethod

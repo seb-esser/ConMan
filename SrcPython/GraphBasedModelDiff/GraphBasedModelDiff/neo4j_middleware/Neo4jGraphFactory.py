@@ -15,7 +15,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         match_source = 'MATCH(s) where ID(s) = {}'.format(source_node_id)
         match_target = 'MATCH(t) where ID(t) = "{}"'.format(target_node_id)
-        merge = 'MERGE (s)-[r.{}]->(t)'.format(rel_type)
+        merge = 'MERGE (s)-[:r {{ relType: \'{}\' }}]->(t)'.format(rel_type)
         return Neo4jFactory.BuildMultiStatement([match_source, match_target, merge])
 
     @classmethod
@@ -29,7 +29,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         create = 'CREATE(n:{}:PrimaryNode)'.format(timestamp)
         setGuid = 'SET n.GlobalId = "{}"'.format(entity_id)
-        setEntityType = 'SET n.entityType = "{}"'.format(entity_type)
+        setEntityType = 'SET n.EntityType = "{}"'.format(entity_type)
         return_id = 'RETURN ID(n)'
         return Neo4jFactory.BuildMultiStatement([create, setGuid, setEntityType, return_id])
 
@@ -69,12 +69,12 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         if parent_id != None:
             match = 'MATCH (p) WHERE ID(p) = {}'.format(parent_id)
-            merge = 'MERGE (p)-[:{}]->(n)'.format(rel_type)
+            merge = 'MERGE (p)-[:r {{ relType: \'{}\' }}]->(n)'.format(rel_type)
         else:
             match = ""
             merge = ""
         create = 'CREATE (n:SecondaryNode:{})'.format(timestamp)
-        setEntityType = 'SET n.entityType = "{}"'.format(entity_type)
+        setEntityType = 'SET n.EntityType = "{}"'.format(entity_type)
         returnID = 'RETURN ID(n)'
 
         return Neo4jFactory.BuildMultiStatement([match, create, setEntityType, merge, returnID])
@@ -90,8 +90,8 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         match = 'MATCH (p) WHERE ID(p) = {}'.format(parent_id)
         create = 'CREATE (n:ListNode:{})'.format(timestamp)
-        setEntityType = 'SET n.entityType = "{}"'.format("NestedList")
-        merge = 'MERGE (p)-[:{}]->(n)'.format(rel_type)
+        setEntityType = 'SET n.EntityType = "{}"'.format("NestedList")
+        merge = 'MERGE (p)-[:r {{ relType: \'{}\' }}]->(n)'.format(rel_type)
         returnID = 'RETURN ID(n)'
         return Neo4jFactory.BuildMultiStatement([match, create, setEntityType, merge, returnID])
 
@@ -106,8 +106,8 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         match = 'MATCH (p) WHERE ID(p) = {}'.format(parent_id)
         create = 'CREATE (n:ListItemNode:{})'.format(timestamp)
-        setEntityType = 'SET n.entityType = "{}"'.format("ListItem")
-        merge = 'MERGE (p)-[:ListItem{}]->(n)'.format(item_no)
+        setEntityType = 'SET n.EntityType = "{}"'.format("ListItem")
+        merge = 'MERGE (p)-[:listItem {{ relType: \'{}\' }}]->(n)'.format(item_no)
         returnID = 'RETURN ID(n)'
         return Neo4jFactory.BuildMultiStatement([match, create, setEntityType, merge, returnID])
 
@@ -123,7 +123,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         match = 'MATCH (p:{}) WHERE p.GlobalId = "{}"'.format(timestamp, owner_history_guid)
         matchOwn = 'MATCH (me) WHERE ID(me) = {}'.format(my_node_id)
-        merge = 'MERGE (me)-[:{}]->(p)'.format('IfcOwnerHistory')
+        merge = 'MERGE (me)-[:r {{ relType: \'{}\' }}]->(p)'.format('IfcOwnerHistory')
         returnID = 'RETURN ID(me)'
         return Neo4jFactory.BuildMultiStatement([match, matchOwn, merge, returnID])
 
@@ -138,7 +138,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         create = 'CREATE(n:ConnectionNode:{})'.format(timestamp)
         setGuid = 'SET n.GlobalId = "{}"'.format(rel_guid)
-        setEntityType = 'SET n.entityType = "{}"'.format(entity_type)
+        setEntityType = 'SET n.EntityType = "{}"'.format(entity_type)
         returnID = 'RETURN ID(n)'
         return Neo4jFactory.BuildMultiStatement([create, setGuid, setEntityType, returnID])
 
@@ -157,8 +157,8 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         matchObjRel = 'MATCH (objrel:{}) WHERE objrel.globalId = "{}"'.format(timestamp, obj_rel_guid)
         matchRootedObj = 'MATCH (rooted:{}) WHERE rooted.globalId = "{}"'.format(timestamp, target_node_guid)
-        merge1 = 'MERGE (objrel)-[:{}]->(rooted)'.format(rel_type)
-        merge2 = 'MERGE (objrel)<-[:{}]-(rooted)'.format(inverse_rel_type)
+        merge1 = 'MERGE (objrel)-[:r {{ relType: \'{}\' }}]->(rooted)'.format(rel_type)
+        merge2 = 'MERGE (objrel)<-[:r {{ relType: \'{}\' }}]-(rooted)'.format(inverse_rel_type)
         returnID = 'RETURN ID(rooted)'
         return Neo4jFactory.BuildMultiStatement([matchObjRel, matchRootedObj, merge1, merge2, returnID])
 
@@ -174,7 +174,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         from_node = 'MATCH (source:{}) WHERE source.p21_id = {}'.format(timestamp, from_p21)
         to_node = 'MATCH (target:{}) WHERE target.p21_id = {}'.format(timestamp, to_p21)
-        merge = 'MERGE (source)-[:{}]->(target)'.format(rel_type)
+        merge = 'MERGE (source)-[:r {{ relType: \'{}\' }}]->(target)'.format(rel_type)
         returnID = 'RETURN ID(source), ID(target)'
         return Neo4jFactory.BuildMultiStatement([from_node, to_node, merge, returnID])
 
@@ -189,7 +189,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         fromNode = 'MATCH (s) WHERE ID(s) = {}'.format(node_id_from)
         toNode = 'MATCH (t) WHERE ID(t) = {}'.format(node_id_to)
-        merge = 'MERGE (s)-[r:{}]->(t)'.format(rel_type)
+        merge = 'MERGE (s)-[:r {{ relType: \'{}\' }}]->(t)'.format(rel_type)
         return Neo4jFactory.BuildMultiStatement([fromNode, toNode, merge])
 
     @classmethod
