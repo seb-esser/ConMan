@@ -23,8 +23,8 @@ class RootedNodeDiff:
 		""" """
 		
 		# retrieve nodes
-		nodes_init = self.__get_con_nodes(label_init)
-		nodes_updated = self.__get_con_nodes(label_updated)
+		nodes_init = self.__get_primary_nodes(label_init)
+		nodes_updated = self.__get_primary_nodes(label_updated)
 
 		# load attrIgnore list from config
 		attr_ignore_list = self.configuration.DiffSettings.diffIgnoreAttrs
@@ -56,13 +56,13 @@ class RootedNodeDiff:
 		# check property updates of unchanged node tuples
 
 		# check adjacencies of unchanged node tuples
-		self.__check_adjacencies(nodes_unchanged)
+		# self.__check_adjacencies(nodes_unchanged)
+		# !! not yet sufficient as current nodes in node set dont share direct edges !!
 
 		return [nodes_unchanged, nodes_added, nodes_deleted]
 
 	def __check_adjacencies(self, nodes_unchanged):
 		"""
-
 		@param nodes_unchanged:
 		@return:
 		"""
@@ -98,7 +98,7 @@ class RootedNodeDiff:
 
 		return nodes
 
-	def __getRootedNodes(self, label):
+	def __get_primary_nodes(self, label):
 		cy = Neo4jQueryFactory.get_primary_nodes(label)
 		raw = self.connector.run_cypher_statement(cy)
 
@@ -114,12 +114,7 @@ class RootedNodeDiff:
 		return con_nodes
 
 	def __get_rooted_con_nodes(self, label):
-		cy_prim = Neo4jQueryFactory.get_primary_nodes(label)
-		cy_conn = Neo4jQueryFactory.get_connection_nodes(label)
-		raw_prim = self.connector.run_cypher_statement(cy_prim)
-		raw_con = self.connector.run_cypher_statement(cy_conn)
+		primaries = self.__get_primary_nodes(label)
+		connections = self.__get_con_nodes(label)
 
-		primary_nodes = NodeItem.fromNeo4jResponseWouRel(raw_prim)
-		con_nodes = NodeItem.fromNeo4jResponseWouRel(raw_con)
-
-		return primary_nodes + con_nodes
+		return primaries + connections
