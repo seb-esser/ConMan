@@ -8,6 +8,7 @@ from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 
 
 
+
 class IFCGraphGenerator:
     """
     IfcP21 to neo4j mapper. 
@@ -25,6 +26,8 @@ class IFCGraphGenerator:
         # try to open the ifc model and load the content into the model variable
         try:
             self.model = ifcopenshell.open(model_path)
+            ifc_version = self.model.schema
+            self.schema = ifcopenshell.ifcopenshell_wrapper.schema_by_name(ifc_version)
         except:
             print('file path: {}'.format(model_path))
             raise Exception('Unable to open IFC model on given file path')
@@ -103,10 +106,10 @@ class IFCGraphGenerator:
 
             # neo4j: build rooted node
             cypher_statement = Neo4jGraphFactory.create_primary_node(entityId, entityType, self.label)
-            node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
+            parent_node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
 
             # get all attrs and children
-            self.__getDirectChildren(entity, 0, node_id[0])
+            self.__getDirectChildren(entity, 0, parent_node_id)
 
             # update progressbar
             percent += increment
@@ -123,16 +126,19 @@ class IFCGraphGenerator:
         # print atomic attributes: 
         info = entity.get_info()
         p21_id = info['id']
-        entityType = info['type']
+
+        # separate associations from class attributes
+        cls_attributes, associations = self.separateAttributes(entity)
+
         # remove type and id from attrDict
         excludeKeys = ['id', 'type']
         attrs_dict = {key: val for key, val in info.items() if key not in excludeKeys}
 
         # remove complex traversal attributes
         filtered_attrs = {}
-        complex_attrs = []
+        associations = []
 
-        # add artifical parameter indicating the P21 entity number. Can be removed in post processing. 
+        # add artificial parameter indicating the P21 entity number. Can be removed in post processing.
         filtered_attrs['p21_id'] = p21_id
         # remove traverse attrs        
         for key, val in attrs_dict.items():
@@ -160,16 +166,16 @@ class IFCGraphGenerator:
                 for i in range(len(val)):
                     # append the list item index to the relationship type 
                     rel_type = key + '__listItem_' + str(i)
-                    complex_attrs.append(rel_type)
+                    associations.append(rel_type)
 
             # detecting a simple child node
             else:
                 if val != None:
-                    complex_attrs.append(key)
+                    associations.append(key)
 
         # run the mapping of the detected data. 
         #       filtered_attrs contain atomic attributes, which gets attached as properties at the parent node
-        #       complex_attrs  contain all attributes that need sub-nodes. They get zipped with the traverse children afterwards. 
+        #       associations  contain all attributes that need sub-nodes. They get zipped with the traverse children afterwards.
 
         if len(filtered_attrs.items()) > 0:
             if self.printToConsole:
@@ -188,8 +194,8 @@ class IFCGraphGenerator:
         # cut the first item as it is the parent itself
         children = children[1:]
 
-        # combine the detected entities with the corresponding attribute names from 'complex_attrs' list
-        complex_childs = set(zip(complex_attrs, children))
+        # combine the detected entities with the corresponding attribute names from 'associations' list
+        complex_childs = set(zip(associations, children))
 
         if len(children) == 0:
             pass
@@ -245,3 +251,35 @@ class IFCGraphGenerator:
 
             # get all attrs and children
             self.__getDirectChildren(entity, 0, node_id[0])
+
+    def separateAttributes(self, entity):
+        """"
+
+        @entity:
+        @return:
+        """
+        info = entity.get_info()
+        clsName = info['type']
+
+
+        # get the class definition for the current instance w.r.t. schema version
+        # https://wiki.osarch.org/index.php?title=IfcOpenShell_code_examples#Exploring_IFC_schema
+        class_definition = self.schema.declaration_by_name(clsName).all_attributes()
+
+        # separate attributes into node attributes, simple associations, and sets of associations
+
+        for a in class_definition:
+            # this is a quite weird approach but it works
+            try:
+                attr_type = a.type_of_attribute().declared_type()
+            except:
+                print(a.type_of_attribute())
+                attr_type = a.type_of_attribute()
+
+            print('{}'.format(attr_type, ""))
+            is_entity = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.entity)
+            is_type = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.type_declaration)
+            is_select = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.select_type)
+            is_aggregation = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
+
+        return [None, None]
