@@ -121,7 +121,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         @param timestamp:identifier for a model
         @return: cypher command as str
         """
-        match = 'MATCH (p:{}) WHERE p.globalId = "{}"'.format(timestamp, owner_history_guid)
+        match = 'MATCH (p:{}) WHERE p.GlobalId = "{}"'.format(timestamp, owner_history_guid)
         matchOwn = 'MATCH (me) WHERE ID(me) = {}'.format(my_node_id)
         merge = 'MERGE (me)-[:{}]->(p)'.format('IfcOwnerHistory')
         returnID = 'RETURN ID(me)'
@@ -137,7 +137,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         @return:cypher command as str
         """
         create = 'CREATE(n:ConnectionNode:{})'.format(timestamp)
-        setGuid = 'SET n.globalId = "{}"'.format(rel_guid)
+        setGuid = 'SET n.GlobalId = "{}"'.format(rel_guid)
         setEntityType = 'SET n.entityType = "{}"'.format(entity_type)
         returnID = 'RETURN ID(n)'
         return Neo4jFactory.BuildMultiStatement([create, setGuid, setEntityType, returnID])

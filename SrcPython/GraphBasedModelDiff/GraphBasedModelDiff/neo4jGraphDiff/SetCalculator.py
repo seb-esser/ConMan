@@ -31,7 +31,7 @@ class SetCalculator(object):
 
         # calculate matching pairs
         switcher = {
-            MatchCriteriaEnum.OnGuid		: self.__get_intersection_byGlobalId(A, B),
+            MatchCriteriaEnum.OnGuid		        : self.__get_intersection_byGlobalId(A, B),
             MatchCriteriaEnum.OnRelType				: self.__get_intersection_byRelType(A, B),
             MatchCriteriaEnum.OnEntityType			: self.__get_intersection_byEntityType(A, B),
             MatchCriteriaEnum.OnHash				: self.__get_intersection_byHash(A, B),
