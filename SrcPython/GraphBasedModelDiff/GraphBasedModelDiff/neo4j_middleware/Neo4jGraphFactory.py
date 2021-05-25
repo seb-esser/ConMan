@@ -51,33 +51,50 @@ class Neo4jGraphFactory(Neo4jFactory):
             elif isinstance(val, (int, float, complex)):
                 add_param = 'SET n.{} = {}'.format(attr, val)
                 attrs.append(add_param)
+            elif val is None:
+                add_param = 'SET n.{} = "{}"'.format(attr, 'None')
+                attrs.append(add_param)
             else:
-                raise Exception('ERROR when adding attributes to existing node. check your inputs. ')
+                add_param = 'SET n.{} = "{}"'.format(attr, 'None')
+                attrs.append(add_param)
+                # raise Exception('ERROR when adding attributes to existing node. check your inputs. \n '
+                #                 '\t {} \t {}'.format(attr, val))
         returnID = 'RETURN n'
 
         return Neo4jFactory.BuildMultiStatement([match] + attrs + [returnID])
 
     @classmethod
-    def create_secondary_node(cls, parent_id: int, entity_type: str, rel_type: str, timestamp: str) -> str:
+    def create_secondary_node(cls, parent_id: int, entity_type: str, rel_attrs: dict, timestamp: str) -> str:
         """
         Provides the cypher command to attach a given dictionary to a node specified by its node id
         @param parent_id: source node, which is referenced by the newly created secondary node. Can be set to None
         @param entity_type: reflection of data model class
-        @param rel_type: reflection of association attribute name provided by the underlying data model
+        @param rel_attrs: dictionary to be attached to the edge
         @param timestamp: identifier for a model
         @return: cypher command as str
         """
-        if parent_id != None:
+
+        create = 'CREATE (n:SecondaryNode:{} {{EntityType: "{}" }})'.format(timestamp, entity_type)
+
+        if parent_id is not None:
             match = 'MATCH (p) WHERE ID(p) = {}'.format(parent_id)
-            merge = 'MERGE (p)-[:r {{ relType: \'{}\' }}]->(n)'.format(rel_type)
+            merge = 'MERGE (p)-[r:rel]->(n)'
+
+            attrs = []
+            for attr, val in rel_attrs.items():
+                if isinstance(val, str):
+                    add_param = 'SET r.{} = "{}"'.format(attr, val)
+                    attrs.append(add_param)
+                elif isinstance(val, (int, float, complex)):
+                    add_param = 'SET r.{} = {}'.format(attr, val)
+                    attrs.append(add_param)
         else:
             match = ""
             merge = ""
-        create = 'CREATE (n:SecondaryNode:{})'.format(timestamp)
-        setEntityType = 'SET n.EntityType = "{}"'.format(entity_type)
+
         returnID = 'RETURN ID(n)'
 
-        return Neo4jFactory.BuildMultiStatement([match, create, setEntityType, merge, returnID])
+        return Neo4jFactory.BuildMultiStatement([match, create, merge] + attrs + [returnID])
 
     @classmethod
     def create_list_node(cls, parent_id: int, rel_type: str, timestamp: str) -> str:
