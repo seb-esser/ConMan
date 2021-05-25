@@ -23,7 +23,7 @@ class NodeItem:
         return self.hash_value
 
     def __repr__(self):
-        return 'NodeItem: id: {} entityType: {}'.format(self.id, self.entityType)
+        return 'NodeItem: id: {} EntityType: {}'.format(self.id, self.entityType)
 
     @classmethod
     def fromNeo4jResponseWithRel(cls, raw: str) -> list:
@@ -56,7 +56,7 @@ class NodeItem:
         for node_raw in raw:
             node = cls(int(node_raw.id), None, None)
             node.setNodeAttributes(node_raw._properties)
-            node.entityType = node.attrs['entityType']
+            node.entityType = node.attrs['EntityType']
             ret_val.append(node)
 
         return ret_val
@@ -78,7 +78,7 @@ class NodeItem:
         removes entityType and p21_id from attr dict
         @return:
         """
-        self.attrs.pop("entityType", None)
+        self.attrs.pop("EntityType", None)
         self.attrs.pop("p21_id", None)
         self.attrs.pop('relType', None)
 

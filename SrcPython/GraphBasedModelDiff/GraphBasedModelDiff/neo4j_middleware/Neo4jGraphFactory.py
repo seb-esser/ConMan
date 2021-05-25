@@ -15,7 +15,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         match_source = 'MATCH(s) where ID(s) = {}'.format(source_node_id)
         match_target = 'MATCH(t) where ID(t) = "{}"'.format(target_node_id)
-        merge = 'MERGE (s)-[r.{}]->(t)'.format(rel_type)
+        merge = 'MERGE (s)-[:r {{ relType: \'{}\' }}]->(t)'.format(rel_type)
         return Neo4jFactory.BuildMultiStatement([match_source, match_target, merge])
 
     @classmethod
@@ -29,7 +29,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         create = 'CREATE(n:{}:PrimaryNode)'.format(timestamp)
         setGuid = 'SET n.GlobalId = "{}"'.format(entity_id)
-        setEntityType = 'SET n.entityType = "{}"'.format(entity_type)
+        setEntityType = 'SET n.EntityType = "{}"'.format(entity_type)
         return_id = 'RETURN ID(n)'
         return Neo4jFactory.BuildMultiStatement([create, setGuid, setEntityType, return_id])
 
@@ -45,39 +45,56 @@ class Neo4jGraphFactory(Neo4jFactory):
         match = 'MATCH(n:{}) WHERE ID(n) = {}'.format(timestamp, node_id)
         attrs = []
         for attr, val in attributes.items():
-            if isinstance(val, str):
+            if isinstance(val, (str, tuple)):
                 add_param = 'SET n.{} = "{}"'.format(attr, val)
                 attrs.append(add_param)
             elif isinstance(val, (int, float, complex)):
                 add_param = 'SET n.{} = {}'.format(attr, val)
                 attrs.append(add_param)
+            elif val is None:
+                add_param = 'SET n.{} = "{}"'.format(attr, 'None')
+                attrs.append(add_param)
             else:
-                raise Exception('ERROR when adding attributes to existing node. check your inputs. ')
+                add_param = 'SET n.{} = "{}"'.format(attr, 'None')
+                attrs.append(add_param)
+                # raise Exception('ERROR when adding attributes to existing node. check your inputs. \n '
+                #                 '\t {} \t {}'.format(attr, val))
         returnID = 'RETURN n'
 
         return Neo4jFactory.BuildMultiStatement([match] + attrs + [returnID])
 
     @classmethod
-    def create_secondary_node(cls, parent_id: int, entity_type: str, rel_type: str, timestamp: str) -> str:
+    def create_secondary_node(cls, parent_id: int, entity_type: str, rel_attrs: dict, timestamp: str) -> str:
         """
         Provides the cypher command to attach a given dictionary to a node specified by its node id
         @param parent_id: source node, which is referenced by the newly created secondary node. Can be set to None
         @param entity_type: reflection of data model class
-        @param rel_type: reflection of association attribute name provided by the underlying data model
+        @param rel_attrs: dictionary to be attached to the edge
         @param timestamp: identifier for a model
         @return: cypher command as str
         """
-        if parent_id != None:
+
+        create = 'CREATE (n:SecondaryNode:{} {{EntityType: "{}" }})'.format(timestamp, entity_type)
+
+        if parent_id is not None:
             match = 'MATCH (p) WHERE ID(p) = {}'.format(parent_id)
-            merge = 'MERGE (p)-[:{}]->(n)'.format(rel_type)
+            merge = 'MERGE (p)-[r:rel]->(n)'
+
+            attrs = []
+            for attr, val in rel_attrs.items():
+                if isinstance(val, str):
+                    add_param = 'SET r.{} = "{}"'.format(attr, val)
+                    attrs.append(add_param)
+                elif isinstance(val, (int, float, complex)):
+                    add_param = 'SET r.{} = {}'.format(attr, val)
+                    attrs.append(add_param)
         else:
             match = ""
             merge = ""
-        create = 'CREATE (n:SecondaryNode:{})'.format(timestamp)
-        setEntityType = 'SET n.entityType = "{}"'.format(entity_type)
+
         returnID = 'RETURN ID(n)'
 
-        return Neo4jFactory.BuildMultiStatement([match, create, setEntityType, merge, returnID])
+        return Neo4jFactory.BuildMultiStatement([match, create, merge] + attrs + [returnID])
 
     @classmethod
     def create_list_node(cls, parent_id: int, rel_type: str, timestamp: str) -> str:
@@ -90,8 +107,8 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         match = 'MATCH (p) WHERE ID(p) = {}'.format(parent_id)
         create = 'CREATE (n:ListNode:{})'.format(timestamp)
-        setEntityType = 'SET n.entityType = "{}"'.format("NestedList")
-        merge = 'MERGE (p)-[:{}]->(n)'.format(rel_type)
+        setEntityType = 'SET n.EntityType = "{}"'.format("NestedList")
+        merge = 'MERGE (p)-[:r {{ relType: \'{}\' }}]->(n)'.format(rel_type)
         returnID = 'RETURN ID(n)'
         return Neo4jFactory.BuildMultiStatement([match, create, setEntityType, merge, returnID])
 
@@ -106,8 +123,8 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         match = 'MATCH (p) WHERE ID(p) = {}'.format(parent_id)
         create = 'CREATE (n:ListItemNode:{})'.format(timestamp)
-        setEntityType = 'SET n.entityType = "{}"'.format("ListItem")
-        merge = 'MERGE (p)-[:ListItem{}]->(n)'.format(item_no)
+        setEntityType = 'SET n.EntityType = "{}"'.format("ListItem")
+        merge = 'MERGE (p)-[:listItem {{ relType: \'{}\' }}]->(n)'.format(item_no)
         returnID = 'RETURN ID(n)'
         return Neo4jFactory.BuildMultiStatement([match, create, setEntityType, merge, returnID])
 
@@ -121,9 +138,9 @@ class Neo4jGraphFactory(Neo4jFactory):
         @param timestamp:identifier for a model
         @return: cypher command as str
         """
-        match = 'MATCH (p:{}) WHERE p.globalId = "{}"'.format(timestamp, owner_history_guid)
+        match = 'MATCH (p:{}) WHERE p.GlobalId = "{}"'.format(timestamp, owner_history_guid)
         matchOwn = 'MATCH (me) WHERE ID(me) = {}'.format(my_node_id)
-        merge = 'MERGE (me)-[:{}]->(p)'.format('IfcOwnerHistory')
+        merge = 'MERGE (me)-[:r {{ relType: \'{}\' }}]->(p)'.format('IfcOwnerHistory')
         returnID = 'RETURN ID(me)'
         return Neo4jFactory.BuildMultiStatement([match, matchOwn, merge, returnID])
 
@@ -137,8 +154,8 @@ class Neo4jGraphFactory(Neo4jFactory):
         @return:cypher command as str
         """
         create = 'CREATE(n:ConnectionNode:{})'.format(timestamp)
-        setGuid = 'SET n.globalId = "{}"'.format(rel_guid)
-        setEntityType = 'SET n.entityType = "{}"'.format(entity_type)
+        setGuid = 'SET n.GlobalId = "{}"'.format(rel_guid)
+        setEntityType = 'SET n.EntityType = "{}"'.format(entity_type)
         returnID = 'RETURN ID(n)'
         return Neo4jFactory.BuildMultiStatement([create, setGuid, setEntityType, returnID])
 
@@ -157,26 +174,34 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         matchObjRel = 'MATCH (objrel:{}) WHERE objrel.globalId = "{}"'.format(timestamp, obj_rel_guid)
         matchRootedObj = 'MATCH (rooted:{}) WHERE rooted.globalId = "{}"'.format(timestamp, target_node_guid)
-        merge1 = 'MERGE (objrel)-[:{}]->(rooted)'.format(rel_type)
-        merge2 = 'MERGE (objrel)<-[:{}]-(rooted)'.format(inverse_rel_type)
+        merge1 = 'MERGE (objrel)-[:r {{ relType: \'{}\' }}]->(rooted)'.format(rel_type)
+        merge2 = 'MERGE (objrel)<-[:r {{ relType: \'{}\' }}]-(rooted)'.format(inverse_rel_type)
         returnID = 'RETURN ID(rooted)'
         return Neo4jFactory.BuildMultiStatement([matchObjRel, matchRootedObj, merge1, merge2, returnID])
 
     @classmethod
-    def merge_on_p21(cls, from_p21, to_p21, rel_type, timestamp):
+    def merge_on_p21(cls, from_p21, to_p21, rel_attrs, timestamp):
         """
         Provides the cypher command to merge two nodes based on their P21 vals
         @param from_p21:
         @param to_p21:
-        @param rel_type:
+        @param rel_attrs:
         @param timestamp:
         @return: cypher command as str
         """
         from_node = 'MATCH (source:{}) WHERE source.p21_id = {}'.format(timestamp, from_p21)
         to_node = 'MATCH (target:{}) WHERE target.p21_id = {}'.format(timestamp, to_p21)
-        merge = 'MERGE (source)-[:{}]->(target)'.format(rel_type)
+        merge = 'MERGE (source)-[r:rel ]->(target)'
+        attrs = []
+        for attr, val in rel_attrs.items():
+            if isinstance(val, str):
+                add_param = 'SET r.{} = "{}"'.format(attr, val)
+                attrs.append(add_param)
+            elif isinstance(val, (int, float, complex)):
+                add_param = 'SET r.{} = {}'.format(attr, val)
+                attrs.append(add_param)
         returnID = 'RETURN ID(source), ID(target)'
-        return Neo4jFactory.BuildMultiStatement([from_node, to_node, merge, returnID])
+        return Neo4jFactory.BuildMultiStatement([from_node, to_node, merge] + attrs + [returnID])
 
     @classmethod
     def merge_on_node_ids(cls, node_id_from: int, node_id_to: int, rel_type: str = 'DEFAULT_CONNECTION') -> str:
@@ -189,7 +214,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         fromNode = 'MATCH (s) WHERE ID(s) = {}'.format(node_id_from)
         toNode = 'MATCH (t) WHERE ID(t) = {}'.format(node_id_to)
-        merge = 'MERGE (s)-[r:{}]->(t)'.format(rel_type)
+        merge = 'MERGE (s)-[:r {{ relType: \'{}\' }}]->(t)'.format(rel_type)
         return Neo4jFactory.BuildMultiStatement([fromNode, toNode, merge])
 
     @classmethod

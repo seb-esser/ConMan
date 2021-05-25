@@ -15,8 +15,7 @@ class AdjacencyAnalyser(object):
         """
         self.connector = connector
 
-
-    def get_adjacency_matrix(self, label): 
+    def get_adjacency_matrix_byHashsums(self, label):
         """
         calculates the adjacency matrix ordered by ascending hashsums
         @label: graph identifier, which the primary and connection nodes get queried from
@@ -47,7 +46,7 @@ class AdjacencyAnalyser(object):
         calculator = SetCalculator()
         cartesian_prod = calculator.calc_cartesian_product(sorted_nodes, sorted_nodes)
 
-        vals = []
+        values = []
         # query adjacency values
         for pair in cartesian_prod: 
             # check if rel exists
@@ -57,17 +56,29 @@ class AdjacencyAnalyser(object):
             # encode response
             con = raw_response[0]['are_connected']
             if con is True:
-                vals.append(1)
+                values.append(1)
             else: 
-                vals.append(0)
+                values.append(0)
 
         dims = len(sorted_nodes)
-        adj_mtx = np.array(vals).reshape(dims,dims)
-        print(adj_mtx)
-
+        adj_mtx = np.array(values).reshape(dims,dims)
+        # assign return val
         return adj_mtx 
 
+    def get_adjacency_matrix_byNodeIDs(self, nodeIds) -> np.array:
+        cy = Neo4jQueryFactory.get_adjacency_byNodeIds(nodeIds)
+        raw = self.connector.run_cypher_statement(cy)
 
+        # build adjacency matrix
+        dim_mtx = len(nodeIds)
+        values = []
+        for item in raw:
+            if item["connected"] is True:
+                values.append(1)
+            else:
+                values.append(0)
 
-
+        adj_mtx = np.array(values).reshape(dim_mtx, dim_mtx)
+        # assign return val
+        return adj_mtx
 

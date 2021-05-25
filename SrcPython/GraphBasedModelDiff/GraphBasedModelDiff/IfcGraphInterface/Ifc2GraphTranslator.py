@@ -7,7 +7,6 @@ from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 
 
-
 class IFCGraphGenerator:
     """
     IfcP21 to neo4j mapper. 
@@ -25,6 +24,8 @@ class IFCGraphGenerator:
         # try to open the ifc model and load the content into the model variable
         try:
             self.model = ifcopenshell.open(model_path)
+            ifc_version = self.model.schema
+            self.schema = ifcopenshell.ifcopenshell_wrapper.schema_by_name(ifc_version)
         except:
             print('file path: {}'.format(model_path))
             raise Exception('Unable to open IFC model on given file path')
@@ -103,10 +104,10 @@ class IFCGraphGenerator:
 
             # neo4j: build rooted node
             cypher_statement = Neo4jGraphFactory.create_primary_node(entityId, entityType, self.label)
-            node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
+            parent_node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
 
             # get all attrs and children
-            self.__getDirectChildren(entity, 0, node_id[0])
+            self.build_node_content(entity, 0, parent_node_id)
 
             # update progressbar
             percent += increment
@@ -115,7 +116,14 @@ class IFCGraphGenerator:
         progressbar.printbar(percent)
 
     # private recursive function
-    def __getDirectChildren(self, entity, indent, parent_NodeId=None):
+    def build_node_content(self, entity, indent: int, node_id: int):
+        """
+
+        @param entity:
+        @param indent:
+        @param node_id:
+        @return:
+        """
 
         if self.printToConsole:
             print("".ljust(indent * 4) + '{}'.format(entity))
@@ -123,111 +131,99 @@ class IFCGraphGenerator:
         # print atomic attributes: 
         info = entity.get_info()
         p21_id = info['id']
-        entityType = info['type']
-        # remove type and id from attrDict
-        excludeKeys = ['id', 'type']
-        attrs_dict = {key: val for key, val in info.items() if key not in excludeKeys}
 
-        # remove complex traversal attributes
-        filtered_attrs = {}
-        complex_attrs = []
+        # separate associations from class attributes
+        node_attribute_names, single_associations, aggregated_associations = self.separate_attributes(entity)
 
-        # add artifical parameter indicating the P21 entity number. Can be removed in post processing. 
-        filtered_attrs['p21_id'] = p21_id
-        # remove traverse attrs        
-        for key, val in attrs_dict.items():
+        # define dict of attributes that get directly attached to the node
+        node_attr_dict = {}
+        for a in node_attribute_names:
+            node_attr_dict[a] = info[a]
 
-            # some special tuples that have to be treated differently from pure lists
-            special_key_names = ['Coordinates', 'DirectionRatios']
-            nestedLists_key_names = ['CoordList', 'segments']
-            pdt_key_names = ['PredefinedType']
+        # attach p21_id param
+        node_attr_dict['p21_id'] = p21_id
 
-            # detecting atomic attribute -> map to existing node
-            if isinstance(val, str) or isinstance(val, float) or isinstance(val, int) or isinstance(val, bool):
-                filtered_attrs[key] = val
+        # --1-- append node attributes to current node
+        # atomic attrs exist on current node -> map to node
+        cypher_statement = Neo4jGraphFactory.add_attributes_by_node_id(node_id, node_attr_dict, self.label)
+        self.connector.run_cypher_statement(cypher_statement)
 
-            elif key in pdt_key_names:
-                filtered_attrs[key] = str(val)
+        # --2-- build simple associations with recursive call
+        # query all traversal entities (i.e., associated entity instances)
+        children = self.model.traverse(entity, 1)[1:]
 
-            # detecting atomic attribute but encapsulated in tuple
-            elif isinstance(val, tuple) and key in special_key_names:
-                filtered_attrs[key] = str(val)
+        for association in single_associations:
+            entity = info[association]
+            if entity is None:
+                continue
 
-            # detecting a list of child entities (again encapsulated as a list)
-            elif isinstance(val, tuple) and len(val) > 1 and key not in special_key_names:
+            entity_type = entity.get_info()['type']
+            p21_id_child = entity.get_info()['id']
 
-                # reserve suitable names for the relationships between parent and children
-                for i in range(len(val)):
-                    # append the list item index to the relationship type 
-                    rel_type = key + '__listItem_' + str(i)
-                    complex_attrs.append(rel_type)
+            edge_attrs = {'relType': association}
 
-            # detecting a simple child node
+            node_exists = self.check_node_exists(p21_id_child)
+
+            if node_exists:
+                # merge with existing
+                cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.label)
+                self.connector.run_cypher_statement(cy)
+
             else:
-                if val != None:
-                    complex_attrs.append(key)
+                # create new node
+                cy = Neo4jGraphFactory.create_secondary_node(
+                    parent_id=node_id, entity_type=entity_type, rel_attrs=edge_attrs, timestamp=self.label)
+                child_id = self.connector.run_cypher_statement(cy, 'ID(n)')[0]
 
-        # run the mapping of the detected data. 
-        #       filtered_attrs contain atomic attributes, which gets attached as properties at the parent node
-        #       complex_attrs  contain all attributes that need sub-nodes. They get zipped with the traverse children afterwards. 
+                # ToDo: consider to kick the recursion after creating all direct associations
 
-        if len(filtered_attrs.items()) > 0:
-            if self.printToConsole:
-                print("\t".ljust(indent * 4) + '{}'.format(filtered_attrs))
+                # kick the recursion and attach the attrs to the child node
+                self.build_node_content(entity, indent+1, child_id)
 
-            # append atomic attrs to current node
-            if parent_NodeId != None:
-                # atomic attrs exist on current node -> map to node 
-                cypher_statement = Neo4jGraphFactory.add_attributes_by_node_id(parent_NodeId, filtered_attrs,
-                                                                               self.label)
-                self.connector.run_cypher_statement(cypher_statement)
+        # --3-- build aggregated associations with recursive call
+        for association in aggregated_associations:
+            entities = info[association]
+            i = 0
+            for entity in entities:
+                entity_type = entity.get_info()['type']
+                p21_id_child = entity.get_info()['id']
 
-        # query all traversal entities -> subnodes 
-        children = self.model.traverse(entity, 1)
+                edge_attrs = {
+                    'relType': association,
+                    'listItem': i
+                }
 
-        # cut the first item as it is the parent itself
-        children = children[1:]
+                # check if node already exists
+                node_exists = self.check_node_exists(p21_id_child)
 
-        # combine the detected entities with the corresponding attribute names from 'complex_attrs' list
-        complex_childs = set(zip(complex_attrs, children))
+                if node_exists:
+                    # merge with existing
+                    cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.label)
+                    self.connector.run_cypher_statement(cy)
 
-        if len(children) == 0:
-            pass
-        else:
+                else:
+                    # create new node
+                    cy = Neo4jGraphFactory.create_secondary_node(
+                        parent_id=node_id, entity_type=entity_type, rel_attrs=edge_attrs, timestamp=self.label)
+                    child_id = self.connector.run_cypher_statement(cy, 'ID(n)')[0]
 
-            for child in complex_childs:
+                    # kick the recursion and attach the attrs to the child node
+                    self.build_node_content(entity, indent + 1, child_id)
 
-                ## check if child is already existing in the graph. otherwise create new node
-
-                cypher_statement = ''
-                cypher_statement = Neo4jQueryFactory.get_nodeId_byP21(child[1].__dict__['id'], self.label)
-                res = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
-
-                if len(res) == 0:
-                    # node doesnt exist yet, continue with creating a new attr node
-
-                    cypher_statement = ''
-                    cypher_statement = Neo4jGraphFactory.create_secondary_node(parent_NodeId, child[1].__dict__['type'],
-                                                                               child[0], self.label)
-                    node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
-
-                    # recursively call the function again but update the node id. 
-                    # It will append the atomic properties and creates the nested child nodes again
-                    children = self.__getDirectChildren(child[1], indent + 1, node_id[0])
-
-                elif len(res) == 1:
-                    # node already exists, run merge command
-
-                    cypher_statement = ''
-                    cypher_statement = Neo4jGraphFactory.merge_on_p21(p21_id, child[1].__dict__['id'], child[0],
-                                                                      self.label)
-                    node_id = self.connector.run_cypher_statement(cypher_statement)
-
-                elif len(res) > 1:
-                    # node exist multiple times. 
-                    raise Exception('Detected nodes with same p21 id. ERROR!')
+                # increase counter
+                i += 1
 
         return None
+
+    def check_node_exists(self, p21_id_child: int) -> bool:
+        """
+        check if a node with a specified p21_id already exists in the graph
+        @param p21_id_child:
+        @return: True or False
+        """
+        cy = Neo4jQueryFactory.get_node_exists(p21_id=p21_id_child, label=self.label)
+        node_exists = self.connector.run_cypher_statement(cy)[0][0]
+        return node_exists
 
     # public entry
     def __mapObjRelationships(self, objRels):
@@ -241,7 +237,73 @@ class IFCGraphGenerator:
 
             # neo4j: build rooted node
             cypher_statement = Neo4jGraphFactory.create_connection_node(entityId, entityType, self.label)
-            node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
+            node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
 
             # get all attrs and children
-            self.__getDirectChildren(entity, 0, node_id[0])
+            self.build_node_content(entity, 0, node_id)
+
+    def separate_attributes(self, entity) -> tuple:
+        """"
+        Queries all attributes of the corresponding entity definition and returns if an attribute has
+        attr type value, an entity value or is an aggregation of entities
+        @entity:
+        @return:
+        """
+        info = entity.get_info()
+        clsName = info['type']
+        entity_id = info['id']
+
+        # remove entity_id and type
+        info.pop('id')
+        info.pop('type')
+
+        # get the class definition for the current instance w.r.t. schema version
+        # https://wiki.osarch.org/index.php?title=IfcOpenShell_code_examples#Exploring_IFC_schema
+
+        # separate attributes into node attributes, simple associations, and sets of associations
+        node_attributes = []
+        single_associations = []
+        aggregated_associations = []
+
+        try:
+            class_definition = self.schema.declaration_by_name(clsName).all_attributes()
+        except:
+            raise Exception("Failed to query schema specification in IFC2GraphTranslator. ")
+
+        for attr in class_definition:
+
+            # check if attribute has attr value in the current entity instance
+            # if info[name] is not None:
+            #     print('attribute present')
+            # else:
+            #     print('attribute empty')
+            #     continue
+
+            # this is attr quite weird approach but it works
+            try:
+                attr_type = attr.type_of_attribute().declared_type()
+            except:
+                attr_type = attr.type_of_attribute()
+
+            # get the value structure
+            is_entity = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.entity)
+            is_type = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.type_declaration)
+            is_select = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.select_type)
+            is_enumeration = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.enumeration_type)
+            is_aggregation = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
+
+            if is_type or is_enumeration:
+                node_attributes.append(attr.name())
+            elif is_select or is_entity:
+                single_associations.append(attr.name())
+            elif is_aggregation:
+                # ToDo: check if it is an aggregation of types or an aggregation of entities
+                if attr.name() in ['Coordinates', 'DirectionRatios', 'CoordList', 'segments']:
+                    node_attributes.append(attr.name())
+                else:
+                    aggregated_associations.append(attr.name())
+            else:
+                raise Exception('Tried to encode the attribute type of entity {} attribute {}. '
+                                'Please check your graph translator.'.format(entity_id, attr.name()))
+
+        return node_attributes, single_associations, aggregated_associations

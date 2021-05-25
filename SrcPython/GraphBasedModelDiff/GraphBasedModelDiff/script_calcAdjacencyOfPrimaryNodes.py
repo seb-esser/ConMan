@@ -13,7 +13,7 @@ label_updated = "ts20210119T085409"
 
 # do magic
 analysis_engine = AdjacencyAnalyser(connector)
-adj_mtx = analysis_engine.get_adjacency_matrix(label_init)
+adj_mtx = analysis_engine.get_adjacency_matrix_byHashsums(label_init)
 
 
 

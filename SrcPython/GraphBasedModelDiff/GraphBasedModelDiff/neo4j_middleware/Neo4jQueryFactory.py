@@ -47,7 +47,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH (n:PrimaryNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.entityType, PROPERTIES(n)'
+        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n)'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
@@ -58,7 +58,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH (n:ConnectionNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.entityType'
+        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n)'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
@@ -87,11 +87,11 @@ class Neo4jQueryFactory(Neo4jFactory):
                 return ['"' + x + '"' for x in l]
             
             ignore_str = surroundStrings(attrIgnoreList)
-            # define seperator
-            seperator = ', '
+            # define separator
+            separator = ', '
 
-            # join the contents of the list with the seperator
-            ignore_str = seperator.join(ignore_str)
+            # join the contents of the list with the separator
+            ignore_str = separator.join(ignore_str)
 
             # close the string with []
             ignore_str = '[' + ignore_str + ']'
@@ -114,7 +114,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match = 'MATCH (n:{})-[r]->(c)'.format(label)
         where = 'WHERE ID(n) = {}'.format(parent_node_id)
-        ret = 'RETURN ID(c), type(r), c.entityType, properties(c)'
+        ret = 'RETURN ID(c), r.relType, c.EntityType, properties(c)'
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     @classmethod
@@ -189,7 +189,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match1 = 'match p = (n) Where ID(n)={}'.format(node_id)
         match2 = 'match (n)-[r]->(f)'
-        ret = 'UNWIND type(r) as mylist RETURN mylist'
+        ret = 'UNWIND r.relType as mylist RETURN mylist'
         return Neo4jFactory.BuildMultiStatement([match1, match2, ret])
 
     @classmethod
@@ -205,6 +205,57 @@ class Neo4jQueryFactory(Neo4jFactory):
         ret = 'RETURN paths, NODES(paths), RELATIONSHIPS(paths)'
         return Neo4jFactory.BuildMultiStatement([match1, match2, cond, ret])
 
+    @classmethod
+    def get_primary_structure(cls, label: str) -> str:
+        """
+        Queries all nodes and edges involved in the primary structure
+        @param label: model label
+        @return: cypher query string
+        """
+        pattern = 'MATCH pattern = (n:{}}:PrimaryNode)<--(con)'.format(label)
+        ret = 'RETURN pattern'
+        return Neo4jFactory.BuildMultiStatement([pattern, ret])
+
+    @classmethod
+    def get_adjacency_primary(cls, label: str) -> str:
+        """
+
+        @param label:
+        @return: cypher query string
+        """
+        match1 = 'MATCH (n:ts20210521T074802) WHERE Not n:SecondaryNode'
+        match2 = 'MATCH (m:ts20210521T074802) WHERE Not m:SecondaryNode'
+        ret = 'RETURN n.GlobalId as FromNodeGUID, m.GlobalId as ToNodeGUID, Exists((n)-->(m)) as connected'
+        return Neo4jFactory.BuildMultiStatement([match1, match2, ret])
+
+    @classmethod
+    def get_adjacency_byNodeIds(cls, nodeIds) -> str:
+        """
+
+        @param nodeIds:
+        @return: cypher query string
+        """
+
+        match1 = 'MATCH (n) WHERE ID(n) in {}'.format(nodeIds)
+        match2 = 'MATCH (m) WHERE ID(m) in {}'.format(nodeIds)
+
+        unwind1 = 'UNWIND n.GlobalId as fromGuid'
+        unwind2 = 'UNWIND m.GlobalId as toGuid'
+
+        ret = 'RETURN fromGuid as fromGuid, toGuid as toGuid, Exists((m) -->(n)) as connected'
+        sort = 'Order by fromGuid ASC, toGuid ASC'
+        return Neo4jFactory.BuildMultiStatement([match1, match2, unwind1, unwind2, ret, sort])
+
+    @classmethod
+    def get_node_exists(cls, p21_id: int, label: str) -> str:
+        """
+
+        @param p21_id:
+        @param label:
+        @return: cypher query string
+        """
+        cy = 'OPTIONAL Match(n:{} {{p21_id: {} }}) RETURN n IS NOT NULL AS existing'.format(label, p21_id)
+        return cy
 
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --
