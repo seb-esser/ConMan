@@ -1,8 +1,8 @@
 """ packages """
 import json
-
+import logging
 """ modules """
-from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum, LoggingLevelEnum
+from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
 
 
 class Configuration:
@@ -76,7 +76,7 @@ class Configuration:
         raise Warning('not implemented properly. Check ToDos')
 
         # ToDo: prepare everything to use this method with file-based jsons as well as HTTP request bodies
-
+        # json import working for logsettings -- Benedict Harder
         with open(jsonPath) as f:
             json_obj = json.load(f)
 
@@ -104,16 +104,17 @@ class Configuration:
 
 
 class LoggingSettings:
-    def __init__(self, to_console, to_file, log_file_path, log_console_level, log_file_level):
+    def __init__(self, to_console, to_file, log_file_path, log_formatter, log_console_level, log_file_level):
         self.logToConsole = to_console
         self.logToFile = to_file
         self.logFilePath = log_file_path
+        self.logFormatter = log_formatter
         self.logConsoleLevel = log_console_level
         self.logFileLevel = log_file_level
 
     @classmethod
     def default_settings(cls):
-        return cls(False, False, '/logging', LoggingLevelEnum.NONE, LoggingLevelEnum.NONE)
+        return cls(True, True, 'myapp.log', logging.Formatter('%(asctime)s: %(name)s: %(message)s'), logging.INFO, logging.INFO)
 
     @classmethod
     def from_json(cls, obj):
@@ -121,21 +122,54 @@ class LoggingSettings:
         bool_file = obj['logToFile']
         bool_console = obj['logToConsole']
         logPath = obj['loggingFilePath']
-        levelConsole = obj['loggingLevelConsole']  # ToDo: Implement cast to LoggingLevelEnum
-        levelFile = obj['loggingLevelFile']  # ToDo: Implement cast to LoggingLevelEnum
-
-        return cls(bool_console, bool_file, logPath, levelConsole, levelFile)
+        # Format
+        if obj['loggingFormat'] == "standard":
+            logFormat = logging.Formatter('%(asctime)s: %(name)s: %(message)s')
+        else:
+            raise Exception('Invalid value in defaultConfig.json')
+        # Console Level
+        if obj['loggingLevelConsole'] == "simple":
+            levelConsole = logging.INFO
+        else:
+            raise Exception('Invalid value in defaultConfig.json')
+        # File Level
+        if obj['loggingLevelFile'] =="simple":
+            levelFile = logging.INFO
+        else:
+            raise Exception('Invalid value in defaultConfig.json')
+        # ToDo: Implement cast to LoggingLevelEnum
+        return cls(bool_console, bool_file, logPath, logFormat, levelConsole, levelFile)
 
     def to_json(self):
         """ write instance to JSON """
         raise Exception('This method is not implemented yet')
 
+    def initialize_logger(self, logger):
+        """ initialize a logger with settings from the class"""
+        logger.setLevel(logging.DEBUG)
+
+        # config for logging to a file
+        if self.logToFile:
+            file_handler = logging.FileHandler(self.logFilePath, mode = 'a')
+            file_handler.setLevel(self.logFileLevel)
+            file_handler.setFormatter(self.logFormatter)
+            logger.addHandler(file_handler)
+
+        # config for logging to console
+        if self.logToConsole:
+            stream_handler = logging.StreamHandler()
+            stream_handler.setFormatter(self.logFormatter)
+            stream_handler.setLevel(self.logConsoleLevel)
+            logger.addHandler(stream_handler)
+
+        return logger
+
     # --- dunder ---
     def __repr__(self):
-        return 'LoggingSettings: ToConsole: {} ToFile: {}'.format(self.logToConsole, self.logToFile)
+        return 'LoggingSettings: ToConsole: {}, ToFile: {}, ConsoleLevel: {}, FileLevel: {}'.format(self.logToConsole, self.logToFile, self.logConsoleLevel, self.logFileLevel)
 
     def __str__(self):
-        return 'LoggingSettings: ToConsole: {} ToFile: {}'.format(self.logToConsole, self.logToFile)
+        return 'LoggingSettings: ToConsole: {}, ToFile: {}, ConsoleLevel: {}, FileLevel: {}'.format(self.logToConsole, self.logToFile, self.logConsoleLevel, self.logFileLevel)
 
 
 class DiffSettings:

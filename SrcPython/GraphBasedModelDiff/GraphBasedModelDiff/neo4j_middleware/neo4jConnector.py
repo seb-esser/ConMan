@@ -1,9 +1,14 @@
-
-
 import logging
 
 from neo4j import GraphDatabase
+from neo4jGraphDiff.Config.Configuration import Configuration
 
+# example of how to configure the logger
+# the logger needs to be built within the module it is supposed to be used in, but the it can be configured elsewhere.
+config = Configuration.basic_config()
+logsetting = config.LogSettings
+logger = logging.getLogger(__name__)
+logger = logsetting.initialize_logger(logger)
 
 class Neo4jConnector:
     """ handles the connection to a given neo4j database """
@@ -15,14 +20,15 @@ class Neo4jConnector:
     # constructor
     def __init__(self, writeToConsole=True, writeToLogFile=False):
         print("Initialized new Connector instance.")
-        self.ToConsole = writeToConsole
-        self.ToLogFile = writeToLogFile
+        #self.ToConsole = writeToConsole
+        #self.ToLogFile = writeToLogFile
 
     # methods
     def connect_driver(self):
         try:
             self.my_driver = GraphDatabase.driver(self.uri, auth=("neo4j", self.password), encrypted=False)
         except self.my_driver:
+            logger.error('Connection failed')
             raise Exception("Oops!  Connection failed.  Try again...")       
             
 
@@ -30,7 +36,7 @@ class Neo4jConnector:
         with self.my_driver.session() as session:
             with session.begin_transaction() as tx:
                 for record in tx.run("MATCH (n) RETURN n LIMIT 25"):
-                    print(record)
+                    logger.info(record)
 
     def run_cypher_statement(self, statement, postStatement=None):
         """ executes a given cypher statement and does some post processing if stated """
@@ -38,12 +44,10 @@ class Neo4jConnector:
         try:
             with self.my_driver.session() as session:
                 with session.begin_transaction() as tx:
-                    if self.ToConsole:
-                        print("[neo4j_connector] Running query: " + str(statement)[:80] + '...')
-                    if self.ToLogFile:
-                        logging.info("Running query:" +str(statement))
+                    logger.info("[neo4j_connector] Running query: " + str(statement)[:80] + '...')
+
                     res = tx.run(statement)
-                
+                    logger.info("[neo4j_connector] Query result: " + str(res))
                     return_val = []
 
                     if postStatement != None:
@@ -55,21 +59,21 @@ class Neo4jConnector:
                         for record in res:
                            # print(record)
                            return_val.append(record)
-                if self.ToConsole:
-                    print('[neo4j_connector] Received response. ')
+                logger.info('[neo4j_connector] Received response. ')
                 return return_val
 
-        except:
-            print('[neo4j_connector] something went wrong. Check the neo4j connector. ')
-            print('[neo4j_connector] Tried to execute cypher statement >> {} <<'.format(statement) )
-            print('[neo4j_connector] Possible issues: ' + 
+        except :
+
+            logger.error('[neo4j_connector] something went wrong. Check the neo4j connector. ')
+            logger.error('[neo4j_connector] Tried to execute cypher statement >> {} <<'.format(statement) )
+            logger.error('[neo4j_connector] Possible issues: ' + 
                     '\t Incorrect cypher statement' + 
                     '\t Missing packages inside the graph database \n')
             raise Exception('Error in neo4j Connector.')
 
     def disconnect_driver(self):
         self.my_driver.close()
-        print('Driver disconnected.')
+        logger.info('Driver disconnected.')
 
 
     # constructs a multi statement cypher command
