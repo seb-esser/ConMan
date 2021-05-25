@@ -10,6 +10,7 @@ logsetting = config.LogSettings
 logger = logging.getLogger(__name__)
 logger = logsetting.initialize_logger(logger)
 
+
 class Neo4jConnector:
     """ handles the connection to a given neo4j database """
     # member variables
@@ -18,29 +19,29 @@ class Neo4jConnector:
     my_driver = []
 
     # constructor
-    def __init__(self, writeToConsole=True, writeToLogFile=False):
+    def __init__(self):
         print("Initialized new Connector instance.")
-        #self.ToConsole = writeToConsole
-        #self.ToLogFile = writeToLogFile
 
     # methods
     def connect_driver(self):
+        """
+        creates a new connection to the database
+        @return:
+        """
         try:
             self.my_driver = GraphDatabase.driver(self.uri, auth=("neo4j", self.password), encrypted=False)
         except self.my_driver:
             logger.error('Connection failed')
-            raise Exception("Oops!  Connection failed.  Try again...")       
-            
+            raise Exception("Oops!  Connection failed.  Try again...")
 
-    def test_connection(self):
-        with self.my_driver.session() as session:
-            with session.begin_transaction() as tx:
-                for record in tx.run("MATCH (n) RETURN n LIMIT 25"):
-                    logger.info(record)
+    def run_cypher_statement(self, statement, postStatement = None):
+        """
+        executes a given cypher statement and does some post processing if stated
+        @statement
+        @postStatement
+        @return
+        """
 
-    def run_cypher_statement(self, statement, postStatement=None):
-        """ executes a given cypher statement and does some post processing if stated """
-      
         try:
             with self.my_driver.session() as session:
                 with session.begin_transaction() as tx:
@@ -52,30 +53,30 @@ class Neo4jConnector:
 
                     if postStatement != None:
                         for record in res:
-                           # print(record[postStatement])
-                           return_val.append(record[postStatement])
-                   
-                    else: 
+                            # print(record[postStatement])
+                            return_val.append(record[postStatement])
+
+                    else:
                         for record in res:
-                           # print(record)
-                           return_val.append(record)
+                            # print(record)
+                            return_val.append(record)
                 logger.info('[neo4j_connector] Received response. ')
                 return return_val
 
-        except :
+        except:
 
             logger.error('[neo4j_connector] something went wrong. Check the neo4j connector. ')
-            logger.error('[neo4j_connector] Tried to execute cypher statement >> {} <<'.format(statement) )
-            logger.error('[neo4j_connector] Possible issues: ' + 
-                    '\t Incorrect cypher statement' + 
-                    '\t Missing packages inside the graph database \n')
+            logger.error('[neo4j_connector] Tried to execute cypher statement >> {} <<'.format(statement))
+            logger.error('[neo4j_connector] Possible issues: ' +
+                         '\t Incorrect cypher statement' +
+                         '\t Missing packages inside the graph database \n')
             raise Exception('Error in neo4j Connector.')
 
     def disconnect_driver(self):
+        """
+        disconnects the connector instance
+        @return:
+        """
         self.my_driver.close()
         logger.info('Driver disconnected.')
 
-
-    # constructs a multi statement cypher command
-    def BuildMultiStatement(self, cypherCMDs):
-         return ' '.join(cypherCMDs)
