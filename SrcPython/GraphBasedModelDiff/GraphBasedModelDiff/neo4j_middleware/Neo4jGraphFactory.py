@@ -45,7 +45,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         match = 'MATCH(n:{}) WHERE ID(n) = {}'.format(timestamp, node_id)
         attrs = []
         for attr, val in attributes.items():
-            if isinstance(val, str):
+            if isinstance(val, (str, tuple)):
                 add_param = 'SET n.{} = "{}"'.format(attr, val)
                 attrs.append(add_param)
             elif isinstance(val, (int, float, complex)):
@@ -180,20 +180,28 @@ class Neo4jGraphFactory(Neo4jFactory):
         return Neo4jFactory.BuildMultiStatement([matchObjRel, matchRootedObj, merge1, merge2, returnID])
 
     @classmethod
-    def merge_on_p21(cls, from_p21, to_p21, rel_type, timestamp):
+    def merge_on_p21(cls, from_p21, to_p21, rel_attrs, timestamp):
         """
         Provides the cypher command to merge two nodes based on their P21 vals
         @param from_p21:
         @param to_p21:
-        @param rel_type:
+        @param rel_attrs:
         @param timestamp:
         @return: cypher command as str
         """
         from_node = 'MATCH (source:{}) WHERE source.p21_id = {}'.format(timestamp, from_p21)
         to_node = 'MATCH (target:{}) WHERE target.p21_id = {}'.format(timestamp, to_p21)
-        merge = 'MERGE (source)-[:r {{ relType: \'{}\' }}]->(target)'.format(rel_type)
+        merge = 'MERGE (source)-[r:rel ]->(target)'
+        attrs = []
+        for attr, val in rel_attrs.items():
+            if isinstance(val, str):
+                add_param = 'SET r.{} = "{}"'.format(attr, val)
+                attrs.append(add_param)
+            elif isinstance(val, (int, float, complex)):
+                add_param = 'SET r.{} = {}'.format(attr, val)
+                attrs.append(add_param)
         returnID = 'RETURN ID(source), ID(target)'
-        return Neo4jFactory.BuildMultiStatement([from_node, to_node, merge, returnID])
+        return Neo4jFactory.BuildMultiStatement([from_node, to_node, merge] + attrs + [returnID])
 
     @classmethod
     def merge_on_node_ids(cls, node_id_from: int, node_id_to: int, rel_type: str = 'DEFAULT_CONNECTION') -> str:

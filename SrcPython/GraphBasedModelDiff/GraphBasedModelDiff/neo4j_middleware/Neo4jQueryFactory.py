@@ -245,5 +245,17 @@ class Neo4jQueryFactory(Neo4jFactory):
         ret = 'RETURN fromGuid as fromGuid, toGuid as toGuid, Exists((m) -->(n)) as connected'
         sort = 'Order by fromGuid ASC, toGuid ASC'
         return Neo4jFactory.BuildMultiStatement([match1, match2, unwind1, unwind2, ret, sort])
+
+    @classmethod
+    def get_node_exists(cls, p21_id: int, label: str) -> str:
+        """
+
+        @param p21_id:
+        @param label:
+        @return: cypher query string
+        """
+        cy = 'OPTIONAL Match(n:{} {{p21_id: {} }}) RETURN n IS NOT NULL AS existing'.format(label, p21_id)
+        return cy
+
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --

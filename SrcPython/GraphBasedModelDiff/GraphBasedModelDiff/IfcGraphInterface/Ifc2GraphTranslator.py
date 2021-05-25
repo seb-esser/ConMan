@@ -158,82 +158,72 @@ class IFCGraphGenerator:
                 continue
 
             entity_type = entity.get_info()['type']
+            p21_id_child = entity.get_info()['id']
+
             edge_attrs = {'relType': association}
 
-            cy = Neo4jGraphFactory.create_secondary_node(
-                parent_id=node_id, entity_type=entity_type, rel_attrs=edge_attrs, timestamp=self.label)
-            child_id = self.connector.run_cypher_statement(cy, 'ID(n)')[0]
+            node_exists = self.check_node_exists(p21_id_child)
 
-            # ToDo: consider to kick the recursion after creating all direct associations
+            if node_exists:
+                # merge with existing
+                cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.label)
+                self.connector.run_cypher_statement(cy)
 
-            # kick the recursion and attach the attrs to the child node
-            self.build_node_content(entity, indent+1, child_id)
+            else:
+                # create new node
+                cy = Neo4jGraphFactory.create_secondary_node(
+                    parent_id=node_id, entity_type=entity_type, rel_attrs=edge_attrs, timestamp=self.label)
+                child_id = self.connector.run_cypher_statement(cy, 'ID(n)')[0]
+
+                # ToDo: consider to kick the recursion after creating all direct associations
+
+                # kick the recursion and attach the attrs to the child node
+                self.build_node_content(entity, indent+1, child_id)
 
         # --3-- build aggregated associations with recursive call
         for association in aggregated_associations:
             entities = info[association]
             i = 0
             for entity in entities:
-
                 entity_type = entity.get_info()['type']
+                p21_id_child = entity.get_info()['id']
+
                 edge_attrs = {
                     'relType': association,
                     'listItem': i
                 }
 
-                cy = Neo4jGraphFactory.create_secondary_node(
-                    parent_id=node_id, entity_type=entity_type, rel_attrs=edge_attrs, timestamp=self.label)
-                child_id = self.connector.run_cypher_statement(cy, 'ID(n)')[0]
+                # check if node already exists
+                node_exists = self.check_node_exists(p21_id_child)
 
-                # kick the recursion and attach the attrs to the child node
-                self.build_node_content(entity, indent + 1, child_id)
+                if node_exists:
+                    # merge with existing
+                    cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.label)
+                    self.connector.run_cypher_statement(cy)
+
+                else:
+                    # create new node
+                    cy = Neo4jGraphFactory.create_secondary_node(
+                        parent_id=node_id, entity_type=entity_type, rel_attrs=edge_attrs, timestamp=self.label)
+                    child_id = self.connector.run_cypher_statement(cy, 'ID(n)')[0]
+
+                    # kick the recursion and attach the attrs to the child node
+                    self.build_node_content(entity, indent + 1, child_id)
 
                 # increase counter
                 i += 1
 
-        # # cut the first item as it is the parent itself
-        # children = children[1:]
-        #
-        # # combine the detected entities with the corresponding attribute names from 'associations' list
-        # complex_childs = set(zip(associations, children))
-        #
-        # if len(children) == 0:
-        #     pass
-        # else:
-        #
-        #     for child in complex_childs:
-        #
-        #         ## check if child is already existing in the graph. otherwise create new node
-        #
-        #         cypher_statement = ''
-        #         cypher_statement = Neo4jQueryFactory.get_nodeId_byP21(child[1].__dict__['id'], self.label)
-        #         res = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
-        #
-        #         if len(res) == 0:
-        #             # node doesnt exist yet, continue with creating a new attr node
-        #
-        #             cypher_statement = ''
-        #             cypher_statement = Neo4jGraphFactory.create_secondary_node(node_id, child[1].__dict__['type'],
-        #                                                                        child[0], self.label)
-        #             node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
-        #
-        #             # recursively call the function again but update the node id.
-        #             # It will append the atomic properties and creates the nested child nodes again
-        #             self.build_node_content(child[1], indent + 1, node_id[0])
-        #
-        #         elif len(res) == 1:
-        #             # node already exists, run merge command
-        #
-        #             cypher_statement = ''
-        #             cypher_statement = Neo4jGraphFactory.merge_on_p21(p21_id, child[1].__dict__['id'], child[0],
-        #                                                               self.label)
-        #             node_id = self.connector.run_cypher_statement(cypher_statement)
-        #
-        #         elif len(res) > 1:
-        #             # node exist multiple times.
-        #             raise Exception('Detected nodes with same p21 id. ERROR!')
-
         return None
+
+    def check_node_exists(self, p21_id_child: int) -> bool:
+        """
+        check if a node with a specified p21_id already exists in the graph
+        @param p21_id_child:
+        @return: True or False
+        """
+        cy = Neo4jQueryFactory.get_node_exists(p21_id=p21_id_child, label=self.label)
+        node_exists = self.connector.run_cypher_statement(cy)[0][0]
+        return node_exists
 
     # public entry
     def __mapObjRelationships(self, objRels):
@@ -247,10 +237,10 @@ class IFCGraphGenerator:
 
             # neo4j: build rooted node
             cypher_statement = Neo4jGraphFactory.create_connection_node(entityId, entityType, self.label)
-            node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')
+            node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
 
             # get all attrs and children
-            self.build_node_content(entity, 0, node_id[0])
+            self.build_node_content(entity, 0, node_id)
 
     def separate_attributes(self, entity) -> tuple:
         """"
