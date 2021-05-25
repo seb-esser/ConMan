@@ -7,8 +7,6 @@ from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 
 
-
-
 class IFCGraphGenerator:
     """
     IfcP21 to neo4j mapper. 
@@ -118,7 +116,7 @@ class IFCGraphGenerator:
         progressbar.printbar(percent)
 
     # private recursive function
-    def __getDirectChildren(self, entity, indent, parent_NodeId=None):
+    def __getDirectChildren(self, entity, indent, parent_NodeId = None):
 
         if self.printToConsole:
             print("".ljust(indent * 4) + '{}'.format(entity))
@@ -128,7 +126,7 @@ class IFCGraphGenerator:
         p21_id = info['id']
 
         # separate associations from class attributes
-        node_attributes, single_associations, aggregated_associations = self.separateAttributes(entity)
+        node_attributes, single_associations, aggregated_associations = self.separate_attributes(entity)
 
         # remove type and id from attrDict
         excludeKeys = ['id', 'type']
@@ -140,7 +138,7 @@ class IFCGraphGenerator:
 
         # add artificial parameter indicating the P21 entity number. Can be removed in post processing.
         filtered_attrs['p21_id'] = p21_id
-        # remove traverse attrs        
+        # remove traverse attrs
         for key, val in attrs_dict.items():
 
             # some special tuples that have to be treated differently from pure lists
@@ -252,56 +250,48 @@ class IFCGraphGenerator:
             # get all attrs and children
             self.__getDirectChildren(entity, 0, node_id[0])
 
-    def separateAttributes(self, entity) -> tuple:
+    def separate_attributes(self, entity) -> tuple:
         """"
         Queries all attributes of the corresponding entity definition and returns if an attribute has
-        a type value, an entity value or is an aggregation of entities
+        attr type value, an entity value or is an aggregation of entities
         @entity:
         @return:
         """
         info = entity.get_info()
         clsName = info['type']
-        id = info['id']
+        entity_id = info['id']
 
-        # remove id and type
+        # remove entity_id and type
         info.pop('id')
         info.pop('type')
 
         # get the class definition for the current instance w.r.t. schema version
         # https://wiki.osarch.org/index.php?title=IfcOpenShell_code_examples#Exploring_IFC_schema
 
-        #
-        # # get info for each attr
-        # for attr_name, attr_val in info.items():
-        #     # attr definition
-        #     ind = self.schema.declaration_by_name(clsName).attribute_index(attr_name)
-        #     attr_def = self.schema.declaration_by_name(clsName).attribute_by_index(ind)
-        #     print(attr_def)
-
         # separate attributes into node attributes, simple associations, and sets of associations
-
         node_attributes = []
         single_associations = []
         aggregated_associations = []
 
-        class_definition = self.schema.declaration_by_name(clsName).all_attributes()
-        for a in class_definition:
+        try:
+            class_definition = self.schema.declaration_by_name(clsName).all_attributes()
+        except:
+            raise Exception("Failed to query schema specification in IFC2GraphTranslator. ")
 
-            # check if attribute has a value in the current entity instance
+        for attr in class_definition:
+
+            # check if attribute has attr value in the current entity instance
             # if info[name] is not None:
             #     print('attribute present')
             # else:
             #     print('attribute empty')
             #     continue
 
-            # this is a quite weird approach but it works
+            # this is attr quite weird approach but it works
             try:
-                attr_type = a.type_of_attribute().declared_type()
+                attr_type = attr.type_of_attribute().declared_type()
             except:
-                print(a.type_of_attribute())
-                attr_type = a.type_of_attribute()
-
-            print('{}'.format(attr_type, ""))
+                attr_type = attr.type_of_attribute()
 
             # get the value structure
             is_entity = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.entity)
@@ -311,13 +301,13 @@ class IFCGraphGenerator:
             is_aggregation = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
 
             if is_type or is_select or is_enumeration:
-                node_attributes.append(a.name())
+                node_attributes.append(attr.name())
             elif is_entity:
-                single_associations.append(a.name())
+                single_associations.append(attr.name())
             elif is_aggregation:
-                aggregated_associations.append(a.name())
+                aggregated_associations.append(attr.name())
             else:
                 raise Exception('Tried to encode the attribute type of entity {} attribute {}. '
-                                'Please check your graph translator.'.format(id, a.name()))
+                                'Please check your graph translator.'.format(entity_id, attr.name()))
 
         return node_attributes, single_associations, aggregated_associations
