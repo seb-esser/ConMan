@@ -128,7 +128,7 @@ class IFCGraphGenerator:
         p21_id = info['id']
 
         # separate associations from class attributes
-        cls_attributes, associations = self.separateAttributes(entity)
+        node_attributes, single_associations, aggregated_associations = self.separateAttributes(entity)
 
         # remove type and id from attrDict
         excludeKeys = ['id', 'type']
@@ -252,23 +252,48 @@ class IFCGraphGenerator:
             # get all attrs and children
             self.__getDirectChildren(entity, 0, node_id[0])
 
-    def separateAttributes(self, entity):
+    def separateAttributes(self, entity) -> tuple:
         """"
-
+        Queries all attributes of the corresponding entity definition and returns if an attribute has
+        a type value, an entity value or is an aggregation of entities
         @entity:
         @return:
         """
         info = entity.get_info()
         clsName = info['type']
+        id = info['id']
 
+        # remove id and type
+        info.pop('id')
+        info.pop('type')
 
         # get the class definition for the current instance w.r.t. schema version
         # https://wiki.osarch.org/index.php?title=IfcOpenShell_code_examples#Exploring_IFC_schema
-        class_definition = self.schema.declaration_by_name(clsName).all_attributes()
+
+        #
+        # # get info for each attr
+        # for attr_name, attr_val in info.items():
+        #     # attr definition
+        #     ind = self.schema.declaration_by_name(clsName).attribute_index(attr_name)
+        #     attr_def = self.schema.declaration_by_name(clsName).attribute_by_index(ind)
+        #     print(attr_def)
 
         # separate attributes into node attributes, simple associations, and sets of associations
 
+        node_attributes = []
+        single_associations = []
+        aggregated_associations = []
+
+        class_definition = self.schema.declaration_by_name(clsName).all_attributes()
         for a in class_definition:
+
+            # check if attribute has a value in the current entity instance
+            # if info[name] is not None:
+            #     print('attribute present')
+            # else:
+            #     print('attribute empty')
+            #     continue
+
             # this is a quite weird approach but it works
             try:
                 attr_type = a.type_of_attribute().declared_type()
@@ -277,9 +302,22 @@ class IFCGraphGenerator:
                 attr_type = a.type_of_attribute()
 
             print('{}'.format(attr_type, ""))
+
+            # get the value structure
             is_entity = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.entity)
             is_type = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.type_declaration)
             is_select = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.select_type)
+            is_enumeration = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.enumeration_type)
             is_aggregation = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
 
-        return [None, None]
+            if is_type or is_select or is_enumeration:
+                node_attributes.append(a.name())
+            elif is_entity:
+                single_associations.append(a.name())
+            elif is_aggregation:
+                aggregated_associations.append(a.name())
+            else:
+                raise Exception('Tried to encode the attribute type of entity {} attribute {}. '
+                                'Please check your graph translator.'.format(id, a.name()))
+
+        return node_attributes, single_associations, aggregated_associations
