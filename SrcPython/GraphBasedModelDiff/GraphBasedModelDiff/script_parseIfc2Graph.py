@@ -44,8 +44,6 @@ paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresen
          # # moved wall, new window and subsequent change in parent wall
          ]
 
-paths = ['./00_sampleData/IFC_stepP21/wall-column/Wall-Column.ifc']
-
 for p in paths:
     print(p)
 

@@ -184,9 +184,15 @@ class IFCGraphGenerator:
         for association in aggregated_associations:
             entities = info[association]
             i = 0
+            if entities is None:
+                # detected an array of associations but nothing was referenced within the given instance model
+                continue
             for entity in entities:
-                entity_type = entity.get_info()['type']
-                p21_id_child = entity.get_info()['id']
+                try:
+                    entity_type = entity.get_info()['type']
+                    p21_id_child = entity.get_info()['id']
+                except:
+                    raise Exception('Failed to query data from entity.')
 
                 edge_attrs = {
                     'relType': association,
@@ -300,7 +306,11 @@ class IFCGraphGenerator:
                                'ElectricCurrentExponent',
                                'ThermodynamicTemperatureExponent',
                                'AmountOfSubstanceExponent',
-                               'LuminousIntensityExponent']:
+                               'LuminousIntensityExponent',
+                               'Exponent',      # from
+                               'Precision',     # from IfcGeometricRepresentationContext
+                               'Scale'          # from IfcCartesianPointTransformationOperator3D in 2x3
+                               ]:
                 node_attributes.append(attr.name())
 
             elif is_type or is_enumeration or is_select:
@@ -309,12 +319,23 @@ class IFCGraphGenerator:
                 single_associations.append(attr.name())
             elif is_aggregation:
                 # ToDo: check if it is an aggregation of types or an aggregation of entities
-                if attr.name() in ['Coordinates', 'DirectionRatios', 'CoordList', 'segments', 'MiddleNames', 'PrefixTitles', 'SuffixTitles', 'Roles', 'Addresses']:
+                if attr.name() in ['Coordinates',
+                                   'DirectionRatios',
+                                   'CoordList',
+                                   'segments',
+                                   'MiddleNames',
+                                   'PrefixTitles',
+                                   'SuffixTitles',
+                                   'Roles',
+                                   'Addresses',
+                                   'CoordIndex',
+                                   'InnerCoordIndices'
+                                   ]:
                     node_attributes.append(attr.name())
                 else:
                     aggregated_associations.append(attr.name())
             else:
-                raise Exception('Tried to encode the attribute type of entity {} attribute {}. '
-                                'Please check your graph translator.'.format(entity_id, attr.name()))
+                raise Exception('Tried to encode the attribute type of entity #{} clsName: {} attribute {}. '
+                                'Please check your graph translator.'.format(entity_id, clsName, attr.name()))
 
         return node_attributes, single_associations, aggregated_associations
