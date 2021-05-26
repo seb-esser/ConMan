@@ -268,11 +268,10 @@ class IFCGraphGenerator:
         try:
             class_definition = self.schema.declaration_by_name(clsName).all_attributes()
         except:
-            raise Exception("Failed to query schema specification in IFC2GraphTranslator. ")
+            raise Exception("Failed to query schema specification in IFC2GraphTranslator.\n "
+                            "Schema: {}, Entity: {} ".format(self.schema, clsName))
 
         for attr in class_definition:
-            if attr.name() == "LengthExponent":
-                print(type(attr))
             # check if attribute has attr value in the current entity instance
             # if info[name] is not None:
             #     print('attribute present')
@@ -289,14 +288,24 @@ class IFCGraphGenerator:
             # get the value structure
             is_entity = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.entity)
             is_type = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.type_declaration)
-            is_attribute = isinstance(attr, ifcopenshell.ifcopenshell_wrapper.attribute)
             is_select = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.select_type)
             is_enumeration = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.enumeration_type)
             is_aggregation = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
 
-            if is_type or is_enumeration or is_attribute:
+            # catch some weird cases with IfcDimensionalExponents
+            #  as this entity doesnt use types but atomic attr declarations
+            if attr.name() in ['LengthExponent',
+                               'MassExponent',
+                               'TimeExponent',
+                               'ElectricCurrentExponent',
+                               'ThermodynamicTemperatureExponent',
+                               'AmountOfSubstanceExponent',
+                               'LuminousIntensityExponent']:
                 node_attributes.append(attr.name())
-            elif is_select or is_entity:
+
+            elif is_type or is_enumeration or is_select:
+                node_attributes.append(attr.name())
+            elif is_entity:
                 single_associations.append(attr.name())
             elif is_aggregation:
                 # ToDo: check if it is an aggregation of types or an aggregation of entities
