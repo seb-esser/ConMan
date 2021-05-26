@@ -114,7 +114,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match = 'MATCH (n:{})-[r]->(c)'.format(label)
         where = 'WHERE ID(n) = {}'.format(parent_node_id)
-        ret = 'RETURN ID(c), r.relType, c.EntityType, properties(c)'
+        ret = 'RETURN ID(c), PROPERTIES(r), c.EntityType, PROPERTIES(c)'
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     @classmethod

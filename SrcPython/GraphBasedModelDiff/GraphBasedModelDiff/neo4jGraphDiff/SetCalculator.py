@@ -43,10 +43,13 @@ class SetCalculator(object):
         nodes_added = set_B
         nodes_deleted = set_A
 
-        for pair in matched_pairs:
-            nodes_added.remove(pair[1])
-            nodes_deleted.remove(pair[0])
-            nodes_unchanged.append((pair[0], pair[1]))
+        try:
+            for pair in matched_pairs:
+                nodes_added.remove(pair[1])
+                nodes_deleted.remove(pair[0])
+                nodes_unchanged.append((pair[0], pair[1]))
+        except:
+            raise Exception('Unable to sort nodes in SetCalculator. ')
 
         return nodes_unchanged, nodes_added, nodes_deleted
 

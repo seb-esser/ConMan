@@ -29,7 +29,9 @@ class NodeItem:
     def fromNeo4jResponseWithRel(cls, raw: str) -> list:
         ret_val = []
         for inst in raw:
-            child = cls(int(inst[0]), inst[1], inst[2])
+            child = cls(int(inst[0]), inst[1]['relType'], inst[2])
+            if 'listItem' in inst[1]:
+                child.relType = inst[1]['relType'] + '__listItem{}'.format(inst[1]['listItem'])
             attrs = inst[3]
             child.attrs = attrs
             ret_val.append(child)

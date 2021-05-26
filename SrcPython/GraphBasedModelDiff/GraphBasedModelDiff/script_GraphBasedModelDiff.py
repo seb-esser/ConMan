@@ -12,7 +12,7 @@ from neo4jGraphDiff.PrimaryNodeDiff import RootedNodeDiff
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 # -- ... --
-connector = Neo4jConnector(False, False)
+connector = Neo4jConnector()
 connector.connect_driver()
 
 testcases = {"sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
@@ -27,6 +27,7 @@ testcases = {"sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
              }
 
 label_init, label_updated = testcases['Storey']
+
 
 async def main():
     # set config
