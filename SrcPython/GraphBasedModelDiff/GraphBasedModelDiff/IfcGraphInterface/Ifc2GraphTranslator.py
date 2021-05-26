@@ -307,7 +307,7 @@ class IFCGraphGenerator:
                                'ThermodynamicTemperatureExponent',
                                'AmountOfSubstanceExponent',
                                'LuminousIntensityExponent',
-                               'Exponent',      # from
+                               'Exponent',      # from IfcDerivedUnitElement
                                'Precision',     # from IfcGeometricRepresentationContext
                                'Scale'          # from IfcCartesianPointTransformationOperator3D in 2x3
                                ]:
