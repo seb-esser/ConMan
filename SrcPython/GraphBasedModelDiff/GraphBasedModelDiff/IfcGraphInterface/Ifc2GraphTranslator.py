@@ -295,6 +295,21 @@ class IFCGraphGenerator:
             is_entity = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.entity)
             is_type = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.type_declaration)
             is_select = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.select_type)
+
+            is_pdt_select = False
+            is_entity_select = False
+            is_nested_select = False
+
+            # ToDo: Distinguish if it is a select of entities or a select of predefinedTypes
+            if is_select:
+                # methods = attr.type_of_attribute().declared_type()
+                # print(dir(methods))
+                lst = attr.type_of_attribute().declared_type().select_list()
+
+                is_entity_select = all([isinstance(x, ifcopenshell.ifcopenshell_wrapper.entity) for x in lst])
+                is_pdt_select = all([isinstance(x, ifcopenshell.ifcopenshell_wrapper.type_declaration) for x in lst])
+                is_nested_select = all([isinstance(x, ifcopenshell.ifcopenshell_wrapper.select_type) for x in lst])
+
             is_enumeration = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.enumeration_type)
             is_aggregation = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
 
@@ -313,9 +328,9 @@ class IFCGraphGenerator:
                                ]:
                 node_attributes.append(attr.name())
 
-            elif is_type or is_enumeration or is_select:
+            elif is_type or is_enumeration or is_pdt_select or is_nested_select:
                 node_attributes.append(attr.name())
-            elif is_entity:
+            elif is_entity or is_entity_select:
                 single_associations.append(attr.name())
             elif is_aggregation:
                 # ToDo: check if it is an aggregation of types or an aggregation of entities
