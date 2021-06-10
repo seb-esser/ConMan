@@ -16,12 +16,14 @@ class PatternDetector:
         cy = cy + pattern.to_cypher_query()
         cy = cy + "RETURN en".format(entry_node_id)
         raw = self.connector.run_cypher_statement(cy)
-        print(raw)
+        num_results = len(raw)
 
+        if num_results == 0:
+            return False
+        elif num_results == 1:
+            return True
+        else:
+            print('Model: {} \t EntryNodeId: {}'.format(timestamp, entry_node_id))
+            raise Exception('captured more than 1 pattern. ')
 
-        # next:
-        # if node_exists: True and pattern_exists: False: run DFS
-        # if node_exists: False:
-
-        return True
 

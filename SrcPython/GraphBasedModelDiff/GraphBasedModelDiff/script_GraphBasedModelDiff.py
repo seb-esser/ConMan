@@ -26,7 +26,7 @@ testcases = {"sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
              "Storey": ("ts20210521T074802", "ts20210521T074934")
              }
 
-label_init, label_updated = testcases['Storey']
+label_init, label_updated = testcases['wall_column']
 
 
 async def main():
