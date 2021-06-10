@@ -257,5 +257,15 @@ class Neo4jQueryFactory(Neo4jFactory):
         cy = 'OPTIONAL Match(n:{} {{p21_id: {} }}) RETURN n IS NOT NULL AS existing'.format(label, p21_id)
         return cy
 
+    @classmethod
+    def get_relationship_attributes(cls, rel_id: int) -> str:
+        """
+        queries all properties attached to a graph edge
+        @param rel_id: the relationship ID
+        @return:
+        """
+        cy = 'MATCH (n)-[r]->(m) WHERE ID(r) = {} RETURN PROPERTIES(r)'.format(rel_id)
+        return cy
+
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --

@@ -10,11 +10,17 @@ class PatternDetector:
         self.connector: Neo4jConnector = connector
 
     def search_if_pattern_exists(self, timestamp: str, entry_node_id: int, pattern: GraphPattern) -> bool:
+
+        num_paths = pattern.get_number_of_paths()
+
         cy = ""
 
         cy = cy + 'MATCH (en) WHERE ID(en) = {}'.format(entry_node_id)
         cy = cy + pattern.to_cypher_query()
-        cy = cy + "RETURN en".format(entry_node_id)
+        cy = cy + " RETURN ".format(entry_node_id)
+        for i in range(num_paths):
+            cy = cy + 'path{}, '.format(i)
+        cy = cy[:-2]
         raw = self.connector.run_cypher_statement(cy)
         num_results = len(raw)
 

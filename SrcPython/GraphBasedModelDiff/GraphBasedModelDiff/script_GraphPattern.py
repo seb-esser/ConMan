@@ -8,16 +8,20 @@ connector.connect_driver()
 
 # extract a pattern from a specified graph and start node
 ts_init = "ts20210119T085407"
-id_init = 4175
+id_init = 4171
 
 cy = Neo4jQueryFactory.get_distinct_paths_from_node(id_init)
 raw_res = connector.run_cypher_statement(cy)
 
+# load overall pattern structure from specified graph
 pattern = GraphPattern.from_neo4j_response(raw_res)
+
+# load rel attributes (optional step, you can uncomment this method atm)
+pattern.load_rel_attrs(connector)
 
 # find pattern in graph with timestamp
 ts_updated = 'ts20210119T085407'
-id_updated = 4175
+id_updated = 4171
 
 detector = PatternDetector(connector=connector)
 exists = detector.search_if_pattern_exists(ts_updated, id_updated, pattern)
