@@ -43,11 +43,11 @@ class GraphPath:
         else:
             start_node = self.segments[0].startNode.entityType
 
-        val = '({})'.format(start_node)
+        val = 'MATCH ({})'.format(start_node)
 
         for edge in self.segments:
             relType = edge.relType
             end = edge.endNode.entityType
-            val = val + '-[:{3}]->({0}{1} {{entityType: \'{2}\' }})'.format(node_var, it, end, relType)
+            val = val + '-->({0}{1} {{EntityType: \'{2}\' }})'.format(node_var, it, end, relType)
             it += 1
         return val

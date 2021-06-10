@@ -9,6 +9,9 @@ class GraphPattern:
         self.paths: List[GraphPath] = paths
         self.entry_node: NodeItem
 
+    def __repr__(self):
+        return 'GraphPattern instance composed by several GraphPath instances'
+
     @classmethod
     def from_neo4j_response(cls, raw):
         # decode cypher response
@@ -25,18 +28,18 @@ class GraphPattern:
 
     def to_cypher_query(self):
         """
-
+        creates a cypher query snippet to search for this pattern in a given graph
         @return:
         """
 
         alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-                    'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r']
+                    'k', 'l', 'm', 'n', 'o', 'path', 'q', 'r']
 
         cy_statement: str = ""
         path_iterator = 0
-        for p in self.paths:
-            cy_path = p.to_patch(node_var=alphabet[path_iterator], entry_node_identifier='en')
-            cy_statement = cy_statement + ',{} '.format(cy_path)
+        for path in self.paths:
+            cy_path = path.to_patch(node_var=alphabet[path_iterator], entry_node_identifier='en')
+            cy_statement = cy_statement + ' {}'.format(cy_path)
             path_iterator += 1
 
         return cy_statement

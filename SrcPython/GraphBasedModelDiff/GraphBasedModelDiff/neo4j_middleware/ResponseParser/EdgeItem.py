@@ -21,7 +21,7 @@ class EdgeItem:
         for edge in raw:
             raw_startnode_id = edge.start_node.id
             raw_endnode_id = edge.end_node.id
-            raw_type = edge.type
+            raw_type = edge.type # ToDo: extract association name here
 
             start_node = next(x for x in nodes if x.id == raw_startnode_id)
             end_node = next(x for x in nodes if x.id == raw_endnode_id)

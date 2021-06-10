@@ -6,8 +6,9 @@ from neo4j_middleware.neo4jConnector import Neo4jConnector
 connector = Neo4jConnector()
 connector.connect_driver()
 
-ts_init = "ts20210119T085416"
-id_init = 924
+# extract a pattern from a specified graph and start node
+ts_init = "ts20210119T085407"
+id_init = 4175
 
 cy = Neo4jQueryFactory.get_distinct_paths_from_node(id_init)
 raw_res = connector.run_cypher_statement(cy)
@@ -15,8 +16,8 @@ raw_res = connector.run_cypher_statement(cy)
 pattern = GraphPattern.from_neo4j_response(raw_res)
 
 # find pattern in graph with timestamp
-ts_updated = 'ts20210119T085417'
-id_updated = 953
+ts_updated = 'ts20210119T085407'
+id_updated = 4175
 
 detector = PatternDetector(connector=connector)
 exists = detector.search_if_pattern_exists(ts_updated, id_updated, pattern)

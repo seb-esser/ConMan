@@ -202,7 +202,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         match1 = 'MATCH p = (n) WHERE ID(n)={}'.format(node_id)
         match2 = 'MATCH paths = (n)-[*..12]->(leaf)' # max length is set to 12!
         cond = 'WHERE NOT (leaf)-->()' # no outgoing edges
-        ret = 'RETURN paths, NODES(paths), RELATIONSHIPS(paths)'
+        ret = 'RETURN paths, NODES(paths), RELATIONSHIPS(paths)' # ToDo: extract association name in RETURN statement: r.relType
         return Neo4jFactory.BuildMultiStatement([match1, match2, cond, ret])
 
     @classmethod

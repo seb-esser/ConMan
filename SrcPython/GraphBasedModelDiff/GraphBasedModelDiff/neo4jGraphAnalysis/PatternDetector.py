@@ -12,7 +12,7 @@ class PatternDetector:
     def search_if_pattern_exists(self, timestamp: str, entry_node_id: int, pattern: GraphPattern) -> bool:
         cy = ""
 
-        cy = cy + 'MATCH (en) '
+        cy = cy + 'MATCH (en) WHERE ID(en) = {}'.format(entry_node_id)
         cy = cy + pattern.to_cypher_query()
         cy = cy + "RETURN en".format(entry_node_id)
         raw = self.connector.run_cypher_statement(cy)
