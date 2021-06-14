@@ -1,5 +1,6 @@
 from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
+from neo4j_middleware.Neo4jFactory import Neo4jFactory
 
 
 class GraphPath:
@@ -34,12 +35,12 @@ class GraphPath:
         @param path_number: specify an integer indicating the path number inside a pattern. Otherwise None
         @param node_var: identifier used inside a graph path
         @type entry_node_identifier: str representation of the entry node. use cypher style
-        @return:
+        @return: cypher string fragment
         """
 
         # init local vars of this method
         cy = ''
-        segment_iterator = 1
+        seg_number = 1
 
         if entry_node_identifier is not None:
             start_node = entry_node_identifier
@@ -50,63 +51,28 @@ class GraphPath:
         if path_number is not None:
             cy = 'MATCH path{} = ({})'.format(path_number, start_node)
         else:
-            cy = 'MATCH ({})'.format(segment_iterator, start_node)
+            cy = 'MATCH ({})'.format(seg_number, start_node)
 
         # loop over all segments of the current path
         for segment in self.segments:
-            end = segment.endNode.entityType
+            end_node_type: str = segment.endNode.entityType
+            end_node_attrs: dict = {k: v for k, v in segment.endNode.attrs.items() if v is not None} # segment.endNode.attrs
+
+            end_node_attrs.pop('p21_id', None)
+
             rel_attrs = segment.attributes
 
-            def format_rel_attrs(attrs: dict):
-                cy = '{'
-                for key, val in attrs.items():
-                    cy = cy + key + ': ' + val
-                cy = cy + '}'
-                return cy
+            #cy = cy + '-[r{0}{1} {2} ]->({3}{0} {{ EntityType: \'{4}\' }} )'\
+            cy = cy + '-[r{0}{1} {2} ]->({3}{0} {4} )'\
+                .format(seg_number,
+                        path_number,
+                        Neo4jFactory.formatDict(rel_attrs),
+                        node_var,
+                        Neo4jFactory.formatDict(end_node_attrs)
+                        # end_node_type
 
-            cy = cy + '-[r{1}{4} {3} ]->({0}{1} {{EntityType: \'{2}\' }})'\
-                .format(node_var, segment_iterator, end, self.formatDict(rel_attrs), path_number)
-            segment_iterator += 1
+                        )
+            seg_number += 1
         return cy
 
-    def formatDict(self, dictionary):
-        """
-        formats a given dictionary to be understood in a cypher query
-        @param dictionary: dict to be formatted
-        @return: string representation of dict
-        """
 
-        # copied and tweaked from: https://stackoverflow.com/a/65346803
-        s = "{"
-
-        for key in dictionary:
-            s += "{0}:".format(key)
-            if isinstance(dictionary[key], dict):
-                # Apply formatting recursively
-                s += "{0}, ".format(dictionary(self[key]))
-            elif isinstance(dictionary[key], list):
-                s += "["
-                for l in dictionary[key]:
-                    if isinstance(l, dict):
-                        s += "{0}, ".format(dictionary(l))
-                    else:
-                        # print(l)
-                        if isinstance(l, int):
-                            s += "{0}, ".format(l)
-                        else:
-                            s += "'{0}', ".format(l)
-                if len(s) > 1:
-                    s = s[0: -2]
-                s += "], "
-            else:
-                if isinstance(dictionary[key], int):
-                    s += "{0}, ".format(dictionary[key])
-                else:
-                    s += "\'{0}\', ".format(dictionary[key])
-                # Quote all the values
-                # s += "\'{0}\', ".format(self[key])
-
-        if len(s) > 1:
-            s = s[0: -2]
-        s += "}"
-        return s
