@@ -55,8 +55,8 @@ class PatternDetector:
         cy = cy + 'MATCH (en) WHERE ID(en) = {}'.format(entry_node_id)
 
         # append graph pattern in cypher statement
-        # cy = cy + pattern.to_cypher_query()
-        cy = cy + pattern.to_cypher_query_indexed()
+        cy = cy + pattern.to_cypher_query()
+        # cy = cy + pattern.to_cypher_query_indexed()
 
         # specify return items
         cy = cy + " RETURN ".format(entry_node_id)

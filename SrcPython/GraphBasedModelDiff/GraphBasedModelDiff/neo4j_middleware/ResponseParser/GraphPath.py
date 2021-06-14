@@ -41,6 +41,7 @@ class GraphPath:
         # init local vars of this method
         cy = ''
         seg_number = 1
+        cy_list = []
 
         if entry_node_identifier is not None:
             start_node = entry_node_identifier
@@ -53,6 +54,8 @@ class GraphPath:
         else:
             cy = 'MATCH ({})'.format(seg_number, start_node)
 
+        cy_list.append(cy)
+
         # loop over all segments of the current path
         for segment in self.segments:
             end_node_type: str = segment.endNode.entityType
@@ -63,7 +66,7 @@ class GraphPath:
             rel_attrs = segment.attributes
 
             #cy = cy + '-[r{0}{1} {2} ]->({3}{0} {{ EntityType: \'{4}\' }} )'\
-            cy = cy + '-[r{0}{1} {2} ]->({3}{0} {4} )'\
+            cy = '-[r{0}{1} {2} ]->({3}{0} {4} )'\
                 .format(seg_number,
                         path_number,
                         Neo4jFactory.formatDict(rel_attrs),
@@ -73,6 +76,9 @@ class GraphPath:
 
                         )
             seg_number += 1
-        return cy
+            cy_list.append(cy)
+        return cy_list
+
+
 
 

@@ -52,7 +52,9 @@ class GraphPattern:
         cy_statement: str = ""
         path_iterator = 0
         for path in self.paths:
-            cy_path = path.to_patch(node_var=alphabet[path_iterator], entry_node_identifier='en', path_number=path_iterator)
+            cy_paths = path.to_patch(node_var=alphabet[path_iterator], entry_node_identifier='en', path_number=path_iterator)
+            cy_path = " ".join(cy_paths)
+
             cy_statement = cy_statement + ' {}'.format(cy_path)
             path_iterator += 1
 
@@ -72,6 +74,9 @@ class GraphPattern:
 
         # loop over all paths. Each path contains a list of segments
         for p in self.paths:
+
+
+
             segments = p.segments
 
             for seg in segments:
