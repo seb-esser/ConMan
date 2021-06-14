@@ -1,3 +1,6 @@
+from neo4j_middleware.Neo4jFactory import Neo4jFactory
+
+
 class NodeItem:
     """
     reflects the node structure from neo4j
@@ -24,6 +27,17 @@ class NodeItem:
 
     def __repr__(self):
         return 'NodeItem: id: {} EntityType: {}'.format(self.id, self.entityType)
+
+    def __eq__(self, other):
+        """
+        implements a comparison function. matching by node id
+        @param other:
+        @return:
+        """
+        if self.id == other.id:
+            return True
+        else:
+            return False
 
     @classmethod
     def fromNeo4jResponseWithRel(cls, raw: str) -> list:
@@ -92,3 +106,24 @@ class NodeItem:
             if key in ['Coordinates', 'DirectionRatios']:
                 cleared_dict[key] = eval(val)
         self.attrs = cleared_dict
+
+    def to_cypher(self, timestamp: str = None, node_identifier:str = None):
+        """
+        returns a cypher query fragment to search for this node with semantics
+        @param timestamp: specify in which model you'd like to search for the node
+        @param node_identifier:
+        @return:
+        """
+        if node_identifier is None:
+            node_identifier = 'n'
+        if timestamp is None:
+            ts = ''
+        else:
+            ts = ': {}'.format(timestamp)
+
+        # remove p21_id attribute
+        cleaned_node_attrs = self.attrs
+        cleaned_node_attrs.pop('p21_id', None)
+
+        return '({0}{1} {2})'.format(node_identifier, ts, Neo4jFactory.formatDict(self.attrs))
+

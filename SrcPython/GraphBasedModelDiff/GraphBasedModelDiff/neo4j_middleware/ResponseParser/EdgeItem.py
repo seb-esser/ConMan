@@ -1,13 +1,32 @@
 from neo4j_middleware.ResponseParser import NodeItem
-from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from neo4j_middleware.Neo4jFactory import Neo4jFactory
 
 
 class EdgeItem:
     def __init__(self, start_node: NodeItem, end_node: NodeItem, rel_id: int):
-        self.startNode = start_node
-        self.endNode = end_node
+        self.startNode: NodeItem = start_node
+        self.endNode: NodeItem = end_node
         self.edge_id = rel_id
         self.attributes: dict = {}
+
+    def __repr__(self):
+        return 'EdgeItem object: startId: {} - edgeId: {} -> targetId: {}'\
+            .format(self.startNode.id, self.edge_id, self.endNode.id)
+
+    def __eq__(self, other):
+        """
+        compares two edges and returns true if both edges are considered as equal
+        @param other:
+        @return:
+        """
+        start_equal = self.startNode == other.startNode
+        end_equal = self.endNode == other.endNode
+        rel_attrs_equal = self.attributes == other.attributes
+
+        if all([start_equal, end_equal, rel_attrs_equal]):
+            return True
+        else:
+            return False
 
     @classmethod
     def from_neo4j_response(cls, raw: str, nodes):
@@ -33,3 +52,9 @@ class EdgeItem:
 
         return edges
 
+    def to_cypher(self, source_identifier: str, target_identifier: str):
+        cy = 'MATCH {0}-[rel{1}]->{2}'.format(
+            self.startNode.to_cypher(node_identifier=source_identifier, timestamp=None),
+            Neo4jFactory.formatDict(self.attributes),
+            self.endNode.to_cypher(node_identifier=target_identifier, timestamp=None))
+        return cy
