@@ -2,6 +2,7 @@ from typing import List
 
 from neo4j_middleware import neo4jConnector
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
@@ -67,30 +68,28 @@ class GraphPattern:
         """
 
         all_nodes: List[NodeItem] = self.get_unified_node_set()
+        self.get_unified_edge_set()
 
-        # init list of segments that are already appended to the cypher statement
-        created_segments = []
-        i = 0
+        node_dict = {}
+        for n in all_nodes:
+            node_dict[n] = 'n{}'.format(n.id)
 
+        alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+                    'k', 'l', 'm', 'n', 'o', 'path', 'q', 'r']
+        path_iterator = 0
         # loop over all paths. Each path contains a list of segments
         for p in self.paths:
+            print('Path {}:'.format(path_iterator))
+            segment_cyphers = p.to_patch(node_var=alphabet[path_iterator], entry_node_identifier='en', path_number=path_iterator)
 
+            # DoTo: create a p.to_patch2() method that checks if the current edge is already included in the cypher statement.
+            #  pass the node_dict into this method
 
+            for se in segment_cyphers[1:]:
+                print(se)
 
-            segments = p.segments
-
-            for seg in segments:
-                # check if segment is already appended to cypher statement
-                if seg in created_segments:
-                    continue
-                else:
-                    source_node_identifier: str = 'n{}'.format(i)
-                    target_node_identifier: str = 'n{}'.format(i+1)
-                    cy = seg.to_cypher(source_node_identifier, target_node_identifier)
-                    print(cy)
-                    created_segments.append(seg)
-
-                    i = i + 2
+            print('\n')
+            path_iterator += 1
 
 
         return ''
@@ -117,3 +116,28 @@ class GraphPattern:
                 if end_node not in all_pattern_nodes:
                     all_pattern_nodes.append(end_node)
         return all_pattern_nodes
+
+    def get_unified_edge_set(self):
+        i = 0
+        print('before:')
+        for path in self.paths:
+            print('path {}: numSegments: {} '.format(i, len(path.segments)))
+            i += 1
+
+        print('')
+        unified_segments = []
+        for path in self.paths:
+            for segment in path.segments:
+                if segment in unified_segments:
+                    # remove segment from Path
+                    path.segments.remove(segment)
+                else:
+                    unified_segments.append(segment)
+
+        print('after')
+        i = 0
+        for path in self.paths:
+            print('path {}: numSegments: {} '.format(i, len(path.segments)))
+            i += 1
+
+        return unified_segments
