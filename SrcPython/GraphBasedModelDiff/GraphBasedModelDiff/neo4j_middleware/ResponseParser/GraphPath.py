@@ -79,6 +79,19 @@ class GraphPath:
             cy_list.append(cy)
         return cy_list
 
-
+    def remove_segments_by_id(self, segment_ids):
+        """
+        removes an edge from the segments list of this GraphPath instance
+        @param segment_ids:
+        @return:
+        """
+        for seg_id in segment_ids:
+            # find corresponding edgeItem instance in list
+            edge = next((x for x in self.segments if x.edge_id == seg_id), None)
+            if edge is not None:
+                # remove the segment
+                self.segments.remove(edge)
+            else:
+                raise Exception('could not find edgeItem in segments of current path. ')
 
 

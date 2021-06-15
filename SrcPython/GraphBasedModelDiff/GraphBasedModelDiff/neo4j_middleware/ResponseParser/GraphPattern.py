@@ -41,7 +41,7 @@ class GraphPattern:
                 attr_dict = connector.run_cypher_statement(cy, 'PROPERTIES(r)')[0]
                 segment.attributes = attr_dict
 
-    def to_cypher_query(self) -> str:
+    def to_cypher_query(self, timestamp: str = None) -> str:
         """
         creates a cypher query snippet to search for this pattern in a given graph
         @return: cypher statement snippet
@@ -61,9 +61,10 @@ class GraphPattern:
 
         return cy_statement
 
-    def to_cypher_query_indexed(self) -> str:
+    def to_cypher_query_indexed(self, timestamp: str = None) -> str:
         """
         improved version to search for a specified graph pattern using a distinct node set definition
+        @type timestamp: optional timestamp string to identify the target graph the pattern should be searched for
         @return:
         """
 
@@ -72,7 +73,10 @@ class GraphPattern:
 
         node_dict = {}
         for n in all_nodes:
-            node_dict[n.id] = 'n{}'.format(n.id)
+            if timestamp is None:
+                node_dict[n.id] = 'n{}'.format(n.id)
+            else:
+                node_dict[n.id] = 'n{}: {}'.format(n.id, timestamp)
 
         # init cypher query
         cy_list = []
@@ -103,14 +107,9 @@ class GraphPattern:
             path_iterator += 1
             cy_list.append(' ')
 
-        cy = 'RETURN '
-        for i in range(path_iterator):
-            cy += 'path{}, '.format(i)
-        cy = cy[:-2]
-        cy_list.append(cy)
         cy_statement = ''.join(cy_list)
-        print(cy_statement)
-        return cy
+
+        return cy_statement
 
     def get_number_of_paths(self) -> int:
         """
@@ -141,34 +140,31 @@ class GraphPattern:
         @return:
         """
         # print before state to console
-        self.print_to_console()
+        # self.print_to_console()
 
-        new_pattern = GraphPattern([])
-
-        print('')
         unified_segments = []
         # loop over all paths
         for path in self.paths:
             # a path consists of several segments (i.e., edges)
-            initial_segments = path.segments
+            initial_segments = list(path.segments)  # make deep copy
             for segment in initial_segments:
-                print(segment.edge_id)
 
                 if segment.edge_id in unified_segments:
                     # segment has been already tackled
                     # remove current segment from Path
-                    tr1 = segment in path.segments
-                    path.segments.remove(segment)
-                    tr2 = segment in path.segments
+                    path.remove_segments_by_id([segment.edge_id])
                 else:
                     # segment appears the first time, therefore keep it and add it to the list
                     unified_segments.append(segment.edge_id)
 
         # print after state to console
-        self.print_to_console()
-        a = 1
+        # self.print_to_console()
 
     def print_to_console(self):
+        """
+        visualizes the graph pattern structure to the console
+        @return:
+        """
         print('GraphPattern structure: ')
         no = 0
         for path in self.paths:

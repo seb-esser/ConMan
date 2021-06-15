@@ -20,7 +20,7 @@ class PatternDetector:
         """
 
         # build cypher statement
-        cy = self.search_for_pattern(entry_node_id, pattern)
+        cy = self.search_for_pattern(entry_node_id, pattern, timestamp)
 
         # run the cypher statement
         raw = self.connector.run_cypher_statement(cy)
@@ -35,11 +35,12 @@ class PatternDetector:
             return True
         else:
             print('Model: {} \t EntryNodeId: {}'.format(timestamp, entry_node_id))
-            raise Exception('captured more than 1 pattern. ')
+            raise Exception('Found more than 1 subgraph that matches the specified pattern. ')
 
-    def search_for_pattern(self, entry_node_id: int, pattern: GraphPattern) -> str:
+    def search_for_pattern(self, entry_node_id: int, pattern: GraphPattern, timestamp: str) -> str:
         """
         creates a cypher query that searches a graph for a specified graph pattern
+        @param timestamp: the model the pattern should be searched for
         @param entry_node_id:
         @param pattern:
         @return:
@@ -52,11 +53,11 @@ class PatternDetector:
         cy = ""
 
         # specify entry node in cypher statement
-        cy = cy + 'MATCH (en) WHERE ID(en) = {}'.format(entry_node_id)
+        cy = cy + 'MATCH (en:{}) WHERE ID(en) = {}'.format(timestamp, entry_node_id)
 
         # append graph pattern in cypher statement
         # cy = cy + pattern.to_cypher_query()
-        cy = cy + pattern.to_cypher_query_indexed()
+        cy = pattern.to_cypher_query_indexed(timestamp=timestamp) # timestamp attribute is optional
 
         # specify return items
         cy = cy + " RETURN ".format(entry_node_id)
@@ -64,6 +65,8 @@ class PatternDetector:
             cy = cy + 'path{}, '.format(i)
         # cut off the last ', ' items from cypher string
         cy = cy[:-2]
+
+        print(cy)
 
         return cy
 
