@@ -58,3 +58,10 @@ class EdgeItem:
             Neo4jFactory.formatDict(self.attributes),
             self.endNode.to_cypher(node_identifier=target_identifier, timestamp=None))
         return cy
+
+    def to_cypher_fragment(self, target_identifier: str, segment_identifier: int, relationship_iterator: int):
+        cy = '-[r{3}{2}{0}]->{1}'.format(
+            Neo4jFactory.formatDict(self.attributes),
+            self.endNode.to_cypher(node_identifier=target_identifier, timestamp=None),
+            relationship_iterator, segment_identifier)
+        return cy

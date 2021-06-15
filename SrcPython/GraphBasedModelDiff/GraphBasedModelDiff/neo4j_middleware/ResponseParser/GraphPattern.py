@@ -72,27 +72,45 @@ class GraphPattern:
 
         node_dict = {}
         for n in all_nodes:
-            node_dict[n] = 'n{}'.format(n.id)
+            node_dict[n.id] = 'n{}'.format(n.id)
 
-        alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-                    'k', 'l', 'm', 'n', 'o', 'path', 'q', 'r']
+        # init cypher query
+        cy_list = []
+
         path_iterator = 0
         # loop over all paths. Each path contains a list of segments
-        for p in self.paths:
-            print('Path {}:'.format(path_iterator))
-            segment_cyphers = p.to_patch(node_var=alphabet[path_iterator], entry_node_identifier='en', path_number=path_iterator)
+        for unified_path in self.paths:
+            # build start of cypher subquery
+            start = unified_path.segments[0].startNode
+            # cy_list.append('MATCH path{0} = ({1})'.format(path_iterator, node_dict[start.id]))
 
-            # DoTo: create a p.to_patch2() method that checks if the current edge is already included in the cypher statement.
-            #  pass the node_dict into this method
+            cy_start = 'MATCH path{0} = {1}'.format(path_iterator, start.to_cypher(node_identifier=node_dict[start.id]))
+            cy_list.append(cy_start)
 
-            for se in segment_cyphers[1:]:
-                print(se)
+            # define path section
+            edge_iterator = 0
+            for edge in unified_path.segments:
 
-            print('\n')
+                end = edge.endNode
+                cy_frag = edge.to_cypher_fragment(
+                    target_identifier=node_dict[end.id],
+                    segment_identifier=path_iterator,
+                    relationship_iterator=edge_iterator)
+                cy_list.append(cy_frag)
+                edge_iterator += 1
+
+            # increase path iterator by one
             path_iterator += 1
+            cy_list.append(' ')
 
-
-        return ''
+        cy = 'RETURN '
+        for i in range(path_iterator):
+            cy += 'path{}, '.format(i)
+        cy = cy[:-2]
+        cy_list.append(cy)
+        cy_statement = ''.join(cy_list)
+        print(cy_statement)
+        return cy
 
     def get_number_of_paths(self) -> int:
         """
@@ -118,11 +136,19 @@ class GraphPattern:
         return all_pattern_nodes
 
     def get_unified_edge_set(self):
-        i = 0
-        print('before:')
-        for path in self.paths:
-            print('path {}: numSegments: {} '.format(i, len(path.segments)))
-            i += 1
+        """
+        unifies the set of edges included in the graph pattern.
+        @return:
+        """
+
+        self.print_to_console()
+
+        # # ToDo: Logging
+        # i = 0
+        # print('before:')
+        # for path in self.paths:
+        #     print('path {}: numSegments: {} '.format(i, len(path.segments)))
+        #     i += 1
 
         print('')
         unified_segments = []
@@ -134,10 +160,20 @@ class GraphPattern:
                 else:
                     unified_segments.append(segment)
 
-        print('after')
-        i = 0
-        for path in self.paths:
-            print('path {}: numSegments: {} '.format(i, len(path.segments)))
-            i += 1
+        # # ToDo: Logging
+        # print('after')
+        # i = 0
+        # for path in self.paths:
+        #     print('path {}: numSegments: {} '.format(i, len(path.segments)))
+        #     i += 1
+        self.print_to_console()
+        pass
 
-        return unified_segments
+    def print_to_console(self):
+        print('GraphPattern structure: ')
+        no = 0
+        for path in self.paths:
+            print('\t path no {}:'.format(no))
+            no += 1
+            for seg in path.segments:
+                print('\t\t{}'.format(str(seg)))
