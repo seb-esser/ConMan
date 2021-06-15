@@ -140,34 +140,33 @@ class GraphPattern:
         unifies the set of edges included in the graph pattern.
         @return:
         """
-
+        # print before state to console
         self.print_to_console()
 
-        # # ToDo: Logging
-        # i = 0
-        # print('before:')
-        # for path in self.paths:
-        #     print('path {}: numSegments: {} '.format(i, len(path.segments)))
-        #     i += 1
+        new_pattern = GraphPattern([])
 
         print('')
         unified_segments = []
+        # loop over all paths
         for path in self.paths:
-            for segment in path.segments:
-                if segment in unified_segments:
-                    # remove segment from Path
-                    path.segments.remove(segment)
-                else:
-                    unified_segments.append(segment)
+            # a path consists of several segments (i.e., edges)
+            initial_segments = path.segments
+            for segment in initial_segments:
+                print(segment.edge_id)
 
-        # # ToDo: Logging
-        # print('after')
-        # i = 0
-        # for path in self.paths:
-        #     print('path {}: numSegments: {} '.format(i, len(path.segments)))
-        #     i += 1
+                if segment.edge_id in unified_segments:
+                    # segment has been already tackled
+                    # remove current segment from Path
+                    tr1 = segment in path.segments
+                    path.segments.remove(segment)
+                    tr2 = segment in path.segments
+                else:
+                    # segment appears the first time, therefore keep it and add it to the list
+                    unified_segments.append(segment.edge_id)
+
+        # print after state to console
         self.print_to_console()
-        pass
+        a = 1
 
     def print_to_console(self):
         print('GraphPattern structure: ')

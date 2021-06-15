@@ -6,7 +6,7 @@ class EdgeItem:
     def __init__(self, start_node: NodeItem, end_node: NodeItem, rel_id: int):
         self.startNode: NodeItem = start_node
         self.endNode: NodeItem = end_node
-        self.edge_id = rel_id
+        self.edge_id: int = rel_id
         self.attributes: dict = {}
 
     def __repr__(self):
@@ -19,14 +19,13 @@ class EdgeItem:
         @param other:
         @return:
         """
-        start_equal = self.startNode == other.startNode
-        end_equal = self.endNode == other.endNode
-        rel_attrs_equal = self.attributes == other.attributes
 
-        if all([start_equal, end_equal, rel_attrs_equal]):
-            return True
-        else:
-            return False
+        # start_equal = self.startNode == other.startNode
+        # end_equal = self.endNode == other.endNode
+        # rel_attrs_equal = self.attributes == other.attributes
+        id_equal = self.edge_id == other.edge_id
+        # if all([start_equal, end_equal, rel_attrs_equal]):
+        return id_equal
 
     @classmethod
     def from_neo4j_response(cls, raw: str, nodes):
