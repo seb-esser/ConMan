@@ -6,7 +6,7 @@ class NodeItem:
     reflects the node structure from neo4j
     """
 
-    def __init__(self, id: int, relType: str, entityType: str = None):
+    def __init__(self, id: int, relType: str, entityType: str = None, nodeType: str = None):
         """
 
         @param id: node id
@@ -18,6 +18,7 @@ class NodeItem:
         self.hash_value = None
         self.relType = relType
         self.attrs = None
+        self.nodeType = nodeType
 
     def set_hash(self, hash_val: str):
         self.hash_value = hash_val
