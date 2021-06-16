@@ -111,6 +111,66 @@ class GraphPattern:
 
         return cy_statement
 
+    def to_cypher_create(self, timestamp: str = None) -> str:
+        """
+        creates a cypher query string to create a given graph pattern in a target graph
+         without recognizing existing items
+        @param timestamp:
+        @return:
+        """
+
+        all_nodes: List[NodeItem] = self.get_unified_node_set()
+        self.get_unified_edge_set()
+
+        node_dict = {}
+        for n in all_nodes:
+            node_dict[n.id] = 'n{}'.format(n.id)
+
+        # init cypher query
+        cy_list = []
+
+        # in CREATE statements, each node can be created only once.
+        # therefore, re-use its var name but do not re-create attributes etc
+
+        # 1: create all nodes
+        for node in all_nodes:
+            cy_node = node.to_cypher(timestamp=timestamp, node_identifier=node_dict[node.id])
+            cy_frag = 'CREATE {} '.format(cy_node)
+            cy_list.append(cy_frag)
+
+        # 2: create all paths
+
+        # from here on: only use the node variables stated in the node_dict.
+        # All nodes and their attributes are already created
+        path_iterator = 0
+        # loop over all paths. Each path contains a list of segments
+        for unified_path in self.paths:
+            # build start of cypher subquery
+            start = unified_path.segments[0].startNode
+            # cy_list.append('MATCH path{0} = ({1})'.format(path_iterator, node_dict[start.id]))
+
+            cy_start = 'CREATE path{0} = ({1})'.format(path_iterator, node_dict[start.id])
+            cy_list.append(cy_start)
+
+            # define path section
+            edge_iterator = 0
+            for edge in unified_path.segments:
+                end = edge.endNode
+                cy_frag = edge.to_cypher_create(
+                    target_identifier=node_dict[end.id],
+                    segment_identifier=path_iterator,
+                    relationship_iterator=edge_iterator)
+                cy_list.append(cy_frag)
+                edge_iterator += 1
+
+            # increase path iterator by one
+            path_iterator += 1
+            cy_list.append(' ')
+
+        cy_statement = ''.join(cy_list)
+
+        return cy_statement
+
     def get_number_of_paths(self) -> int:
         """
         returns the number of paths in the pattern
@@ -118,21 +178,21 @@ class GraphPattern:
         """
         return len(self.paths)
 
-    def get_unified_node_set(self):
+    def get_unified_node_set(self) -> List[NodeItem]:
         """
         returns a unified/distinct list of nodes of the graph pattern
         @return: unified list of nodes
         """
-        all_pattern_nodes = []
+        unified_pattern_node_list = []
         for path in self.paths:
             for segment in path.segments:
                 start_node = segment.startNode
                 end_node = segment.endNode
-                if start_node not in all_pattern_nodes:
-                    all_pattern_nodes.append(start_node)
-                if end_node not in all_pattern_nodes:
-                    all_pattern_nodes.append(end_node)
-        return all_pattern_nodes
+                if start_node not in unified_pattern_node_list:
+                    unified_pattern_node_list.append(start_node)
+                if end_node not in unified_pattern_node_list:
+                    unified_pattern_node_list.append(end_node)
+        return unified_pattern_node_list
 
     def get_unified_edge_set(self):
         """

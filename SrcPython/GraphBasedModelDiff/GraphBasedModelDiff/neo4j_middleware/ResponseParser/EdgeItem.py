@@ -51,16 +51,43 @@ class EdgeItem:
 
         return edges
 
-    def to_cypher(self, source_identifier: str, target_identifier: str):
+    def to_cypher(self, source_identifier: str, target_identifier: str) -> str:
+        """
+        returns a cypher statement to search for this edge item.
+        @param source_identifier:
+        @param target_identifier:
+        @return: cypher statement as str
+        """
         cy = 'MATCH {0}-[rel{1}]->{2}'.format(
             self.startNode.to_cypher(node_identifier=source_identifier, timestamp=None),
             Neo4jFactory.formatDict(self.attributes),
             self.endNode.to_cypher(node_identifier=target_identifier, timestamp=None))
         return cy
 
-    def to_cypher_fragment(self, target_identifier: str, segment_identifier: int, relationship_iterator: int):
+    def to_cypher_fragment(self, target_identifier: str, segment_identifier: int, relationship_iterator: int) -> str:
+        """
+        returns a fragment of a cypher statement to assemble several edges to a path
+        @param target_identifier:
+        @param segment_identifier:
+        @param relationship_iterator:
+        @return: cypher fragment as str
+        """
         cy = '-[r{3}{2}{0}]->{1}'.format(
             Neo4jFactory.formatDict(self.attributes),
             self.endNode.to_cypher(node_identifier=target_identifier, timestamp=None),
             relationship_iterator, segment_identifier)
         return cy
+
+    def to_cypher_create(self, target_identifier: str, segment_identifier: int, relationship_iterator: int):
+        """
+        returns a cypher command to create the edge. the edge is labeled with 'rel'
+        @return: cypher statement as str
+        """
+        cy = '-[r{3}{2}:rel{0}]->({1})'.format(
+            Neo4jFactory.formatDict(self.attributes),
+            target_identifier,
+            relationship_iterator,
+            segment_identifier)
+        return cy
+
+

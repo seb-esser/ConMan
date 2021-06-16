@@ -6,14 +6,15 @@ class NodeItem:
     reflects the node structure from neo4j
     """
 
-    def __init__(self, id: int, relType: str, entityType: str = None, nodeType: str = None):
+    def __init__(self, NodeId: int, relType: str, entityType: str = None, nodeType: str = None):
         """
 
-        @param id: node id
+        @type nodeType: the classification of PrimaryNode, SecondaryNode or ConnectionNode
+        @param NodeId: node id in the graph database
         @param relType: relType of edge pointing to this node
         @param entityType: the reflected Ifc Entity name
         """
-        self.id = id
+        self.id = NodeId
         self.entityType = entityType
         self.hash_value = None
         self.relType = relType
@@ -44,9 +45,11 @@ class NodeItem:
     def fromNeo4jResponseWithRel(cls, raw: str) -> list:
         ret_val = []
         for inst in raw:
-            child = cls(int(inst[0]), inst[1]['relType'], inst[2])
+            node_type = inst[4][0]
+            child = cls(NodeId=int(inst[0]), relType=inst[1]['relType'], entityType=inst[2], nodeType=node_type)
             if 'listItem' in inst[1]:
                 child.relType = inst[1]['relType'] + '__listItem{}'.format(inst[1]['listItem'])
+                raise Exception('is this still the way to go?')
             attrs = inst[3]
             child.attrs = attrs
             ret_val.append(child)
@@ -108,7 +111,7 @@ class NodeItem:
                 cleared_dict[key] = eval(val)
         self.attrs = cleared_dict
 
-    def to_cypher(self, timestamp: str = None, node_identifier:str = None):
+    def to_cypher(self, timestamp: str = None, node_identifier: str = None):
         """
         returns a cypher query fragment to search for this node with semantics
         @param timestamp: specify in which model you'd like to search for the node

@@ -47,7 +47,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH (n:PrimaryNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n)'
+        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
@@ -114,7 +114,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match = 'MATCH (n:{})-[r]->(c)'.format(label)
         where = 'WHERE ID(n) = {}'.format(parent_node_id)
-        ret = 'RETURN ID(c), PROPERTIES(r), c.EntityType, PROPERTIES(c)'
+        ret = 'RETURN ID(c), PROPERTIES(r), c.EntityType, PROPERTIES(c), LABELS(n)'
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     @classmethod
