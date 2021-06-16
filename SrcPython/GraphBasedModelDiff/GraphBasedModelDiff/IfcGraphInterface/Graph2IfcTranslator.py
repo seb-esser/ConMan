@@ -58,6 +58,10 @@ class IfcGenerator:
             # list of pointers
             try:
                 lst = getattr(parent, name)
+                if lst is None:
+                    lst = []
+                elif type(lst) is tuple:
+                    lst = list(lst)
                 lst.append(child)
                 setattr(parent, name, lst)
             except:
