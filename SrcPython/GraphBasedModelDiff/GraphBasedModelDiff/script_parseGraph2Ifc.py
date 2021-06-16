@@ -36,13 +36,14 @@ def build_childs(n):
 
         build_childs(c)
 
-connector = Neo4jConnector(False, False)
+
+connector = Neo4jConnector()
 connector.connect_driver()
 
 generator = IfcGenerator()
 query_factory = Neo4jQueryFactory()
 
-ts = "ts20210119T085408"
+ts = "ts20210616T145238"
 
 # get all primary nodes
 cy = query_factory.get_primary_nodes(ts)
@@ -65,9 +66,7 @@ for n in nodes:
 
     build_childs(n)
 
-
-
-generator.save_model(ts)
+generator.save_model('test2')
 
 connector.disconnect_driver()
 
