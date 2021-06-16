@@ -116,7 +116,7 @@ class GraphPattern:
         creates a cypher query string to create a given graph pattern in a target graph
          without recognizing existing items
         @param timestamp:
-        @return:
+        @return: cypher query statement as str
         """
 
         all_nodes: List[NodeItem] = self.get_unified_node_set()
@@ -124,7 +124,7 @@ class GraphPattern:
 
         node_dict = {}
         for n in all_nodes:
-            node_dict[n.id] = 'n{}'.format(n.id)
+            node_dict[n.id] = 'n{0}'.format(n.id, n.nodeType)
 
         # init cypher query
         cy_list = []
@@ -134,7 +134,7 @@ class GraphPattern:
 
         # 1: create all nodes
         for node in all_nodes:
-            cy_node = node.to_cypher(timestamp=timestamp, node_identifier=node_dict[node.id])
+            cy_node = node.to_cypher(timestamp=timestamp, node_identifier=node_dict[node.id], include_nodeType_label=True)
             cy_frag = 'CREATE {} '.format(cy_node)
             cy_list.append(cy_frag)
 

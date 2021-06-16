@@ -59,9 +59,9 @@ class EdgeItem:
         @return: cypher statement as str
         """
         cy = 'MATCH {0}-[rel{1}]->{2}'.format(
-            self.startNode.to_cypher(node_identifier=source_identifier, timestamp=None),
+            self.startNode.to_cypher(timestamp=None, node_identifier=source_identifier),
             Neo4jFactory.formatDict(self.attributes),
-            self.endNode.to_cypher(node_identifier=target_identifier, timestamp=None))
+            self.endNode.to_cypher(timestamp=None, node_identifier=target_identifier))
         return cy
 
     def to_cypher_fragment(self, target_identifier: str, segment_identifier: int, relationship_iterator: int) -> str:
@@ -74,7 +74,7 @@ class EdgeItem:
         """
         cy = '-[r{3}{2}{0}]->{1}'.format(
             Neo4jFactory.formatDict(self.attributes),
-            self.endNode.to_cypher(node_identifier=target_identifier, timestamp=None),
+            self.endNode.to_cypher(timestamp=None, node_identifier=target_identifier),
             relationship_iterator, segment_identifier)
         return cy
 

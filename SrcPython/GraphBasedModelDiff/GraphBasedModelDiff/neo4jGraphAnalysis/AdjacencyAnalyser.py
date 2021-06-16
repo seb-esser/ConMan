@@ -36,7 +36,7 @@ class AdjacencyAnalyser(object):
         # get hashes of all nodes
         for n in nodes: 
             cy = Neo4jQueryFactory.get_hash_by_nodeId(label, n.id)
-            raw_response = self.connector.run_cypher_statement(cy, 'hash_value')
+            raw_response = self.connector.run_cypher_statement(cy, 'hash')
             n.set_hash(raw_response[0])
 
         # sort nodes by their hashsums      

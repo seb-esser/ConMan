@@ -6,15 +6,15 @@ class NodeItem:
     reflects the node structure from neo4j
     """
 
-    def __init__(self, NodeId: int, relType: str, entityType: str = None, nodeType: str = None):
+    def __init__(self, nodeId: int, relType: str, entityType: str = None, nodeType: str = None):
         """
 
         @type nodeType: the classification of PrimaryNode, SecondaryNode or ConnectionNode
-        @param NodeId: node id in the graph database
+        @param nodeId: node id in the graph database
         @param relType: relType of edge pointing to this node
         @param entityType: the reflected Ifc Entity name
         """
-        self.id = NodeId
+        self.id = nodeId
         self.entityType = entityType
         self.hash_value = None
         self.relType = relType
@@ -46,10 +46,10 @@ class NodeItem:
         ret_val = []
         for inst in raw:
             node_type = inst[4][0]
-            child = cls(NodeId=int(inst[0]), relType=inst[1]['relType'], entityType=inst[2], nodeType=node_type)
+            child = cls(nodeId=int(inst[0]), relType=inst[1]['relType'], entityType=inst[2], nodeType=node_type)
             if 'listItem' in inst[1]:
                 child.relType = inst[1]['relType'] + '__listItem{}'.format(inst[1]['listItem'])
-                raise Exception('is this still the way to go?')
+                # ToDo: consider to re-model the recursive Diff approach by incorporating edgeItems
             attrs = inst[3]
             child.attrs = attrs
             ret_val.append(child)
@@ -59,14 +59,14 @@ class NodeItem:
     def fromNeo4jResponseWouRel(cls, raw: str) -> list:
         ret_val = []
         for inst in raw:
-            child = cls(id=int(inst[0]), relType=None, entityType=inst[1])
+            child = cls(nodeId=int(inst[0]), relType=None, entityType=inst[1], nodeType=None)
             attrs = inst[2]
             child.attrs = attrs
             ret_val.append(child)
         return ret_val
 
     @classmethod
-    def fromNeo4jResponse(cls, raw: str) -> list:
+    def fromNeo4jResponse(cls, raw) -> list:
         """
         creates a List of NodeItem instances from a given neo4j response
         @param raw: neo4j response string
@@ -74,8 +74,10 @@ class NodeItem:
         """
         ret_val = []
         for node_raw in raw:
-            node = cls(int(node_raw.id), None, None)
-            node.setNodeAttributes(node_raw._properties)
+            node_labels = list(node_raw.labels)
+            node_labels[:] = [x for x in node_labels if not x.startswith('ts')]
+            node = cls(nodeId=int(node_raw.id), nodeType=node_labels[0], relType=None, entityType=None)
+            node.setNodeAttributes(dict(node_raw._properties))
             node.entityType = node.attrs['EntityType']
             ret_val.append(node)
 
@@ -111,11 +113,12 @@ class NodeItem:
                 cleared_dict[key] = eval(val)
         self.attrs = cleared_dict
 
-    def to_cypher(self, timestamp: str = None, node_identifier: str = None):
+    def to_cypher(self, timestamp: str = None, node_identifier: str = None, include_nodeType_label: bool = False):
         """
         returns a cypher query fragment to search for this node with semantics
+        @param include_nodeType_label: set to True if NodeType should be added to the CREATE statement. False by default
         @param timestamp: specify in which model you'd like to search for the node
-        @param node_identifier:
+        @param node_identifier: the variable name in the cypher query
         @return:
         """
         if node_identifier is None:
@@ -123,7 +126,10 @@ class NodeItem:
         if timestamp is None:
             ts = ''
         else:
-            ts = ': {}'.format(timestamp)
+            ts = ':{}'.format(timestamp)
+
+        if include_nodeType_label:
+            ts += ':{}'.format(self.nodeType)
 
         # remove p21_id attribute
         cleaned_node_attrs = self.attrs

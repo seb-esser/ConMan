@@ -1,5 +1,5 @@
 """ packages """
-from neo4j_middleware.ResponseParser.GraphPath import GraphPath
+from typing import List
 
 """ modules """
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
@@ -9,7 +9,7 @@ from neo4j_middleware.ResponseParser.NodeDiffData import NodeDiffData
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 from neo4jGraphDiff.AbsDirectedSubgraphDiff import AbsDirectedSubgraphDiff
-
+from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 
 class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """
@@ -37,7 +37,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
 
         return diffContainer
 
-    def __compare_children(self, node_init, node_updated, diff_result_container, indent=0):
+    def __compare_children(self, node_init, node_updated, diff_result_container, indent = 0):
         """
         queries the all child nodes of a node and compares the results between
         the initial and the updated graph based on AttrDiff
@@ -103,12 +103,15 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
                                                             diff_result_container,
                                                             indent=indent + 1)
 
-            # end for loop 
-
         return diff_result_container
 
-    def __apply_diffIgnore(self, diff, IgnoreAttrs):
-        """ removes the attributes stated in the used DiffIgnore file from the diff result of apoc """
+    def __apply_diffIgnore(self, diff, IgnoreAttrs: List[str]):
+        """
+
+        @param diff:
+        @param IgnoreAttrs:
+        @return:
+        """
         for ignore in IgnoreAttrs:
             if ignore in diff.AttrsUnchanged:       del diff.AttrsUnchanged[ignore]
             if ignore in diff.AttrsAdded:           del diff.AttrsAdded[ignore]
@@ -154,30 +157,29 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
             path_init = self.__get_path(root_init.id, node_init.id)
             path_updated = self.__get_path(root_updated.id, node_updated.id)
 
-            pmod_list = nodeDiff.createPModDefinitions(node_init.id, node_updated.id, path_init=path_init, path_updated=path_updated)
+            pmod_list = nodeDiff.createPModDefinitions(node_init.id, node_updated.id, path_init=path_init,
+                                                       path_updated=path_updated)
             # append modifications to container
             diff_result_container.propertyModifications.extend(pmod_list)
         return diff_result_container
 
-    def __get_hashes_of_nodes(self, label: str, nodeList: list, indent=0) -> list:
+    def __get_hashes_of_nodes(self, label: str, nodeList: List[NodeItem], indent = 0) -> List[NodeItem]:
         """
         calculates the hash_value sum for each node in a given node list
         @param label: the model identifier
-        @param nodeList:
-        @param indent:
+        @param nodeList: a list of nodes the hash value should be calculated
+        @param indent: printing stuff (might be removed soon)
         @return:
         """
 
         ignore_attrs = self.configuration.DiffSettings.diffIgnoreAttrs  # list of strings
         # calc corresponding hash_value
         for node in nodeList:
-            child_node_id = node.id
-            relType = node.relType
             # calc hash_value of current node
-            cypher_hash = Neo4jQueryFactory.get_hash_by_nodeId(label, child_node_id, ignore_attrs)
-            hash = self.connector.run_cypher_statement(cypher_hash)[0][0]
+            cypher_hash = Neo4jQueryFactory.get_hash_by_nodeId(label, node.id, ignore_attrs)
+            hash_value = self.connector.run_cypher_statement(cypher_hash)[0][0]
 
-            node.set_hash(hash)
+            node.set_hash(hash_value)
 
         if self.toConsole():
             print("".ljust(indent * 4) + 'Calculated hashes for model >> {} <<:'.format(label))
@@ -187,9 +189,14 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         return nodeList
 
     def __get_path(self, root_node_id: int, current_node_id: int) -> GraphPath:
+        """
+
+        @param root_node_id:
+        @param current_node_id:
+        @return:
+        """
         cy = Neo4jQueryFactory.get_directed_path_by_nodeId(node_id_start=root_node_id, node_id_target=current_node_id)
         res = self.connector.run_cypher_statement(cy)
 
         path = GraphPath.from_neo4j_response(res)
         return path
-

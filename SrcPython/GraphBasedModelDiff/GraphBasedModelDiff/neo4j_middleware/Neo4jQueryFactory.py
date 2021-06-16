@@ -64,7 +64,8 @@ class Neo4jQueryFactory(Neo4jFactory):
     @classmethod
     def get_hash_by_nodeId(cls, label: str, nodeId: int, attrIgnoreList=None) -> str:
         """
-        Calculates the hash_value sum over a given node. Use attrIgnoreList to specify attribute names that should be excluded when calculating the hash_value
+        Calculates the hash_value sum over a given node.
+        Use attrIgnoreList to specify attribute names that should be excluded when calculating the hash_value
         @param label: model label
         @param nodeId: the node ID
         @param attrIgnoreList: attributes to be ignored in the hash_value calculation
@@ -80,9 +81,9 @@ class Neo4jQueryFactory(Neo4jFactory):
 
         # apply diffIgnore attributes if staged
         if attrIgnoreList == None:
-            calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash_value RETURN hash'
+            calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash RETURN hash'
         else:
-            # define fucntion where quotationmarks "" or [] are added
+            # define function where quotationmarks "" or [] are added
             def surroundStrings(l):
                 return ['"' + x + '"' for x in l]
             
@@ -202,7 +203,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         match1 = 'MATCH p = (n) WHERE ID(n)={}'.format(node_id)
         match2 = 'MATCH paths = (n)-[*..12]->(leaf)' # max length is set to 12!
         cond = 'WHERE NOT (leaf)-->()' # no outgoing edges
-        ret = 'RETURN paths, NODES(paths), RELATIONSHIPS(paths)' # ToDo: extract association name in RETURN statement: r.relType
+        ret = 'RETURN paths, NODES(paths), RELATIONSHIPS(paths)'
         return Neo4jFactory.BuildMultiStatement([match1, match2, cond, ret])
 
     @classmethod
