@@ -48,6 +48,11 @@ class IFCGraphGenerator:
 
     # public entry method to generate the graph out of a given IFC model
     def generateGraph(self):
+        """
+        parses the IFC model into the graph database
+        @return: the label, by which you can identify the model in the database
+        """
+
         # delete entire graph if label already exists
         print('DEBUG INFO: entire graph labeled with >> {} << gets deleted \n'.format(self.label))
         self.connector.run_cypher_statement('MATCH(n:{}) DETACH DELETE n'.format(self.label))
@@ -68,6 +73,8 @@ class IFCGraphGenerator:
         # ToDo: handle IfcPropertyDefinition
 
         print('[IFC_P21 > {} < ]: Generating graph - DONE. \n '.format(self.label))
+
+        return self.label
 
     def validateParsingResult(self):
         # ticket_PostEvent-VerifyParsedModel

@@ -9,27 +9,46 @@
 
 # 6. create IFC model out of the updated graph
 from IfcGraphInterface.Ifc2GraphTranslator import IFCGraphGenerator
+from PatchManager.PatchGenerator import PatchGenerator
+from neo4jGraphDiff.GraphDiff import GraphDiff
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 connector = Neo4jConnector()
 connector.connect_driver()
 
-# 0 clear database
-connector.run_cypher_statement('MATCH (n) DETACH DELETE n')
-
-# 1 load models into graph
 model_name_init = './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_single.ifc'
 model_name_updated = './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_double.ifc'
 
-print('STEP 1: Generate graph initial and graph updated... ')
-graphGenerator_init = IFCGraphGenerator(connector, model_name_init, None)
-graphGenerator_init.generateGraph()
+label_init = 'ts20210616T145238'
+label_updated = 'ts20210616T145520'
 
-graphGenerator_updated = IFCGraphGenerator(connector, model_name_updated, None)
-graphGenerator_updated.generateGraph()
-print('Graphs generated successfully')
+skip_part_1 = True
+print_diff_report = True
 
-# 2 diff models
+# 1 -- load models into graph --
+if not skip_part_1:
+
+    print('STEP 1: Generate graph initial and graph updated... ')
+    graphGenerator_init = IFCGraphGenerator(connector, model_name_init, None)
+    label_init = graphGenerator_init.generateGraph()
+
+    graphGenerator_updated = IFCGraphGenerator(connector, model_name_updated, None)
+    label_updated = graphGenerator_updated.generateGraph()
+    print('Graphs generated successfully')
+
+# 2 -- diff models --
+diff = GraphDiff(label_init=label_init, label_updated=label_updated)
+report = diff.run_diff(connector=connector)
+if print_diff_report:
+    report.print_report()
+
+# 3 -- generate patch --
+patch_generator = PatchGenerator(connector=connector)
+patch_generator.create_patch_from_graph_diff(report)
+json_patch = patch_generator.export_to_json()
+print(json_patch)
+
+
 
 
 

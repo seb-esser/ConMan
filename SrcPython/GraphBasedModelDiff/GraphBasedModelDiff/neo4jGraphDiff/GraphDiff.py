@@ -51,7 +51,7 @@ class GraphDiff:
         js_rep = generator.export_to_json()
         print(js_rep)
 
-        return generator
+        return self.report
 
     def calc_secondary(self, DiffEngine, nodeIDs_unchanged):
         all_tasks = []
