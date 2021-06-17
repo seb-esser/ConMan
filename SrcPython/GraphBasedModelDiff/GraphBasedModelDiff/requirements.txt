@@ -12,6 +12,7 @@ click @ file:///tmp/build/80754af9/click_1621604852318/work
 colorama==0.4.4
 cycler==0.10.0
 decorator==4.4.2
+deepdiff @ file:///home/conda/feedstock_root/build_artifacts/deepdiff_1619737190863/work
 defusedxml==0.7.1
 entrypoints==0.3
 Flask @ file:///home/ktietz/src/ci/flask_1611932660458/work
@@ -35,15 +36,23 @@ jupyterlab==3.0.16
 jupyterlab-pygments==0.1.2
 jupyterlab-server==2.6.0
 kiwisolver==1.3.1
+lark-parser @ file:///home/conda/feedstock_root/build_artifacts/lark-parser_1620449992245/work
 lxml==4.6.2
 MarkupSafe @ file:///C:/ci/markupsafe_1621528314575/work
 matplotlib==3.3.3
-neo4j==4.2.dev0
+matplotlib-inline==0.1.2
+mistune==0.8.4
+nbclassic==0.3.1
+nbclient==0.5.3
+nbconvert==6.0.7
+nbformat==5.1.3
+neo4j==4.3.1
 neotime==1.7.4
 nest-asyncio==1.5.1
 networkx==2.5
 notebook==6.4.0
 numpy==1.19.3
+ordered-set @ file:///home/conda/feedstock_root/build_artifacts/ordered-set_1592489036906/work
 packaging==20.9
 pandocfilters==1.4.3
 parso==0.8.2
