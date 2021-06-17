@@ -6,6 +6,7 @@ from neo4jGraphDiff.Caption.PropertyModification import PropertyModificationType
 from neo4jGraphDiff.Caption.ResultGenerator import ResultGenerator
 from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 import json
@@ -28,6 +29,18 @@ class PatchGenerator:
         self.patch.base_timestamp = res.timestamp_init
         self.patch.resulting_timestamp = res.timestamp_updated
         self.patch.ignore_attrs = res.config.DiffSettings.diffIgnoreAttrs
+
+        # --- Primary Node Updates ---
+        added = res.ResultPrimaryDiff['added']
+        deleted = res.ResultPrimaryDiff['deleted']
+
+        for added_node in added:
+            # query substructure from this node
+            cy = Neo4jQueryFactory.get_distinct_paths_from_node(added_node.id)
+            raw_res = self.connector.run_cypher_statement(cy)
+            sub_pattern = GraphPattern.from_neo4j_response(raw_res)
+            print(sub_pattern.to_cypher_query_indexed())
+            a = 1
 
         # --- Secondary structure modifications ---
         for p_mod in res.ResultComponentDiff:
@@ -68,6 +81,7 @@ class PatchGenerator:
                 self.patch.operations.append(operation)
 
         # --- Structural modifications ---
+
 
     def export_to_json(self):
         return self.patch.to_json()

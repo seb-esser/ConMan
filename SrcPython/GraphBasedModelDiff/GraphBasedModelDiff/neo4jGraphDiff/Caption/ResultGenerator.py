@@ -15,15 +15,11 @@ class ResultGenerator:
 
     def __init__(self, ts_init: str, ts_updated: str, usedConfig=None):
         """ """
-        self.timestamp_init : str = ts_init
-        self.timestamp_updated : str = ts_updated
-        self.config : Configuration = usedConfig
-        self.timestamp_init: str
-        self.timestamp_updated: str
-        self.ResultRooted = {}
+        self.timestamp_init: str = ts_init
+        self.timestamp_updated: str = ts_updated
+        self.config: Configuration = usedConfig
+        self.ResultPrimaryDiff = {}
         self.ResultComponentDiff = []
-
-
 
     def capture_result_primary(self, rootDiffRes: list):
         """
@@ -34,9 +30,9 @@ class ResultGenerator:
         nodes_added = rootDiffRes[1]
         nodes_deleted = rootDiffRes[2]
 
-        self.ResultRooted['unchanged'] = nodes_unchanged
-        self.ResultRooted['added'] = nodes_added
-        self.ResultRooted['deleted'] = nodes_deleted
+        self.ResultPrimaryDiff['unchanged'] = nodes_unchanged
+        self.ResultPrimaryDiff['added'] = nodes_added
+        self.ResultPrimaryDiff['deleted'] = nodes_deleted
 
     def capture_result_con_nodes(self):
         """ captures SubstructureDiffResult of ObjRel structure Diff """
@@ -67,7 +63,7 @@ class ResultGenerator:
         print('\nROOT NODES:')
 
         print('\t NODES-PAIRS UNCHANGED: ')
-        for item in self.ResultRooted['unchanged']:
+        for item in self.ResultPrimaryDiff['unchanged']:
             print \
                 ('\t  init: NodeId:{:<5} EntityType: {:<26} updated: NodeId:{:<5} EntityType: {:<26}'.format(item[0].id,
                                                                                                              item
@@ -79,15 +75,15 @@ class ResultGenerator:
                                                                                                                  1].entityType))
 
         print('\n\t NODES ADDED:')
-        if len(self.ResultRooted['added']) > 0:
-            for item in self.ResultRooted['added']:
+        if len(self.ResultPrimaryDiff['added']) > 0:
+            for item in self.ResultPrimaryDiff['added']:
                 print('\t  NodeId:{:<5} EntityType: {:<20}'.format(item.id, item.entityType))
         else:
             print('\t  EMPTY')
 
         print('\n\t NODES DELETED:')
-        if len(self.ResultRooted['deleted']) > 0:
-            for item in self.ResultRooted['deleted']:
+        if len(self.ResultPrimaryDiff['deleted']) > 0:
+            for item in self.ResultPrimaryDiff['deleted']:
                 print('\t  NodeId:{:<5} EntityType: {:<20}'.format(item.id, item.entityType))
         else:
             print('\t  EMPTY')
