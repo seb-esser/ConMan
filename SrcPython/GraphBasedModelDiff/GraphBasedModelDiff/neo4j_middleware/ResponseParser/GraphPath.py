@@ -1,3 +1,5 @@
+from typing import List
+
 from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.Neo4jFactory import Neo4jFactory
@@ -5,9 +7,11 @@ from neo4j_middleware.Neo4jFactory import Neo4jFactory
 
 class GraphPath:
 
-    def __init__(self, segments):
+    def __init__(self, segments: List[EdgeItem]):
         self.segments = segments
 
+    def get_start_node(self) -> NodeItem:
+        return self.segments[0].startNode
 
     @classmethod
     def from_neo4j_response(cls, raw: str):

@@ -25,11 +25,6 @@ class PatchIntegrator(object):
         for op in operations:
             print(op)
 
-        # decode patternOperations
-        for pattern_op in patch.pattern_operations:
-            cy = pattern_op.integrate_patch_on_target_graph(target_graph)
-            # self.connector.run_cypher_statement(cy)
-
     @classmethod
     def from_json(cls, json_path):
         # js = jsonpickle.decode(json_path)

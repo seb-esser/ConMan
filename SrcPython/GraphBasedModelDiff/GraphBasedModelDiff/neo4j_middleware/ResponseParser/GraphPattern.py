@@ -10,7 +10,7 @@ from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 class GraphPattern:
     def __init__(self, paths):
         self.paths: List[GraphPath] = paths
-        self.entry_node: NodeItem
+        # self.entry_node: NodeItem
 
     def __repr__(self):
         return 'GraphPattern instance composed by several GraphPath instances'
@@ -28,6 +28,9 @@ class GraphPattern:
             paths.append(path)
 
         return cls(paths)
+
+    def get_entry_node(self) -> NodeItem:
+        return self.paths[0].get_start_node()
 
     def load_rel_attrs(self, connector: neo4jConnector):
         """
@@ -171,20 +174,6 @@ class GraphPattern:
 
         return cy_statement
 
-    def integrate_patch_on_target_graph(self, target_timestamp: str) -> str:
-        """
-        integrates this pattern on a target graph.
-        Existing structures are considered.
-        @param target_timestamp:
-        @return:
-        """
-
-        cy_list = []
-
-        cy_statement = ''.join(cy_list)
-        return cy_statement
-
-
     def get_number_of_paths(self) -> int:
         """
         returns the number of paths in the pattern
@@ -246,3 +235,32 @@ class GraphPattern:
             no += 1
             for seg in path.segments:
                 print('\t\t{}'.format(str(seg)))
+
+    def split_pattern(self, node: NodeItem) -> List[GraphPattern]:
+        """
+        removes a node specified by ?! . Splits the pattern into sub-patterns
+        @return:
+        """
+
+        sub_patterns: List[GraphPattern] = []
+        new_start_nodes = []
+        # find edges the current node is involved
+        for path in self.paths:
+            if path.get_start_node() == node:
+
+                # remove first segment from current path
+                cutted_path = path.segments[1:]
+                path_object = GraphPath(cutted_path)
+
+                new_start_node = cutted_path[0].startNode
+                if new_start_node not in new_start_nodes:
+                    pattern = GraphPattern([path_object])
+                    sub_patterns.append(pattern)
+                    new_start_nodes.append(new_start_node)
+                else:
+                    # find pattern that has the same start node as the current cutted_path
+                    sub_p = [x for x in sub_patterns if x.get_entry_node() == new_start_node][0]
+                    sub_p.paths.append(path_object)
+
+        return sub_patterns
+

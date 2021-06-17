@@ -268,5 +268,14 @@ class Neo4jQueryFactory(Neo4jFactory):
         cy = 'MATCH (n)-[r]->(m) WHERE ID(r) = {} RETURN PROPERTIES(r)'.format(rel_id)
         return cy
 
+    @classmethod
+    def get_node(cls, node_id: int) -> str:
+        """
+
+        @param node_id:
+        @return:
+        """
+        return 'MATCH (n) WHERE ID(n) = {} RETURN n'.format(node_id)
+
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --
