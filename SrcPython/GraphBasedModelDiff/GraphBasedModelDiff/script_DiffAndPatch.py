@@ -43,10 +43,7 @@ if print_diff_report:
 
 # 3 -- generate patch --
 patch_generator = PatchGenerator(connector=connector)
-patch_generator.create_patch_from_graph_diff(report)
-
-patch = patch_generator.get_patch()
-
+patch = patch_generator.create_patch_from_graph_diff(report)
 
 # 4 -- receive and apply patch on a specified graph
 incoming_patch: Patch = patch

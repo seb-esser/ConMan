@@ -1,6 +1,5 @@
 import asyncio
 
-from PatchManager.PatchGenerator import PatchGenerator
 from neo4jGraphDiff.Caption.ResultGenerator import ResultGenerator
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.PrimaryNodeDiff import RootedNodeDiff
@@ -27,29 +26,17 @@ class GraphDiff:
 
         rootedNodeDiff = RootedNodeDiff(connector, self.config)
 
-        attrIgnore = self.config.DiffSettings.diffIgnoreAttrs
         [nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(self.label_init, self.label_updated)
 
         # save results to report
         self.report.capture_result_primary([nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted])
 
-        print('\nCOMPONENT DIFF \n')
+        print('\n COMPONENT DIFF \n')
 
         # 2: Check sub-graphs for each rooted node
         DiffEngine = DfsIsomorphismCalculator(connector, self.label_init, self.label_updated, self.config)
 
         self.calc_secondary(DiffEngine, nodeIDs_unchanged)
-
-        # show result on console
-        self.report.print_report()
-        # report.print_time_plot()
-
-        # create a patch out of the captured diff result
-        generator = PatchGenerator(connector)
-        generator.create_patch_from_graph_diff(self.report)
-
-        js_rep = generator.export_to_json()
-        print(js_rep)
 
         return self.report
 

@@ -86,3 +86,6 @@ Werkzeug @ file:///home/ktietz/src/ci/werkzeug_1611932622770/work
 wincertstore==0.2
 xmldiff==2.4
 zipp @ file:///tmp/build/80754af9/zipp_1615904174917/work
+
+jsonpickle~=2.0.0
+ifcopenshell~=0.6.0.a0f79cc
