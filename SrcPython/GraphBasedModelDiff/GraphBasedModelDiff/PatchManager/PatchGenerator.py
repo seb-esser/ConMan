@@ -1,6 +1,8 @@
 from PatchManager.Operation.AttributeOperations.AddAttributeOperation import AddAttributeOperation
 from PatchManager.Operation.AttributeOperations.DeleteAttributeOperation import DeleteAttributeOperation
 from PatchManager.Operation.AttributeOperations.ModifyAttributeOperation import ModifyAttributeOperation
+from PatchManager.Operation.PatternOperations.AddPatternOperation import AddPatternOperation
+from PatchManager.Operation.PatternOperations.RemovePatternOperation import RemovePatternOperation
 from PatchManager.Patch import Patch
 from neo4jGraphDiff.Caption.PropertyModification import PropertyModificationTypeEnum
 from neo4jGraphDiff.Caption.ResultGenerator import ResultGenerator
@@ -18,6 +20,16 @@ class PatchGenerator:
         self.patch = Patch()
         self.connector: Neo4jConnector = connector
 
+    def __repr__(self):
+        return 'Patch generator translating a given DiffResult object into a patch object'
+
+    def get_patch(self) -> Patch:
+        """
+        returns the generated patch object
+        @return: patch object
+        """
+        return self.patch
+
     def create_patch_from_graph_diff(self, res: ResultGenerator):
         """
         creates a patch from a given SubstructureDiffResult object.
@@ -30,23 +42,40 @@ class PatchGenerator:
         self.patch.resulting_timestamp = res.timestamp_updated
         self.patch.ignore_attrs = res.config.DiffSettings.diffIgnoreAttrs
 
+        self.patch.pattern_operations = []
+
         # --- Primary Node Updates ---
         added = res.ResultPrimaryDiff['added']
         deleted = res.ResultPrimaryDiff['deleted']
 
         for added_node in added:
+
             # query substructure from this node
             cy = Neo4jQueryFactory.get_distinct_paths_from_node(added_node.id)
             raw_res = self.connector.run_cypher_statement(cy)
             sub_pattern = GraphPattern.from_neo4j_response(raw_res)
-            print(sub_pattern.to_cypher_query_indexed())
-            a = 1
 
-        # --- Secondary structure modifications ---
+            # create instance of addPatternOperation
+            add_pattern_op = AddPatternOperation(pattern=sub_pattern)
+            self.patch.pattern_operations.append(add_pattern_op)
+
+        for deleted_node in deleted:
+            # query substructure from this node
+            cy = Neo4jQueryFactory.get_distinct_paths_from_node(deleted_node.id)
+            raw_res = self.connector.run_cypher_statement(cy)
+            sub_pattern = GraphPattern.from_neo4j_response(raw_res)
+
+            # create instance of addPatternOperation
+            add_pattern_op = RemovePatternOperation(pattern=sub_pattern)
+            self.patch.pattern_operations.append(add_pattern_op)
+
+        # --- Secondary modifications ---
+
         for p_mod in res.ResultComponentDiff:
-            struc_mods = p_mod.StructureModifications
             prop_mods = p_mod.propertyModifications
+            struc_mods = p_mod.StructureModifications
 
+            # Secondary: property modifications
             for p in prop_mods:
                 mutation = {}
                 root_init = p.nodeId_init
@@ -80,8 +109,11 @@ class PatchGenerator:
                 # assign operation to patch
                 self.patch.operations.append(operation)
 
-        # --- Structural modifications ---
+            # Secondary: structural modifications
+            for s in struc_mods:
+                raise NotImplementedError('Structural modifications on secondary nodes are not captured yet. ')
 
+        return self.patch
 
     def export_to_json(self):
         return self.patch.to_json()

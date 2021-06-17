@@ -3,12 +3,11 @@
 # 2. diff models
 # 3. formulate patch
 
-# 4. load init model once again but with modified time stamp
-
 # 5. apply patch
 
 # 6. create IFC model out of the updated graph
 from IfcGraphInterface.Ifc2GraphTranslator import IFCGraphGenerator
+from PatchManager.Patch import Patch
 from PatchManager.PatchGenerator import PatchGenerator
 from neo4jGraphDiff.GraphDiff import GraphDiff
 from neo4j_middleware.neo4jConnector import Neo4jConnector
@@ -23,7 +22,7 @@ label_init = 'ts20210616T145238'
 label_updated = 'ts20210616T145520'
 
 skip_part_1 = True
-print_diff_report = True
+print_diff_report = False
 
 # 1 -- load models into graph --
 if not skip_part_1:
@@ -45,11 +44,14 @@ if print_diff_report:
 # 3 -- generate patch --
 patch_generator = PatchGenerator(connector=connector)
 patch_generator.create_patch_from_graph_diff(report)
-json_patch = patch_generator.export_to_json()
-print(json_patch)
+
+patch = patch_generator.get_patch()
+
+
+# 4 -- receive and apply patch on a specified graph
+incoming_patch: Patch = patch
 
 
 
-
-
-
+# finally, disconnect from database
+connector.disconnect_driver()

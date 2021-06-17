@@ -1,7 +1,10 @@
-from GraphBasedModelDiff.PatchManager.Operation.AbstractOperation import AbstractOperation
+import abc
+
+from PatchManager.Operation.AbstractOperation import AbstractOperation
 
 
 class NodeOperation(AbstractOperation):
 
+    @abc.abstractmethod
     def __init__(self):
-        pass
+        super().__init__()
