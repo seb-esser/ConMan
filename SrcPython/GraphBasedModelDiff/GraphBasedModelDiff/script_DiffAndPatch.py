@@ -9,6 +9,7 @@
 from IfcGraphInterface.Ifc2GraphTranslator import IFCGraphGenerator
 from PatchManager.Patch import Patch
 from PatchManager.PatchGenerator import PatchGenerator
+from PatchManager.PatchIntegrator import PatchIntegrator
 from neo4jGraphDiff.GraphDiff import GraphDiff
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -48,7 +49,14 @@ patch = patch_generator.create_patch_from_graph_diff(report)
 # 4 -- receive and apply patch on a specified graph
 incoming_patch: Patch = patch
 
+print('DEBUG INFO: initial model gets re-created with timestamp: 9999')
 
+graphGenerator_artificial = IFCGraphGenerator(connector, model_name_init, None)
+graphGenerator_artificial.label = 'ts9999'
+label_toBeUpdated = graphGenerator_artificial.generateGraph()
+
+integrator = PatchIntegrator(connector=connector)
+integrator.apply_patch(incoming_patch)
 
 # finally, disconnect from database
 connector.disconnect_driver()

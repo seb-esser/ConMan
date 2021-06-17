@@ -171,6 +171,20 @@ class GraphPattern:
 
         return cy_statement
 
+    def integrate_patch_on_target_graph(self, target_timestamp: str) -> str:
+        """
+        integrates this pattern on a target graph.
+        Existing structures are considered.
+        @param target_timestamp:
+        @return:
+        """
+
+        cy_list = []
+
+        cy_statement = ''.join(cy_list)
+        return cy_statement
+
+
     def get_number_of_paths(self) -> int:
         """
         returns the number of paths in the pattern
