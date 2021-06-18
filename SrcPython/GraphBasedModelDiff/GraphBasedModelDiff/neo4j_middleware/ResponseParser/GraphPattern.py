@@ -10,7 +10,6 @@ from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 class GraphPattern:
     def __init__(self, paths):
         self.paths: List[GraphPath] = paths
-        # self.entry_node: NodeItem
 
     def __repr__(self):
         return 'GraphPattern instance composed by several GraphPath instances'
@@ -30,6 +29,10 @@ class GraphPattern:
         return cls(paths)
 
     def get_entry_node(self) -> NodeItem:
+        """
+        returns the entry node of this graphPattern
+        @return: NodeItem reflecting the entry node of this pattern
+        """
         return self.paths[0].get_start_node()
 
     def load_rel_attrs(self, connector: neo4jConnector):
@@ -236,11 +239,12 @@ class GraphPattern:
             for seg in path.segments:
                 print('\t\t{}'.format(str(seg)))
 
-    def split_pattern(self, node: NodeItem) -> List[GraphPattern]:
+    def split_pattern(self):
         """
-        removes a node specified by ?! . Splits the pattern into sub-patterns
+        removes the current entry node from the pattern and returns the sub-patterns
         @return:
         """
+        node = self.get_entry_node()
 
         sub_patterns: List[GraphPattern] = []
         new_start_nodes = []
