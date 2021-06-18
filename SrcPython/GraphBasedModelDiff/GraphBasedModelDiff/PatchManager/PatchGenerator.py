@@ -42,7 +42,6 @@ class PatchGenerator:
         self.patch.resulting_timestamp = res.timestamp_updated
         self.patch.ignore_attrs = res.config.DiffSettings.diffIgnoreAttrs
 
-        self.patch.pattern_operations = []
 
         # --- Primary Node Updates ---
         added = res.ResultPrimaryDiff['added']
@@ -54,10 +53,11 @@ class PatchGenerator:
             cy = Neo4jQueryFactory.get_distinct_paths_from_node(added_node.id)
             raw_res = self.connector.run_cypher_statement(cy)
             sub_pattern = GraphPattern.from_neo4j_response(raw_res)
+            sub_pattern.load_rel_attrs(self.connector)
 
             # create instance of addPatternOperation
             add_pattern_op = AddPatternOperation(pattern=sub_pattern)
-            self.patch.pattern_operations.append(add_pattern_op)
+            self.patch.operations.append(add_pattern_op)
 
         for deleted_node in deleted:
             # query substructure from this node

@@ -113,6 +113,26 @@ class GraphPattern:
             path_iterator += 1
             cy_list.append(' ')
 
+        include_primary_paths = True
+        if include_primary_paths:
+            prm_paths = self.query_primary_paths()
+            cy_list += prm_paths
+
+        define_return = True
+        if define_return:
+            num_paths = self.get_number_of_paths()
+            num_primPaths = len(prm_paths)
+
+            return_cy = 'RETURN '
+            for np in range(num_paths):
+                return_cy += 'path{}, '.format(np)
+            for npr in range(num_primPaths):
+                return_cy += 'primPath{}, '.format(npr)
+            return_cy = return_cy[:-2] # remove last ', '
+
+            cy_list.append(return_cy)
+
+        # build the final cypher statement
         cy_statement = ''.join(cy_list)
 
         return cy_statement
@@ -267,4 +287,14 @@ class GraphPattern:
                     sub_p.paths.append(path_object)
 
         return sub_patterns
+
+    def query_primary_paths(self):
+        unified_nodes = self.get_unified_node_set()
+        cy_list = []
+        it = 0
+        for n in unified_nodes:
+            cy = 'OPTIONAL MATCH primPath{0} = (n{1})<-[*..3]-(primaryN{1}: PrimaryNode) '.format(it, n.id)
+            cy_list.append(cy)
+            it += 1
+        return cy_list
 

@@ -45,7 +45,7 @@ if print_diff_report:
 # 3 -- generate patch --
 patch_generator = PatchGenerator(connector=connector)
 patch = patch_generator.create_patch_from_graph_diff(report)
-
+print(patch.operations[0].pattern.to_cypher_query_indexed())
 # 4 -- receive and apply patch on a specified graph
 incoming_patch: Patch = patch
 
