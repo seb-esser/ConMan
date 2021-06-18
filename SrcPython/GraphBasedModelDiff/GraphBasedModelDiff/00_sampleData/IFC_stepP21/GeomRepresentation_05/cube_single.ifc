@@ -20,7 +20,7 @@ DATA;
 #4= IFCSITE('2gG1du9OH4eQ4omNt$zfn1',$,'site',$,$,#3,$,$,$,$,$,$,$,$);
 #5= IFCPROJECT('2KrDsiaI1FkRwWUa5EvoNK',$,'GeomRep',$,$,$,$,(#13),$);
 #6= IFCRELAGGREGATES('1U7z3bi0N_4L0UNA$m7S6j',$,$,$,#5,(#4));
-#7= IFCCARTESIANPOINT((2.0,5.0,1.0));
+#7= IFCCARTESIANPOINT((0.0,0.0,0.0));
 #8= IFCAXIS2PLACEMENT3D(#7,$,$);
 #9= IFCLOCALPLACEMENT(#3,#8);
 #10= IFCRECTANGLEPROFILEDEF(.AREA.,'rectangleProfileDef',$,4.0,6.0);
