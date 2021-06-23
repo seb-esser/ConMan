@@ -57,6 +57,7 @@ graphGenerator_artificial.label = 'ts9999'
 label_toBeUpdated = graphGenerator_artificial.generateGraph()
 
 print(patch.operations[0].pattern.to_cypher_merge(timestamp=label_toBeUpdated))
+exit()
 
 integrator = PatchIntegrator(connector=connector)
 # integrator.apply_patch(incoming_patch)
