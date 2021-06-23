@@ -5,8 +5,8 @@ from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
-
-def build_childs(n):
+# this function can either be recursive or non-recursive, depending on 'rec'
+def build_childs(n, rec):
     # build association
     cy = query_factory.get_child_nodes(ts, n.id)
     raw_res = connector.run_cypher_statement(cy)
@@ -34,7 +34,8 @@ def build_childs(n):
         # build association
         generator.build_association(n.id, c.id, c.relType)
 
-        build_childs(c)
+        if rec:
+            build_childs(c, True)
 
 
 connector = Neo4jConnector()
@@ -43,7 +44,7 @@ connector.connect_driver()
 generator = IfcGenerator()
 query_factory = Neo4jQueryFactory()
 
-ts = "ts20210616T145238"
+ts = "ts20200928T074754"
 
 # get all primary nodes
 cy = query_factory.get_primary_nodes(ts)
@@ -64,7 +65,29 @@ for n in nodes:
     # build IFC entity
     generator.build_entity(n.id, n.entityType, n.attrs)
 
-    build_childs(n)
+    build_childs(n, True)
+
+# get all connection nodes
+cn = query_factory.get_connection_nodes(ts)
+raw_res = connector.run_cypher_statement(cn)
+
+connection_nodes = NodeItem.fromNeo4jResponseWouRel(raw_res)
+
+for cnode in connection_nodes:
+    cy = query_factory.get_node_properties_by_id(cnode.id)
+    raw_res = connector.run_cypher_statement(cy, "properties(n)")
+    # assign properties to node object
+    cnode.setNodeAttributes(raw_res)
+
+    cnode.tidy_attrs()
+
+    # build IFC entity
+    generator.build_entity(cnode.id, cnode.entityType, cnode.attrs)
+
+    # build the childe (non-recursive)
+    build_childs(cnode, False)
+
+    
 
 generator.save_model('test2')
 
