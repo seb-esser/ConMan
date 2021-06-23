@@ -22,7 +22,7 @@ model_name_updated = './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_dou
 label_init = 'ts20210616T145238'
 label_updated = 'ts20210616T145520'
 
-skip_part_1 = True
+skip_part_1 = False
 print_diff_report = False
 
 # 1 -- load models into graph --
@@ -30,10 +30,10 @@ if not skip_part_1:
 
     print('STEP 1: Generate graph initial and graph updated... ')
     graphGenerator_init = IFCGraphGenerator(connector, model_name_init, None)
-    label_init = graphGenerator_init.generateGraph()
+    graphGenerator_init.generateGraph()
 
     graphGenerator_updated = IFCGraphGenerator(connector, model_name_updated, None)
-    label_updated = graphGenerator_updated.generateGraph()
+    graphGenerator_updated.generateGraph()
     print('Graphs generated successfully')
 
 # 2 -- diff models --
@@ -46,6 +46,7 @@ if print_diff_report:
 patch_generator = PatchGenerator(connector=connector)
 patch = patch_generator.create_patch_from_graph_diff(report)
 print(patch.operations[0].pattern.to_cypher_query_indexed())
+print(patch.operations[0].pattern.to_cypher_merge())
 # 4 -- receive and apply patch on a specified graph
 incoming_patch: Patch = patch
 
@@ -55,8 +56,10 @@ graphGenerator_artificial = IFCGraphGenerator(connector, model_name_init, None)
 graphGenerator_artificial.label = 'ts9999'
 label_toBeUpdated = graphGenerator_artificial.generateGraph()
 
+print(patch.operations[0].pattern.to_cypher_merge(timestamp=label_toBeUpdated))
+
 integrator = PatchIntegrator(connector=connector)
-integrator.apply_patch(incoming_patch)
+# integrator.apply_patch(incoming_patch)
 
 # finally, disconnect from database
 connector.disconnect_driver()

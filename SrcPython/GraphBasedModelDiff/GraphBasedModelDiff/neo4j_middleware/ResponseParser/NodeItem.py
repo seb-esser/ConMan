@@ -133,7 +133,7 @@ class NodeItem:
 
         # remove p21_id attribute
         cleaned_node_attrs = self.attrs
-        cleaned_node_attrs.pop('p21_id', None)
+        # cleaned_node_attrs.pop('p21_id', None)
 
         return '({0}{1} {2})'.format(node_identifier, ts, Neo4jFactory.formatDict(self.attrs))
 

@@ -90,4 +90,17 @@ class EdgeItem:
             segment_identifier)
         return cy
 
+    def to_cypher_merge(self, target_identifier: str, target_node: NodeItem, target_timestamp: str, segment_identifier: int, relationship_iterator: int):
+        """
+        returns a cypher command to create the edge. the edge is labeled with 'rel'
+        @return: cypher statement as str
+        """
+        cy = '-[r{3}{2}:rel{0}]->{1}'.format(
+            Neo4jFactory.formatDict(self.attributes),
+            target_node.to_cypher(timestamp=target_timestamp, node_identifier=target_identifier, include_nodeType_label=True),
+            relationship_iterator,
+            segment_identifier)
+        return cy
+
+
 
