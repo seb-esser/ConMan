@@ -49,6 +49,8 @@ class PatchGenerator:
 
         for added_node in added:
 
+
+
             # query substructure from this node
             cy = Neo4jQueryFactory.get_distinct_paths_from_node(added_node.id)
             raw_res = self.connector.run_cypher_statement(cy)
@@ -71,9 +73,9 @@ class PatchGenerator:
 
         # --- Secondary modifications ---
 
-        for p_mod in res.ResultComponentDiff:
-            prop_mods = p_mod.propertyModifications
-            struc_mods = p_mod.StructureModifications
+        for mod in res.ResultComponentDiff:
+            prop_mods = mod.propertyModifications
+            struc_mods = mod.StructureModifications
 
             # Secondary: property modifications
             for p in prop_mods:
@@ -92,18 +94,13 @@ class PatchGenerator:
                                                       attrValNew=p.valueNew)
 
                 elif p.modificationType == PropertyModificationTypeEnum.DELETED:
-                    operation = DeleteAttributeOperation(prim_hash=hashsum,
-                                                         pattern=p.path_init.to_patch(),
-                                                         attrName=p.attrName,
-                                                         attrValOld=p.valueOld)
+                    operation = DeleteAttributeOperation(prim_guid=hashsum, pattern=p.path_init.to_patch(),
+                                                         attrName=p.attrName, attrValOld=p.valueOld)
 
                 elif p.modificationType == PropertyModificationTypeEnum.MODIFIED:
-                    operation = ModifyAttributeOperation(prim_hash=hashsum,
-                                                         pattern=p.path_init.to_patch(),
-                                                         attrName=p.attrName,
-                                                         attrValOld=p.valueOld,
-                                                         attrValNew=p.valueNew
-                                                         )
+                    operation = ModifyAttributeOperation(prim_guid=hashsum, pattern=p.path_init.to_patch(),
+                                                         attrName=p.attrName, attrValOld=p.valueOld,
+                                                         attrValNew=p.valueNew)
                 else:
                     raise Exception("unhandled modification type occured")
                 # assign operation to patch
@@ -111,7 +108,7 @@ class PatchGenerator:
 
             # Secondary: structural modifications
             for s in struc_mods:
-                raise NotImplementedError('Structural modifications on secondary nodes are not captured yet. ')
+                print(s)
 
         return self.patch
 

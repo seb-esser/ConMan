@@ -22,7 +22,7 @@ model_name_updated = './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_dou
 label_init = 'ts20210616T145238'
 label_updated = 'ts20210616T145520'
 
-skip_part_1 = False
+skip_part_1 = True
 print_diff_report = False
 
 # 1 -- load models into graph --

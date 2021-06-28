@@ -9,7 +9,10 @@ class PatternOperation(AbstractOperation):
     Abstract class of all pattern operations
     """
     pattern: GraphPattern
+    reference_structure: GraphPattern
 
     @abc.abstractmethod
     def __init__(self):
-        pass
+        super().__init__()
+
+
