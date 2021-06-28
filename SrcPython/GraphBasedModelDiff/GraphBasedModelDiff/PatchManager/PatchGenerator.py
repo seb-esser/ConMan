@@ -43,22 +43,31 @@ class PatchGenerator:
         self.patch.ignore_attrs = res.config.DiffSettings.diffIgnoreAttrs
 
 
+        # --- connection node Updates ---
+        # ToDo: implement suitable approaches to capture connectionNode insertions and deletions
+
         # --- Primary Node Updates ---
         added = res.ResultPrimaryDiff['added']
         deleted = res.ResultPrimaryDiff['deleted']
 
         for added_node in added:
 
-
-
-            # query substructure from this node
-            cy = Neo4jQueryFactory.get_distinct_paths_from_node(added_node.id)
+            # query position in primary structure
+            cy = Neo4jQueryFactory.get_parent_connection_node(added_node.id)
             raw_res = self.connector.run_cypher_statement(cy)
             sub_pattern = GraphPattern.from_neo4j_response(raw_res)
             sub_pattern.load_rel_attrs(self.connector)
 
             # create instance of addPatternOperation
-            add_pattern_op = AddPatternOperation(pattern=sub_pattern)
+
+            ref_node = sub_pattern.get_entry_node()
+            ref_node.tidy_attrs()
+            reference_structure = ref_node.to_cypher(node_identifier='c', include_nodeType_label=True)
+
+            print('MATCH {} RETURN c'.format(reference_structure) )
+            add_pattern = sub_pattern.to_cypher_create()
+
+            add_pattern_op = AddPatternOperation(pattern=add_pattern, reference_structure=reference_structure)
             self.patch.operations.append(add_pattern_op)
 
         for deleted_node in deleted:

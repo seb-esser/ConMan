@@ -72,7 +72,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
 
-        getModel = 'MATCH(n:{})'.format(label)
+        getModel = 'MATCH(n)'.format(label)
         where = 'WHERE ID(n) = {}'.format(nodeId)
 
         open_sub = 'CALL {WITH n'
@@ -218,6 +218,11 @@ class Neo4jQueryFactory(Neo4jFactory):
         return Neo4jFactory.BuildMultiStatement([pattern, ret])
 
     @classmethod
+    def get_conNodes_patterns(cls, node_id: int) -> str:
+        return 'MATCH paths = (c:ConnectionNode)-[r]->(n) WHERE ID(c) = {} ' \
+               'RETURN paths, NODES(paths), RELATIONSHIPS(paths)'.format(node_id)
+
+    @classmethod
     def get_adjacency_primary(cls, label: str) -> str:
         """
 
@@ -276,6 +281,11 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return:
         """
         return 'MATCH (n) WHERE ID(n) = {} RETURN n'.format(node_id)
+
+    @classmethod
+    def get_parent_connection_node(cls, node_id: int):
+        return 'MATCH path = (c:ConnectionNode)-[r]->(n) WHERE ID(n)={} ' \
+               'RETURN path, NODES(path), RELATIONSHIPS(path)'.format(node_id)
 
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --

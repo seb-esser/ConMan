@@ -5,22 +5,36 @@ from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from .SetCalculator import SetCalculator
 
 
-class RootedNodeDiff:
+class PrimaryNodeDiff:
 	""" """
-	def __init__(self, connector, configuration): 
+	def __init__(self, connector, configuration):
+		"""
+
+		@param connector:
+		@param configuration:
+		"""
 		self.configuration = configuration
 		self.utils = SetCalculator()
 		self.connector = connector
 		pass
 
 	def toConsole(self):
+		"""
+
+		@return:
+		"""
 		if self.configuration.LogSettings.logToConsole:
 			return True
 		else:
 			return False
 
-	def diffRootedNodes(self, label_init, label_updated):
-		""" """
+	def diff_primary_nodes(self, label_init, label_updated):
+		"""
+		compares the sets of primary nodes between to given graphs identified by their timestamp labels
+		@param label_init: the graph of the initial model
+		@param label_updated: the graph of the updated model
+		@return: a list of unchanged (as tuple), added, and deleted primaryNodes
+		"""
 		
 		# retrieve nodes
 		nodes_init = self.__get_primary_nodes(label_init)

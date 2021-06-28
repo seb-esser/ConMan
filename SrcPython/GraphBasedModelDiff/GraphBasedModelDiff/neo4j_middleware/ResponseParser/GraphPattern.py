@@ -140,10 +140,11 @@ class GraphPattern:
 
         return cy_statement
 
-    def to_cypher_create(self, timestamp: str = None) -> str:
+    def to_cypher_create(self, timestamp: str = None, reference_structure = None) -> str:
         """
         creates a cypher query string to create a given graph pattern in a target graph
          without recognizing existing items
+        @param reference_structure:
         @param timestamp:
         @return: cypher query statement as str
         """
@@ -157,6 +158,10 @@ class GraphPattern:
 
         # init cypher query
         cy_list = []
+
+        if reference_structure is not None:
+            match_reference = reference_structure.to_cypher_indexed()
+            cy_list.append(match_reference)
 
         # in CREATE statements, each node can be created only once.
         # therefore, re-use its var name but do not re-create attributes etc

@@ -1,3 +1,4 @@
+from PatchManager.NodeMapping import NodeMapping
 from PatchManager.Operation import AbstractOperation
 import jsonpickle
 
@@ -11,6 +12,7 @@ class Patch(object):
         self.base_timestamp: str = ""
         # the timestamp the resulting model should carry
         self.resulting_timestamp: str = ""
+        self.connection_node_mapping = list[NodeMapping] = []
 
     def __repr__(self):
         return 'Patch object'

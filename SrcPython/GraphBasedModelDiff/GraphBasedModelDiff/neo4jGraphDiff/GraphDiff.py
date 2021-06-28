@@ -2,7 +2,8 @@ import asyncio
 
 from neo4jGraphDiff.Caption.ResultGenerator import ResultGenerator
 from neo4jGraphDiff.Config.Configuration import Configuration
-from neo4jGraphDiff.PrimaryNodeDiff import RootedNodeDiff
+from neo4jGraphDiff.ConnectionNodeDiff import ConnectionNodeDiff
+from neo4jGraphDiff.PrimaryNodeDiff import PrimaryNodeDiff
 from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -24,12 +25,18 @@ class GraphDiff:
 
         print(' ROOT DIFF \n')
 
-        rootedNodeDiff = RootedNodeDiff(connector, self.config)
-
-        [nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diffRootedNodes(self.label_init, self.label_updated)
+        # diff primary node sets
+        rootedNodeDiff = PrimaryNodeDiff(connector, self.config)
+        [nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diff_primary_nodes(self.label_init,
+                                                                                                self.label_updated)
 
         # save results to report
         self.report.capture_result_primary([nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted])
+
+        print(' CONNECTION NODE DIFF \n')
+        connectionNodeDiff = ConnectionNodeDiff(connector=connector, label_init=self.label_init,
+                                                label_updated=self.label_updated)
+        connectionNodeDiff.diff_connectionNodes()
 
         print('\n COMPONENT DIFF \n')
 
