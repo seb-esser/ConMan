@@ -19,11 +19,13 @@ connector.connect_driver()
 model_name_init = './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_single.ifc'
 model_name_updated = './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_double.ifc'
 
-label_init = 'ts20210616T145238'
-label_updated = 'ts20210616T145520'
+label_init = 'ts20210623T091748'
+label_updated = 'ts20210623T091749'
 
-skip_part_1 = True
-print_diff_report = False
+skip_part_1 = False
+print_diff_report = True
+
+connector.run_cypher_statement('MATCH (n) DETACH DELETE n')
 
 # 1 -- load models into graph --
 if not skip_part_1:
@@ -45,6 +47,10 @@ if print_diff_report:
 # 3 -- generate patch --
 patch_generator = PatchGenerator(connector=connector)
 patch = patch_generator.create_patch_from_graph_diff(report)
+
+f = patch.to_json()
+print(f)
+
 print(patch.operations[0].pattern.to_cypher_query_indexed())
 print(patch.operations[0].pattern.to_cypher_merge())
 # 4 -- receive and apply patch on a specified graph
