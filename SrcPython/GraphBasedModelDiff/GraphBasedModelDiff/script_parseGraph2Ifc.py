@@ -1,6 +1,6 @@
 
 
-from IfcGraphInterface.Graph2IfcTranslator import IfcGenerator
+from IfcGraphInterface.Graph2IfcTranslator import Graph2IfcTranslator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
@@ -41,7 +41,7 @@ def build_childs(n, rec):
 connector = Neo4jConnector()
 connector.connect_driver()
 
-generator = IfcGenerator()
+generator = Graph2IfcTranslator()
 query_factory = Neo4jQueryFactory()
 
 ts = "ts20200928T074754"
