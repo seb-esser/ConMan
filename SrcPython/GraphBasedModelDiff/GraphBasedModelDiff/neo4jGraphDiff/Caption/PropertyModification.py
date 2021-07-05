@@ -1,11 +1,12 @@
 from enum import Enum
 
-from neo4j_middleware.ResponseParser.GraphPath import GraphPath
+from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 
 
 class PropertyModification:
 
-    def __init__(self, id_init, id_updated, attrName, modificationType, value_old = None, value_new = None):
+    def __init__(self, id_init, id_updated, attrName, modificationType, pattern: GraphPattern, value_old = None, value_new = None):
+        self.pattern = pattern
         self.nodeId_init = id_init
         self.nodeId_updated = id_updated
         self.attrName = attrName
@@ -15,12 +16,6 @@ class PropertyModification:
               "deleted": PropertyModificationTypeEnum.DELETED,
               "modified": PropertyModificationTypeEnum.MODIFIED}
         self.modificationType = sw[modificationType]
-        self.path_init: GraphPath
-        self.path_updated: GraphPath
-
-    def set_paths(self, path_init, path_updated):
-        self.path_init = path_init
-        self.path_updated = path_updated
 
     def __repr__(self):
         return 'PMod: node_init: {} node_updated: {} attr: {} action: {} oldVal: {} newVal: {}' \

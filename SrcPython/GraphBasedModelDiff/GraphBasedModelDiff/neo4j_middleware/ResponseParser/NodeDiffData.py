@@ -1,5 +1,8 @@
+from typing import List
+
 from neo4jGraphDiff.Caption.PropertyModification import PropertyModification
 from neo4j_middleware.ResponseParser.GraphPath import GraphPath
+from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 
 
 class NodeDiffData:
@@ -29,16 +32,15 @@ class NodeDiffData:
         else:
             return False
 
-    def createPModDefinitions(self, nodeId_init: int, nodeId_updated: int, path_init: GraphPath, path_updated: GraphPath):
+    def createPModDefinitions(self, nodeId_init: int, nodeId_updated: int, pattern: GraphPattern):
         """
         creates a PropertyModification instance out of the given object data
+        @param pattern:
         @param nodeId_init: the node id of the modified node in the initial graph
         @param nodeId_updated: the node id of the modified node in the updated graph
-        @param path_init: the path between the primary node and the modified one
-        @param path_updated: the path between the primary node and the modified one
         @return:
         """
-        lst: list[PropertyModification] = []
+        lst: List[PropertyModification] = []
 
         for i in self.AttrsAdded.items():
             pm = PropertyModification(
@@ -46,10 +48,9 @@ class NodeDiffData:
                 nodeId_updated,
                 attrName=i[0],
                 modificationType="added",
+                pattern=pattern,
                 value_old=None,
                 value_new=i[1])
-            # add patterns to propertyModification instances
-            pm.set_paths(path_init=path_init, path_updated=path_updated)
 
             lst.append(pm)
 
@@ -59,10 +60,10 @@ class NodeDiffData:
                 nodeId_updated,
                 attrName=i[0],
                 modificationType="deleted",
+                pattern=pattern,
                 value_old=i[1],
                 value_new=None)
-            # add patterns to propertyModification instances
-            pm.set_paths(path_init=path_init, path_updated=path_updated)
+
             lst.append(pm)
 
         for i in self.AttrsModified.items():
@@ -71,10 +72,10 @@ class NodeDiffData:
                 nodeId_updated,
                 attrName=i[0],
                 modificationType="modified",
+                pattern=pattern,
                 value_old=i[1]['left'],
                 value_new=i[1]['right'])
-            # add patterns to propertyModification instances
-            pm.set_paths(path_init=path_init, path_updated=path_updated)
+
             lst.append(pm)
 
         return lst

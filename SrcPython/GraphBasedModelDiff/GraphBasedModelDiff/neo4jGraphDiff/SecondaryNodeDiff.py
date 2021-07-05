@@ -1,6 +1,8 @@
 """ packages """
 from typing import List
 
+from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
+
 """ modules """
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
 from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
@@ -154,11 +156,9 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
             root_init = diff_result_container.RootNode_init
             root_updated = diff_result_container.RootNode_updated
 
-            path_init = self.__get_path(root_init.id, node_init.id)
-            path_updated = self.__get_path(root_updated.id, node_updated.id)
+            pattern = self.__get_pattern(root_init.id, node_init.id)
 
-            pmod_list = nodeDiff.createPModDefinitions(node_init.id, node_updated.id, path_init=path_init,
-                                                       path_updated=path_updated)
+            pmod_list = nodeDiff.createPModDefinitions(node_init.id, node_updated.id, pattern=pattern)
             # append modifications to container
             diff_result_container.propertyModifications.extend(pmod_list)
         return diff_result_container
@@ -188,7 +188,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
 
         return nodeList
 
-    def __get_path(self, root_node_id: int, current_node_id: int) -> GraphPath:
+    def __get_pattern(self, root_node_id: int, current_node_id: int) -> GraphPattern:
         """
 
         @param root_node_id:
@@ -199,4 +199,5 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         res = self.connector.run_cypher_statement(cy)
 
         path = GraphPath.from_neo4j_response(res)
-        return path
+        pattern = GraphPattern(paths=[path])
+        return pattern

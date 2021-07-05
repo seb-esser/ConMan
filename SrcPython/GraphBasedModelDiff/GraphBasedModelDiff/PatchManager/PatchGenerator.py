@@ -47,10 +47,10 @@ class PatchGenerator:
         # ToDo: implement suitable approaches to capture connectionNode insertions and deletions
 
         # --- Primary Node Updates ---
-        added = res.ResultPrimaryDiff['added']
-        deleted = res.ResultPrimaryDiff['deleted']
+        added_primary_nodes = res.ResultPrimaryDiff['added']
+        deleted_primary_nodes = res.ResultPrimaryDiff['deleted']
 
-        for added_node in added:
+        for added_node in added_primary_nodes:
 
             # query position in primary structure
             cy = Neo4jQueryFactory.get_parent_connection_node(added_node.id)
@@ -67,10 +67,13 @@ class PatchGenerator:
             print('MATCH {} RETURN c'.format(reference_structure) )
             add_pattern = sub_pattern.to_cypher_create()
 
-            add_pattern_op = AddPatternOperation(pattern=add_pattern, reference_structure=reference_structure)
+            add_pattern_op = AddPatternOperation(pattern=add_pattern,
+                                                 reference_structure=reference_structure,
+                                                 prim_guid=ref_node.attrs['GlobalId'])
+
             self.patch.operations.append(add_pattern_op)
 
-        for deleted_node in deleted:
+        for deleted_node in deleted_primary_nodes:
             # query substructure from this node
             cy = Neo4jQueryFactory.get_distinct_paths_from_node(deleted_node.id)
             raw_res = self.connector.run_cypher_statement(cy)
@@ -83,43 +86,50 @@ class PatchGenerator:
         # --- Secondary modifications ---
 
         for mod in res.ResultComponentDiff:
-            prop_mods = mod.propertyModifications
-            struc_mods = mod.StructureModifications
+            property_mods = mod.propertyModifications
+            strucural_mods = mod.StructureModifications
 
             # Secondary: property modifications
-            for p in prop_mods:
-                mutation = {}
-                root_init = p.nodeId_init
-                root_updated = p.nodeId_updated
-
-                # calc hashsum
-                cy = Neo4jQueryFactory.get_hash_by_nodeId(res.timestamp_init, root_init, self.patch.ignore_attrs)
-                hashsum = self.connector.run_cypher_statement(cy, 'hash')[0]
+            for p in property_mods:
+                pattern: GraphPattern = p.pattern
+                pattern.load_rel_attrs(connector=self.connector)
+                entry_node = pattern.get_entry_node()
+                primary_node_guid = entry_node.attrs['GlobalId']
 
                 if p.modificationType == PropertyModificationTypeEnum.ADDED:
-                    operation = AddAttributeOperation(prim_hash=hashsum,
-                                                      pattern=p.path_init.to_patch(),
+
+                    operation = AddAttributeOperation(prim_guid=primary_node_guid,
+                                                      pattern=pattern,
                                                       attrName=p.attrName,
                                                       attrValNew=p.valueNew)
 
                 elif p.modificationType == PropertyModificationTypeEnum.DELETED:
-                    operation = DeleteAttributeOperation(prim_guid=hashsum, pattern=p.path_init.to_patch(),
-                                                         attrName=p.attrName, attrValOld=p.valueOld)
+                    operation = DeleteAttributeOperation(prim_guid=primary_node_guid,
+                                                         pattern=pattern,
+                                                         attrName=p.attrName,
+                                                         attrValOld=p.valueOld)
 
                 elif p.modificationType == PropertyModificationTypeEnum.MODIFIED:
-                    operation = ModifyAttributeOperation(prim_guid=hashsum, pattern=p.path_init.to_patch(),
-                                                         attrName=p.attrName, attrValOld=p.valueOld,
+                    operation = ModifyAttributeOperation(prim_guid=primary_node_guid,
+                                                         pattern=pattern,
+                                                         attrName=p.attrName,
+                                                         attrValOld=p.valueOld,
                                                          attrValNew=p.valueNew)
                 else:
-                    raise Exception("unhandled modification type occured")
+                    raise Exception("unhandled modification type occurred")
                 # assign operation to patch
                 self.patch.operations.append(operation)
 
             # Secondary: structural modifications
-            for s in struc_mods:
-                print(s)
+            for s in strucural_mods:
+                pass
+                # print(s)
 
         return self.patch
 
     def export_to_json(self):
+        """
+        returns a json object
+        @return:
+        """
         return self.patch.to_json()

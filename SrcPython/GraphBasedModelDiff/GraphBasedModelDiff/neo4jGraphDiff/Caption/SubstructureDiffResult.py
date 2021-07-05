@@ -30,24 +30,20 @@ class SubstructureDiffResult(Result):
                             modType: str,
                             value_old,
                             value_new,
-                            graph_path_init,
-                            graph_path_updated):
+                            graphPattern):
         """
         captures a property modification on node attributes
+        @param graphPattern:
         @param nodeId_init:
         @param nodeId_updated:
         @param attrName:
         @param modType:
         @param value_old:
         @param value_new:
-        @param graph_path_init:
-        @param graph_path_updated:
+
         @return:
         """
-        modification = PropertyModification(nodeId_init, nodeId_updated, attrName, modType, value_old, value_new)
-
-        # set exact graph path
-        modification.set_paths(graph_path_init, graph_path_updated)
+        modification = PropertyModification(nodeId_init, nodeId_updated, attrName, modType, graphPattern, value_old, value_new)
 
         self.propertyModifications.append(modification)
         self.isSimilar = False

@@ -1,9 +1,10 @@
 from PatchManager.Operation.AttributeOperations.AttributeOperation import AttributeOperation
+from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 
 
 class ModifyAttributeOperation(AttributeOperation):
 
-    def __init__(self, prim_guid: str, pattern: str, attrName: str, attrValOld, attrValNew):
+    def __init__(self, prim_guid: str, pattern: GraphPattern, attrName: str, attrValOld, attrValNew):
         """
 
         @param prim_guid:

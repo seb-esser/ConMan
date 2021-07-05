@@ -98,4 +98,9 @@ class GraphPath:
             else:
                 raise Exception('could not find edgeItem in segments of current path. ')
 
-
+    def get_entry_node(self) -> NodeItem:
+        """
+        returns the first node of the path
+        @return:
+        """
+        return self.segments[0].startNode
