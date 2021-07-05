@@ -7,7 +7,10 @@ import ifcopenshell
 create_guid = lambda: ifcopenshell.guid.compress(uuid.uuid1().hex)
 
 
-class IfcGenerator:
+class Graph2IfcTranslator:
+    """
+
+    """
 
     def __init__(self):
 
