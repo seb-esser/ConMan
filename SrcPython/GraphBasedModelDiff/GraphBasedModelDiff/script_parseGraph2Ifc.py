@@ -51,7 +51,7 @@ for cnode in connection_nodes:
     # build IFC entity
     generator.build_entity(cnode.id, cnode.entityType, cnode.attrs)
 
-    # build the childe (non-recursive)
+    # build the childs (non-recursive)
     generator.build_childs(n, False, connector, ts)
 
     
