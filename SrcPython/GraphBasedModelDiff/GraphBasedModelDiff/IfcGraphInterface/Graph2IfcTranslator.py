@@ -95,10 +95,9 @@ class Graph2IfcTranslator:
 
     def build_childs(self, n, rec):
         """
-
+        queries all direct child nodes to node n and inserts their semantics into the IFC SPF model
         @param n:
-        @param rec:
-        @param ts:
+        @param rec: triggers if this method should be carried out recursively
         @return:
         """
     # build association
@@ -107,14 +106,17 @@ class Graph2IfcTranslator:
         raw_res = self.connector.run_cypher_statement(cy)
 
         # cast cypher response in a list of node items
-        childs = NodeItem.fromNeo4jResponseWithRel(raw_res)
-        if len(childs) == 0:
+        child_nodes = NodeItem.fromNeo4jResponseWithRel(raw_res)
+
+        # check if leaf node was found
+        if len(child_nodes) == 0:
             return
 
-        for c in childs:
+        for c in child_nodes:
             # query all node properties of n
             cy = query_factory.get_node_properties_by_id(c.id)
             raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
+
             # assign properties to node object
             c.setNodeAttributes(raw_res)
 
@@ -161,7 +163,7 @@ class Graph2IfcTranslator:
         @return:
         """
 
-         # get all primary nodes
+        # get all primary nodes
         cy = Neo4jQueryFactory.get_primary_nodes(self.ts)
         raw_res = self.connector.run_cypher_statement(cy)
 
