@@ -81,8 +81,10 @@ class Graph2IfcTranslator:
                     lst = []
                 elif type(lst) is tuple:
                     lst = list(lst)
-                lst.append(child)
-                setattr(parent, name, lst)
+
+                if child not in lst:
+                    lst.append(child)
+                    setattr(parent, name, lst)
             except:
                 print('Skip building {} between #{} and #{}'.format(association_name, spf_id_parent, spf_id_child))
         else:
