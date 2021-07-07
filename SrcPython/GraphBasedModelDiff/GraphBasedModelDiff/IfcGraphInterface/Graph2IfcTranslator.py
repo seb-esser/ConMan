@@ -5,6 +5,8 @@ from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 import ifcopenshell
 
+from neo4j_middleware.neo4jConnector import Neo4jConnector
+
 create_guid = lambda: ifcopenshell.guid.compress(uuid.uuid1().hex)
 
 
@@ -13,11 +15,16 @@ class Graph2IfcTranslator:
 
     """
 
-    def __init__(self):
+    def __init__(self, connector: Neo4jConnector, ts: str):
+        """
 
-        self.model = ifcopenshell.file(schema='IFC4')
+        @param connector:
+        @param ts:
+        """
+        self.model = ifcopenshell.file(schema='IFC4x1')
         self.node_id_2_spf_id = {}
-        pass
+        self.connector = connector
+        self.ts = ts
 
     def get_model(self):
         """
@@ -29,6 +36,7 @@ class Graph2IfcTranslator:
     def build_entity(self, graph_node_id: int, class_name: str, attributes: dict):
         """
         builds an entity and adds it into the ifc model
+        @param graph_node_id:
         @param class_name:
         @param attributes:
         @return: the SPF ID
@@ -50,6 +58,13 @@ class Graph2IfcTranslator:
             raise Exception("Error in creating ifc entity. ")
 
     def build_association(self, parent_node_id: int, child_node_id: int, association_name: str):
+        """
+        creates an association among two IFC entities specified by an directed edge in the graph representation
+        @param parent_node_id:
+        @param child_node_id:
+        @param association_name:
+        @return:
+        """
         spf_id_parent = self.node_id_2_spf_id[parent_node_id]
         spf_id_child = self.node_id_2_spf_id[child_node_id]
 
@@ -76,11 +91,18 @@ class Graph2IfcTranslator:
             except:
                 print('Skip building {} between #{} and #{}'.format(association_name, spf_id_parent, spf_id_child))
 
-    def build_childs(self, n, rec, connector, ts):
+    def build_childs(self, n, rec):
+        """
+
+        @param n:
+        @param rec:
+        @param ts:
+        @return:
+        """
     # build association
         query_factory = Neo4jQueryFactory()
-        cy = query_factory.get_child_nodes(ts, n.id)
-        raw_res = connector.run_cypher_statement(cy)
+        cy = query_factory.get_child_nodes(self.ts, n.id)
+        raw_res = self.connector.run_cypher_statement(cy)
 
         # cast cypher response in a list of node items
         childs = NodeItem.fromNeo4jResponseWithRel(raw_res)
@@ -90,7 +112,7 @@ class Graph2IfcTranslator:
         for c in childs:
             # query all node properties of n
             cy = query_factory.get_node_properties_by_id(c.id)
-            raw_res = connector.run_cypher_statement(cy, "properties(n)")
+            raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
             # assign properties to node object
             c.setNodeAttributes(raw_res)
 
@@ -106,7 +128,7 @@ class Graph2IfcTranslator:
             self.build_association(n.id, c.id, c.relType)
 
             if rec:
-                self.build_childs(c, True, connector, ts)
+                self.build_childs(c, True)
 
     def lookup_ifc_counterpart_exists(self, node_id) -> int:
         """
@@ -130,3 +152,56 @@ class Graph2IfcTranslator:
             return True
         except:
             return False
+
+    def generateSPF(self):
+        """
+        translates a graph from neo4j into an IFC SPF file
+        @return:
+        """
+
+         # get all primary nodes
+        cy = Neo4jQueryFactory.get_primary_nodes(self.ts)
+        raw_res = self.connector.run_cypher_statement(cy)
+
+        # cast cypher response in a list of node items
+        nodes = NodeItem.fromNeo4jResponseWouRel(raw_res)
+
+        print('---- Building primary & secondary nodes. ----')
+        for n in nodes:
+            # query all node properties of n
+            cy = Neo4jQueryFactory.get_node_properties_by_id(n.id)
+            raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
+            # assign properties to node object
+            n.setNodeAttributes(raw_res)
+
+            n.tidy_attrs()
+
+            # build IFC entity
+            self.build_entity(n.id, n.entityType, n.attrs)
+
+            self.build_childs(n, True)
+
+        print('---- Primary & secondary nodes done. ----')
+
+        # get all connection nodes
+        cn = Neo4jQueryFactory.get_connection_nodes(self.ts)
+        raw_res = self.connector.run_cypher_statement(cn)
+
+        connection_nodes = NodeItem.fromNeo4jResponseWouRel(raw_res)
+
+        print('---- Building connection nodes. ----')
+        for cnode in connection_nodes:
+            cy = Neo4jQueryFactory.get_node_properties_by_id(cnode.id)
+            raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
+            # assign properties to node object
+            cnode.setNodeAttributes(raw_res)
+
+            cnode.tidy_attrs()
+
+            # build IFC entity
+            self.build_entity(cnode.id, cnode.entityType, cnode.attrs)
+
+            # build the childs (non-recursive)
+            self.build_childs(n, False)
+
+        print('---- Connection Nodes done. ----')
