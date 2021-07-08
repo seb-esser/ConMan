@@ -7,9 +7,6 @@ import ifcopenshell
 
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
-create_guid = lambda: ifcopenshell.guid.compress(uuid.uuid1().hex)
-
-
 class Graph2IfcTranslator:
     """
 
@@ -41,8 +38,6 @@ class Graph2IfcTranslator:
         @param attributes:
         @return: the SPF ID
         """
-
-
 
         try:
             print('building entity {}'.format(class_name))
@@ -206,6 +201,6 @@ class Graph2IfcTranslator:
             self.build_entity(cnode.id, cnode.entityType, cnode.attrs)
 
             # build the childs (non-recursive)
-            self.build_childs(n, False)
+            self.build_childs(cnode, False)
 
         print('---- Connection Nodes done. ----')
