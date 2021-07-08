@@ -23,7 +23,7 @@ label_init = 'ts20210623T091748'
 label_updated = 'ts20210623T091749'
 
 skip_part_1 = False
-print_diff_report = True
+print_diff_report = False
 
 connector.run_cypher_statement('MATCH (n) DETACH DELETE n')
 

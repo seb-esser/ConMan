@@ -59,7 +59,9 @@ class NodeItem:
     def fromNeo4jResponseWouRel(cls, raw: str) -> list:
         ret_val = []
         for inst in raw:
-            child = cls(nodeId=int(inst[0]), relType=None, entityType=inst[1], nodeType=None)
+            node_labels = list(inst[3])
+            node_type = [x for x in node_labels if not x.startswith('ts')][0]
+            child = cls(nodeId=int(inst[0]), relType=None, entityType=inst[1], nodeType=node_type)
             attrs = inst[2]
             child.attrs = attrs
             ret_val.append(child)

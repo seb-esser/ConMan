@@ -58,7 +58,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH (n:ConnectionNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n)'
+        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod

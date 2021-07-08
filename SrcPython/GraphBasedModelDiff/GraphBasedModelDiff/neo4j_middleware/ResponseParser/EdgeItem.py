@@ -102,6 +102,20 @@ class EdgeItem:
             segment_identifier)
         return cy
 
+    def to_cypher_individual_merge(self, target_timestamp: str, segment_identifier: int, relationship_iterator: int):
+        cy1 = 'MERGE {}'.format(
+            self.startNode.to_cypher(
+                node_identifier='a', include_nodeType_label=True, timestamp=target_timestamp)
+        )
+        cy2 = 'MERGE {}'.format(
+            self.endNode.to_cypher(
+                node_identifier='b', include_nodeType_label=True, timestamp=target_timestamp)
+        )
+        cy3 = 'MERGE (a)-[r{0}{1}:rel{2}]->(b)'.format(
+            segment_identifier, relationship_iterator, Neo4jFactory.formatDict(self.attributes))
+
+        return Neo4jFactory.BuildMultiStatement([cy1, cy2, cy3])
+
 
 
 
