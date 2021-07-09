@@ -178,7 +178,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match = 'MATCH pattern = (n)-[*..10]->(m)'
         where = 'WHERE ID(n) = {}'.format(node_id)
-        ret = 'RETURN pattern'
+        ret = 'RETURN pattern, NODES(pattern), RELATIONSHIPS(pattern)'
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     @classmethod

@@ -97,7 +97,7 @@ class NodeItem:
         else:
             self.attrs = attrs
 
-    def tidy_attrs(self):
+    def tidy_attrs(self, remove_None_values: bool = True):
         """
         removes entityType and p21_id from attr dict
         @return:
@@ -106,14 +106,15 @@ class NodeItem:
         self.attrs.pop("p21_id", None)
         self.attrs.pop('relType', None)
 
-        # remove attrs that have a none value assigned
-        cleared_dict = {}
-        for key, val in self.attrs.items():
-            if val != 'None':
-                cleared_dict[key] = val
-            if key in ['Coordinates', 'DirectionRatios']:
-                cleared_dict[key] = eval(val)
-        self.attrs = cleared_dict
+        if remove_None_values is True:
+            # remove attrs that have a none value assigned
+            cleared_dict = {}
+            for key, val in self.attrs.items():
+                if val != 'None':
+                    cleared_dict[key] = val
+                if key in ['Coordinates', 'DirectionRatios']:
+                    cleared_dict[key] = eval(val)
+            self.attrs = cleared_dict
 
     def to_cypher(self, timestamp: str = None, node_identifier: str = None, include_nodeType_label: bool = False):
         """

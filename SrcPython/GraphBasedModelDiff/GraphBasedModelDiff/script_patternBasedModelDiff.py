@@ -1,0 +1,33 @@
+from neo4jGraphDiff.HierarchyPatternDiff import HierarchyPatternDiff
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
+from neo4j_middleware.neo4jConnector import Neo4jConnector
+
+connector = Neo4jConnector()
+
+connector.connect_driver()
+
+ts_init = 'ts20210623T091748'
+ts_updated = 'ts20210623T091749'
+
+# get topmost entry nodes
+raw_init = connector.run_cypher_statement(
+    """
+    MATCH (n:PrimaryNode:{}) 
+    WHERE n.EntityType = "IfcProject" 
+    RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)
+    """.format(ts_init))
+raw_updated = connector.run_cypher_statement(
+    """
+    MATCH (n:PrimaryNode:{}) 
+    WHERE n.EntityType = "IfcProject" 
+    RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)
+    """.format(ts_updated))
+
+entry_init: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_init)[0]
+entry_updated: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_updated)[0]
+
+pattern_diff = HierarchyPatternDiff(connector=connector)
+patterns_are_similar = pattern_diff.diffPatterns(entry_init, entry_updated)
+
+
+

@@ -113,7 +113,7 @@ class GraphPattern:
             path_iterator += 1
             cy_list.append(' ')
 
-        include_primary_paths = False
+        include_primary_paths = True
         if include_primary_paths:
             prm_paths = self.query_primary_paths()
             cy_list += prm_paths
@@ -394,8 +394,19 @@ class GraphPattern:
         cy_list = []
         it = 0
         for n in unified_nodes:
-            cy = 'OPTIONAL MATCH primPath{0} = (n{1})<-[*..3]-(primaryN{1}: PrimaryNode) '.format(it, n.id)
+            cy = 'OPTIONAL MATCH refPath{0} = (n{1})--(refNode{1}) '.format(it, n.id)
             cy_list.append(cy)
             it += 1
         return cy_list
 
+    def tidy_node_attributes(self):
+        """
+        removes all p21_id attributes from nodes involved in this pattern
+        @return:
+        """
+        for p in self.paths:
+            for e in p.segments:
+                n1: NodeItem = e.startNode
+                n2: NodeItem = e.startNode
+                n1.tidy_attrs(remove_None_values=False)
+                n2.tidy_attrs(remove_None_values=False)

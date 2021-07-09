@@ -59,41 +59,20 @@ class PatchGenerator:
             sub_pattern = GraphPattern.from_neo4j_response(raw_res)
             sub_pattern.load_rel_attrs(self.connector)
 
-            con_node = sub_pattern.get_entry_node()
-            new_node = added_node
-
             cy = sub_pattern.to_cypher_merge_separated(timestamp=self.patch.base_timestamp)
             print(cy)
-
-            merge_con = 'MERGE {}'.format(con_node.to_cypher(
-                node_identifier='con',
-                include_nodeType_label=True,
-                timestamp=self.patch.resulting_timestamp))
-
-            merge_added_node = 'MERGE {}'.format(new_node.to_cypher(
-                node_identifier='p',
-                include_nodeType_label=True,
-                timestamp=self.patch.resulting_timestamp))
-
-            build_rel = 'MERGE (con)-[rel]->(p)'
-
-            print(merge_con)
-            print(merge_added_node)
-            print(build_rel)
-
-            add_pattern_op = AddPatternOperation(pattern=add_pattern,
-                                                 reference_structure=reference_structure,
-                                                 prim_guid=ref_node.attrs['GlobalId'])
-
 
             # -- STEP 2 : Define Graph rewriting rule including leftHandSide and rightHandSide
             cy = Neo4jQueryFactory.get_pattern_by_node_id(added_node.id)
             raw_res = self.connector.run_cypher_statement(cy)
             added_pattern = GraphPattern.from_neo4j_response(raw_res)
+            added_pattern.load_rel_attrs(connector=self.connector)
+            added_pattern.tidy_node_attributes()
 
             match_statement = added_pattern.to_cypher_query_indexed()
-            print('MATCH {} RETURN path'.format(match_statement))
+            print('{}'.format(match_statement))
 
+            a = 1
 
             # create instance of addPatternOperation
 
