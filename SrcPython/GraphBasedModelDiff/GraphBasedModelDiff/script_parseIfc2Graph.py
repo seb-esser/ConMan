@@ -31,6 +31,8 @@ paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresen
          './00_sampleData/IFC_stepP21/GeomRepresentation_03/Update_GeomRepresentation_03.ifc',# 1 proxy as cylinder -> mainly PMod,
          './00_sampleData/IFC_stepP21/GeomRepresentation_04/Initial_GeomRepresentation_04.ifc',  # extrudedArea
          './00_sampleData/IFC_stepP21/GeomRepresentation_04/Update_GeomRepresentation_04.ifc',  # BRep -> structural Mod
+         './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_single.ifc',
+         './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_double.ifc',
          './00_sampleData/IFC_stepP21/wall-column/Wall-Column.ifc',
          './00_sampleData/IFC_stepP21/wall-column/Column-Wall.ifc',
          './00_sampleData/IFC_stepP21/SleeperSample/sleeper_init.ifc',
