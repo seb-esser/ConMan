@@ -32,8 +32,8 @@ class NodeMatchingTable:
 
 class NodePair:
     def __init__(self, init: NodeItem, updated: NodeItem):
-        self.init_node = init
-        self.updated_node = updated
+        self.init_node: NodeItem = init
+        self.updated_node: NodeItem = updated
 
     def __repr__(self):
         return 'NodePair: entityType: {} ID_init: {} ID_updated: {}'.format(self.init_node.entityType,

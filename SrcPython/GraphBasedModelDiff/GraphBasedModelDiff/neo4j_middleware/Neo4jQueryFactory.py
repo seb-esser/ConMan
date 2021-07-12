@@ -1,3 +1,6 @@
+from typing import List
+
+from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
 from .Neo4jFactory import Neo4jFactory
 
 
@@ -135,12 +138,16 @@ class Neo4jQueryFactory(Neo4jFactory):
         return 'MATCH (n) WHERE ID(n)={} RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)'.format(nodeId)
 
     @classmethod
-    def get_hierarchical_prim_nodes(cls, node_id: int) -> str:
+    def get_hierarchical_prim_nodes(cls, node_id: int, exclude_nodes: List[NodePair] = []) -> str:
+        va = ''
+        for n in exclude_nodes:
+            va += '{}, {}, '.format(n.init_node.id, n.updated_node.id)
+
         return """
             MATCH (n)<-[r1]-(c:ConnectionNode)-[r2]->(m:PrimaryNode) 
-            WHERE ID(n) = {} AND NOT r1 = r2
+            WHERE ID(n) = {} AND NOT r1 = r2 AND NOT(ID(m) IN [{}])
             RETURN ID(m), m.EntityType, PROPERTIES(m), LABELS(m)
-            """.format(node_id)
+            """.format(node_id, va[:-2])
 
     @classmethod
     def get_node_properties_by_id(cls, nodeId: int) -> str:

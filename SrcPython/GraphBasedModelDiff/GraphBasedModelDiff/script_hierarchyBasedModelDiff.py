@@ -30,7 +30,7 @@ entry_init: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_init)[0]
 entry_updated: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_updated)[0]
 
 pDiff = HierarchyPatternDiff(connector=connector, ts_init=ts_init, ts_updated=ts_updated)
-pDiff.diff_subgraphs(entry_init, entry_updated)
+result = pDiff.diff_subgraphs(entry_init, entry_updated)
 
 # diff rooted nodes
 

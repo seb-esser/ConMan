@@ -1,4 +1,7 @@
+from typing import List
+
 from neo4jGraphDiff.AbsDirectedSubgraphDiff import AbsDirectedSubgraphDiff
+from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
 from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
@@ -23,7 +26,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         self.diff_result: SubstructureDiffResult = SubstructureDiffResult()
 
-        # self.visited_con_nodes
+        self.visited_primary_nodes: List[NodePair] = []
 
     def diff_subgraphs(self, entry_init: NodeItem, entry_updated: NodeItem):
         """
@@ -33,12 +36,16 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         @return:
         """
 
+        self.visited_primary_nodes.append(NodePair(entry_init, entry_updated))
+
         # run diff and get node matching
         self.diff_result = self.diff_engine.diff_subgraphs(entry_init, entry_updated)
 
         # run subgraph diff again and consider already matched node pairs now
-        cy_next_nodes_init = Neo4jQueryFactory.get_hierarchical_prim_nodes(entry_init.id)
-        cy_next_nodes_upd = Neo4jQueryFactory.get_hierarchical_prim_nodes(entry_updated.id)
+        cy_next_nodes_init = Neo4jQueryFactory.get_hierarchical_prim_nodes(node_id=entry_init.id,
+                                                                           exclude_nodes=self.visited_primary_nodes)
+        cy_next_nodes_upd = Neo4jQueryFactory.get_hierarchical_prim_nodes(node_id=entry_updated.id,
+                                                                          exclude_nodes=self.visited_primary_nodes)
 
         raw_init = self.connector.run_cypher_statement(cy_next_nodes_init)
         raw_updated = self.connector.run_cypher_statement(cy_next_nodes_upd)
@@ -47,7 +54,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         next_nodes_upd = NodeItem.fromNeo4jResponseWouRel(raw_updated)
 
         # check if no new children got found:
-        if len(next_nodes_init) and len(next_nodes_upd) == 0:
+        if len(next_nodes_init) == 0 and len(next_nodes_upd) == 0:
             return self.diff_result
 
         # calc node intersection
