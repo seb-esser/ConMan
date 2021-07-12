@@ -21,7 +21,7 @@ class PatchGenerator:
         self.connector: Neo4jConnector = connector
 
     def __repr__(self):
-        return 'Patch generator translating a given DiffResult object into a patch object'
+        return 'Patch generator translating a given diff_result object into a patch object'
 
     def get_patch(self) -> Patch:
         """

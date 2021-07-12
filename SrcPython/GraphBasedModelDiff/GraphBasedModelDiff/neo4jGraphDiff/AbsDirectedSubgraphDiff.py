@@ -69,7 +69,7 @@ class AbsDirectedSubgraphDiff(abc.ABC):
     def apply_DiffIgnore_Nodes(self, node_list):
         """ removes nodes from a list if their type is set to be ignored """
 
-        # ToDo: Logging: Add info statement that ingoreNodes got applied. 
+        # ToDo: Logging: Add info statement that ignoreNodes got applied.
 
         # get entity types that shall be ignored in the subgraph diff
         ignore_entityTypes = self.configuration.DiffSettings.diffIgnoreEntityTypes  # list of strings

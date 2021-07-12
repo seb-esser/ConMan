@@ -13,7 +13,7 @@ from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 class SubstructureDiffResult(Result):
     """carries the diff result """
 
-    def __init__(self, root_init: NodeItem, root_updated: NodeItem, method=None):
+    def __init__(self, root_init: NodeItem = None, root_updated: NodeItem = None, method=None):
         super().__init__()
         self.isSimilar: bool = True
         self.method = method

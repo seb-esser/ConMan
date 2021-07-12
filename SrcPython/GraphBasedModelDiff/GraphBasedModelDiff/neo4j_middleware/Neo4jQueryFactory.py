@@ -137,8 +137,8 @@ class Neo4jQueryFactory(Neo4jFactory):
     @classmethod
     def get_hierarchical_prim_nodes(cls, node_id: int) -> str:
         return """
-            MATCH (n)<--(c:ConnectionNode)-->(m:PrimaryNode) 
-            WHERE ID(n) = {}
+            MATCH (n)<-[r1]-(c:ConnectionNode)-[r2]->(m:PrimaryNode) 
+            WHERE ID(n) = {} AND NOT r1 = r2
             RETURN ID(m), m.EntityType, PROPERTIES(m), LABELS(m)
             """.format(node_id)
 

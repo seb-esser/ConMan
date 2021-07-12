@@ -29,27 +29,8 @@ raw_updated = connector.run_cypher_statement(
 entry_init: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_init)[0]
 entry_updated: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_updated)[0]
 
-# calc diff on substructure
-diff_engine = DfsIsomorphismCalculator(connector=connector,
-                                       label_init=ts_init,
-                                       label_updated=ts_updated,
-                                       config=Configuration.basic_config())
-
-# run diff and get node matching
-res = diff_engine.diff_subgraphs(entry_init, entry_updated)
-
-# get conNode and related primary nodes
-print(res)
-# run subgraph diff again and consider already matched node pairs now
-
-cy_next_nodes_init = Neo4jQueryFactory.get_hierarchical_prim_nodes(entry_init.id)
-cy_next_nodes_upd = Neo4jQueryFactory.get_hierarchical_prim_nodes(entry_updated.id)
-
-raw_init = connector.run_cypher_statement(cy_next_nodes_init)
-raw_updated = connector.run_cypher_statement(cy_next_nodes_upd)
-
-next_nodes_init = NodeItem.fromNeo4jResponseWouRel(raw_init)
-next_nodes_upd = NodeItem.fromNeo4jResponseWouRel(raw_updated)
+pDiff = HierarchyPatternDiff(connector=connector, ts_init=ts_init, ts_updated=ts_updated)
+pDiff.diff_subgraphs(entry_init, entry_updated)
 
 # diff rooted nodes
 
