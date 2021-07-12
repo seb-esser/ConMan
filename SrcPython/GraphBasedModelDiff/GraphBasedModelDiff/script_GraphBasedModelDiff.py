@@ -35,7 +35,7 @@ def main():
 
     diff = GraphDiff(label_init, label_updated)
     patch = diff.run_diff(connector=connector)
-
+    patch.print_report()
 
 # asyncio.run(main())
 main()

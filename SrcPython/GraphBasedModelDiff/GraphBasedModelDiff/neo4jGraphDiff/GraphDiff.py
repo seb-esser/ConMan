@@ -47,21 +47,30 @@ class GraphDiff:
         print('\n COMPONENT DIFF \n')
 
         # 2: Check sub-graphs for each rooted node
-        DiffEngine = DfsIsomorphismCalculator(connector, self.label_init, self.label_updated, self.config)
 
-        self.calc_secondary(DiffEngine, nodes_unchanged)
+        self.calc_secondary(connector=connector, nodes_unchanged=nodes_unchanged)
 
         return self.report
 
-    def calc_secondary(self, DiffEngine, nodeIDs_unchanged):
+    def calc_secondary(self, connector: Neo4jConnector, nodes_unchanged):
+
         all_tasks = []
-        for pair in nodeIDs_unchanged:
+        for pair in nodes_unchanged:
+            DiffEngine = DfsIsomorphismCalculator(connector=connector,
+                                                  label_init=self.label_init,
+                                                  label_updated=self.label_updated,
+                                                  config=self.config)
+
             node_init = pair[0]
             node_updated = pair[1]
             print('[TASK] Compare objects with root nodeIDs {}'.format(pair))
 
             # run component diff
-            res = DiffEngine.diff_subgraphs(node_init, node_updated)
+            DiffEngine.diff_subgraphs(node_init, node_updated)
+
+            # get result
+            res = DiffEngine.get_diff_result()
+
             self.report.capture_result_secondary(res)
 
             # run component diff async

@@ -28,7 +28,37 @@ class NodeMatchingTable:
         for pair in matchedNodes.matched_nodes:
             if pair not in self.matched_nodes:
                 self.matched_nodes.append(pair)
-        
+
+    def get_all_init_nodes(self):
+        return [x.init_node for x in self.matched_nodes]
+
+    def get_all_updated_nodes(self):
+        return [x.updated_node for x in self.matched_nodes]
+
+    def node_involved_in_nodePair(self, node: NodeItem):
+        """
+        returns true if nodeItem is captured within a node pair
+        @param node:
+        @return:
+        """
+        if node in self.get_all_init_nodes():
+            return True
+        elif node in self.get_all_updated_nodes():
+            return True
+        else:
+            return False
+
+    def node_pair_in_matching_table(self, pair):
+        """
+        returns true if a NodePair item is already listed in the matching table
+        @param pair:
+        @return:
+        """
+        if pair in self.matched_nodes:
+            return True
+        else:
+            return False
+
 
 class NodePair:
     def __init__(self, init: NodeItem, updated: NodeItem):
@@ -36,6 +66,7 @@ class NodePair:
         self.updated_node: NodeItem = updated
 
     def __repr__(self):
-        return 'NodePair: entityType: {} ID_init: {} ID_updated: {}'.format(self.init_node.entityType,
-                                                                          self.init_node.id,
-                                                                          self.updated_node.id)
+        return 'NodePair: entityType: {} ID_init: {} ID_updated: {}'.format(
+            self.init_node.entityType,
+            self.init_node.id,
+            self.updated_node.id)

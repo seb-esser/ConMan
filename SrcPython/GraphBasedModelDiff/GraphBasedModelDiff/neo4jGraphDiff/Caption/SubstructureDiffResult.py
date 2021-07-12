@@ -62,6 +62,8 @@ class SubstructureDiffResult(Result):
     def increaseRecursionCounter(self):
         self.recursionCounter += 1
 
-
+    def set_nodes(self, node_init, node_updated):
+        self.RootNode_init = node_init
+        self.RootNode_updated = node_updated
 
 

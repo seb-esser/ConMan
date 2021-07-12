@@ -1,6 +1,7 @@
 """ packages """
 from typing import List
 
+from neo4jGraphDiff.Caption.NodeMatchingTable import NodeMatchingTable, NodePair
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 
 """ modules """
@@ -19,28 +20,30 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
 
     def __init__(self, connector, label_init, label_updated, config):
         super().__init__(connector, label_init, label_updated, config)
+        self.diffContainer = SubstructureDiffResult(method="Node-Diff")
+
+    def get_diff_result(self):
+        return self.diffContainer
 
     # public overwrite method requested by abstract superclass AbsDirectedSubgraphDiff
-    def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem) -> SubstructureDiffResult:
+    def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem):
 
-        diffContainer = SubstructureDiffResult(method="Node-Diff", root_init=node_init, root_updated=node_updated)
+        # store entry points
+        self.diffContainer.set_nodes(node_init, node_updated)
 
         # start recursion
-        diffContainer = self.__compare_children(node_init, node_updated, diffContainer, indent=0)
-        return diffContainer
+        self.__compare_children(node_init, node_updated, indent=0)
 
     async def diff_subgraphs_async(self, node_init: NodeItem, node_updated: NodeItem) -> SubstructureDiffResult:
         """
 
         """
-        diffContainer = SubstructureDiffResult(method="Node-Diff", root_init=node_init, root_updated=node_updated)
+        self.diffContainer.set_nodes(node_init, node_updated)
 
         # start recursion
-        diffContainer = self.__compare_children(node_init, node_updated, diffContainer)
+        self.__compare_children(node_init, node_updated)
 
-        return diffContainer
-
-    def __compare_children(self, node_init, node_updated, diff_result_container, indent = 0):
+    def __compare_children(self, node_init, node_updated, indent = 0):
         """
         queries the all child nodes of a node and compares the results between
         the initial and the updated graph based on AttrDiff
@@ -48,7 +51,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
 
         desiredMatchMethod = self.configuration.DiffSettings.MatchingType_Childs
 
-        diff_result_container.increaseRecursionCounter()
+        self.diffContainer.increaseRecursionCounter()
 
         if self.toConsole():
             print("".ljust(indent * 4) +
@@ -62,7 +65,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         if len(children_init) == 0 and len(children_updated) == 0:
             if self.toConsole():
                 print("".ljust(indent * 4) + ' leaf node.')
-            return diff_result_container
+            return
 
         # calc hashes if necessary for matching method
         if desiredMatchMethod == MatchCriteriaEnum.OnHash:
@@ -77,8 +80,6 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         # compare children and raise an dissimilarity if necessary.
         [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(children_init, children_updated,
                                                                                      desiredMatchMethod)
-        for n1, n2 in nodes_unchanged:
-            diff_result_container.nodeMatchingTable.add_matched_nodes(n1, n2)
 
         if self.toConsole():
             print('')
@@ -89,26 +90,31 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         if len(nodes_added) != 0 or len(nodes_deleted) != 0:
             # log structural modifications
             for ch in nodes_added:
-                diff_result_container.logStructureModification(node_updated.id, ch.id, 'added')
+                self.diffContainer.logStructureModification(node_updated.id, ch.id, 'added')
 
             for ch in nodes_deleted:
-                diff_result_container.logStructureModification(node_init.id, ch.id, 'deleted')
+                self.diffContainer.logStructureModification(node_init.id, ch.id, 'deleted')
 
         # --- 3 --- loop over all matching child pairs and detect their similarities and differences
 
         # check the nodes that have the same relationship OR the same EntityType and the same node type: 
         for matchingChildPair in nodes_unchanged:
             # detect changes on property level between both matching nodes
-            diff_result_container = self.__calcPropertyDifference(
-                diff_result_container, matchingChildPair[0], matchingChildPair[1])
+            self.__calcPropertyDifference(matchingChildPair[0], matchingChildPair[1])
+
+            for n1, n2 in nodes_unchanged:
+                if self.diffContainer.nodeMatchingTable.node_pair_in_matching_table(NodePair(n1, n2)):
+                    # logged this pair already, continue for loop
+                    continue
+                else:
+                    self.diffContainer.nodeMatchingTable.add_matched_nodes(n1, n2)
 
             # run recursion for children if "NoChange" or "Modified" happened
-            diff_result_container = self.__compare_children(matchingChildPair[0],
-                                                            matchingChildPair[1],
-                                                            diff_result_container,
-                                                            indent=indent + 1)
+            self.__compare_children(matchingChildPair[0],
+                                    matchingChildPair[1],
+                                    indent=indent + 1)
 
-        return diff_result_container
+        return
 
     def __apply_diffIgnore(self, diff, IgnoreAttrs: List[str]):
         """
@@ -125,11 +131,10 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
 
         return diff
 
-    def __calcPropertyDifference(self, diff_result_container: SubstructureDiffResult, node_init: NodeItem,
-                                 node_updated: NodeItem) -> SubstructureDiffResult:
+    def __calcPropertyDifference(self, node_init: NodeItem,
+                                 node_updated: NodeItem):
         """
         calculates if a semantic modification was applied on two nodes
-        @param diff_result_container: reporter instance
         @param node_init:
         @param node_updated:
         @return:
@@ -154,17 +159,16 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
                 print('[RESULT]: child nodes match')
 
         else:
-            diff_result_container.isSimilar = False
+            self.diffContainer.isSimilar = False
             # log modifications
-            root_init = diff_result_container.RootNode_init
-            root_updated = diff_result_container.RootNode_updated
+            root_init = self.diffContainer.RootNode_init
+            root_updated = self.diffContainer.RootNode_updated
 
             pattern = self.__get_pattern(root_init.id, node_init.id)
 
             pmod_list = nodeDiff.createPModDefinitions(node_init.id, node_updated.id, pattern=pattern)
             # append modifications to container
-            diff_result_container.propertyModifications.extend(pmod_list)
-        return diff_result_container
+            self.diffContainer.propertyModifications.extend(pmod_list)
 
     def __get_hashes_of_nodes(self, label: str, nodeList: List[NodeItem], indent = 0) -> List[NodeItem]:
         """
