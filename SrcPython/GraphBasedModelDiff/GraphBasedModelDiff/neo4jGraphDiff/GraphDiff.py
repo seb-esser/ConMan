@@ -27,23 +27,29 @@ class GraphDiff:
 
         # diff primary node sets
         rootedNodeDiff = PrimaryNodeDiff(connector, self.config)
-        [nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted] = rootedNodeDiff.diff_primary_nodes(self.label_init,
-                                                                                                self.label_updated)
+        [nodes_unchanged, nodes_added, nodes_deleted] = rootedNodeDiff.diff_primary_nodes(self.label_init,
+                                                                                          self.label_updated)
 
         # save results to report
-        self.report.capture_result_primary([nodeIDs_unchanged, nodeIDs_added, nodeIDs_deleted])
+        self.report.capture_result_primary([nodes_unchanged, nodes_added, nodes_deleted])
 
         print(' CONNECTION NODE DIFF \n')
-        connectionNodeDiff = ConnectionNodeDiff(connector=connector, label_init=self.label_init,
+
+        # diff connection nodes
+        connectionNodeDiff = ConnectionNodeDiff(connector=connector,
+                                                label_init=self.label_init,
                                                 label_updated=self.label_updated)
-        connectionNodeDiff.diff_connectionNodes()
+        [conNodeIDs_unchanged, conNodeIDs_added, conNodeIDs_deleted] = connectionNodeDiff.diff_connectionNodes()
+
+        # save results to report
+        self.report.capture_result_con_nodes([conNodeIDs_unchanged, conNodeIDs_added, conNodeIDs_deleted])
 
         print('\n COMPONENT DIFF \n')
 
         # 2: Check sub-graphs for each rooted node
         DiffEngine = DfsIsomorphismCalculator(connector, self.label_init, self.label_updated, self.config)
 
-        self.calc_secondary(DiffEngine, nodeIDs_unchanged)
+        self.calc_secondary(DiffEngine, nodes_unchanged)
 
         return self.report
 

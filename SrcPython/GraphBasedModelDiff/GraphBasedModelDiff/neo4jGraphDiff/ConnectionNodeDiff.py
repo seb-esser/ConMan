@@ -69,6 +69,6 @@ class ConnectionNodeDiff:
             patterns_updated.append(pattern)
 
         # calc pattern intersection
-
-
         print(patterns_updated)
+
+        return [nodes_unchanged, nodes_added, nodes_deleted]

@@ -1,5 +1,7 @@
 from typing import List
 
+from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
+from neo4jGraphDiff.SetCalculator import SetCalculator
 from neo4j_middleware import neo4jConnector
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
@@ -410,3 +412,14 @@ class GraphPattern:
                 n2: NodeItem = e.startNode
                 n1.tidy_attrs(remove_None_values=False)
                 n2.tidy_attrs(remove_None_values=False)
+
+    def compare_pattern(self, other):
+        """
+
+        @param other:
+        @return:
+        """
+
+        return False
+
+

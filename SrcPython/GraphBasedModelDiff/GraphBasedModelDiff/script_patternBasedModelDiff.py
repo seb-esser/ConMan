@@ -26,7 +26,7 @@ raw_updated = connector.run_cypher_statement(
 entry_init: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_init)[0]
 entry_updated: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_updated)[0]
 
-pattern_diff = HierarchyPatternDiff(connector=connector)
+pattern_diff = HierarchyPatternDiff(connector=connector, ts_init=ts_init, ts_updated=ts_updated)
 patterns_are_similar = pattern_diff.diffPatterns(entry_init, entry_updated)
 
 

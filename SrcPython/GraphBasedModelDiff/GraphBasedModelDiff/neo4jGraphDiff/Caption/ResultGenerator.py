@@ -2,6 +2,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from neo4jGraphDiff.Caption.EdgeMatchingTable import EdgeMatchingTable
+from neo4jGraphDiff.Caption.NodeMatchingTable import NodeMatchingTable
 from neo4jGraphDiff.Config.Configuration import Configuration
 
 """ module import """
@@ -11,7 +13,7 @@ from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 
 
 class ResultGenerator:
-    """description of class"""
+    """captures the diff between two graphs """
 
     def __init__(self, ts_init: str, ts_updated: str, usedConfig=None):
         """ """
@@ -20,6 +22,8 @@ class ResultGenerator:
         self.config: Configuration = usedConfig
         self.ResultPrimaryDiff = {}
         self.ResultComponentDiff = []
+        self.node_matching_table: NodeMatchingTable = NodeMatchingTable()
+        self.edge_matching_table: EdgeMatchingTable = EdgeMatchingTable()
 
     def capture_result_primary(self, rootDiffRes: list):
         """
@@ -30,13 +34,25 @@ class ResultGenerator:
         nodes_added = rootDiffRes[1]
         nodes_deleted = rootDiffRes[2]
 
+        for n1, n2 in nodes_unchanged:
+            self.node_matching_table.add_matched_nodes(n1, n2)
+
         self.ResultPrimaryDiff['unchanged'] = nodes_unchanged
         self.ResultPrimaryDiff['added'] = nodes_added
         self.ResultPrimaryDiff['deleted'] = nodes_deleted
 
-    def capture_result_con_nodes(self):
+    def capture_result_con_nodes(self, res):
         """ captures SubstructureDiffResult of ObjRel structure Diff """
-        pass
+        nodes_unchanged = res[0]
+        nodes_added = res[1]
+        nodes_deleted = res[2]
+
+        for n1, n2 in nodes_unchanged:
+            self.node_matching_table.add_matched_nodes(n1, n2)
+
+        # self.ResultPrimaryDiff['unchanged'].append(nodes_unchanged)
+        # self.ResultPrimaryDiff['added'].append(nodes_added)
+        # self.ResultPrimaryDiff['deleted'].append(nodes_deleted)
 
     def capture_result_secondary(self, diffRes: SubstructureDiffResult):
         """
@@ -44,6 +60,7 @@ class ResultGenerator:
         @param diffRes:
         """
         self.ResultComponentDiff.append(diffRes)
+        self.node_matching_table.append_pairs(diffRes.nodeMatchingTable)
 
     def print_report(self):
         """

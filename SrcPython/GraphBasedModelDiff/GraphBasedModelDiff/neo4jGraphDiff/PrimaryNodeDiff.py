@@ -1,3 +1,5 @@
+from typing import List
+
 from neo4jGraphAnalysis.AdjacencyAnalyser import AdjacencyAnalyser
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
@@ -82,8 +84,8 @@ class PrimaryNodeDiff:
 		"""
 
 		# unpack node ids for adjacency matrix
-		nodeIds_init: list[int] = []
-		nodeIds_updated: list[int] = []
+		nodeIds_init: List[int] = []
+		nodeIds_updated: List[int] = []
 
 		for pair in nodes_unchanged:
 			nodeIds_init.append(pair[0].id)

@@ -125,10 +125,14 @@ class Neo4jQueryFactory(Neo4jFactory):
         @param nodeId: the node id in the neo4j database
         @return: cypher query string
         """
-        match = 'MATCH (n)'
+        match = 'MATCH path = (n)'
         where = 'WHERE ID(n) = {}'.format(nodeId)
-        ret = 'RETURN ID(n), n.entityType'
+        ret = 'RETURN NODES(path) '
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
+
+    @classmethod
+    def get_node_by_id(cls, nodeId: int) -> str:
+        return 'MATCH (n) WHERE ID(n)={} RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)'.format(nodeId)
 
     @classmethod
     def get_node_properties_by_id(cls, nodeId: int) -> str:

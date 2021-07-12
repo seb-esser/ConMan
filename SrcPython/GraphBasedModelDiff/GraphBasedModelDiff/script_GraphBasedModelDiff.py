@@ -25,18 +25,16 @@ testcases = {"sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
              "residential": ("ts20210219T121203", "ts20210219T121608"),
              "4x3_bridges": ("ts20210118T211240", "ts20210227T133609"),
              "Storey": ("ts20210521T074802", "ts20210521T074934"),
-             "new_cuboid": ("ts20210616T145238", "ts20210616T145520")
+             "new_cuboid": ("ts20210623T091748", "ts20210623T091749")
              }
 
 label_init, label_updated = testcases['new_cuboid']
-
 
 # async def main():
 def main():
 
     diff = GraphDiff(label_init, label_updated)
     patch = diff.run_diff(connector=connector)
-    print(patch)
 
 
 # asyncio.run(main())

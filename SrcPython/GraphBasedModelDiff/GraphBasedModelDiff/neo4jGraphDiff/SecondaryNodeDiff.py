@@ -13,11 +13,12 @@ from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4jGraphDiff.AbsDirectedSubgraphDiff import AbsDirectedSubgraphDiff
 from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 
+
 class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
     """ compares two directed subgraphs based on a node diff of nodes and recursively analyses the entire subgraph """
 
     def __init__(self, connector, label_init, label_updated, config):
-        return super().__init__(connector, label_init, label_updated, config)
+        super().__init__(connector, label_init, label_updated, config)
 
     # public overwrite method requested by abstract superclass AbsDirectedSubgraphDiff
     def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem) -> SubstructureDiffResult:
@@ -76,6 +77,8 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         # compare children and raise an dissimilarity if necessary.
         [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(children_init, children_updated,
                                                                                      desiredMatchMethod)
+        for n1, n2 in nodes_unchanged:
+            diff_result_container.nodeMatchingTable.add_matched_nodes(n1, n2)
 
         if self.toConsole():
             print('')
