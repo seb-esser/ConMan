@@ -135,6 +135,14 @@ class Neo4jQueryFactory(Neo4jFactory):
         return 'MATCH (n) WHERE ID(n)={} RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)'.format(nodeId)
 
     @classmethod
+    def get_hierarchical_prim_nodes(cls, node_id: int) -> str:
+        return """
+            MATCH (n)<--(c:ConnectionNode)-->(m:PrimaryNode) 
+            WHERE ID(n) = {}
+            RETURN ID(m), m.EntityType, PROPERTIES(m), LABELS(m)
+            """.format(node_id)
+
+    @classmethod
     def get_node_properties_by_id(cls, nodeId: int) -> str:
         """
         Query all params of a node specified by its node id

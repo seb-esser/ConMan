@@ -1,6 +1,7 @@
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.HierarchyPatternDiff import HierarchyPatternDiff
 from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
+from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -40,6 +41,19 @@ res = diff_engine.diff_subgraphs(entry_init, entry_updated)
 # get conNode and related primary nodes
 print(res)
 # run subgraph diff again and consider already matched node pairs now
+
+cy_next_nodes_init = Neo4jQueryFactory.get_hierarchical_prim_nodes(entry_init.id)
+cy_next_nodes_upd = Neo4jQueryFactory.get_hierarchical_prim_nodes(entry_updated.id)
+
+raw_init = connector.run_cypher_statement(cy_next_nodes_init)
+raw_updated = connector.run_cypher_statement(cy_next_nodes_upd)
+
+next_nodes_init = NodeItem.fromNeo4jResponseWouRel(raw_init)
+next_nodes_upd = NodeItem.fromNeo4jResponseWouRel(raw_updated)
+
+# diff rooted nodes
+
+# run the recursive approach
 
 connector.disconnect_driver()
 
