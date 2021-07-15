@@ -47,14 +47,9 @@ for p in result.nodeMatchingTable.matched_nodes:
     connector.run_cypher_statement(cy)
 
 # Find all nodes that do not have a SIMILAR_TO relationship
-cy = """
-Match (n)-[r:SIMILAR_TO]->(m) 
-WITH collect(ID(n)) as nodeIds_init, collect(ID(m)) as nodeIds_updt
-MATCH (a:{0}) WHERE NOT ID(a) IN nodeIds_init
-MATCH (b:{1}) WHERE NOT ID(b) IN nodeIds_updt
-RETURN a, b
-""".format(ts_init, ts_updated)
+cy = Neo4jQueryFactory.get_all_nodes_wou_SIMILARTO_rel(ts_updated)
 raw_res = connector.run_cypher_statement(cy)
+nodes = NodeItem.fromNeo4jResponseWouRel(raw_res)
 
 connector.disconnect_driver()
 

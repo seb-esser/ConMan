@@ -306,5 +306,20 @@ class Neo4jQueryFactory(Neo4jFactory):
         return 'MATCH path = (c:ConnectionNode)-[r]->(n) WHERE ID(n)={} ' \
                'RETURN path, NODES(path), RELATIONSHIPS(path)'.format(node_id)
 
+    @classmethod
+    def get_all_nodes_wou_SIMILARTO_rel(cls, timestamp: str) -> str:
+        """
+        queries all nodes that do not have an incoming or outgoing SIMILAR_TO relationship
+        @param timestamp:
+        @return:
+        """
+        cy = """
+        Match (n)-[r:SIMILAR_TO]-(m) 
+        WITH collect(ID(n)) as nodeIds
+        MATCH (a:{0}) WHERE NOT ID(a) IN nodeIds
+        RETURN ID(a), a.EntityType, PROPERTIES(a), LABELS(a)
+        """.format(timestamp)
+        return cy
+
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --

@@ -24,8 +24,6 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
                                                label_updated=self.label_updated,
                                                config=self.configuration)
 
-        self.diff_result: SubstructureDiffResult = SubstructureDiffResult()
-
         # this list is used to track already visited primary nodes!
         self.visited_primary_nodes: List[NodePair] = []
 
@@ -41,7 +39,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         self.diff_engine.diffContainer.nodeMatchingTable.add_matched_nodes(entry_init, entry_updated)
 
         # run diff and get node matching
-        self.diff_result = self.diff_engine.diff_subgraphs(entry_init, entry_updated)
+        self.diff_engine.diff_subgraphs(entry_init, entry_updated)
 
         # run subgraph diff again and consider already matched node pairs now
         cy_next_nodes_init = Neo4jQueryFactory.get_hierarchical_prim_nodes(node_id=entry_init.id,
@@ -57,15 +55,14 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # check if no new children got found:
         if len(next_nodes_init) == 0 and len(next_nodes_upd) == 0:
-            return self.diff_result
+            return self.diff_engine.diffContainer
 
         # calc node intersection
         set_calculator = SetCalculator()
         [unc, added, deleted] = set_calculator.calc_intersection(
             next_nodes_init, next_nodes_upd, MatchCriteriaEnum.OnGuid)
 
-        if len(added) > 0 or len(deleted) > 0:
-            print("stop")
+        # log added and deleted nodes on primary structure
         for ad in added:
             self.diff_engine.diffContainer.logStructureModification(entry_updated.id, ad.id, 'added')
             self.visited_primary_nodes.append(NodePair(NodeItem(nodeId=-1), ad))
@@ -73,7 +70,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
             self.diff_engine.diffContainer.logStructureModification(entry_init.id, de.id, 'deleted')
             self.visited_primary_nodes.append(NodePair(de, NodeItem(nodeId=-1)))
 
-        # kick recursion
+        # kick recursion for next hierarchy level
         for pair in unc:
             self.diff_subgraphs(pair[0], pair[1])
 
