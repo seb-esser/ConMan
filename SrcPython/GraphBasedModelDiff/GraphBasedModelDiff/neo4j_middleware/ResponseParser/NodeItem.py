@@ -6,7 +6,7 @@ class NodeItem:
     reflects the node structure from neo4j
     """
 
-    def __init__(self, nodeId: int, relType: str, entityType: str = None, nodeType: str = None):
+    def __init__(self, nodeId: int, relType: str = None, entityType: str = None, nodeType: str = None):
         """
 
         @type nodeType: the classification of PrimaryNode, SecondaryNode or ConnectionNode

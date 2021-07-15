@@ -26,6 +26,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         self.diff_result: SubstructureDiffResult = SubstructureDiffResult()
 
+        # this list is used to track already visited primary nodes!
         self.visited_primary_nodes: List[NodePair] = []
 
     def diff_subgraphs(self, entry_init: NodeItem, entry_updated: NodeItem):
@@ -37,6 +38,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         """
 
         self.visited_primary_nodes.append(NodePair(entry_init, entry_updated))
+        self.diff_engine.diffContainer.nodeMatchingTable.add_matched_nodes(entry_init, entry_updated)
 
         # run diff and get node matching
         self.diff_result = self.diff_engine.diff_subgraphs(entry_init, entry_updated)
@@ -62,14 +64,18 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         [unc, added, deleted] = set_calculator.calc_intersection(
             next_nodes_init, next_nodes_upd, MatchCriteriaEnum.OnGuid)
 
+        if len(added) > 0 or len(deleted) > 0:
+            print("stop")
         for ad in added:
-            self.diff_result.logStructureModification(entry_init.id, ad.id, 'added')
+            self.diff_engine.diffContainer.logStructureModification(entry_updated.id, ad.id, 'added')
+            self.visited_primary_nodes.append(NodePair(NodeItem(nodeId=-1), ad))
         for de in deleted:
-            self.diff_result.logStructureModification(entry_init.id, de.id, 'deleted')
+            self.diff_engine.diffContainer.logStructureModification(entry_init.id, de.id, 'deleted')
+            self.visited_primary_nodes.append(NodePair(de, NodeItem(nodeId=-1)))
 
         # kick recursion
         for pair in unc:
             self.diff_subgraphs(pair[0], pair[1])
 
-        return self.diff_result
+        return self.diff_engine.diffContainer
 

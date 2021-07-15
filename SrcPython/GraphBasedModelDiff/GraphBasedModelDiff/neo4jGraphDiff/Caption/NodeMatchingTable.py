@@ -59,6 +59,10 @@ class NodeMatchingTable:
         else:
             return False
 
+    def get_all_primaryNode_pairs(self):
+        return [p for p in self.matched_nodes if
+                (p.init_node.nodeType == "PrimaryNode" and p.updated_node.nodeType == "PrimaryNode")]
+
 
 class NodePair:
     def __init__(self, init: NodeItem, updated: NodeItem):
@@ -70,3 +74,10 @@ class NodePair:
             self.init_node.entityType,
             self.init_node.id,
             self.updated_node.id)
+
+    def __eq__(self, other):
+        if self.init_node.id == other.init_node.id and self.updated_node.id == other.updated_node.id:
+            return True
+        else:
+            return False
+
