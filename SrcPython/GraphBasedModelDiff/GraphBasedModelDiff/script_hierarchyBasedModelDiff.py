@@ -1,6 +1,7 @@
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.HierarchyPatternDiff import HierarchyPatternDiff
 from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
+from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
@@ -33,7 +34,14 @@ pDiff = HierarchyPatternDiff(connector=connector, ts_init=ts_init, ts_updated=ts
 result = pDiff.diff_subgraphs(entry_init, entry_updated)
 
 for p in result.nodeMatchingTable.matched_nodes:
-    print(p)
+    # print(p)
+    cy = """
+    MATCH (n) WHERE ID(n)={0}
+    MATCH (m) WHERE ID(m)= {1}
+    MERGE (n)-[:SIMILAR_TO]->(m)
+    
+    """.format(p.init_node.id, p.updated_node.id)
+    connector.run_cypher_statement(cy)
 
 connector.disconnect_driver()
 
