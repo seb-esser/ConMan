@@ -3,14 +3,13 @@ from enum import Enum
 
 from typing import List
 
-from neo4jGraphDiff.AbsResult import Result
 from neo4jGraphDiff.Caption.NodeMatchingTable import NodeMatchingTable
 from neo4jGraphDiff.Caption.PropertyModification import PropertyModification
 from neo4jGraphDiff.Caption.StructureModification import StructureModification
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 
-class SubstructureDiffResult(Result):
+class SubstructureDiffResult:
     """carries the diff result """
 
     def __init__(self, root_init: NodeItem = None, root_updated: NodeItem = None, method=None):
@@ -23,6 +22,7 @@ class SubstructureDiffResult(Result):
         self.RootNode_init: NodeItem = root_init
         self.RootNode_updated: NodeItem = root_updated
         self.recursionCounter = 0
+
         self.nodeMatchingTable: NodeMatchingTable = NodeMatchingTable()
 
     def logNodeModification(self,

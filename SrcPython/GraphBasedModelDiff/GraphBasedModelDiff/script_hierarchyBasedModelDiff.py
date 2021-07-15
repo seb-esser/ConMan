@@ -37,7 +37,7 @@ pDiff = HierarchyPatternDiff(connector=connector, ts_init=ts_init, ts_updated=ts
 result = pDiff.diff_subgraphs(entry_init, entry_updated)
 
 # Create SIMILAR_TO relationships to mark all nodePairs that are matched
-for p in result.nodeMatchingTable.matched_nodes:
+for p in result.node_matching_table.matched_nodes:
     # print(p)
     cy = """
     MATCH (n) WHERE ID(n)={0}

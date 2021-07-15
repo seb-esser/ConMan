@@ -28,13 +28,18 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
     # public overwrite method requested by abstract superclass AbsDirectedSubgraphDiff
     def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem):
 
+        # clear sub result container
+        self.diffContainer = SubstructureDiffResult(method="Node-Diff")
+
         # store entry points
         self.diffContainer.set_nodes(node_init, node_updated)
 
         # start recursion
         self.__compare_children(node_init, node_updated, indent=0)
 
-    async def diff_subgraphs_async(self, node_init: NodeItem, node_updated: NodeItem) -> SubstructureDiffResult:
+        return self.diffContainer
+
+    async def diff_subgraphs_async(self, node_init: NodeItem, node_updated: NodeItem):
         """
 
         """

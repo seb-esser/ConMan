@@ -1,10 +1,12 @@
 from typing import List
 
 from neo4jGraphDiff.AbsDirectedSubgraphDiff import AbsDirectedSubgraphDiff
+
 from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
 from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
+from neo4jGraphDiff.Result import Result
 from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
 from neo4jGraphDiff.SetCalculator import SetCalculator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
@@ -24,6 +26,9 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
                                                label_updated=self.label_updated,
                                                config=self.configuration)
 
+        # capture result
+        self.result = Result(label_init=self.label_init, label_updated=self.label_updated)
+
         # this list is used to track already visited primary nodes!
         self.visited_primary_nodes: List[NodePair] = []
 
@@ -39,7 +44,10 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         self.diff_engine.diffContainer.nodeMatchingTable.add_matched_nodes(entry_init, entry_updated)
 
         # run diff and get node matching
-        self.diff_engine.diff_subgraphs(entry_init, entry_updated)
+        sub_result = self.diff_engine.diff_subgraphs(entry_init, entry_updated)
+
+        # integrate sub_result in main result
+        self.result.append_sub_result(sub_res=sub_result)
 
         # run subgraph diff again and consider already matched node pairs now
         cy_next_nodes_init = Neo4jQueryFactory.get_hierarchical_prim_nodes(node_id=entry_init.id,
@@ -74,5 +82,5 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         for pair in unc:
             self.diff_subgraphs(pair[0], pair[1])
 
-        return self.diff_engine.diffContainer
+        return self.result
 
