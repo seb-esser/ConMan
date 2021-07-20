@@ -26,10 +26,10 @@ class Result:
     def append_sub_result(self, sub_res: SubstructureDiffResult):
 
         if len(sub_res.propertyModifications) > 0:
-            self.property_updates.append(sub_res.propertyModifications)
+            self.property_updates += sub_res.propertyModifications
 
         if len(sub_res.StructureModifications) > 0:
-            self.structure_updates.append(sub_res.StructureModifications)
+            self.structure_updates += sub_res.StructureModifications
 
         # store matched nodes
         self.node_matching_table.append_pairs(sub_res.nodeMatchingTable)

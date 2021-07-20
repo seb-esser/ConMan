@@ -40,6 +40,43 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         @return:
         """
 
+        # recursion
+        self.__move_level_down(entry_init, entry_updated)
+
+        # post processing
+        set_calculator = SetCalculator()
+        prim_nodes_init = [x.init_node for x in self.visited_primary_nodes]
+        prim_nodes_updt = [x.updated_node for x in self.visited_primary_nodes]
+
+        for n in prim_nodes_init:
+            if n.id == -1:
+                prim_nodes_init.remove(n)
+        for n in prim_nodes_updt:
+            if n.id == -1:
+                prim_nodes_updt.remove(n)
+
+        [unc, added, deleted] = set_calculator.calc_intersection(
+            prim_nodes_init, prim_nodes_updt, intersection_method=MatchCriteriaEnum.OnGuid)
+
+        for n1, n2 in unc:
+            self.result.node_matching_table.add_matched_nodes(n1, n2)
+        # log added and deleted nodes on primary structure
+        for ad in added:
+            self.diff_engine.diffContainer.logStructureModification(entry_updated.id, ad.id, 'added')
+            self.visited_primary_nodes.append(NodePair(NodeItem(nodeId=-1), ad))
+        for de in deleted:
+            self.diff_engine.diffContainer.logStructureModification(entry_init.id, de.id, 'deleted')
+            self.visited_primary_nodes.append(NodePair(de, NodeItem(nodeId=-1)))
+        return self.result
+
+    def __move_level_down(self, entry_init: NodeItem, entry_updated: NodeItem):
+        """
+
+        @param entry_init:
+        @param entry_updated:
+        @return:
+        """
+
         self.visited_primary_nodes.append(NodePair(entry_init, entry_updated))
         self.diff_engine.diffContainer.nodeMatchingTable.add_matched_nodes(entry_init, entry_updated)
 
@@ -50,6 +87,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         self.result.append_sub_result(sub_res=sub_result)
 
         # run subgraph diff again and consider already matched node pairs now
+        # query next primary nodes
         cy_next_nodes_init = Neo4jQueryFactory.get_hierarchical_prim_nodes(node_id=entry_init.id,
                                                                            exclude_nodes=self.visited_primary_nodes)
         cy_next_nodes_upd = Neo4jQueryFactory.get_hierarchical_prim_nodes(node_id=entry_updated.id,
@@ -80,7 +118,6 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # kick recursion for next hierarchy level
         for pair in unc:
-            self.diff_subgraphs(pair[0], pair[1])
+            self.__move_level_down(pair[0], pair[1])
 
-        return self.result
 

@@ -48,6 +48,7 @@ for p in result.node_matching_table.matched_nodes:
 
 # Find all nodes that do not have a SIMILAR_TO relationship
 cy = Neo4jQueryFactory.get_all_nodes_wou_SIMILARTO_rel(ts_updated)
+print(cy)
 raw_res = connector.run_cypher_statement(cy)
 nodes = NodeItem.fromNeo4jResponseWouRel(raw_res)
 
