@@ -310,8 +310,8 @@ class Neo4jQueryFactory(Neo4jFactory):
     def get_all_nodes_wou_SIMILARTO_rel(cls, timestamp: str) -> str:
         """
         queries all nodes that do not have an incoming or outgoing SIMILAR_TO relationship
-        @param timestamp:
-        @return:
+        @param timestamp: the model's identifier
+        @return: cypher query string
         """
         cy = """
         Match (n)-[r:SIMILAR_TO]-(m) 
@@ -320,6 +320,15 @@ class Neo4jQueryFactory(Neo4jFactory):
         RETURN ID(a), a.EntityType, PROPERTIES(a), LABELS(a)
         """.format(timestamp)
         return cy
+
+    @classmethod
+    def get_all_relationships(cls, timestamp: str) -> str:
+        """
+        queries all relationships of a model and returns raw data to instantiate a GraphPattern instance
+        @param timestamp: the model's identifier
+        @return: cypher query string
+        """
+        return """MATCH pa = (n:{0})-[r:rel]->(m:{0}) RETURN pa, NODES(pa), RELATIONSHIPS(pa)""".format(timestamp)
 
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --

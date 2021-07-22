@@ -1,3 +1,5 @@
+from typing import Dict
+
 from neo4j_middleware.ResponseParser import NodeItem
 from neo4j_middleware.Neo4jFactory import Neo4jFactory
 
@@ -116,7 +118,13 @@ class EdgeItem:
 
         return Neo4jFactory.BuildMultiStatement([cy1, cy2, cy3])
 
-
+    def set_attributes(self, attrs: Dict):
+        """
+        sets the attribute property
+        @param attrs: queried dictionary from neo4j graph
+        @return: Nothing
+        """
+        self.attributes = attrs
 
 
 

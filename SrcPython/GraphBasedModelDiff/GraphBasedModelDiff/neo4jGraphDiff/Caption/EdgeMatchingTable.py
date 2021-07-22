@@ -1,18 +1,21 @@
 from typing import List
 
+from neo4jGraphDiff.Caption.NodeMatchingTable import NodeMatchingTable
+from neo4j_middleware import neo4jConnector
 from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 
 
 class EdgeMatchingTable:
 
     def __init__(self):
-        self.matched_nodes: List[EdgePair] = []
+        self.matched_edges: List[EdgePair] = []
 
-    def add_matched_nodes(self, edge1: EdgeItem, edge2: EdgeItem):
-        self.matched_nodes.append(EdgePair(edge1, edge2))
+    @classmethod
+    def from_node_matching(cls, connector: neo4jConnector, matched_nodes: NodeMatchingTable):
+        pass
 
 
 class EdgePair:
     def __init__(self, init: EdgeItem, updated: EdgeItem):
-        self.init_node = init
-        self.updated_node = updated
+        self.init_edge = init
+        self.updated_edge = updated

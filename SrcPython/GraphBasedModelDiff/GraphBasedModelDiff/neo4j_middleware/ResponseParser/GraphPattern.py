@@ -348,6 +348,7 @@ class GraphPattern:
 
         # print after state to console
         # self.print_to_console()
+        return self.paths
 
     def print_to_console(self):
         """
