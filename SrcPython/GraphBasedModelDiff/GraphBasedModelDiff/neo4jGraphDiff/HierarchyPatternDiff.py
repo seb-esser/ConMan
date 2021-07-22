@@ -116,8 +116,12 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
             self.diff_engine.diffContainer.logStructureModification(entry_init.id, de.id, 'deleted')
             self.visited_primary_nodes.append(NodePair(de, NodeItem(nodeId=-1)))
 
-        # kick recursion for next hierarchy level
+        # kick recursion for next hierarchy level if pair was not already visited
         for pair in unc:
-            self.__move_level_down(pair[0], pair[1])
+
+            if NodePair(pair[0], pair[1]) not in self.visited_primary_nodes:
+                self.__move_level_down(pair[0], pair[1])
+            else:
+                print("a")
 
 

@@ -11,8 +11,8 @@ connector = Neo4jConnector()
 
 connector.connect_driver()
 
-ts_init = 'ts20210623T091748'
-ts_updated = 'ts20210623T091749'
+ts_init = 'ts20210623T091751'
+ts_updated = 'ts20210623T091752'
 
 connector.run_cypher_statement("Match(n)-[r:SIMILAR_TO]->(m) DELETE r")
 

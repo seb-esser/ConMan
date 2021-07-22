@@ -25,6 +25,9 @@ class SetCalculator(object):
 
         nodes_unchanged = []
 
+        if len(set_A) == 0 or len(set_B) == 0:
+            raise Exception("got empty sets in set intersection calculation. ")
+
         # match nodes based on child node hash_value
         A = set_A
         B = set_B

@@ -33,6 +33,8 @@ connector.connect_driver()
 #          './00_sampleData/IFC_stepP21/GeomRepresentation_04/Update_GeomRepresentation_04.ifc',  # BRep -> structural Mod
 #          './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_single.ifc',
 #          './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_double.ifc',
+#          './00_sampleData/IFC_stepP21/GeomRepresentation_06/cube_double.ifc',
+#          './00_sampleData/IFC_stepP21/GeomRepresentation_06/cube_double_wModifiedParentPlacement.ifc',
 #          './00_sampleData/IFC_stepP21/wall-column/Wall-Column.ifc',
 #          './00_sampleData/IFC_stepP21/wall-column/Column-Wall.ifc',
 #          './00_sampleData/IFC_stepP21/SleeperSample/sleeper_init.ifc',
@@ -45,7 +47,8 @@ connector.connect_driver()
 #          './00_sampleData/IFC_stepP21/Storey_01/SingleStorey_updated.ifc'
 #          # # moved wall, new window and subsequent change in parent wall
 #          ]
-paths = ['./00_sampleData/IFC_stepP21/4x3_sampleData/acca_alignment.ifc']
+paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_06/cube_double.ifc',
+         './00_sampleData/IFC_stepP21/GeomRepresentation_06/cube_double_wModifiedParentPlacement.ifc']
 
 for p in paths:
     print(p)
