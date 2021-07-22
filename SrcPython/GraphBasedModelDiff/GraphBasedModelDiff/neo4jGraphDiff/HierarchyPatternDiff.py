@@ -74,10 +74,11 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         # -- compare edgeSet --
 
         # load edge data
-        edges_init = self.__load_edges(self.label_init)
-        edges_updt = self.__load_edges(self.label_updated)
-
-        edge_matching = EdgeMatchingTable()
+        # edges_init = self.__load_edges(self.label_init)
+        # edges_updt = self.__load_edges(self.label_updated)
+        #
+        # edge_matching = EdgeMatchingTable()
+        # edge_matching.calculate(edges_init, edges_updt)
 
 
         return self.result

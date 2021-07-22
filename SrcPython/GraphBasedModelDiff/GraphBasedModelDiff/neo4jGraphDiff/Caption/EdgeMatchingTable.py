@@ -14,6 +14,15 @@ class EdgeMatchingTable:
     def from_node_matching(cls, connector: neo4jConnector, matched_nodes: NodeMatchingTable):
         pass
 
+    def calculate(self, edges_init: List[EdgeItem], edges_updt: List[EdgeItem]):
+        """
+        calculates the Intersection of two edge sets
+        @param edges_init:
+        @param edges_updt:
+        @return:
+        """
+        pass
+
 
 class EdgePair:
     def __init__(self, init: EdgeItem, updated: EdgeItem):

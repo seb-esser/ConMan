@@ -330,5 +330,17 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         return """MATCH pa = (n:{0})-[r:rel]->(m:{0}) RETURN pa, NODES(pa), RELATIONSHIPS(pa)""".format(timestamp)
 
+
+    @classmethod
+    def load_SIMILAR_TO_rectangles(cls, ts_init: str, ts_updt: str):
+        return """
+        MATCH (init_start:{0})-[r1:rel]->(init_end:{0})
+        MATCH (updt_start:{1})-[r2:rel]->(updt_end:{1})
+
+        MATCH (init_start)-[s1:SIMILAR_TO]-(updt_start)
+        MATCH (init_end)-[s2:SIMILAR_TO]-(updt_end)
+
+        RETURN ID(init_start), ID(init_end), ID(updt_start), ID(updt_end)
+        """.format(ts_init, ts_updt)
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --
