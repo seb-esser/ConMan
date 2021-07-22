@@ -20,19 +20,23 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
 
     def __init__(self, connector, label_init, label_updated, config):
         super().__init__(connector, label_init, label_updated, config)
+        self.matchingTable: NodeMatchingTable = NodeMatchingTable()
         self.diffContainer = SubstructureDiffResult(method="Node-Diff")
 
     def get_diff_result(self):
         return self.diffContainer
 
     # public overwrite method requested by abstract superclass AbsDirectedSubgraphDiff
-    def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem):
+    def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem, matched_nodes = None):
 
         # clear sub result container
         self.diffContainer = SubstructureDiffResult(method="Node-Diff")
 
         # store entry points
         self.diffContainer.set_nodes(node_init, node_updated)
+
+        if matched_nodes is not None:
+            self.matchingTable.matched_nodes += matched_nodes
 
         # start recursion
         self.__compare_children(node_init, node_updated, indent=0)
@@ -85,6 +89,21 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         # compare children and raise an dissimilarity if necessary.
         [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(children_init, children_updated,
                                                                                      desiredMatchMethod)
+
+        # check if nodes in nodes_unchanged got already matched but a previous subtree analysis
+        import copy
+        intmed_unc = copy.deepcopy(nodes_unchanged)
+        for pair in intmed_unc:
+            if NodePair(pair[0], pair[1]) in self.matchingTable.matched_nodes:
+                # stop recursion
+                return
+            elif self.matchingTable.node_involved_in_nodePair(pair[0]):
+                # init node of matched pair was already involved in a matching
+                nodes_unchanged.remove(pair)
+            elif self.matchingTable.node_involved_in_nodePair(pair[1]):
+                # updated node of matched pair was already involved in a matching
+                nodes_unchanged.remove(pair)
+
 
         if self.toConsole():
             print('')

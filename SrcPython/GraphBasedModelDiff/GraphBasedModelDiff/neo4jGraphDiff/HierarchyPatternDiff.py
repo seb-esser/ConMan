@@ -81,7 +81,8 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         self.diff_engine.diffContainer.nodeMatchingTable.add_matched_nodes(entry_init, entry_updated)
 
         # run diff and get node matching
-        sub_result = self.diff_engine.diff_subgraphs(entry_init, entry_updated)
+        sub_result = self.diff_engine.diff_subgraphs(entry_init, entry_updated,
+                                                     self.diff_engine.diffContainer.nodeMatchingTable.matched_nodes)
 
         # integrate sub_result in main result
         self.result.append_sub_result(sub_res=sub_result)
@@ -121,7 +122,5 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
             if NodePair(pair[0], pair[1]) not in self.visited_primary_nodes:
                 self.__move_level_down(pair[0], pair[1])
-            else:
-                print("a")
 
 
