@@ -47,9 +47,19 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         self.__move_level_down(entry_init, entry_updated)
 
         # post processing
-        set_calculator = SetCalculator()
+
         prim_nodes_init = [x.init_node for x in self.visited_primary_nodes]
         prim_nodes_updt = [x.updated_node for x in self.visited_primary_nodes]
+
+        con_init = NodeItem.fromNeo4jResponseWouRel(
+            self.connector.run_cypher_statement(
+                Neo4jQueryFactory.get_connection_nodes(self.label_init)
+            ))
+
+        con_updt = NodeItem.fromNeo4jResponseWouRel(
+            self.connector.run_cypher_statement(
+                Neo4jQueryFactory.get_connection_nodes(self.label_updated)
+            ))
 
         for n in prim_nodes_init:
             if n.id == -1:
@@ -58,11 +68,12 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
             if n.id == -1:
                 prim_nodes_updt.remove(n)
 
-        [unc, added, deleted] = set_calculator.calc_intersection(
-            prim_nodes_init, prim_nodes_updt, intersection_method=MatchCriteriaEnum.OnGuid)
+        [unc, added, deleted] = self.calcSimilarity(prim_nodes_init + con_init, prim_nodes_updt + con_updt)
 
+        # log unchanged nodes
         for n1, n2 in unc:
             self.result.node_matching_table.add_matched_nodes(n1, n2)
+
         # log added and deleted nodes on primary structure
         for ad in added:
             self.diff_engine.diffContainer.logStructureModification(entry_updated.id, ad.id, 'added')
@@ -80,8 +91,23 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         # edge_matching = EdgeMatchingTable()
         # edge_matching.calculate(edges_init, edges_updt)
 
-
         return self.result
+
+    def calcSimilarity(self, nodes_init, nodes_updated):
+        """
+
+        @param nodes_init:
+        @param nodes_updated:
+        @return:
+        """
+        set_calculator = SetCalculator()
+
+        return set_calculator.calc_intersection(
+            nodes_init, nodes_updated, intersection_method=MatchCriteriaEnum.OnGuid)
+
+
+
+
 
     def __move_level_down(self, entry_init: NodeItem, entry_updated: NodeItem):
         """

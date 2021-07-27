@@ -342,5 +342,25 @@ class Neo4jQueryFactory(Neo4jFactory):
 
         RETURN ID(init_start), ID(init_end), ID(updt_start), ID(updt_end)
         """.format(ts_init, ts_updt)
+
+    @classmethod
+    def get_modified_edge_IDs(cls, ts_init: str, ts_updt: str) -> str:
+        return """
+        MATCH (init_start:{0})-[r1:rel]->(init_end:{0})
+        MATCH (updt_start:{1})-[r2:rel]->(updt_end:{1})
+
+        MATCH (init_start)-[s1:SIMILAR_TO]-(updt_start)
+        MATCH (init_end)-[s2:SIMILAR_TO]-(updt_end)
+
+        // unwind all edge IDs
+        WITH COLLECT(ID(r1)) as edgeIds_init, COLLECT(ID(r2)) as edgeIds_updt
+
+        // find all edges that are not included in this pattern but belong to the specified timestamps
+        MATCH (a:{0})-[mod_init:rel]->(b:{0}) WHERE NOT ID(mod_init) IN edgeIds_init
+        MATCH (c:{1})-[mod_updt:rel]->(d:{1}) WHERE NOT ID(mod_updt) IN edgeIds_updt
+
+        RETURN ID(mod_init) as modifiedEdgeIDs_init, ID(mod_updt) as modifiedEdgeIDs_updated
+        """.format(ts_init, ts_updt)
+
 # ticket_PostEvent-VerifyParsedModel
 # -- create a new method GetNumberOfNodesInGraph(cls, label) here --

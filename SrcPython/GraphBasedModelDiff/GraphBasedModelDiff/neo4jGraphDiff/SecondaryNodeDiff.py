@@ -96,7 +96,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         for pair in intmed_unc:
             if NodePair(pair[0], pair[1]) in self.matchingTable.matched_nodes:
                 # stop recursion
-                return
+                continue
             elif self.matchingTable.node_involved_in_nodePair(pair[0]):
                 # init node of matched pair was already involved in a matching
                 nodes_unchanged.remove(pair)

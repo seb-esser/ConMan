@@ -11,10 +11,10 @@ connector = Neo4jConnector()
 
 connector.connect_driver()
 
-ts_init = 'ts20210623T091751'
-ts_updated = 'ts20210623T091752'
+ts_init = 'ts20210623T091748'
+ts_updated = 'ts20210623T091749'
 
-connector.run_cypher_statement("Match(n)-[r:SIMILAR_TO]->(m) DELETE r")
+connector.run_cypher_statement("Match(n:{})-[r:SIMILAR_TO]-(m:{}) DELETE r".format(ts_init, ts_updated))
 
 # get topmost entry nodes
 raw_init = connector.run_cypher_statement(
