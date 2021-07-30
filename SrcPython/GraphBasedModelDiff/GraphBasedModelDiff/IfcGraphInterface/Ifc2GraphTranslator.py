@@ -331,8 +331,13 @@ class IFCGraphGenerator:
                                'LuminousIntensityExponent',
                                'Exponent',      # from IfcDerivedUnitElement
                                'Precision',     # from IfcGeometricRepresentationContext
-                               'Scale'          # from IfcCartesianPointTransformationOperator3D in 2x3
-                               ]:
+                               'Scale',          # from IfcCartesianPointTransformationOperator3D in 2x3
+                               'Orientation',    # from IfcFaceOuterBound in 2x3
+                               'SelfIntersect',  # from IfcCompositeCurve in 2x3
+                               'SameSense',      # from IfcCompositeCurveSegment in IFC2x3
+                               'SenseAgreement',  # from IfcTrimmedCurve in IFC2x3
+                               'AgreementFlag',   # from IfcPolygonalBoundedHalfSpace
+                               'ParameterTakesPrecedence']:
                 node_attributes.append(attr.name())
 
             elif is_type or is_enumeration or is_pdt_select or is_nested_select:
@@ -341,6 +346,7 @@ class IFCGraphGenerator:
                 single_associations.append(attr.name())
             elif is_aggregation:
                 # ToDo: check if it is an aggregation of types or an aggregation of entities
+                # https://standards.buildingsmart.org/IFC/RELEASE/IFC4/ADD2_TC1/HTML/link/ifctrimmedcurve.htm -> trimSelect
                 if attr.name() in ['Coordinates',
                                    'DirectionRatios',
                                    'CoordList',
@@ -351,7 +357,9 @@ class IFCGraphGenerator:
                                    'Roles',
                                    'Addresses',
                                    'CoordIndex',
-                                   'InnerCoordIndices'
+                                   'InnerCoordIndices',
+                                   'Trim1',
+                                   'Trim2'
                                    ]:
                     node_attributes.append(attr.name())
                 else:
