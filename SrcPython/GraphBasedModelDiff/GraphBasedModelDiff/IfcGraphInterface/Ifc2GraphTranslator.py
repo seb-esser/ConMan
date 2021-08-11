@@ -337,7 +337,41 @@ class IFCGraphGenerator:
                                'SameSense',      # from IfcCompositeCurveSegment in IFC2x3
                                'SenseAgreement',  # from IfcTrimmedCurve in IFC2x3
                                'AgreementFlag',   # from IfcPolygonalBoundedHalfSpace
-                               'ParameterTakesPrecedence']:
+                               'ParameterTakesPrecedence',
+                               'ClosedCurve',
+                               'SelfIntersect',
+                               'LayerOn',
+                               'LayerFrozen',
+                               'LayerBlocked',
+                               'ProductDefinitional',
+                               'Scale2',         #IfcCartesianTransformationOperator2DnonUniform
+                               'Scale3',
+                               'RelatedPriorities',
+                               'RelatingPriorities',
+                               'SameSense',
+                               'AgreementFlag',
+                               'USense',
+                               'VSense',
+                               'WeightsData',
+                               'Weights',
+                               'Sizeable',
+                               'ParameterTakesPrecedence',
+                               'IsCritical',
+                               'DestabilizingLoad',
+                               'IsLinear',
+                               'RepeatS',
+                               'RepeatT',
+                               'IsHeading',
+                               'IsMilestone',
+                               'Priority',
+                               'SenseAgreement',
+                               'IsPotable',
+                               'NumberOfRiser',
+                               'NumberOfTreads',
+                               'Pixel',
+                               'InputPhase',
+                               'Degree'
+                               ]:
                 node_attributes.append(attr.name())
 
             elif is_type or is_enumeration or is_pdt_select or is_nested_select:
@@ -347,20 +381,25 @@ class IFCGraphGenerator:
             elif is_aggregation:
                 # ToDo: check if it is an aggregation of types or an aggregation of entities
                 # https://standards.buildingsmart.org/IFC/RELEASE/IFC4/ADD2_TC1/HTML/link/ifctrimmedcurve.htm -> trimSelect
-                if attr.name() in ['Coordinates',
-                                   'DirectionRatios',
-                                   'CoordList',
-                                   'segments',
-                                   'MiddleNames',
-                                   'PrefixTitles',
-                                   'SuffixTitles',
-                                   'Roles',
-                                   'Addresses',
-                                   'CoordIndex',
-                                   'InnerCoordIndices',
-                                   'Trim1',
-                                   'Trim2'
-                                   ]:
+                if attr.name() in [
+                    'Coordinates',
+                    'DirectionRatios',
+                    'CoordList',
+                    'segments',
+                    'MiddleNames',
+                    'PrefixTitles',
+                    'SuffixTitles',
+                    'Roles',
+                    'Addresses',
+                    'CoordIndex',
+                    'InnerCoordIndices',
+                    'Trim1',
+                    'Trim2',
+                    'Orientation',
+
+
+
+                ]:
                     node_attributes.append(attr.name())
                 else:
                     aggregated_associations.append(attr.name())
