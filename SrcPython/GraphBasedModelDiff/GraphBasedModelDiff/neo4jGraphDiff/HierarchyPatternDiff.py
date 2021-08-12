@@ -117,9 +117,13 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         @return:
         """
 
+        if entry_init.id == 151407 or entry_updated.id == 337946:
+            print("obacht")
+
         self.visited_primary_nodes.append(NodePair(entry_init, entry_updated))
         self.diff_engine.diffContainer.nodeMatchingTable.add_matched_nodes(entry_init, entry_updated)
 
+        print('[DIFF] Running subgraph Diff under PrimaryNodes {} and {}'.format(entry_init.id, entry_updated.id))
         # run diff and get node matching
         sub_result = self.diff_engine.diff_subgraphs(entry_init, entry_updated,
                                                      self.diff_engine.diffContainer.nodeMatchingTable.matched_nodes)

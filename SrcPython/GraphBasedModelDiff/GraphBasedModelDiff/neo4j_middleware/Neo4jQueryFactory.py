@@ -146,7 +146,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         return """
             MATCH (n)<-[r1]-(c:ConnectionNode)-[r2]->(m:PrimaryNode) 
             WHERE ID(n) = {} AND NOT r1 = r2 AND NOT(ID(m) IN [{}])
-            RETURN ID(m), m.EntityType, PROPERTIES(m), LABELS(m)
+            RETURN DISTINCT ID(m), m.EntityType, PROPERTIES(m), LABELS(m)
             """.format(node_id, va[:-2])
 
     @classmethod

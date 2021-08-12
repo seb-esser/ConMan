@@ -11,8 +11,13 @@ connector = Neo4jConnector()
 
 connector.connect_driver()
 
-ts_init = 'ts20210623T091748'
-ts_updated = 'ts20210623T091749'
+# placement example
+# ts_init = 'ts20210623T091748'
+# ts_updated = 'ts20210623T091749'
+
+# Solibri example
+ts_init = 'ts20121017T152740'
+ts_updated = 'ts20121017T154702'
 
 connector.run_cypher_statement("Match(n:{})-[r:SIMILAR_TO]-(m:{}) DELETE r".format(ts_init, ts_updated))
 
