@@ -70,6 +70,10 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         children_init = self.get_children_nodes(self.label_init, node_init.id)
         children_updated = self.get_children_nodes(self.label_updated, node_updated.id)
 
+        # apply DiffIgnore -> Ignore nodes if requested
+        children_init = self.apply_DiffIgnore_Nodes(children_init)
+        children_updated = self.apply_DiffIgnore_Nodes(children_updated)
+
         # leave node?
         if len(children_init) == 0 and len(children_updated) == 0:
             if self.toConsole():
@@ -81,10 +85,6 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
             # calc hashes for init and updated
             children_init = self.__get_hashes_of_nodes(self.label_init, children_init, indent)
             children_updated = self.__get_hashes_of_nodes(self.label_updated, children_updated, indent)
-
-        # apply DiffIgnore -> Ignore nodes if requested        
-        children_init = self.apply_DiffIgnore_Nodes(children_init)
-        children_updated = self.apply_DiffIgnore_Nodes(children_updated)
 
         # compare children and raise an dissimilarity if necessary.
         [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(children_init, children_updated,
