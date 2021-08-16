@@ -18,10 +18,11 @@ Therefore, please download and install the following products on your machine be
 
    The DB browser of running neo4j instances is accessible port 7474 (http). 
 
-   Default credentials: 
-   
-    | user  | `neo4j`    |
-    | pw    | `password` |
+Default credentials: 
+| var   | value      |
+| ----- |:----------:|
+| user  | `neo4j`    |
+| pw    | `password` |
 
 - Download and install [Anaconda](https://www.anaconda.com/products/individual). 
     Also check out the installation guidelines provided in `\00_condaEnvs\readme.md` 
@@ -36,14 +37,16 @@ Please specify the correct path to the model(s) you'd like to parse into the dat
 Once a model is parsed into the database, it gets accessed using its timestamp label (referred as `tsYYYYMMDDTHHMMSS` (e.g., `ts20121017T152740`)). 
 
 The graph can be queried using the CYPHER query language, e.g.: 
-
-`MATCH (n:ts20121017T152740) RETURN n LIMIT 35`
+```cypher
+MATCH (n:ts20121017T152740) RETURN n LIMIT 35
+```
 
 A graph representation of an IFC model can be parsed back into an SPF-based representation using the python script `script_parseGraph2Ifc.py` 
 
 # Python packages and dependencies
-
-[IfcOpenShell](http://ifcopenshell.org/)
-[Neo4j Driver](https://pypi.org/project/neo4j/)
+| Package         | URL           | License |
+| --------------- |:-------------:| ------- |
+|[IfcOpenShell](http://ifcopenshell.org/)| | |
+|[Neo4j Driver](https://pypi.org/project/neo4j/)| | |
 
 
