@@ -1,8 +1,9 @@
 """ package """
 import itertools
 
+from GraphBasedModelDiff.neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
+
 """ modules """
-from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
 
 
 class SetCalculator(object):
@@ -25,8 +26,9 @@ class SetCalculator(object):
 
         nodes_unchanged = []
 
-        if len(set_A) == 0 or len(set_B) == 0:
-            raise Exception("got empty sets in set intersection calculation. ")
+        # if len(set_A) == 0 or len(set_B) == 0:
+            # raise Exception("got empty sets in set intersection calculation. ")
+
 
         # match nodes based on child node hash_value
         A = set_A
@@ -34,11 +36,11 @@ class SetCalculator(object):
 
         # calculate matching pairs
         switcher = {
-            MatchCriteriaEnum.OnGuid		        : self.__get_intersection_byGlobalId(A, B),
-            MatchCriteriaEnum.OnRelType				: self.__get_intersection_byRelType(A, B),
-            MatchCriteriaEnum.OnEntityType			: self.__get_intersection_byEntityType(A, B),
-            MatchCriteriaEnum.OnHash				: self.__get_intersection_byHash(A, B),
-            MatchCriteriaEnum.OnHashAndOnRelType	: self.__get_intersection_byHashAnRelType(A, B)
+            MatchCriteriaEnum.OnGuid: self.__get_intersection_byGlobalId(A, B),
+            MatchCriteriaEnum.OnRelType: self.__get_intersection_byRelType(A, B),
+            MatchCriteriaEnum.OnEntityType: self.__get_intersection_byEntityType(A, B),
+            MatchCriteriaEnum.OnHash: self.__get_intersection_byHash(A, B),
+            MatchCriteriaEnum.OnHashAndOnRelType: self.__get_intersection_byHashAnRelType(A, B)
         }
 
         matched_pairs = switcher[intersection_method]
@@ -52,7 +54,8 @@ class SetCalculator(object):
                 nodes_deleted.remove(pair[0])
                 nodes_unchanged.append((pair[0], pair[1]))
         except:
-            raise Exception('Unable to sort nodes in SetCalculator. ')
+            print('A problem occured during set calculations. Tried to continue')
+            # raise Exception('Unable to sort nodes in SetCalculator. ')
 
         return nodes_unchanged, nodes_added, nodes_deleted
 
