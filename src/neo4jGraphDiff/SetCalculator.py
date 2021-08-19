@@ -1,7 +1,7 @@
 """ package """
 import itertools
 
-from GraphBasedModelDiff.neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
+from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
 
 """ modules """
 

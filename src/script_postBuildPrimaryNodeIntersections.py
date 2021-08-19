@@ -1,7 +1,7 @@
-from GraphBasedModelDiff.neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
-from GraphBasedModelDiff.neo4jGraphDiff.SetCalculator import SetCalculator
-from GraphBasedModelDiff.neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-from GraphBasedModelDiff.neo4j_middleware.ResponseParser.NodeItem import NodeItem
+from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
+from neo4jGraphDiff.SetCalculator import SetCalculator
+from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 connector = Neo4jConnector()
@@ -25,6 +25,7 @@ prim_nodes_updt = NodeItem.fromNeo4jResponseWouRel(
 calculator = SetCalculator()
 [unc, added, deleted] = calculator.calc_intersection(prim_nodes_init, prim_nodes_updt, MatchCriteriaEnum.OnGuid)
 
+print()
 print('Deleted PrimaryNodes:')
 for n in deleted:
     print(n)
