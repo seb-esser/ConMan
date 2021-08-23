@@ -97,25 +97,6 @@ class Neo4jGraphFactory(Neo4jFactory):
         return Neo4jFactory.BuildMultiStatement([match, create, merge] + attrs + [returnID])
 
     @classmethod
-    def create_secondary_node_wouRels(cls, entity_type: str, timestamp: str) -> str:
-        """
-        Provides the cypher command to attach a given dictionary to a node specified by its node id
-        @param parent_id: source node, which is referenced by the newly created secondary node. Can be set to None
-        @param entity_type: reflection of data model class
-        @param rel_attrs: dictionary to be attached to the edge
-        @param timestamp: identifier for a model
-        @return: cypher command as str
-        """
-
-        create = 'CREATE (n:SecondaryNode:{} {{EntityType: "{}" }})'.format(timestamp, entity_type)
-        match = ""
-        merge = ""
-        attrs = []
-        returnID = 'RETURN ID(n)'
-
-        return Neo4jFactory.BuildMultiStatement([match, create, merge] + attrs + [returnID])
-    
-    @classmethod
     def create_list_node(cls, parent_id: int, rel_type: str, timestamp: str) -> str:
         """
         Provides the cypher command to attach a given dictionary to a node specified by its node id
