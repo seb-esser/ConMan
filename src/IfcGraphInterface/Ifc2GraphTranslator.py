@@ -1,6 +1,7 @@
 """ package import """
 import ifcopenshell
 import progressbar
+import concurrent.futures
 
 """ file import """
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
@@ -46,6 +47,8 @@ class IFCGraphGenerator:
 
         super().__init__()
 
+    
+        
     # public entry method to generate the graph out of a given IFC model
     def generateGraph(self):
         """
@@ -69,30 +72,18 @@ class IFCGraphGenerator:
             elements = self.model.by_type(type, False)
             entity_list += elements
 
-        # Split list into 4 equal chunks for threading
-        # split_list = list(entity_list[i::4] for i in range(4)))
+        # Split list into n equal chunks for threading
+        n = 4
+        split_list = list(entity_list[i::n] for i in range(n))
 
-        # Data for progressbar
-        increment = 100 / len(entity_list)
-        percent = 0
-        for entity in entity_list:
-            
-            # print progressbar
-            progressbar.printbar(percent)
-            
-            # check if the entity is either an ObjectDef or Relationship or neither
-            if entity.is_a('IfcObjectDefinition'):
-                self.__mapPrimaryEntity(entity)
-            elif entity.is_a('IfcRelationship'):
-                self.__mapObjRelationship(entity)
-            else:
-                self.__mapSecondaryEntity(entity)
-
-            # add increment to percentage
-            percent += increment
         
-        progressbar.printbar(percent)
+        
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.map(self.thread_target, split_list)
+            #print(results)
 
+            #for f in concurrent.futures.as_completed(results):
+            #    print(f.result())
         # props = self.model.by_type('IfcPropertyDefinition')
 
         # parse rooted node + subgraphs
@@ -108,6 +99,30 @@ class IFCGraphGenerator:
 
         return self.label
 
+    # method for threading
+    def thread_target(self, entity_list):
+        # Data for progressbar
+        increment = 100 / len(entity_list)
+        percent = 0
+        for entity in entity_list:
+                
+            # print progressbar
+            progressbar.printbar(percent)
+                
+            # check if the entity is either an ObjectDef or Relationship or neither
+            if entity.is_a('IfcObjectDefinition'):
+                self.__mapPrimaryEntity(entity)
+            elif entity.is_a('IfcRelationship'):
+                self.__mapObjRelationship(entity)
+            else:
+                self.__mapSecondaryEntity(entity)
+
+            # add increment to percentage
+            percent += increment
+            
+        progressbar.printbar(percent)
+        return None
+        
     def validateParsingResult(self):
         # ticket_PostEvent-VerifyParsedModel
 
