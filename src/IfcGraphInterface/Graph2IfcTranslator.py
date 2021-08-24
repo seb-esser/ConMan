@@ -7,18 +7,19 @@ import ifcopenshell
 
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
+
 class Graph2IfcTranslator:
     """
 
     """
 
-    def __init__(self, connector: Neo4jConnector, ts: str):
+    def __init__(self, connector: Neo4jConnector, ts: str, schema_identifier: str = 'IFC4'):
         """
 
         @param connector:
         @param ts:
         """
-        self.model = ifcopenshell.file(schema='IFC4x1')
+        self.model = ifcopenshell.file(schema=schema_identifier)
         self.node_id_2_spf_id = {}
         self.connector = connector
         self.ts = ts
@@ -41,6 +42,26 @@ class Graph2IfcTranslator:
 
         try:
             print('building entity {}'.format(class_name))
+
+            # for key, val in attributes.items():
+            #     if key in [
+            #         'Coordinates',
+            #         'DirectionRatios',
+            #         'CoordList',
+            #         'segments',
+            #         'MiddleNames',
+            #         'PrefixTitles',
+            #         'SuffixTitles',
+            #         'Roles',
+            #         'Addresses',
+            #         'CoordIndex',
+            #         'InnerCoordIndices',
+            #         'Trim1',
+            #         'Trim2',
+            #         'Orientation',
+            #         'RefLongitude']:
+            #         print(val)
+
             e = self.model.create_entity(class_name, **attributes)
 
             # save node id 2 spf id in dict
@@ -95,7 +116,7 @@ class Graph2IfcTranslator:
         @param rec: triggers if this method should be carried out recursively
         @return:
         """
-    # build association
+        # build association
         query_factory = Neo4jQueryFactory()
         cy = query_factory.get_child_nodes(self.ts, n.id)
         raw_res = self.connector.run_cypher_statement(cy)

@@ -116,7 +116,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @param parent_node_id: the node id of the parent node
         @return: cypher query string
         """
-        match = 'MATCH (n:{})-[r]->(c)'.format(label)
+        match = 'MATCH (n:{})-[r:rel]->(c)'.format(label)
         where = 'WHERE ID(n) = {}'.format(parent_node_id)
         ret = 'RETURN ID(c), PROPERTIES(r), c.EntityType, PROPERTIES(c), LABELS(n)'
         return Neo4jFactory.BuildMultiStatement([match, where, ret])

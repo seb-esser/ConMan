@@ -17,7 +17,7 @@ types = set(i.is_a() for i in model)
 types_count = {t: len(model.by_type(t)) for t in types}
 
 num_elems = sorted(types_count.items(), key = lambda kv:kv[1], reverse = True)
-num_elems = [occurence for occurence in num_elems if occurence[1] > 500]
+num_elems = [occurence for occurence in num_elems if occurence[1] > 2300]
 
 
 x_values = [val[0] for val in num_elems]
@@ -27,13 +27,19 @@ objects = x_values
 y_pos = np.arange(len(objects))
 performance = y_values
 
-plt.bar(y_pos, performance, align='center', alpha=0.5)
-plt.xticks(y_pos, objects, rotation=90, size=10)
-
+fig = plt.bar(y_pos, performance, align='center', alpha=0.5)
+plt.xticks(y_pos, objects, rotation=90)
 
 plt.ylabel('No of num_elems')
 plt.title('IFC entity types frequency')
+# # Pad margins so that markers don't get clipped by the axes
+# plt.margins(0.2)
+# Tweak spacing to prevent clipping of tick-labels
+plt.subplots_adjust(bottom=0.4)
 
-plt.show()
+plt.grid(axis='y', color='0.95')
+
+# plt.show()
+plt.savefig('frequency_init_model.pdf')
 
 
