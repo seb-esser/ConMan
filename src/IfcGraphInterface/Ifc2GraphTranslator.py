@@ -396,9 +396,8 @@ class IFCGraphGenerator:
                     'Trim1',
                     'Trim2',
                     'Orientation',
-
-
-
+                    'RefLongitude',
+                    'RefLatitude'
                 ]:
                     node_attributes.append(attr.name())
                 else:

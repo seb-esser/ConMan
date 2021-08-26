@@ -16,7 +16,7 @@ for pm in result.property_updates:
     guid = pm.pattern.get_entry_node().attrs['GlobalId']
     if guid not in guids:
         guids.append(guid)
-        print("GlobalID: {} \t EntityType: {} Modification on {}".format(guid, entity, pm.attrName))
+        print("GlobalID: {} \t EntityType: {} \t\t {}".format(guid, entity, pm.attrName))
 
 
 print(len(guids))
