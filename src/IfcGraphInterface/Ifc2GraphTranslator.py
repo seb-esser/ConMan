@@ -73,13 +73,34 @@ class IFCGraphGenerator:
             entity_list += elements
 
         # Split list into n equal chunks for threading
-        n = 4
-        split_list = list(entity_list[i::n] for i in range(n))
+        #n = 4
+        #split_list = list(entity_list[i::n] for i in range(n))
+        #increment = 100 / len(entity_list)
+        #percent = 0
+        
+        for entity in entity_list:
+                
+            # print progressbar
+            # progressbar.printbar(percent)
+                
+            # check if the entity is either an ObjectDef or Relationship or neither
+            if entity.is_a('IfcObjectDefinition'):
+                self.__mapPrimaryEntity(entity)
+            elif entity.is_a('IfcRelationship'):
+                self.__mapObjRelationship(entity)
+            else:
+                self.__mapSecondaryEntity(entity)
 
+            # add increment to percentage
+            # percent += increment
+            
+        # progressbar.printbar(percent)
+        for entity in entity_list:
+            print('Building rels')
+            self.build_node_rels(entity)
         
-        
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.map(self.thread_target, split_list)
+        #with concurrent.futures.ThreadPoolExecutor() as executor:
+        #    executor.map(self.thread_target, split_list)
             #print(results)
 
             #for f in concurrent.futures.as_completed(results):
@@ -100,28 +121,28 @@ class IFCGraphGenerator:
         return self.label
 
     # method for threading
-    def thread_target(self, entity_list):
-        # Data for progressbar
-        increment = 100 / len(entity_list)
-        percent = 0
-        for entity in entity_list:
+    # def thread_target(self, entity_list):
+    #     # Data for progressbar
+    #     increment = 100 / len(entity_list)
+    #     percent = 0
+    #     for entity in entity_list:
                 
-            # print progressbar
-            progressbar.printbar(percent)
+    #         # print progressbar
+    #         progressbar.printbar(percent)
                 
-            # check if the entity is either an ObjectDef or Relationship or neither
-            if entity.is_a('IfcObjectDefinition'):
-                self.__mapPrimaryEntity(entity)
-            elif entity.is_a('IfcRelationship'):
-                self.__mapObjRelationship(entity)
-            else:
-                self.__mapSecondaryEntity(entity)
+    #         # check if the entity is either an ObjectDef or Relationship or neither
+    #         if entity.is_a('IfcObjectDefinition'):
+    #             self.__mapPrimaryEntity(entity)
+    #         elif entity.is_a('IfcRelationship'):
+    #             self.__mapObjRelationship(entity)
+    #         else:
+    #             self.__mapSecondaryEntity(entity)
 
-            # add increment to percentage
-            percent += increment
+    #         # add increment to percentage
+    #         percent += increment
             
-        progressbar.printbar(percent)
-        return None
+    #     progressbar.printbar(percent)
+    #     return None
         
     def validateParsingResult(self):
         # ticket_PostEvent-VerifyParsedModel
@@ -154,7 +175,7 @@ class IFCGraphGenerator:
         parent_node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
         
         # get all attrs and children
-        self.build_node_content(entity, 0, parent_node_id)
+        self.build_node_attributes(entity, 0, parent_node_id)
         
     def __mapSecondaryEntity(self, entity):
         info = entity.get_info()
@@ -163,10 +184,10 @@ class IFCGraphGenerator:
         cypher_statement = Neo4jGraphFactory.create_secondary_node_wouRels(entityType, self.label)
         node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
         
-        self.build_node_content(entity, 0, node_id)
+        self.build_node_attributes(entity, 0, node_id)
         
     # private recursive function
-    def build_node_content(self, entity, indent: int, node_id: int):
+    def build_node_attributes(self, entity, indent: int, node_id: int):
         """
 
         @param entity:
@@ -183,9 +204,8 @@ class IFCGraphGenerator:
         p21_id = info['id']
 
         # separate associations from class attributes
-        node_attribute_names, _, _ = self.separate_attributes(
-            entity)
-
+        node_attribute_names, _, _ = self.separate_attributes(entity)
+        
         # define dict of attributes that get directly attached to the node
         node_attr_dict = {}
         for a in node_attribute_names:
@@ -200,8 +220,52 @@ class IFCGraphGenerator:
             node_id, node_attr_dict, self.label)
         self.connector.run_cypher_statement(cypher_statement)
 
+    def build_node_rels(self, entity):
+        # get info
+        info = entity.get_info()
+        p21_id = info['id']
         
+        # get attribute definitions
+        _, single_associations, aggregated_associations = self.separate_attributes(entity)
+        
+        for association in single_associations:
+            entity = info[association]
+            if entity is None:
+                continue
 
+            p21_id_child = entity.get_info()['id']
+
+            edge_attrs = {'relType': association}
+
+            # merge with existing
+            cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.label)
+            self.connector.run_cypher_statement(cy)
+        
+        for association in aggregated_associations:
+            entities = info[association]
+            i = 0
+            if entities is None:
+                # detected an array of associations but nothing was referenced within the given instance model
+                continue
+            for entity in entities:
+                try:
+                    p21_id_child = entity.get_info()['id']
+                
+                except:
+                    raise Exception('Failed to query data from entity.')
+
+                edge_attrs = {
+                    'relType': association,
+                    'listItem': i
+                }
+
+                # merge with existing
+                cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.label)
+                self.connector.run_cypher_statement(cy)
+
+                # increase counter
+                i += 1
+                
     def check_node_exists(self, p21_id_child: int) -> bool:
         """
         check if a node with a specified p21_id already exists in the graph
@@ -228,7 +292,7 @@ class IFCGraphGenerator:
         node_id = self.connector.run_cypher_statement(
             cypher_statement, 'ID(n)')[0]
         # get all attrs and children
-        self.build_node_content(objRel, 0, node_id)
+        self.build_node_attributes(objRel, 0, node_id)
 
     
     def separate_attributes(self, entity) -> tuple:
