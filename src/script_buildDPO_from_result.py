@@ -28,6 +28,7 @@ guids_added = [
 label_init = "ts20121017T152740"
 label_updt = "ts20121017T154702"
 
+
 connector = Neo4jConnector()
 connector.connect_driver()
 
@@ -41,12 +42,14 @@ for guid in guids_removed:
 
     OPTIONAL MATCH context_1 = (extRefs_in)-[:rel*..2]-(prim_a:PrimaryNode)
     OPTIONAL MATCH context_2 = (extRefs_out)-[:rel*..2]-(prim_b:PrimaryNode)
-    return count([n, sec])""".format(label_init, guid)
+    return count([n, sec]) as count_nodes
+    """.format(label_init, guid)
     # print(cy + '\n --- --- \n')
 
     raw = connector.run_cypher_statement(cy)[0]
     print(raw)
 
+connector.disconnect_driver()
 
 
 
