@@ -15,19 +15,25 @@ connector.connect_driver()
 ts_init = 'ts20121017T152740'
 ts_updated = 'ts20121017T154702'
 
+print("Do you really want to re-run the diff calculation? ")
+confirm = input("[y, n]")
+
+if confirm != "y":
+    exit()
+
 connector.run_cypher_statement("Match(n:{})-[r:SIMILAR_TO]-(m:{}) DELETE r".format(ts_init, ts_updated))
 
 # get topmost entry nodes
 raw_init = connector.run_cypher_statement(
     """
-    MATCH (n:PrimaryNode:{}) 
-    WHERE n.EntityType = "IfcProject" 
+    MATCH (n:PrimaryNode:{})
+    WHERE n.EntityType = "IfcProject"
     RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)
     """.format(ts_init))
 raw_updated = connector.run_cypher_statement(
     """
-    MATCH (n:PrimaryNode:{}) 
-    WHERE n.EntityType = "IfcProject" 
+    MATCH (n:PrimaryNode:{})
+    WHERE n.EntityType = "IfcProject"
     RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)
     """.format(ts_updated))
 
@@ -44,7 +50,7 @@ for p in result.node_matching_table.matched_nodes:
     cy = """
     MATCH (n) WHERE ID(n)={0}
     MATCH (m) WHERE ID(m)= {1}
-    MERGE (n)-[:SIMILAR_TO]->(m)    
+    MERGE (n)-[:SIMILAR_TO]->(m)
     """.format(p.init_node.id, p.updated_node.id)
     connector.run_cypher_statement(cy)
 
@@ -53,6 +59,4 @@ cy = Neo4jQueryFactory.get_all_nodes_wou_SIMILARTO_rel(ts_updated)
 print(cy)
 raw_res = connector.run_cypher_statement(cy)
 nodes = NodeItem.fromNeo4jResponseWouRel(raw_res)
-
-connector.disconnect_driver()
 

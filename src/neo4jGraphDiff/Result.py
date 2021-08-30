@@ -39,3 +39,7 @@ class Result:
         method to calculate all nodes that were added. Calculation is based on the SIMILAR_TO relationship work
         @return:
         """
+
+    def sort_pMods_by_guid(self):
+        lst = sorted(self.property_updates, key=lambda pmod: pmod.pattern.get_entry_node().attrs['GlobalId'])
+        return lst
