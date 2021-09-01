@@ -67,6 +67,11 @@ class NodeMatchingTable:
         return 'NodeMatchingTable NumEntries: {}'.format(len(self.matched_nodes))
 
     def get_parent_primaryNode(self, subgraphNode: NodeItem):
+        """
+        returns the primaryNode from which a secondary node was detected the first time
+        @param subgraphNode:
+        @return:
+        """
 
         # get position of node
         lst_position: int
@@ -83,7 +88,8 @@ class NodeMatchingTable:
         # find next primaryNode in the list by reversing and find first index
         parent_primary_node = [prim_node for prim_node in node_list[::-1] if prim_node.nodeType == "PrimaryNode"][0]
 
-        return parent_primary_node
+        return node_list[::-1].index(parent_primary_node)
+
 
 
 

@@ -1,3 +1,7 @@
+"""
+Script to calculate the pattern size (i.e. number of nodes) to modify a property
+2021-09-01 SE
+"""
 import jsonpickle
 
 from neo4jGraphDiff.Result import Result
@@ -15,4 +19,5 @@ pMods = result.property_updates
 for pm in pMods:
     modified_node = pm.node_init
     index = node_matching_table.get_parent_primaryNode(modified_node)
+    print('Path length for modification of {}: {}'.format(pm.attrName, index))
 
