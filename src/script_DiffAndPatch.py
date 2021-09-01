@@ -8,8 +8,7 @@
 # 6. create IFC model out of the updated graph
 from IfcGraphInterface.Ifc2GraphTranslator import IFCGraphGenerator
 from PatchManager.Patch import Patch
-from PatchManager.PatchGenerator import PatchGenerator
-from PatchManager.PatchIntegrator import PatchIntegrator
+
 from neo4jGraphDiff.GraphDiff import GraphDiff
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 

@@ -1,8 +1,9 @@
 from typing import List
 
-from PatchManager.NodeMapping import NodeMapping
 from PatchManager.Operation import AbstractOperation
 import jsonpickle
+
+from neo4jGraphDiff.Caption.NodeMatchingTable import NodeMatchingTable
 
 
 class Patch(object):
@@ -14,7 +15,7 @@ class Patch(object):
         self.base_timestamp: str = ""
         # the timestamp the resulting model should carry
         self.resulting_timestamp: str = ""
-        self.connection_node_mapping: List[NodeMapping] = []
+        self.connection_node_mapping: NodeMatchingTable = []
 
     def __repr__(self):
         return 'Patch object'

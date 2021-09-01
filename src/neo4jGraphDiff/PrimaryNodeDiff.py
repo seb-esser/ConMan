@@ -1,18 +1,17 @@
-from typing import List
-
-from neo4jGraphAnalysis.AdjacencyAnalyser import AdjacencyAnalyser
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
-from .SetCalculator import SetCalculator
+from SetCalculator import SetCalculator
 
 
 class PrimaryNodeDiff:
-	""" """
+	"""
+
+	"""
 	def __init__(self, connector, configuration):
 		"""
 
-		@param connector:
+		@param connector: Neo4j Connector instance
 		@param configuration:
 		"""
 		self.configuration = configuration

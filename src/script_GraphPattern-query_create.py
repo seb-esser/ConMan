@@ -1,4 +1,8 @@
-from neo4jGraphAnalysis.PatternDetector import PatternDetector
+
+"""
+Sample script to test graph patterns, graph paths and their corresponding applications (merge, match)
+
+"""
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.neo4jConnector import Neo4jConnector
