@@ -69,50 +69,7 @@ class PrimaryNodeDiff:
 			print('Added nodes: {}'.format(nodes_added))
 			print('Deleted nodes: {}'.format(nodes_deleted))
 
-		# check property updates of unchanged node tuples
-
-		# check adjacencies of unchanged node tuples
-		# self.__check_adjacencies(nodes_unchanged)
-		# !! not yet sufficient as current nodes in node set dont share direct edges !!
-
 		return [nodes_unchanged, nodes_added, nodes_deleted]
-
-	def __check_adjacencies(self, nodes_unchanged):
-		"""
-		@param nodes_unchanged:
-		@return:
-		"""
-
-		# unpack node ids for adjacency matrix
-		nodeIds_init: List[int] = []
-		nodeIds_updated: List[int] = []
-
-		for pair in nodes_unchanged:
-			nodeIds_init.append(pair[0].id)
-			nodeIds_updated.append(pair[1].id)
-
-		# calc adjacency matrices
-		adjacency_analyser = AdjacencyAnalyser(self.connector)
-		adj_mtx_init = adjacency_analyser.get_adjacency_matrix_byNodeIDs(nodeIds_init)
-		print(adj_mtx_init)
-
-	def compareRootedNodeRelationships(self):
-		""" """
-		raise Exception('method compareRootedNodeRelationships is not implemented yet')		
-
-	def __getHashesOfRootedNodes(self, label):
-		cy = Neo4jQueryFactory.GetHashesByLabel(label)
-		raw = self.connector.run_cypher_statement(cy)
-		return self.__extractHashes(raw)
-
-	def __extractHashes(self, result):
-		nodes = []
-		for res in result:
-			node = NodeItem(res[0], None, res[1])
-			node.set_hash(res[2])
-			nodes.append(node)
-
-		return nodes
 
 	def __get_primary_nodes(self, label):
 		cy = Neo4jQueryFactory.get_primary_nodes(label)
@@ -129,8 +86,3 @@ class PrimaryNodeDiff:
 		con_nodes = NodeItem.fromNeo4jResponseWouRel(raw_con)
 		return con_nodes
 
-	def __get_rooted_con_nodes(self, label):
-		primaries = self.__get_primary_nodes(label)
-		connections = self.__get_con_nodes(label)
-
-		return primaries + connections

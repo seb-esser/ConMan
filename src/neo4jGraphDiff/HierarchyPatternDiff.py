@@ -38,7 +38,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
     def diff_subgraphs(self, entry_init: NodeItem, entry_updated: NodeItem):
         """
-
+        performs a hierarchy-driven substructure traversal. Result is available under self.result
         @param entry_init:
         @param entry_updated:
         @return:
@@ -46,9 +46,9 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         # recursion
         self.__move_level_down(entry_init, entry_updated)
 
-        # post processing
-        prim_nodes_init = [x.init_node for x in self.visited_primary_nodes]
-        prim_nodes_updt = [x.updated_node for x in self.visited_primary_nodes]
+        #  --- post processing ---
+        prim_nodes_init = [x.init_node for x in self.result.node_matching_table.get_all_primaryNode_pairs()]
+        prim_nodes_updt = [x.updated_node for x in self.result.node_matching_table.get_all_primaryNode_pairs()]
 
         con_init = NodeItem.fromNeo4jResponseWouRel(
             self.connector.run_cypher_statement(
@@ -67,7 +67,11 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
             if n.id == -1:
                 prim_nodes_updt.remove(n)
 
-        [unc, added, deleted] = self.calcSimilarity(prim_nodes_init + con_init, prim_nodes_updt + con_updt)
+        set_calculator = SetCalculator()
+        [unc, added, deleted] = set_calculator.calc_intersection(
+            set_A=prim_nodes_init + con_init,
+            set_B=prim_nodes_updt + con_updt,
+            intersection_method=MatchCriteriaEnum.OnGuid)
 
         # log unchanged nodes
         for n1, n2 in unc:
@@ -92,18 +96,6 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         return self.result
 
-    def calcSimilarity(self, nodes_init, nodes_updated):
-        """
-
-        @param nodes_init:
-        @param nodes_updated:
-        @return:
-        """
-        set_calculator = SetCalculator()
-
-        return set_calculator.calc_intersection(
-            nodes_init, nodes_updated, intersection_method=MatchCriteriaEnum.OnGuid)
-
     def __move_level_down(self, entry_init: NodeItem, entry_updated: NodeItem):
         """
 
@@ -111,8 +103,6 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         @param entry_updated:
         @return:
         """
-
-        self.visited_primary_nodes.append(NodePair(entry_init, entry_updated))
         self.result.node_matching_table.add_matched_nodes(entry_init, entry_updated)
 
         print('[DIFF] Running subgraph Diff under PrimaryNodes {} and {}'.format(entry_init.id, entry_updated.id))
@@ -125,10 +115,12 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # run subgraph diff again and consider already matched node pairs now
         # query next primary nodes
-        cy_next_nodes_init = Neo4jQueryFactory.get_hierarchical_prim_nodes(node_id=entry_init.id,
-                                                                           exclude_nodes=self.visited_primary_nodes)
-        cy_next_nodes_upd = Neo4jQueryFactory.get_hierarchical_prim_nodes(node_id=entry_updated.id,
-                                                                          exclude_nodes=self.visited_primary_nodes)
+        cy_next_nodes_init = Neo4jQueryFactory.get_hierarchical_prim_nodes(
+            node_id=entry_init.id,
+            exclude_nodes=self.result.node_matching_table.get_all_primaryNode_pairs())
+        cy_next_nodes_upd = Neo4jQueryFactory.get_hierarchical_prim_nodes(
+            node_id=entry_updated.id,
+            exclude_nodes=self.result.node_matching_table.get_all_primaryNode_pairs())
 
         raw_init = self.connector.run_cypher_statement(cy_next_nodes_init)
         raw_updated = self.connector.run_cypher_statement(cy_next_nodes_upd)
@@ -155,7 +147,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # kick recursion for next hierarchy level if pair was not already visited
         for pair in unc:
-            if NodePair(pair[0], pair[1]) not in self.visited_primary_nodes:
+            if NodePair(pair[0], pair[1]) not in self.result.node_matching_table.get_all_primaryNode_pairs():
                 self.__move_level_down(pair[0], pair[1])
 
     def __load_edges(self, label):
