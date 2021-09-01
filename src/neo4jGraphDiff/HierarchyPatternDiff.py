@@ -4,6 +4,7 @@ from neo4jGraphDiff.AbsDirectedSubgraphDiff import AbsDirectedSubgraphDiff
 from neo4jGraphDiff.Caption.EdgeMatchingTable import EdgeMatchingTable
 
 from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
+from neo4jGraphDiff.Caption.StructureModification import StructureModification
 from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
@@ -152,10 +153,10 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # log added and deleted nodes on primary structure
         for ad in added:
-            self.diff_engine.diffContainer.logStructureModification(entry_updated.id, ad.id, 'added')
+            self.result.structure_updates.append(StructureModification(parentId=entry_updated.id, childId=ad.id, modificationType="added"))
             self.visited_primary_nodes.append(NodePair(NodeItem(nodeId=-1), ad))
         for de in deleted:
-            self.diff_engine.diffContainer.logStructureModification(entry_init.id, de.id, 'deleted')
+            self.result.structure_updates.append(StructureModification(parentId=entry_init.id, childId=de.id, modificationType="deleted"))
             self.visited_primary_nodes.append(NodePair(de, NodeItem(nodeId=-1)))
 
         # kick recursion for next hierarchy level if pair was not already visited

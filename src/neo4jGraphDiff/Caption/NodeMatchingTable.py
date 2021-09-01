@@ -63,6 +63,8 @@ class NodeMatchingTable:
         return [p for p in self.matched_nodes if
                 (p.init_node.nodeType == "PrimaryNode" and p.updated_node.nodeType == "PrimaryNode")]
 
+    def __repr__(self):
+        return 'Matching Table NumEntries {}'.format(len(self.matched_nodes))
 
 class NodePair:
     def __init__(self, init: NodeItem, updated: NodeItem):
