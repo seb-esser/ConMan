@@ -43,12 +43,10 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         @param entry_updated:
         @return:
         """
-
         # recursion
         self.__move_level_down(entry_init, entry_updated)
 
         # post processing
-
         prim_nodes_init = [x.init_node for x in self.visited_primary_nodes]
         prim_nodes_updt = [x.updated_node for x in self.visited_primary_nodes]
 
@@ -77,10 +75,10 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # log added and deleted nodes on primary structure
         for ad in added:
-            self.diff_engine.diffContainer.logStructureModification(entry_updated.id, ad.id, 'added')
+            self.diff_engine.diffContainer.logStructureModification(entry_updated, ad, 'added')
             self.visited_primary_nodes.append(NodePair(NodeItem(nodeId=-1), ad))
         for de in deleted:
-            self.diff_engine.diffContainer.logStructureModification(entry_init.id, de.id, 'deleted')
+            self.diff_engine.diffContainer.logStructureModification(entry_init, de, 'deleted')
             self.visited_primary_nodes.append(NodePair(de, NodeItem(nodeId=-1)))
 
         # -- compare edgeSet --
@@ -106,10 +104,6 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         return set_calculator.calc_intersection(
             nodes_init, nodes_updated, intersection_method=MatchCriteriaEnum.OnGuid)
 
-
-
-
-
     def __move_level_down(self, entry_init: NodeItem, entry_updated: NodeItem):
         """
 
@@ -119,7 +113,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         """
 
         self.visited_primary_nodes.append(NodePair(entry_init, entry_updated))
-        self.diff_engine.diffContainer.nodeMatchingTable.add_matched_nodes(entry_init, entry_updated)
+        self.result.node_matching_table.add_matched_nodes(entry_init, entry_updated)
 
         print('[DIFF] Running subgraph Diff under PrimaryNodes {} and {}'.format(entry_init.id, entry_updated.id))
         # run diff and get node matching
@@ -153,15 +147,14 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # log added and deleted nodes on primary structure
         for ad in added:
-            self.result.structure_updates.append(StructureModification(parentId=entry_updated.id, childId=ad.id, modificationType="added"))
+            self.result.structure_updates.append(StructureModification(parent=entry_updated, child=ad, modificationType="added"))
             self.visited_primary_nodes.append(NodePair(NodeItem(nodeId=-1), ad))
         for de in deleted:
-            self.result.structure_updates.append(StructureModification(parentId=entry_init.id, childId=de.id, modificationType="deleted"))
+            self.result.structure_updates.append(StructureModification(parent=entry_init, child=de, modificationType="deleted"))
             self.visited_primary_nodes.append(NodePair(de, NodeItem(nodeId=-1)))
 
         # kick recursion for next hierarchy level if pair was not already visited
         for pair in unc:
-
             if NodePair(pair[0], pair[1]) not in self.visited_primary_nodes:
                 self.__move_level_down(pair[0], pair[1])
 
