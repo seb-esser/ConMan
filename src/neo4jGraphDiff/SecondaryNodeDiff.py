@@ -228,7 +228,11 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         """
         cy = Neo4jQueryFactory.get_directed_path_by_nodeId(node_id_start=root_node_id, node_id_target=current_node_id)
         res = self.connector.run_cypher_statement(cy)
-
-        path = GraphPath.from_neo4j_response(res)
-        pattern = GraphPattern(paths=[path])
-        return pattern
+        try:
+            path = GraphPath.from_neo4j_response(res)
+            pattern = GraphPattern(paths=[path])
+            return pattern
+        except:
+            print('Tried to query a graph pattern. DB response was empty. NodeInit_ID: {} NodeUpdt_ID: {}'
+                  .format(root_node_id, current_node_id))
+            return GraphPattern([])

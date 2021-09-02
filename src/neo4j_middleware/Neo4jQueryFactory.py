@@ -184,7 +184,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match_start = 'MATCH(n) WHERE ID(n) = {}'.format(node_id_start)
         match_target = 'MATCH(m) WHERE ID(m) = {}'.format(node_id_target)
-        path = 'MATCH p = shortestPath((n)-[*..10]->(m))' # max path length is hardcoded to 10
+        path = 'MATCH p = shortestPath((n)-[*..15]->(m))' # max path length is hardcoded to 15
         ret = 'RETURN p as path, NODES(p), RELATIONSHIPS(p)'
         return Neo4jFactory.BuildMultiStatement([match_start, match_target, path, ret])
 
