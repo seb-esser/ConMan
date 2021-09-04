@@ -34,12 +34,6 @@ class Result:
         # store matched nodes
         self.node_matching_table.append_pairs(sub_res.nodeMatchingTable)
 
-    def calculate_added_nodes(self):
-        """
-        method to calculate all nodes that were added. Calculation is based on the SIMILAR_TO relationship work
-        @return:
-        """
-
     def sort_pMods_by_guid(self):
         lst = sorted(self.property_updates, key=lambda pmod: pmod.pattern.get_entry_node().attrs['GlobalId'])
         return lst

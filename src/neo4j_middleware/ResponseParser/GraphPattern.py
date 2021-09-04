@@ -1,10 +1,7 @@
 from typing import List
 
-from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
-from neo4jGraphDiff.SetCalculator import SetCalculator
 from neo4j_middleware import neo4jConnector
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 

@@ -3,9 +3,13 @@ class Neo4jFactory:
     def __init__(self):
         pass
 
-    # constructs a multi statement cypher command
     @classmethod
     def BuildMultiStatement(cls, cypherCMDs):
+        """
+        constructs a multi-statement cypher command
+        @param cypherCMDs:
+        @return:
+        """
         return ' '.join(cypherCMDs)
 
     @classmethod

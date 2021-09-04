@@ -114,10 +114,10 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         if len(nodes_added) != 0 or len(nodes_deleted) != 0:
             # log structural modifications
             for ch in nodes_added:
-                self.diffContainer.logStructureModification(node_updated.id, ch.id, 'added')
+                self.diffContainer.logStructureModification(node_updated, ch, 'added')
 
             for ch in nodes_deleted:
-                self.diffContainer.logStructureModification(node_init.id, ch.id, 'deleted')
+                self.diffContainer.logStructureModification(node_init, ch, 'deleted')
 
         # --- 3 --- loop over all matching child pairs and detect their similarities and differences
 
@@ -190,7 +190,7 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
 
             pattern = self.__get_pattern(root_init.id, node_init.id)
 
-            pmod_list = nodeDiff.createPModDefinitions(node_init.id, node_updated.id, pattern=pattern)
+            pmod_list = nodeDiff.createPModDefinitions(node_init, node_updated, pattern=pattern)
             # append modifications to container
             self.diffContainer.propertyModifications.extend(pmod_list)
 
@@ -228,7 +228,11 @@ class DfsIsomorphismCalculator(AbsDirectedSubgraphDiff):
         """
         cy = Neo4jQueryFactory.get_directed_path_by_nodeId(node_id_start=root_node_id, node_id_target=current_node_id)
         res = self.connector.run_cypher_statement(cy)
-
-        path = GraphPath.from_neo4j_response(res)
-        pattern = GraphPattern(paths=[path])
-        return pattern
+        try:
+            path = GraphPath.from_neo4j_response(res)
+            pattern = GraphPattern(paths=[path])
+            return pattern
+        except:
+            print('Tried to query a graph pattern. DB response was empty. NodeInit_ID: {} NodeUpdt_ID: {}'
+                  .format(root_node_id, current_node_id))
+            return GraphPattern([])

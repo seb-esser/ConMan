@@ -12,7 +12,7 @@ from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 class SubstructureDiffResult:
     """carries the diff result """
 
-    def __init__(self, root_init: NodeItem = None, root_updated: NodeItem = None, method=None):
+    def __init__(self, root_init: NodeItem = None, root_updated: NodeItem = None, method = None):
         super().__init__()
         self.isSimilar: bool = True
         self.method = method
@@ -26,8 +26,8 @@ class SubstructureDiffResult:
         self.nodeMatchingTable: NodeMatchingTable = NodeMatchingTable()
 
     def logNodeModification(self,
-                            nodeId_init: int,
-                            nodeId_updated: int,
+                            node_init: NodeItem,
+                            node_updated: NodeItem,
                             attrName: str,
                             modType: str,
                             value_old,
@@ -36,8 +36,8 @@ class SubstructureDiffResult:
         """
         captures a property modification on node attributes
         @param graphPattern:
-        @param nodeId_init:
-        @param nodeId_updated:
+        @param node_init:
+        @param node_updated:
         @param attrName:
         @param modType:
         @param value_old:
@@ -45,14 +45,21 @@ class SubstructureDiffResult:
 
         @return:
         """
-        modification = PropertyModification(nodeId_init, nodeId_updated, attrName, modType, graphPattern, value_old, value_new)
+        modification = PropertyModification(node_init, node_updated, attrName, modType, graphPattern, value_old,
+                                            value_new)
 
         self.propertyModifications.append(modification)
         self.isSimilar = False
 
-    def logStructureModification(self, parentNodeId, childNodeId, modType):
-        """ logs a new modification to the SubstructureDiffResult.modifiedNodes container """
-        modification = StructureModification(parentNodeId, childNodeId, modType)
+    def logStructureModification(self, parentNode: NodeItem, childNode: NodeItem, modType):
+        """
+        captures a structural modification in the graph
+        @param parentNode:
+        @param childNode:
+        @param modType:
+        @return:
+        """
+        modification = StructureModification(parentNode, childNode, modType)
         self.StructureModifications.append(modification)
         self.isSimilar = False
 
@@ -65,5 +72,3 @@ class SubstructureDiffResult:
     def set_nodes(self, node_init, node_updated):
         self.RootNode_init = node_init
         self.RootNode_updated = node_updated
-
-
