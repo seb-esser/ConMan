@@ -1,11 +1,12 @@
 """ package import """
+from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
+from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 import ifcopenshell
 import progressbar
 import concurrent.futures
 
 """ file import """
-from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
+
 
 class IFCGraphGenerator:
     """
@@ -47,9 +48,8 @@ class IFCGraphGenerator:
 
         super().__init__()
 
-    
-        
     # public entry method to generate the graph out of a given IFC model
+
     def generateGraph(self):
         """
         parses the IFC model into the graph database
@@ -73,12 +73,12 @@ class IFCGraphGenerator:
 
         increment = 100 / (len(entity_list)*2)
         percent = 0
-        
+
         for entity in entity_list:
-                
+
             # print progressbar
             progressbar.printbar(percent)
-                
+
             # check if the entity is either an ObjectDef or Relationship or neither
             if entity.is_a('IfcObjectDefinition'):
                 self.__mapEntity(entity, "PrimaryNode")
@@ -89,57 +89,64 @@ class IFCGraphGenerator:
 
             # add increment to percentage
             percent += increment
-            
+
         for entity in entity_list:
             # print progressbar
             progressbar.printbar(percent)
-            
+
             self.build_node_rels(entity)
-            
+
             # add increment to percentage
             percent += increment
 
+        progressbar.printbar(percent)
         print('[IFC_P21 > {} < ]: Generating graph - DONE. \n '.format(self.timestamp))
 
+        self.validateParsingResult()
         return self.timestamp
 
-        
     def validateParsingResult(self):
-        # ticket_PostEvent-VerifyParsedModel
+        """
+        Compares the number of entities in the model with the number of nodes in the graph
+        @return: boolean
+        """
 
-        # step 1: count entities in IFC model
-
-        # step 2: count number of nodes created in the related graph structure
-        # step 2a: identify the graph by its label (i.e., timestamp)
-        # step 2b: create a new method in the class Neo4jQueryFactory
-        # step 2c: implement a suitable cypher statement into the recently created method in Neo4jQueryFactory
-        # step 2d: run the cypher query using the self.connector.run_cypher_statement()
-        # step 2e: access the database response
-
-        # step 3: compare num_entities from the IFC model with the number of nodes detected in the graph
-
-        # step 4: print the test result to console.
-
-        pass
+        # get number of nodes in the graph
+        cy = Neo4jQueryFactory.count_nodes(self.timestamp)
+        count_graph = self.connector.run_cypher_statement(cy, 'count')[0]
+        
+        # get number of entities in the model
+        count_model = len(list(self.model))
+        
+        # compare and calculate diff
+        if count_graph == count_model:
+            print(
+                'Validation successful. Number of entities in the file equal the number of nodes in the graph.')
+            return True
+        else:
+            print('Validation unsuccessful. Number of entities in the file do not equal the number of nodes in the graph.\nDifference: {}'.format(
+                abs(count_graph-count_model)))
+            return False
 
     def __mapEntity(self, entity, label):
         # get some basic data
         info = entity.get_info()
-        
+
         # node_attribute_names, single_associations, aggregated_associations = self.separate_attributes(entity)
-        node_attribute_names, single_associations, aggregated_associations = self.separate_attributes(entity)
-        
+        node_attribute_names, _, _ = self.separate_attributes(entity)
+
         # create a dictionary of attributes
         node_attr_dict = {}
         for a in node_attribute_names:
             node_attr_dict[a] = info[a]
-        
+
         # rename some keys
         node_attr_dict['p21_id'] = node_attr_dict.pop('id')
         node_attr_dict['EntityType'] = node_attr_dict.pop('type')
-        
+
         # run cypher command
-        cypher_statement = Neo4jGraphFactory.create_node_with_attr(label, node_attr_dict, self.timestamp)
+        cypher_statement = Neo4jGraphFactory.create_node_with_attr(
+            label, node_attr_dict, self.timestamp)
         # parent_node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
         self.connector.run_cypher_statement(cypher_statement)
 
@@ -147,10 +154,11 @@ class IFCGraphGenerator:
         # get info
         info = entity.get_info()
         p21_id = info['id']
-        
+
         # get attribute definitions
-        _, single_associations, aggregated_associations = self.separate_attributes(entity)
-        
+        _, single_associations, aggregated_associations = self.separate_attributes(
+            entity)
+
         for association in single_associations:
             entity = info[association]
             if entity is None:
@@ -161,9 +169,10 @@ class IFCGraphGenerator:
             edge_attrs = {'relType': association}
 
             # merge with existing
-            cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.timestamp)
+            cy = Neo4jGraphFactory.merge_on_p21(
+                p21_id, p21_id_child, edge_attrs, self.timestamp)
             self.connector.run_cypher_statement(cy)
-        
+
         for association in aggregated_associations:
             entities = info[association]
             i = 0
@@ -173,7 +182,7 @@ class IFCGraphGenerator:
             for entity in entities:
                 try:
                     p21_id_child = entity.get_info()['id']
-                
+
                 except:
                     raise Exception('Failed to query data from entity.')
 
@@ -183,12 +192,13 @@ class IFCGraphGenerator:
                 }
 
                 # merge with existing
-                cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.timestamp)
+                cy = Neo4jGraphFactory.merge_on_p21(
+                    p21_id, p21_id_child, edge_attrs, self.timestamp)
                 self.connector.run_cypher_statement(cy)
 
                 # increase counter
                 i += 1
-    
+
     def separate_attributes(self, entity) -> tuple:
         """"
         Queries all attributes of the corresponding entity definition and returns if an attribute has

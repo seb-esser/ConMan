@@ -260,3 +260,5 @@ class Neo4jGraphFactory(Neo4jFactory):
         detach = 'DETACH'
         delete = 'DELETE n'
         return Neo4jFactory.BuildMultiStatement([match, detach, delete])
+    
+    

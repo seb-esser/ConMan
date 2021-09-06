@@ -363,4 +363,11 @@ class Neo4jQueryFactory(Neo4jFactory):
         """.format(ts_init, ts_updt)
 
 # ticket_PostEvent-VerifyParsedModel
-# -- create a new method GetNumberOfNodesInGraph(cls, label) here --
+    @classmethod
+    def count_nodes(cls, timestamp):
+        """
+        Provdes the cypher command to return the number of nodes of a graph
+        @param timestamp: timestamp of the graph
+        @return: cypher command as str
+        """
+        return 'Match(n:{}) RETURN count(n) AS count'.format(timestamp)
