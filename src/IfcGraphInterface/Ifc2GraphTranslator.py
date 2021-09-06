@@ -71,7 +71,7 @@ class IFCGraphGenerator:
         for element in self.model:
             entity_list.append(element)
 
-        increment = 100 / len(entity_list)
+        increment = 100 / (len(entity_list)*2)
         percent = 0
         
         for entity in entity_list:
@@ -90,6 +90,14 @@ class IFCGraphGenerator:
             # add increment to percentage
             percent += increment
             
+        for entity in entity_list:
+            # print progressbar
+            progressbar.printbar(percent)
+            
+            self.build_node_rels(entity)
+            
+            # add increment to percentage
+            percent += increment
 
         print('[IFC_P21 > {} < ]: Generating graph - DONE. \n '.format(self.timestamp))
 
@@ -135,51 +143,51 @@ class IFCGraphGenerator:
         # parent_node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
         self.connector.run_cypher_statement(cypher_statement)
 
-    # def build_node_rels(self, entity):
-    #     # get info
-    #     info = entity.get_info()
-    #     p21_id = info['id']
+    def build_node_rels(self, entity):
+        # get info
+        info = entity.get_info()
+        p21_id = info['id']
         
-    #     # get attribute definitions
-    #     _, single_associations, aggregated_associations = self.separate_attributes(entity)
+        # get attribute definitions
+        _, single_associations, aggregated_associations = self.separate_attributes(entity)
         
-    #     for association in single_associations:
-    #         entity = info[association]
-    #         if entity is None:
-    #             continue
+        for association in single_associations:
+            entity = info[association]
+            if entity is None:
+                continue
 
-    #         p21_id_child = entity.get_info()['id']
+            p21_id_child = entity.get_info()['id']
 
-    #         edge_attrs = {'relType': association}
+            edge_attrs = {'relType': association}
 
-    #         # merge with existing
-    #         cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.timestamp)
-    #         self.connector.run_cypher_statement(cy)
+            # merge with existing
+            cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.timestamp)
+            self.connector.run_cypher_statement(cy)
         
-    #     for association in aggregated_associations:
-    #         entities = info[association]
-    #         i = 0
-    #         if entities is None:
-    #             # detected an array of associations but nothing was referenced within the given instance model
-    #             continue
-    #         for entity in entities:
-    #             try:
-    #                 p21_id_child = entity.get_info()['id']
+        for association in aggregated_associations:
+            entities = info[association]
+            i = 0
+            if entities is None:
+                # detected an array of associations but nothing was referenced within the given instance model
+                continue
+            for entity in entities:
+                try:
+                    p21_id_child = entity.get_info()['id']
                 
-    #             except:
-    #                 raise Exception('Failed to query data from entity.')
+                except:
+                    raise Exception('Failed to query data from entity.')
 
-    #             edge_attrs = {
-    #                 'relType': association,
-    #                 'listItem': i
-    #             }
+                edge_attrs = {
+                    'relType': association,
+                    'listItem': i
+                }
 
-    #             # merge with existing
-    #             cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.timestamp)
-    #             self.connector.run_cypher_statement(cy)
+                # merge with existing
+                cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.timestamp)
+                self.connector.run_cypher_statement(cy)
 
-    #             # increase counter
-    #             i += 1
+                # increase counter
+                i += 1
     
     def separate_attributes(self, entity) -> tuple:
         """"
