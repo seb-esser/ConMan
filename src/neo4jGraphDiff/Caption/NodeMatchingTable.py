@@ -88,8 +88,8 @@ class NodeMatchingTable:
         # find next primaryNode in the list by reversing and find first index
         parent_primary_node = [prim_node for prim_node in node_list[::-1] if prim_node.nodeType == "PrimaryNode"][0]
 
-        return node_list[::-1].index(parent_primary_node)
-
+        # return node_list[::-1].index(parent_primary_node)
+        return parent_primary_node
 
 
 

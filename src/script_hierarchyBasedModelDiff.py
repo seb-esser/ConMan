@@ -20,7 +20,7 @@ testcases = {"sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
              "solibri": ("ts20121017T152740", "ts20121017T154702")
              }
 
-ts_init, ts_updated = testcases['new_cuboid']
+ts_init, ts_updated = testcases['solibri']
 
 print("Do you really want to re-run the diff calculation? ")
 confirm = input("[y, n]")
@@ -48,7 +48,8 @@ entry_updated: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_updated)[0]
 pDiff = HierarchyPatternDiff(connector=connector, ts_init=ts_init, ts_updated=ts_updated)
 result = pDiff.diff_subgraphs(entry_init, entry_updated)
 
-u_input = input('Store result object to json? [y, n]')
+u_input = 'y'
+# u_input = input('Store result object to json? [y, n]')
 
 if u_input == 'y':
     import jsonpickle
