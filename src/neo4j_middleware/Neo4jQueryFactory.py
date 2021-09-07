@@ -366,7 +366,7 @@ class Neo4jQueryFactory(Neo4jFactory):
     @classmethod
     def count_nodes(cls, timestamp):
         """
-        Provdes the cypher command to return the number of nodes of a graph
+        Provides the cypher command to return the number of nodes of a graph
         @param timestamp: timestamp of the graph
         @return: cypher command as str
         """
