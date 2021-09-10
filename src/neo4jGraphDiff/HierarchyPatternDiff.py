@@ -1,18 +1,14 @@
 from typing import List
 
 from neo4jGraphDiff.AbsDirectedSubgraphDiff import AbsDirectedSubgraphDiff
-from neo4jGraphDiff.Caption.EdgeMatchingTable import EdgeMatchingTable
-
 from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
 from neo4jGraphDiff.Caption.StructureModification import StructureModification
-from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
 from neo4jGraphDiff.Result import Result
 from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
 from neo4jGraphDiff.SetCalculator import SetCalculator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
-from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
@@ -107,10 +103,9 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         print('[DIFF] Running subgraph Diff under PrimaryNodes {} and {}'.format(entry_init.id, entry_updated.id))
         # run diff and get node matching
-        sub_result = self.diff_engine.diff_subgraphs(entry_init, entry_updated,
-                                                     self.diff_engine.diffContainer.nodeMatchingTable.matched_nodes)
+        sub_result = self.diff_engine.diff_subgraphs(entry_init, entry_updated, self.result.node_matching_table)
 
-        # integrate sub_result in main result
+        # integrate sub_result in main result including smod, pmod and NodeMatchingTable
         self.result.append_sub_result(sub_res=sub_result)
 
         # run subgraph diff again and consider already matched node pairs now
@@ -131,6 +126,22 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         # check if no new children got found:
         if len(next_nodes_init) == 0 and len(next_nodes_upd) == 0:
             return self.diff_engine.diffContainer
+
+        # remove nodes from node set that have been already detected as removed or inserted
+        rmv_lst_init =[]
+        rmv_lst_updt =[]
+
+        for n in next_nodes_init:
+            if n in self.result.get_node_list_removed():
+                rmv_lst_init.append(n)
+        for n in next_nodes_upd:
+            if n in self.result.get_node_list_inserted():
+                rmv_lst_updt.append(n)
+
+        next_nodes_init = [x for x in next_nodes_init if x not in rmv_lst_init]
+        next_nodes_upd = [x for x in next_nodes_upd if x not in rmv_lst_updt]
+
+        #ToDo: refactor and clean up code here
 
         # calc node intersection
         set_calculator = SetCalculator()

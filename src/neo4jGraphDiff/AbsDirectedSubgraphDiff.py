@@ -33,16 +33,6 @@ class AbsDirectedSubgraphDiff(abc.ABC):
         else:
             return False
 
-    # abstract definition of diffSubgraphs() method, implemented in HashDiff and CompareDiff classes
-    @abc.abstractmethod
-    def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem):
-        """
-
-        @param node_init: start node for DFS initial graph
-        @param node_updated: start node for DFS updated graph
-        """
-        pass
-
     # common method for all subclasses
     def get_children_nodes(self, label: str, parent_node_id: int) -> list:
         """
