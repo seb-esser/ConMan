@@ -54,7 +54,7 @@ u_input = 'y'
 if u_input == 'y':
     import jsonpickle
     print('saving result ... ')
-    f = open('result_init{}-updt{}.json'.format(ts_init, ts_updated), 'w')
+    f = open('GraphDelta_init{}-updt{}.json'.format(ts_init, ts_updated), 'w')
     f.write(jsonpickle.dumps(result))
     f.close()
     print('saving result: DONE. ')

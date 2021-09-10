@@ -5,7 +5,7 @@ from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
 from neo4jGraphDiff.Caption.StructureModification import StructureModification
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
-from neo4jGraphDiff.Result import Result
+from neo4jGraphDiff.GraphDelta import GraphDelta
 from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
 from neo4jGraphDiff.SetCalculator import SetCalculator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
@@ -27,14 +27,14 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
                                                config=self.configuration)
 
         # capture result
-        self.result = Result(label_init=self.label_init, label_updated=self.label_updated)
+        self.result = GraphDelta(label_init=self.label_init, label_updated=self.label_updated)
 
         # this list is used to track already visited primary nodes!
         self.visited_primary_nodes: List[NodePair] = []
 
     def diff_subgraphs(self, entry_init: NodeItem, entry_updated: NodeItem):
         """
-        performs a hierarchy-driven substructure traversal. Result is available under self.result
+        performs a hierarchy-driven substructure traversal. GraphDelta is available under self.result
         @param entry_init:
         @param entry_updated:
         @return:

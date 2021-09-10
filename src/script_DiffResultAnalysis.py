@@ -1,12 +1,12 @@
 import jsonpickle
 
-from neo4jGraphDiff.Result import Result
+from neo4jGraphDiff.GraphDelta import GraphDelta
 
 with open('result_solibriExample.json') as f:
     content = f.read()
 
 print("[INFO] loading result json....")
-result: Result = jsonpickle.decode(content)
+result: GraphDelta = jsonpickle.decode(content)
 print("[INFO] loading result json: DONE.")
 # collect all primary elements that have been modified
 

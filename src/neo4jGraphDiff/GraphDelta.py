@@ -7,7 +7,7 @@ from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 
-class Result:
+class GraphDelta:
 
     def __init__(self, label_init: str, label_updated: str):
         """
