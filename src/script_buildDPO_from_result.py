@@ -34,65 +34,66 @@ label_updt = "ts20121017T154702"
 connector = Neo4jConnector()
 connector.connect_driver()
 
-print("Removed Elements: ")
-for guid in guids_removed:
-    print("\tComponent: {}".format(guid))
-    # -- 1 -- query nodes to be removed (as a graph pattern)
 
+def calcDPO(obj_guid: str, label: str):
+    """
+
+    """
+    print("\tComponent: {}".format(obj_guid))
+    # -- 1 -- query nodes to be removed (as a graph pattern)
     cy = """
     MATCH pa = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[*..10]->(sec:SecondaryNode:{0})
     WHERE NOT (sec)-[:SIMILAR_TO]->()
     RETURN pa, NODES(pa), RELATIONSHIPS(pa)
-    """.format(label_init, guid)
-
+    """.format(label, obj_guid)
     raw = connector.run_cypher_statement(cy)
     removedPattern = GraphPattern.from_neo4j_response(raw)
-
     removedPattern.get_unified_edge_set()
     removedPattern.load_rel_attrs(connector=connector)
-
     # print(cy + '\n --- --- \n')
-
     # -- 2 -- calculate embedding of removed component
     cy_ptrs = """
-    MATCH removeNodes = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[*..10]->(sec:SecondaryNode:{0})
-    WHERE NOT (sec)-[:SIMILAR_TO]->() 
+    MATCH removeNodes = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[:rel*..10]->(sec:SecondaryNode:{0})
+    WHERE NOT (sec)-[:SIMILAR_TO]-() 
     OPTIONAL MATCH inclinedPointers = (sec)<-[:rel]-(extPtr_in)-[:SIMILAR_TO]-(a)
     OPTIONAL MATCH outgoingPointers = (sec)-[:rel]->(extPtr_out)-[:SIMILAR_TO]-(b)
 
     WITH COLLECT(extPtr_out) as outs, COLLECT(extPtr_in) as ins
     RETURN [val in outs WHERE val is not null] as ptrs_out, [val in ins WHERE val is not null] as ptrs_in
-    """.format(label_init, guid)
-
+    """.format(label, obj_guid)
     raw_outs, raw_ins = connector.run_cypher_statement(cy_ptrs)[0]
-
     nodes_outs = NodeItem.fromNeo4jResponse(raw_outs)
-    nodes_ins = NodeItem.fromNeo4jResponse(raw_outs) # die können eigentlich gar nicht existieren, weil sie sonst einer anderen struktur zugeordnet wären.
-
+    nodes_ins = NodeItem.fromNeo4jResponse(raw_outs)  # die können eigentlich gar nicht existieren, weil sie sonst einer anderen struktur zugeordnet wären.
     print('\t Num nodes to be removed: {}'.format(len(removedPattern.get_unified_node_set())))
     print('\t Num nodes embedding SecondaryReferences: ')
-
     for n in nodes_outs:
         primNode: NodeItem = result.node_matching_table.get_parent_primaryNode(n)
         cy = "MATCH pa = shortestpath((pn:{0} {{GlobalId: \"{1}\" }})-[*..10]->(e)) WHERE ID(e) = {2} return pa," \
-             " NODES(pa), RELATIONSHIPS(pa)".format(label_init, primNode.attrs["GlobalId"], n.id)
+             " NODES(pa), RELATIONSHIPS(pa)".format(label, primNode.attrs["GlobalId"], n.id)
         raw = connector.run_cypher_statement(cy)
         patt = GraphPattern.from_neo4j_response(raw)
-        print('\t\t refNode ID: {:>6} parent: {:>6} path length: {}'.format(n.id, primNode.id, len(patt.get_unified_node_set())))
+        print('\t\t refNode ID: {:>6} parent: {:>6} path length: {}'.format(n.id, primNode.id,
+                                                                            len(patt.get_unified_node_set())))
         # print(cy)
-    print('\t Num nodes embedding primary structure (including ConnectionNodes: ')
-
     cy = "MATCH embeddingPrimary = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})<--(c:ConnectionNode)-->(prim:PrimaryNode) " \
-         "RETURN embeddingPrimary, NODES(embeddingPrimary), RELATIONSHIPS(embeddingPrimary)".format(label_init, guid)
-    print(cy)
+         "RETURN embeddingPrimary, NODES(embeddingPrimary), RELATIONSHIPS(embeddingPrimary)".format(label, obj_guid)
+    # print(cy)
     raw = connector.run_cypher_statement(cy)
     primary_embedding_pattern = GraphPattern.from_neo4j_response(raw)
     primary_embedding_pattern.load_rel_attrs(connector=connector)
+    print('\t Num nodes embedding primary structure (including ConnectionNodes): {}'
+          .format(len(primary_embedding_pattern.get_unified_node_set())))
+    print('\n')
 
-    print('--- --- --- \n')
 
-    # DPO
+print('REMOVED components:')
+for guid in guids_removed:
+    calcDPO(guid, label_init)
 
+print('')
+print('INSERTED components:')
+for guid in guids_added:
+    calcDPO(guid, label_updt)
 
 connector.disconnect_driver()
 
