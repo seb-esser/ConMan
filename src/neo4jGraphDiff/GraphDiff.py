@@ -1,79 +1,178 @@
-from neo4jGraphDiff.Caption.DeltaReporter import DeltaReporter
+from neo4jGraphDiff.AbsGraphDiff import AbsGraphDiff
+from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
+from neo4jGraphDiff.Caption.StructureModification import StructureModification
 from neo4jGraphDiff.Config.Configuration import Configuration
-from neo4jGraphDiff.ConnectionNodeDiff import ConnectionNodeDiff
-from neo4jGraphDiff.PrimaryNodeDiff import PrimaryNodeDiff
+from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
 from neo4jGraphDiff.ResourceDiff import ResourceDiff
+from neo4jGraphDiff.SetCalculator import SetCalculator
+from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
-class GraphDiff:
-    def __init__(self, label_init: str, label_updated: str):
-        self.config = Configuration.rel_type_config()
-        print(self.config)
-        print(self.config.DiffSettings)
-        self.label_init = label_init
-        self.label_updated = label_updated
+class GraphDiff(AbsGraphDiff):
 
-        self.report = DeltaReporter(ts_init=label_init, ts_updated=label_updated, usedConfig=self.config)
+    def __init__(self, connector: Neo4jConnector, ts_init: str, ts_updated: str):
+        super().__init__(label_init=ts_init, label_updated=ts_updated, connector=connector,
+                         configuration=Configuration.basic_config())
 
-    def run_diff(self, connector: Neo4jConnector):
-        cypher = []
+        # calc diff on resource structure
+        self.resource_diff = ResourceDiff(connector=self.connector,
+                                          label_init=self.label_init,
+                                          label_updated=self.label_updated,
+                                          config=self.configuration)
 
-        # 1: Check base structure of rooted nodes
+    def diff_subgraphs(self, entry_init: NodeItem, entry_updated: NodeItem):
+        """
+        performs a hierarchy-driven substructure traversal. GraphDelta is available under self.delta
+        @param entry_init:
+        @param entry_updated:
+        @return:
+        """
+        # recursion over hierarchical breakdown
+        self.__move_level_down(entry_init, entry_updated)
 
-        print(' ROOT DIFF \n')
+        #  --- post processing ---
+        prim_nodes_init = [x.init_node for x in self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
+        prim_nodes_updt = [x.updated_node for x in self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
 
-        # diff primary node sets
-        rootedNodeDiff = PrimaryNodeDiff(connector, self.config)
-        [nodes_unchanged, nodes_added, nodes_deleted] = rootedNodeDiff.diff_primary_nodes(self.label_init,
-                                                                                          self.label_updated)
+        con_init = NodeItem.fromNeo4jResponseWouRel(
+            self.connector.run_cypher_statement(
+                Neo4jQueryFactory.get_connection_nodes(self.label_init)
+            ))
 
-        # save results to report
-        self.report.capture_result_primary([nodes_unchanged, nodes_added, nodes_deleted])
+        con_updt = NodeItem.fromNeo4jResponseWouRel(
+            self.connector.run_cypher_statement(
+                Neo4jQueryFactory.get_connection_nodes(self.label_updated)
+            ))
 
-        print(' CONNECTION NODE DIFF \n')
+        for n in prim_nodes_init:
+            if n.id == -1:
+                prim_nodes_init.remove(n)
+        for n in prim_nodes_updt:
+            if n.id == -1:
+                prim_nodes_updt.remove(n)
 
-        # diff connection nodes
-        connectionNodeDiff = ConnectionNodeDiff(connector=connector,
-                                                label_init=self.label_init,
-                                                label_updated=self.label_updated)
-        [conNodeIDs_unchanged, conNodeIDs_added, conNodeIDs_deleted] = connectionNodeDiff.diff_connectionNodes()
+        set_calculator = SetCalculator()
+        [unc, added, deleted] = set_calculator.calc_intersection(
+            set_A=prim_nodes_init + con_init,
+            set_B=prim_nodes_updt + con_updt,
+            intersection_method=MatchCriteriaEnum.OnGuid)
 
-        # save results to report
-        self.report.capture_result_con_nodes([conNodeIDs_unchanged, conNodeIDs_added, conNodeIDs_deleted])
+        # log unchanged nodes
+        for n1, n2 in unc:
+            self.resource_diff.result.node_matching_table.add_matched_nodes(n1, n2)
 
-        print('\n COMPONENT DIFF \n')
+        # log added and deleted nodes on primary structure
+        for ad in added:
+            self.resource_diff.result.node_matching_table.add_matched_nodes(NodeItem(nodeId=-1), ad)
+            self.resource_diff.result.capture_structure_mod(entry_init, ad, 'added')
+        for de in deleted:
+            self.resource_diff.result.node_matching_table.add_matched_nodes(de, NodeItem(nodeId=-1))
+            self.resource_diff.result.capture_structure_mod(entry_init, de, 'deleted')
+        # -- compare edgeSet --
 
-        # 2: Check sub-graphs for each rooted node
+        # load edge data
+        # edges_init = self.__load_edges(self.label_init)
+        # edges_updt = self.__load_edges(self.label_updated)
+        #
+        # edge_matching = EdgeMatchingTable()
+        # edge_matching.calculate(edges_init, edges_updt)
 
-        self.calc_secondary(connector=connector, nodes_unchanged=nodes_unchanged)
+        # returns the delta calculated during the diff process
+        return self.resource_diff.get_delta()
 
-        return self.report
+    def __move_level_down(self, entry_init: NodeItem, entry_updated: NodeItem):
+        """
 
-    def calc_secondary(self, connector: Neo4jConnector, nodes_unchanged):
+        @param entry_init:
+        @param entry_updated:
+        @return:
+        """
+        self.resource_diff.result.node_matching_table.add_matched_nodes(entry_init, entry_updated)
 
-        all_tasks = []
-        for pair in nodes_unchanged:
-            DiffEngine = ResourceDiff(connector=connector,
-                                      label_init=self.label_init,
-                                      label_updated=self.label_updated,
-                                      config=self.config)
+        print('[DIFF] Running subgraph Diff under PrimaryNodes {} and {}'.format(entry_init.id, entry_updated.id))
+        # run diff and get node matching
+        self.resource_diff.diff_subgraphs(entry_init, entry_updated)
 
-            node_init = pair[0]
-            node_updated = pair[1]
-            print('[TASK] Compare objects with root nodeIDs {}'.format(pair))
+        # run subgraph diff again and consider already matched node pairs now
+        # query next primary nodes
+        cy_next_nodes_init = Neo4jQueryFactory.get_hierarchical_prim_nodes(
+            node_id=entry_init.id,
+            exclude_nodes=self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs())
+        cy_next_nodes_upd = Neo4jQueryFactory.get_hierarchical_prim_nodes(
+            node_id=entry_updated.id,
+            exclude_nodes=self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs())
 
-            # run component diff
-            DiffEngine.diff_subgraphs(node_init, node_updated)
+        raw_init = self.connector.run_cypher_statement(cy_next_nodes_init)
+        raw_updated = self.connector.run_cypher_statement(cy_next_nodes_upd)
 
-            # get delta
-            res = DiffEngine.get_delta()
+        next_nodes_init = NodeItem.fromNeo4jResponseWouRel(raw_init)
+        next_nodes_upd = NodeItem.fromNeo4jResponseWouRel(raw_updated)
 
-            self.report.capture_result_secondary(res)
+        # check if no new children got found:
+        if len(next_nodes_init) == 0 and len(next_nodes_upd) == 0:
+            return
 
-            # run component diff async
-            # task = asyncio.create_task(DiffEngine.diff_subgraphs_async(node_init, node_updated))
-            # all_tasks.append(task)
-        # tic = time.process_time()
-        # delta = await asyncio.gather(*all_tasks)
-        return self.report
+        # remove nodes from node set that have been already detected as removed or inserted
+        rmv_lst_init = []
+        rmv_lst_updt = []
+
+        for n in next_nodes_init:
+            if n in self.resource_diff.result.get_node_list_removed():
+                rmv_lst_init.append(n)
+        for n in next_nodes_upd:
+            if n in self.resource_diff.result.get_node_list_inserted():
+                rmv_lst_updt.append(n)
+
+        next_nodes_init = [x for x in next_nodes_init if x not in rmv_lst_init]
+        next_nodes_upd = [x for x in next_nodes_upd if x not in rmv_lst_updt]
+
+        #ToDo: refactor and clean up code here
+
+        # calc node intersection
+        set_calculator = SetCalculator()
+        [unc, added, deleted] = set_calculator.calc_intersection(
+            next_nodes_init, next_nodes_upd, MatchCriteriaEnum.OnGuid)
+
+        # log added and deleted nodes on primary structure
+        for ad in added:
+            self.resource_diff.result.structure_updates.append(
+                StructureModification(parent=entry_updated, child=ad, modification_type="added"))
+            self.resource_diff.result.node_matching_table.add_matched_nodes(NodeItem(nodeId=-1), ad)
+
+        for de in deleted:
+            self.resource_diff.result.structure_updates.append(
+                StructureModification(parent=entry_init, child=de, modification_type="deleted"))
+            self.resource_diff.result.node_matching_table.add_matched_nodes(de, NodeItem(nodeId=-1))
+
+        # kick recursion for next hierarchy level if pair was not already visited
+        for pair in unc:
+            if NodePair(pair[0], pair[1]) not in self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs():
+                self.__move_level_down(pair[0], pair[1])
+                # ToDo: here is the entry point for each primary node which is necessary for pMods
+
+    def __load_edges(self, label):
+        """
+        loads all edges from a graph specified by its label
+        @param label:
+        @return:
+        """
+        cy = Neo4jQueryFactory.get_all_relationships(label)
+        raw = self.connector.run_cypher_statement(cy)
+        pattern = GraphPattern.from_neo4j_response(raw)
+        paths = pattern.get_unified_edge_set()
+
+        edges = []
+        for path in paths:
+            # extract edge from pattern
+            edge = path.segments[0]
+
+            # load relationship attributes
+            cy = Neo4jQueryFactory.get_relationship_attributes(rel_id=edge.edge_id)
+            raw = self.connector.run_cypher_statement(cy)[0]
+            edge.set_attributes(raw)
+            edges.append(edge)
+
+        return edges

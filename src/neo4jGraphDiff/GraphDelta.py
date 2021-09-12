@@ -69,4 +69,10 @@ class GraphDelta:
 
         self.property_updates.append(modification)
 
-
+    def capture_property_mod_instance(self, pm: PropertyModification):
+        """
+        adds an instance of a propertyModification
+        @param pm:
+        @return:
+        """
+        self.property_updates.append(pm)

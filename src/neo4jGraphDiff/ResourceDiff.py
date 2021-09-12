@@ -1,7 +1,7 @@
 from typing import List
 
 from neo4jGraphDiff.AbsGraphDiff import AbsGraphDiff
-from neo4jGraphDiff.Caption.NodeMatchingTable import NodeMatchingTable, NodePair
+from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
 from neo4jGraphDiff.GraphDelta import GraphDelta
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
@@ -43,11 +43,11 @@ class ResourceDiff(AbsGraphDiff):
         self.current_prim_updated = node_updated
 
         # start recursion on resource structure
-        self.__compare_node_pair(node_init, node_updated, indent=0)
+        self.__compare_and_continue(node_init, node_updated, indent=0)
 
         return self.result
 
-    def __compare_node_pair(self, node_init, node_updated, indent=0):
+    def __compare_and_continue(self, node_init, node_updated, indent=0):
         """
         compares two nodes n_init and n_updated semantically.
         Afterwards, the method searches for the next direct child nodes and detects structural changes.
@@ -86,8 +86,8 @@ class ResourceDiff(AbsGraphDiff):
         intmed_unc = copy.deepcopy(nodes_unchanged)
         for pair in intmed_unc:
             if NodePair(pair[0], pair[1]) in self.result.node_matching_table.matched_nodes:
-                # stop recursion
-                continue
+                # stop recursion because this node pair was already visited in a previous step
+                nodes_unchanged.remove(pair)
             elif self.result.node_matching_table.node_involved_in_nodePair(pair[0]):
                 # init node of matched pair was already involved in a matching
                 nodes_unchanged.remove(pair)
@@ -124,11 +124,11 @@ class ResourceDiff(AbsGraphDiff):
                     self.result.node_matching_table.add_matched_nodes(n1, n2)
 
             # run recursion for children if "NoChange" or "Modified" happened
-            self.__compare_node_pair(matchingChildPair[0], matchingChildPair[1], indent=indent + 1)
+            self.__compare_and_continue(matchingChildPair[0], matchingChildPair[1], indent=indent + 1)
 
         return
 
-    def __calc_semantic_delta(self, node_init: NodeItem, node_updated: NodeItem):
+    def __calc_semantic_delta(self, node_init: NodeItem, node_updated: NodeItem) -> None:
         """
         calculates and captures a semantic modification between two nodes
         @param node_init:
@@ -159,11 +159,20 @@ class ResourceDiff(AbsGraphDiff):
             root_init = self.current_prim_init
             root_updated = self.current_prim_updated
 
-            pattern = self.__get_pattern(root_init.id, node_init.id)
+            if node_init == root_init:
+                pattern = GraphPattern(paths=[])
+                # ToDo: improve situation if a propertyModification has been applied to a primary node.
+                #  Then the construction of a full pattern fails.
+            else:
+                pattern = self.__get_pattern(root_init.id, node_init.id)
 
             pmod_list = node_diff.create_pmod_definitions(node_init, node_updated, pattern=pattern)
-            # append modifications to container
-            self.result.property_updates.extend(pmod_list)
+
+            # append modifications to delta
+            for pm in pmod_list:
+                # Note: the modification is captured even though it might be already recognized by another path.
+                # please use the unify methods in the GraphDelta class to filter detected modifications afterwards
+                self.result.capture_property_mod_instance(pm)
 
     def __get_hashes_of_nodes(self, label: str, node_list: List[NodeItem], indent=0) -> List[NodeItem]:
         """

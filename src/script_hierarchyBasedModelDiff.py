@@ -1,5 +1,4 @@
-from neo4jGraphDiff.HierarchyPatternDiff import HierarchyPatternDiff
-from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from neo4jGraphDiff.GraphDiff import GraphDiff
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -20,8 +19,10 @@ testcases = {"sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
              "solibri": ("ts20121017T152740", "ts20121017T154702")
              }
 
-ts_init, ts_updated = testcases['new_cuboid']
+case_study = 'solibri'
+ts_init, ts_updated = testcases[case_study]
 
+print('Running Diff on case study: >{}<'.format(case_study))
 print("Do you really want to re-run the diff calculation? ")
 confirm = input("[y, n]")
 
@@ -45,7 +46,7 @@ raw_updated = connector.run_cypher_statement(
 entry_init: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_init)[0]
 entry_updated: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_updated)[0]
 
-pDiff = HierarchyPatternDiff(connector=connector, ts_init=ts_init, ts_updated=ts_updated)
+pDiff = GraphDiff(connector=connector, ts_init=ts_init, ts_updated=ts_updated)
 delta = pDiff.diff_subgraphs(entry_init, entry_updated)
 
 u_input = 'y'
@@ -75,3 +76,6 @@ for p in delta.node_matching_table.matched_nodes:
 # raw_res = connector.run_cypher_statement(cy)
 # nodes = NodeItem.fromNeo4jResponseWouRel(raw_res)
 
+connector.disconnect_driver()
+
+del raw_init, raw_updated, entry_init, entry_updated, p, u_input, confirm, GraphDiff, cy, f, ts_init, ts_updated
