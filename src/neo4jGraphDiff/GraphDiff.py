@@ -1,10 +1,8 @@
-import asyncio
-
 from neo4jGraphDiff.Caption.ResultGenerator import ResultGenerator
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.ConnectionNodeDiff import ConnectionNodeDiff
 from neo4jGraphDiff.PrimaryNodeDiff import PrimaryNodeDiff
-from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
+from neo4jGraphDiff.ResourceDiff import ResourceDiff
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
@@ -56,10 +54,10 @@ class GraphDiff:
 
         all_tasks = []
         for pair in nodes_unchanged:
-            DiffEngine = DfsIsomorphismCalculator(connector=connector,
-                                                  label_init=self.label_init,
-                                                  label_updated=self.label_updated,
-                                                  config=self.config)
+            DiffEngine = ResourceDiff(connector=connector,
+                                      label_init=self.label_init,
+                                      label_updated=self.label_updated,
+                                      config=self.config)
 
             node_init = pair[0]
             node_updated = pair[1]

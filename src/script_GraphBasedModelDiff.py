@@ -1,15 +1,8 @@
 ""
 
-import asyncio
 # import numpy as np
-import time
 
-import PatchManager.PatchGenerator
-from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.GraphDiff import GraphDiff
-from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
-from neo4jGraphDiff.Caption.ResultGenerator import ResultGenerator
-from neo4jGraphDiff.PrimaryNodeDiff import PrimaryNodeDiff
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 # -- ... --

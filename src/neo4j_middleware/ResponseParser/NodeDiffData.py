@@ -2,6 +2,7 @@ from typing import List
 
 from neo4jGraphDiff.Caption.PropertyModification import PropertyModification
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 
 class NodeDiffData:
@@ -31,20 +32,20 @@ class NodeDiffData:
         else:
             return False
 
-    def createPModDefinitions(self, nodeId_init: int, nodeId_updated: int, pattern: GraphPattern):
+    def createPModDefinitions(self, node_init: NodeItem, node_updated: NodeItem, pattern: GraphPattern) -> List[PropertyModification]:
         """
         creates a PropertyModification instance out of the given object data
         @param pattern:
-        @param nodeId_init: the node id of the modified node in the initial graph
-        @param nodeId_updated: the node id of the modified node in the updated graph
+        @param node_init: the node of the modified node in the initial graph
+        @param node_updated: the node of the modified node in the updated graph
         @return:
         """
         lst: List[PropertyModification] = []
 
         for i in self.AttrsAdded.items():
             pm = PropertyModification(
-                nodeId_init,
-                nodeId_updated,
+                node_init,
+                node_updated,
                 attrName=i[0],
                 modificationType="added",
                 pattern=pattern,
@@ -55,8 +56,8 @@ class NodeDiffData:
 
         for i in self.AttrsDeleted.items():
             pm = PropertyModification(
-                nodeId_init,
-                nodeId_updated,
+                node_init,
+                node_updated,
                 attrName=i[0],
                 modificationType="deleted",
                 pattern=pattern,

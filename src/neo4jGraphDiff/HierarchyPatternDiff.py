@@ -1,12 +1,10 @@
-from typing import List
-
 from neo4jGraphDiff.AbsDirectedSubgraphDiff import AbsDirectedSubgraphDiff
 from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
 from neo4jGraphDiff.Caption.StructureModification import StructureModification
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
 from neo4jGraphDiff.GraphDelta import GraphDelta
-from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
+from neo4jGraphDiff.ResourceDiff import ResourceDiff
 from neo4jGraphDiff.SetCalculator import SetCalculator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
@@ -20,17 +18,14 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         super().__init__(label_init=ts_init, label_updated=ts_updated, connector=connector,
                          configuration=Configuration.basic_config())
 
-        # calc diff on substructure
-        self.diff_engine = DfsIsomorphismCalculator(connector=self.connector,
-                                               label_init=self.label_init,
-                                               label_updated=self.label_updated,
-                                               config=self.configuration)
+        # calc diff on resource structure
+        self.resource_diff = ResourceDiff(connector=self.connector,
+                                          label_init=self.label_init,
+                                          label_updated=self.label_updated,
+                                          config=self.configuration)
 
         # capture result
         self.result = GraphDelta(label_init=self.label_init, label_updated=self.label_updated)
-
-        # this list is used to track already visited primary nodes!
-        self.visited_primary_nodes: List[NodePair] = []
 
     def diff_subgraphs(self, entry_init: NodeItem, entry_updated: NodeItem):
         """
@@ -39,7 +34,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         @param entry_updated:
         @return:
         """
-        # recursion
+        # recursion over hierarchical breakdown
         self.__move_level_down(entry_init, entry_updated)
 
         #  --- post processing ---
@@ -75,11 +70,11 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # log added and deleted nodes on primary structure
         for ad in added:
-            self.diff_engine.diffContainer.logStructureModification(entry_updated, ad, 'added')
-            self.visited_primary_nodes.append(NodePair(NodeItem(nodeId=-1), ad))
+            self.resource_diff.diffContainer.logStructureModification(entry_updated, ad, 'added')
+            self.result.node_matching_table.add_matched_nodes(NodeItem(nodeId=-1), ad)
         for de in deleted:
-            self.diff_engine.diffContainer.logStructureModification(entry_init, de, 'deleted')
-            self.visited_primary_nodes.append(NodePair(de, NodeItem(nodeId=-1)))
+            self.resource_diff.diffContainer.logStructureModification(entry_init, de, 'deleted')
+            self.result.node_matching_table.add_matched_nodes(de, NodeItem(nodeId=-1))
 
         # -- compare edgeSet --
 
@@ -103,7 +98,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         print('[DIFF] Running subgraph Diff under PrimaryNodes {} and {}'.format(entry_init.id, entry_updated.id))
         # run diff and get node matching
-        sub_result = self.diff_engine.diff_subgraphs(entry_init, entry_updated, self.result.node_matching_table)
+        sub_result = self.resource_diff.diff_subgraphs(entry_init, entry_updated, self.result.node_matching_table)
 
         # integrate sub_result in main result including smod, pmod and NodeMatchingTable
         self.result.append_sub_result(sub_res=sub_result)
@@ -125,7 +120,7 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # check if no new children got found:
         if len(next_nodes_init) == 0 and len(next_nodes_upd) == 0:
-            return self.diff_engine.diffContainer
+            return self.resource_diff.diffContainer
 
         # remove nodes from node set that have been already detected as removed or inserted
         rmv_lst_init =[]
