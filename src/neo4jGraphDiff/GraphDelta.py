@@ -3,7 +3,7 @@ from typing import List
 from neo4jGraphDiff.Caption.NodeMatchingTable import NodeMatchingTable
 from neo4jGraphDiff.Caption.PropertyModification import PropertyModification
 from neo4jGraphDiff.Caption.StructureModification import StructureModification, StructuralModificationTypeEnum
-from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
+from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 
@@ -24,32 +24,9 @@ class GraphDelta:
         self.property_updates: List[PropertyModification] = []
         self.structure_updates: List[StructureModification] = []
 
-    def append_sub_result(self, sub_res: SubstructureDiffResult):
-
-        if len(sub_res.propertyModifications) > 0:
-            self.property_updates += sub_res.propertyModifications
-
-        if len(sub_res.StructureModifications) > 0:
-            self.structure_updates += sub_res.StructureModifications
-
-        # store matched nodes
-        self.node_matching_table.append_pairs(sub_res.nodeMatchingTable)
-
     def sort_pMods_by_guid(self):
         lst = sorted(self.property_updates, key=lambda pmod: pmod.pattern.get_entry_node().attrs['GlobalId'])
         return lst
-
-    def unify_pMods(self):
-        """
-        removes duplicates from pMod list
-        """
-        sorted = []
-        for pmod in self.property_updates:
-            if pmod not in sorted:
-                sorted.append(pmod)
-
-        self.property_updates = sorted
-        return sorted
 
     def get_node_list_inserted(self):
         """
@@ -74,3 +51,22 @@ class GraphDelta:
             if smod.child not in lst and smod.modType == StructuralModificationTypeEnum.DELETED:
                 lst.append(smod.child)
         return lst
+
+    def capture_structure_mod(self, parent_node: NodeItem, child_node: NodeItem, modType):
+        """
+        appends a structural modification to the delta
+        """
+        modification = StructureModification(parent_node, child_node, modType)
+        self.structure_updates.append(modification)
+
+    def capture_property_mod(self, node_init: NodeItem, node_updated: NodeItem,
+                             attr_name: str, mod_type: str, value_old, value_new, graph_pattern: GraphPattern):
+        """
+        appends a property modification to the delta
+        """
+        modification = PropertyModification(node_init, node_updated, attr_name, mod_type, graph_pattern, value_old,
+                                            value_new)
+
+        self.property_updates.append(modification)
+
+

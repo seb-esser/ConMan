@@ -1,9 +1,9 @@
 from typing import List
 
-from neo4jGraphDiff.AbsDirectedSubgraphDiff import AbsDirectedSubgraphDiff
+from neo4jGraphDiff.AbsGraphDiff import AbsGraphDiff
 from neo4jGraphDiff.Caption.NodeMatchingTable import NodeMatchingTable, NodePair
-from neo4jGraphDiff.Caption.SubstructureDiffResult import SubstructureDiffResult
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
+from neo4jGraphDiff.GraphDelta import GraphDelta
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
@@ -11,45 +11,41 @@ from neo4j_middleware.ResponseParser.NodeDiffData import NodeDiffData
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 
-class ResourceDiff(AbsDirectedSubgraphDiff):
+class ResourceDiff(AbsGraphDiff):
     """ compares two directed graphlets based on a node diff of nodes and recursively analyses the entire subgraph """
 
     def __init__(self, connector, label_init, label_updated, config):
         super().__init__(connector, label_init, label_updated, config)
-        self.matchingTable: NodeMatchingTable = NodeMatchingTable()
-        self.diffContainer = SubstructureDiffResult(method="Node-Diff")
 
-    def get_diff_result(self):
-        return self.diffContainer
+        self.current_prim_init: NodeItem = NodeItem(-1)
+        self.current_prim_updated: NodeItem = NodeItem(-1)
 
-    # public overwrite method requested by abstract superclass AbsDirectedSubgraphDiff
-    def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem, node_matching_table: NodeMatchingTable):
+        # capture delta
+        self.result = GraphDelta(label_init=label_init, label_updated=label_updated)
+
+    def get_delta(self):
+        """
+        returns the calculated delta
+        """
+        return self.result
+
+    # public overwrite method requested by abstract superclass AbsGraphDiff
+    def diff_subgraphs(self, node_init: NodeItem, node_updated: NodeItem):
         """
         compares the resources under a specified node pair
+        node_init: NodeItem
+        node_updated: NodeItem
+        is_primary_pair: specifies if a new prim node is entered
         """
 
-        # clear sub result container
-        self.diffContainer = SubstructureDiffResult(method="Node-Diff")
-
-        # store entry points
-        self.diffContainer.set_nodes(node_init, node_updated)
-
-        # set matchingTable in subDiff
-        self.matchingTable = node_matching_table
+        # set current prim nodes
+        self.current_prim_init = node_init
+        self.current_prim_updated = node_updated
 
         # start recursion on resource structure
         self.__compare_node_pair(node_init, node_updated, indent=0)
 
-        return self.diffContainer
-
-    async def diff_subgraphs_async(self, node_init: NodeItem, node_updated: NodeItem):
-        """
-
-        """
-        self.diffContainer.set_nodes(node_init, node_updated)
-
-        # start recursion
-        self.__compare_node_pair(node_init, node_updated)
+        return self.result
 
     def __compare_node_pair(self, node_init, node_updated, indent=0):
         """
@@ -61,15 +57,13 @@ class ResourceDiff(AbsDirectedSubgraphDiff):
 
         matching_method = self.configuration.DiffSettings.MatchingType_Childs
 
-        self.diffContainer.increaseRecursionCounter()
-
         # get children nodes
         children_init = self.get_children_nodes(self.label_init, node_init.id)
         children_updated = self.get_children_nodes(self.label_updated, node_updated.id)
 
         # apply DiffIgnore -> Ignore nodes if requested
-        children_init = self.apply_DiffIgnore_Nodes(children_init)
-        children_updated = self.apply_DiffIgnore_Nodes(children_updated)
+        children_init = self.apply_diff_ignore_nodes(children_init)
+        children_updated = self.apply_diff_ignore_nodes(children_updated)
 
         # leave node?
         if len(children_init) == 0 and len(children_updated) == 0:
@@ -91,13 +85,13 @@ class ResourceDiff(AbsDirectedSubgraphDiff):
         import copy
         intmed_unc = copy.deepcopy(nodes_unchanged)
         for pair in intmed_unc:
-            if NodePair(pair[0], pair[1]) in self.matchingTable.matched_nodes:
+            if NodePair(pair[0], pair[1]) in self.result.node_matching_table.matched_nodes:
                 # stop recursion
                 continue
-            elif self.matchingTable.node_involved_in_nodePair(pair[0]):
+            elif self.result.node_matching_table.node_involved_in_nodePair(pair[0]):
                 # init node of matched pair was already involved in a matching
                 nodes_unchanged.remove(pair)
-            elif self.matchingTable.node_involved_in_nodePair(pair[1]):
+            elif self.result.node_matching_table.node_involved_in_nodePair(pair[1]):
                 # updated node of matched pair was already involved in a matching
                 nodes_unchanged.remove(pair)
 
@@ -111,10 +105,10 @@ class ResourceDiff(AbsDirectedSubgraphDiff):
             # log structural modifications if not yet captured
             for ch in nodes_added:
                 # ToDo: check if detected sMod was already logged
-                self.diffContainer.logStructureModification(node_updated, ch, 'added')
+                self.result.capture_structure_mod(node_updated, ch, 'added')
 
             for ch in nodes_deleted:
-                self.diffContainer.logStructureModification(node_init, ch, 'deleted')
+                self.result.capture_structure_mod(node_init, ch, 'deleted')
 
         # --- 3 --- loop over all matching child pairs and detect their similarities and differences
 
@@ -122,35 +116,17 @@ class ResourceDiff(AbsDirectedSubgraphDiff):
         for matchingChildPair in nodes_unchanged:
 
             for n1, n2 in nodes_unchanged:
-                if self.diffContainer.nodeMatchingTable.node_pair_in_matching_table(NodePair(n1, n2)):
+                if self.result.node_matching_table.node_pair_in_matching_table(NodePair(n1, n2)):
                     # logged this pair already, continue for loop
                     continue
                 else:
-                    self.diffContainer.nodeMatchingTable.add_matched_nodes(n1, n2)
+                    # log the pair as similar_to
+                    self.result.node_matching_table.add_matched_nodes(n1, n2)
 
             # run recursion for children if "NoChange" or "Modified" happened
             self.__compare_node_pair(matchingChildPair[0], matchingChildPair[1], indent=indent + 1)
 
         return
-
-    def __apply_diff_ignore(self, diff, ignore_attrs: List[str]):
-        """
-        removes attributes from a dictionary that were stated to be ignored
-        @param diff: the diff object
-        @param ignore_attrs: a list of strings reflecting the attribute names to be ignored
-        @return: a cleared diff
-        """
-        for ignore in ignore_attrs:
-            if ignore in diff.AttrsUnchanged:
-                del diff.AttrsUnchanged[ignore]
-            if ignore in diff.AttrsAdded:
-                del diff.AttrsAdded[ignore]
-            if ignore in diff.AttrsDeleted:
-                del diff.AttrsDeleted[ignore]
-            if ignore in diff.AttrsModified:
-                del diff.AttrsModified[ignore]
-
-        return diff
 
     def __calc_semantic_delta(self, node_init: NodeItem, node_updated: NodeItem):
         """
@@ -166,30 +142,28 @@ class ResourceDiff(AbsDirectedSubgraphDiff):
         # delta between both nodes in raw structure
         attr_delta = NodeDiffData.fromNeo4jResponse(raw)
 
-        # apply DiffIgnore on diff result
-        ignore_attrs = self.configuration.DiffSettings.diffIgnoreAttrs
-        node_diff: NodeDiffData = self.__apply_diff_ignore(attr_delta, ignore_attrs)
+        # apply DiffIgnore on diff delta
+        node_diff: NodeDiffData = self.apply_diff_ignore_attributes(attr_delta)
 
         if self.toConsole():
             print('comparing node {} to node {} after applying DiffIgnore:'.format(node_init.id, node_updated.id))
 
         # case 1: no modifications on pair
-        if node_diff.nodesAreSimilar():
+        if node_diff.nodes_are_similar():
             # nodes are similar
             if self.toConsole():
                 print('[RESULT]: child nodes match')
 
         else:
-            self.diffContainer.isSimilar = False
             # log modifications
-            root_init = self.diffContainer.RootNode_init
-            # root_updated = self.diffContainer.RootNode_updated
+            root_init = self.current_prim_init
+            root_updated = self.current_prim_updated
 
             pattern = self.__get_pattern(root_init.id, node_init.id)
 
-            pmod_list = node_diff.createPModDefinitions(node_init, node_updated, pattern=pattern)
+            pmod_list = node_diff.create_pmod_definitions(node_init, node_updated, pattern=pattern)
             # append modifications to container
-            self.diffContainer.propertyModifications.extend(pmod_list)
+            self.result.property_updates.extend(pmod_list)
 
     def __get_hashes_of_nodes(self, label: str, node_list: List[NodeItem], indent=0) -> List[NodeItem]:
         """

@@ -16,23 +16,24 @@ class NodeDiffData:
 
     @classmethod
     def fromNeo4jResponse(cls, raw):
-        ret_val = cls(raw[0][0]['inCommon'], raw[0][0]['different'] ,raw[0][0]['rightOnly'], raw[0][0]['leftOnly'] )
+        ret_val = cls(raw[0][0]['inCommon'], raw[0][0]['different'], raw[0][0]['rightOnly'], raw[0][0]['leftOnly'])
         return ret_val
 
     def __str__(self): 
-        return 'unchanged: {}, modified: {}, added: {}, deleted: {}'.format(self.AttrsUnchanged, self.AttrsModified, self.AttrsAdded, self.AttrsDeleted)
+        return 'unchanged: {}, modified: {}, added: {}, deleted: {}'\
+            .format(self.AttrsUnchanged, self.AttrsModified, self.AttrsAdded, self.AttrsDeleted)
 
     def __repr__(self):
         return 'NodeDiffData object'
 
-    def nodesAreSimilar(self): 
+    def nodes_are_similar(self):
         """ reports if the diffed nodes are similar based in their attributes """
         if self.AttrsAdded == {} and self.AttrsDeleted == {} and self.AttrsModified == {}:
             return True
         else:
             return False
 
-    def createPModDefinitions(self, node_init: NodeItem, node_updated: NodeItem, pattern: GraphPattern) -> List[PropertyModification]:
+    def create_pmod_definitions(self, node_init: NodeItem, node_updated: NodeItem, pattern: GraphPattern) -> List[PropertyModification]:
         """
         creates a PropertyModification instance out of the given object data
         @param pattern:
@@ -40,6 +41,7 @@ class NodeDiffData:
         @param node_updated: the node of the modified node in the updated graph
         @return:
         """
+
         lst: List[PropertyModification] = []
 
         for i in self.AttrsAdded.items():
@@ -68,8 +70,8 @@ class NodeDiffData:
 
         for i in self.AttrsModified.items():
             pm = PropertyModification(
-                nodeId_init,
-                nodeId_updated,
+                node_init,
+                node_updated,
                 attrName=i[0],
                 modificationType="modified",
                 pattern=pattern,

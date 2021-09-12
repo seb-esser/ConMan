@@ -1,9 +1,8 @@
-from neo4jGraphDiff.AbsDirectedSubgraphDiff import AbsDirectedSubgraphDiff
+from neo4jGraphDiff.AbsGraphDiff import AbsGraphDiff
 from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
 from neo4jGraphDiff.Caption.StructureModification import StructureModification
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
-from neo4jGraphDiff.GraphDelta import GraphDelta
 from neo4jGraphDiff.ResourceDiff import ResourceDiff
 from neo4jGraphDiff.SetCalculator import SetCalculator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
@@ -12,7 +11,7 @@ from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
-class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
+class HierarchyPatternDiff(AbsGraphDiff):
 
     def __init__(self, connector: Neo4jConnector, ts_init: str, ts_updated: str):
         super().__init__(label_init=ts_init, label_updated=ts_updated, connector=connector,
@@ -24,12 +23,9 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
                                           label_updated=self.label_updated,
                                           config=self.configuration)
 
-        # capture result
-        self.result = GraphDelta(label_init=self.label_init, label_updated=self.label_updated)
-
     def diff_subgraphs(self, entry_init: NodeItem, entry_updated: NodeItem):
         """
-        performs a hierarchy-driven substructure traversal. GraphDelta is available under self.result
+        performs a hierarchy-driven substructure traversal. GraphDelta is available under self.delta
         @param entry_init:
         @param entry_updated:
         @return:
@@ -38,8 +34,8 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         self.__move_level_down(entry_init, entry_updated)
 
         #  --- post processing ---
-        prim_nodes_init = [x.init_node for x in self.result.node_matching_table.get_all_primaryNode_pairs()]
-        prim_nodes_updt = [x.updated_node for x in self.result.node_matching_table.get_all_primaryNode_pairs()]
+        prim_nodes_init = [x.init_node for x in self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
+        prim_nodes_updt = [x.updated_node for x in self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
 
         con_init = NodeItem.fromNeo4jResponseWouRel(
             self.connector.run_cypher_statement(
@@ -66,16 +62,15 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # log unchanged nodes
         for n1, n2 in unc:
-            self.result.node_matching_table.add_matched_nodes(n1, n2)
+            self.resource_diff.result.node_matching_table.add_matched_nodes(n1, n2)
 
         # log added and deleted nodes on primary structure
         for ad in added:
-            self.resource_diff.diffContainer.logStructureModification(entry_updated, ad, 'added')
-            self.result.node_matching_table.add_matched_nodes(NodeItem(nodeId=-1), ad)
+            self.resource_diff.result.node_matching_table.add_matched_nodes(NodeItem(nodeId=-1), ad)
+            self.resource_diff.result.capture_structure_mod(entry_init, ad, 'added')
         for de in deleted:
-            self.resource_diff.diffContainer.logStructureModification(entry_init, de, 'deleted')
-            self.result.node_matching_table.add_matched_nodes(de, NodeItem(nodeId=-1))
-
+            self.resource_diff.result.node_matching_table.add_matched_nodes(de, NodeItem(nodeId=-1))
+            self.resource_diff.result.capture_structure_mod(entry_init, de, 'deleted')
         # -- compare edgeSet --
 
         # load edge data
@@ -85,7 +80,8 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         # edge_matching = EdgeMatchingTable()
         # edge_matching.calculate(edges_init, edges_updt)
 
-        return self.result
+        # returns the delta calculated during the diff process
+        return self.resource_diff.get_delta()
 
     def __move_level_down(self, entry_init: NodeItem, entry_updated: NodeItem):
         """
@@ -94,23 +90,20 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
         @param entry_updated:
         @return:
         """
-        self.result.node_matching_table.add_matched_nodes(entry_init, entry_updated)
+        self.resource_diff.result.node_matching_table.add_matched_nodes(entry_init, entry_updated)
 
         print('[DIFF] Running subgraph Diff under PrimaryNodes {} and {}'.format(entry_init.id, entry_updated.id))
         # run diff and get node matching
-        sub_result = self.resource_diff.diff_subgraphs(entry_init, entry_updated, self.result.node_matching_table)
-
-        # integrate sub_result in main result including smod, pmod and NodeMatchingTable
-        self.result.append_sub_result(sub_res=sub_result)
+        self.resource_diff.diff_subgraphs(entry_init, entry_updated)
 
         # run subgraph diff again and consider already matched node pairs now
         # query next primary nodes
         cy_next_nodes_init = Neo4jQueryFactory.get_hierarchical_prim_nodes(
             node_id=entry_init.id,
-            exclude_nodes=self.result.node_matching_table.get_all_primaryNode_pairs())
+            exclude_nodes=self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs())
         cy_next_nodes_upd = Neo4jQueryFactory.get_hierarchical_prim_nodes(
             node_id=entry_updated.id,
-            exclude_nodes=self.result.node_matching_table.get_all_primaryNode_pairs())
+            exclude_nodes=self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs())
 
         raw_init = self.connector.run_cypher_statement(cy_next_nodes_init)
         raw_updated = self.connector.run_cypher_statement(cy_next_nodes_upd)
@@ -120,17 +113,17 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # check if no new children got found:
         if len(next_nodes_init) == 0 and len(next_nodes_upd) == 0:
-            return self.resource_diff.diffContainer
+            return
 
         # remove nodes from node set that have been already detected as removed or inserted
-        rmv_lst_init =[]
-        rmv_lst_updt =[]
+        rmv_lst_init = []
+        rmv_lst_updt = []
 
         for n in next_nodes_init:
-            if n in self.result.get_node_list_removed():
+            if n in self.resource_diff.result.get_node_list_removed():
                 rmv_lst_init.append(n)
         for n in next_nodes_upd:
-            if n in self.result.get_node_list_inserted():
+            if n in self.resource_diff.result.get_node_list_inserted():
                 rmv_lst_updt.append(n)
 
         next_nodes_init = [x for x in next_nodes_init if x not in rmv_lst_init]
@@ -145,16 +138,20 @@ class HierarchyPatternDiff(AbsDirectedSubgraphDiff):
 
         # log added and deleted nodes on primary structure
         for ad in added:
-            self.result.structure_updates.append(StructureModification(parent=entry_updated, child=ad, modificationType="added"))
-            self.visited_primary_nodes.append(NodePair(NodeItem(nodeId=-1), ad))
+            self.resource_diff.result.structure_updates.append(
+                StructureModification(parent=entry_updated, child=ad, modification_type="added"))
+            self.resource_diff.result.node_matching_table.add_matched_nodes(NodeItem(nodeId=-1), ad)
+
         for de in deleted:
-            self.result.structure_updates.append(StructureModification(parent=entry_init, child=de, modificationType="deleted"))
-            self.visited_primary_nodes.append(NodePair(de, NodeItem(nodeId=-1)))
+            self.resource_diff.result.structure_updates.append(
+                StructureModification(parent=entry_init, child=de, modification_type="deleted"))
+            self.resource_diff.result.node_matching_table.add_matched_nodes(de, NodeItem(nodeId=-1))
 
         # kick recursion for next hierarchy level if pair was not already visited
         for pair in unc:
-            if NodePair(pair[0], pair[1]) not in self.result.node_matching_table.get_all_primaryNode_pairs():
+            if NodePair(pair[0], pair[1]) not in self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs():
                 self.__move_level_down(pair[0], pair[1])
+                # ToDo: here is the entry point for each primary node which is necessary for pMods
 
     def __load_edges(self, label):
         """

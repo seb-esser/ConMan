@@ -8,7 +8,7 @@ from neo4jGraphDiff.GraphDelta import GraphDelta
 
 with open('result_initts20210623T091748-updtts20210623T091749.json') as f:
     content = f.read()
-    print("[INFO] loading result json....")
+    print("[INFO] loading delta json....")
     result: GraphDelta = jsonpickle.decode(content)
     print("[INFO] DONE. ")
 

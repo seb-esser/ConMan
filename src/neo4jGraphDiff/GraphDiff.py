@@ -1,4 +1,4 @@
-from neo4jGraphDiff.Caption.ResultGenerator import ResultGenerator
+from neo4jGraphDiff.Caption.DeltaReporter import DeltaReporter
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.ConnectionNodeDiff import ConnectionNodeDiff
 from neo4jGraphDiff.PrimaryNodeDiff import PrimaryNodeDiff
@@ -14,7 +14,7 @@ class GraphDiff:
         self.label_init = label_init
         self.label_updated = label_updated
 
-        self.report = ResultGenerator(ts_init=label_init, ts_updated=label_updated, usedConfig=self.config)
+        self.report = DeltaReporter(ts_init=label_init, ts_updated=label_updated, usedConfig=self.config)
 
     def run_diff(self, connector: Neo4jConnector):
         cypher = []
@@ -66,8 +66,8 @@ class GraphDiff:
             # run component diff
             DiffEngine.diff_subgraphs(node_init, node_updated)
 
-            # get result
-            res = DiffEngine.get_diff_result()
+            # get delta
+            res = DiffEngine.get_delta()
 
             self.report.capture_result_secondary(res)
 
@@ -75,5 +75,5 @@ class GraphDiff:
             # task = asyncio.create_task(DiffEngine.diff_subgraphs_async(node_init, node_updated))
             # all_tasks.append(task)
         # tic = time.process_time()
-        # result = await asyncio.gather(*all_tasks)
+        # delta = await asyncio.gather(*all_tasks)
         return self.report

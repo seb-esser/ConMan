@@ -3,11 +3,12 @@ import abc
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.SetCalculator import SetCalculator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from neo4j_middleware.ResponseParser.NodeDiffData import NodeDiffData
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
-class AbsDirectedSubgraphDiff(abc.ABC):
+class AbsGraphDiff(abc.ABC):
     """abstract super class for all subgraph diff methods """
 
     @abc.abstractmethod
@@ -56,7 +57,7 @@ class AbsDirectedSubgraphDiff(abc.ABC):
         else:
             return res
 
-    def apply_DiffIgnore_Nodes(self, node_list):
+    def apply_diff_ignore_nodes(self, node_list):
         """ removes nodes from a list if their type is set to be ignored """
 
         # ToDo: Logging: Add info statement that ignoreNodes got applied.
@@ -76,6 +77,25 @@ class AbsDirectedSubgraphDiff(abc.ABC):
 
         # ToDo: Logging: Add info statement if nodes got removed or not
         return return_list
+
+    def apply_diff_ignore_attributes(self, diff: NodeDiffData) -> NodeDiffData:
+        """
+        removes attributes from a dictionary that were stated to be ignored
+        @param diff: the diff object
+        @return: a cleared diff
+        """
+        ignore_attrs = self.configuration.DiffSettings.diffIgnoreAttrs
+        for ignore in ignore_attrs:
+            if ignore in diff.AttrsUnchanged:
+                del diff.AttrsUnchanged[ignore]
+            if ignore in diff.AttrsAdded:
+                del diff.AttrsAdded[ignore]
+            if ignore in diff.AttrsDeleted:
+                del diff.AttrsDeleted[ignore]
+            if ignore in diff.AttrsModified:
+                del diff.AttrsModified[ignore]
+
+        return diff
 
     def __get_node_data_by_id(self, nodeId: int):
         """
