@@ -76,7 +76,7 @@ class SetCalculator(object):
         by comparing the items' hashes
         @param A: a (distinct) set of nodes
         @param B: a (distinct) set of nodes
-        @return: a list of tuples as the result of the intersection operation
+        @return: a list of tuples as the delta of the intersection operation
         """
         return ((x, y) for x, y in itertools.product(A, B) if x.hash_value == y.hash_value)
 
@@ -86,7 +86,7 @@ class SetCalculator(object):
         by comparing the items' hashes and relTypes
         @param A: a (distinct) set of nodes
         @param B: a (distinct) set of nodes
-        @return: a list of tuples as the result of the intersection operation
+        @return: a list of tuples as the delta of the intersection operation
         """
         return ((x, y) for x, y in itertools.product(A, B) if x.hash_value == y.hash_value and x.relType == y.relType)
 
@@ -95,7 +95,7 @@ class SetCalculator(object):
         Calculates the boolean intersection between set A and set B by comparing the relTypes
         @param A: a (distinct) set of nodes
         @param B: a (distinct) set of nodes
-        @return: a list of tuples as the result of the intersection operation
+        @return: a list of tuples as the delta of the intersection operation
         """
         return( ( x ,y) for x ,y in itertools.product(A, B) if x.relType == y.relType)
 
@@ -105,7 +105,7 @@ class SetCalculator(object):
         by comparing the items' entity types
         @param A: a (distinct) set of nodes
         @param B: a (distinct) set of nodes
-        @return: a list of tuples as the result of the intersection operation
+        @return: a list of tuples as the delta of the intersection operation
             """
         return ((x, y) for x, y in itertools.product(A, B) if x.entityType == y.entityType)
 
@@ -115,7 +115,7 @@ class SetCalculator(object):
         by comparing the items' entity types and rel types
         @param A: a (distinct) set of nodes
         @param B: a (distinct) set of nodes
-        @return: a list of tuples as the result of the intersection operation
+        @return: a list of tuples as the delta of the intersection operation
             """
         return ((x, y) for x, y in itertools.product(A, B) if x.entityType == y.entityType and x.relType == y.relType)
 
@@ -125,6 +125,6 @@ class SetCalculator(object):
         by comparing the items' global_ids
         @param A: a (distinct) set of nodes
         @param B: a (distinct) set of nodes
-        @return: a list of tuples as the result of the intersection operation
+        @return: a list of tuples as the delta of the intersection operation
             """
         return ((x, y) for x, y in itertools.product(A, B) if x.attrs['GlobalId'] == y.attrs['GlobalId'])

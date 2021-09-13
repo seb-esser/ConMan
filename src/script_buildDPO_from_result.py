@@ -1,15 +1,15 @@
 import jsonpickle
 
-from neo4jGraphDiff.Result import Result
+from neo4jGraphDiff.GraphDelta import GraphDelta
 
 with open('result_initts20121017T152740-updtts20121017T154702.json') as f:
     content = f.read()
 
-print("[INFO] loading result json....")
-result: Result = jsonpickle.decode(content)
+print("[INFO] loading delta json....")
+result: GraphDelta = jsonpickle.decode(content)
 print("[INFO] DONE. ")
 
-# ToDo: these lists should be included in the result object. Apparently, these changes are not yet captured.
+# ToDo: these lists should be included in the delta object. Apparently, these changes are not yet captured.
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector

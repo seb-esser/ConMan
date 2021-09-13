@@ -90,7 +90,7 @@ class IFCGraphGenerator:
 
         # step 3: compare num_entities from the IFC model with the number of nodes detected in the graph
 
-        # step 4: print the test result to console. 
+        # step 4: print the test delta to console.
 
         pass
 
