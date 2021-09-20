@@ -25,6 +25,7 @@ class GraphDiff(AbsGraphDiff):
 
     def diff_subgraphs(self, entry_init: NodeItem, entry_updated: NodeItem):
         """
+        RENAME TO calculate_graph_delta()
         performs a hierarchy-driven substructure traversal. GraphDelta is available under self.delta
         @param entry_init:
         @param entry_updated:
@@ -85,7 +86,7 @@ class GraphDiff(AbsGraphDiff):
 
     def __move_level_down(self, entry_init: NodeItem, entry_updated: NodeItem):
         """
-
+        RENAME TO move_hierarchy_level_down()
         @param entry_init:
         @param entry_updated:
         @return:

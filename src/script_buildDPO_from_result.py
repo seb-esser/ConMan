@@ -1,8 +1,9 @@
 import jsonpickle
+from re import search
 
 from neo4jGraphDiff.GraphDelta import GraphDelta
 
-with open('result_initts20121017T152740-updtts20121017T154702.json') as f:
+with open('GraphDelta_initts20121017T152740-updtts20121017T154702.json') as f:
     content = f.read()
 
 print("[INFO] loading delta json....")
@@ -27,12 +28,30 @@ guids_added = [
     "1VaaDkOIb9kR_m_Kk3toPA",
     "2D5DFc$nD1Xub_Y4N75Yhn"
 ]
-label_init = "ts20121017T152740"
-label_updt = "ts20121017T154702"
+label_init = result.ts_init
+label_updt = result.ts_updated
 
 
 connector = Neo4jConnector()
 connector.connect_driver()
+
+
+def remove_trim_errors(result: GraphDelta):
+    """
+    removes false errors caused by the Model->Graph parser
+    @param result:
+    @return:
+    """
+    counter = 0
+    pmods_to_be_removed = []
+
+    for pm in result.property_updates:
+        if search("Trim", pm.attrName):
+            pmods_to_be_removed.append(pm)
+            counter += 1
+
+    print('removed Trim errors: {}'.format(counter))
+    result.property_updates = [x for x in result.property_updates if x not in pmods_to_be_removed]
 
 
 def calcDPO(obj_guid: str, label: str):
@@ -85,6 +104,10 @@ def calcDPO(obj_guid: str, label: str):
           .format(len(primary_embedding_pattern.get_unified_node_set())))
     print('\n')
 
+
+print('Run pre-processing and remove all detected pMods with "Trim" attributes. \n')
+remove_trim_errors(result=result)
+print('Preprocessing DONE. \n')
 
 print('REMOVED components:')
 for guid in guids_removed:
