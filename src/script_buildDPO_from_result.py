@@ -1,15 +1,18 @@
 import jsonpickle
+from re import search
 
-from neo4jGraphDiff.Result import Result
+from neo4jGraphDiff.GraphDelta import GraphDelta
 
-# with open('result_solibriExample.json') as f:
-#     content = f.read()
-#
-# print("[INFO] loading result json....")
-# result: Result = jsonpickle.decode(content)
-# print("[INFO] DONE. ")
+with open('GraphDelta_initts20121017T152740-updtts20121017T154702.json') as f:
+    content = f.read()
 
-# ToDo: these lists should be included in the result object. Apparently, these changes are not yet captured.
+print("[INFO] loading delta json....")
+result: GraphDelta = jsonpickle.decode(content)
+print("[INFO] DONE. ")
+
+# ToDo: these lists should be included in the delta object. Apparently, these changes are not yet captured.
+from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 guids_removed = [
@@ -25,29 +28,95 @@ guids_added = [
     "1VaaDkOIb9kR_m_Kk3toPA",
     "2D5DFc$nD1Xub_Y4N75Yhn"
 ]
-label_init = "ts20121017T152740"
-label_updt = "ts20121017T154702"
+label_init = result.ts_init
+label_updt = result.ts_updated
 
 
 connector = Neo4jConnector()
 connector.connect_driver()
 
-for guid in guids_removed:
+
+def remove_trim_errors(result: GraphDelta):
+    """
+    removes false errors caused by the Model->Graph parser
+    @param result:
+    @return:
+    """
+    counter = 0
+    pmods_to_be_removed = []
+
+    for pm in result.property_updates:
+        if search("Trim", pm.attrName):
+            pmods_to_be_removed.append(pm)
+            counter += 1
+
+    print('removed Trim errors: {}'.format(counter))
+    result.property_updates = [x for x in result.property_updates if x not in pmods_to_be_removed]
+
+
+def calcDPO(obj_guid: str, label: str):
+    """
+
+    """
+    print("\tComponent: {}".format(obj_guid))
+    # -- 1 -- query nodes to be removed (as a graph pattern)
     cy = """
-    MATCH removeNodes = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[*..10]->(sec:SecondaryNode:{0})
+    MATCH pa = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[*..10]->(sec:SecondaryNode:{0})
     WHERE NOT (sec)-[:SIMILAR_TO]->()
-
-    OPTIONAL MATCH inclinedPointers = (sec)<-[:rel]-(extRefs_in)-[:SIMILAR_TO]-(a)
-    OPTIONAL MATCH outgoingPointers = (sec)-[:rel]->(extRefs_out)-[:SIMILAR_TO]-(b)
-
-    OPTIONAL MATCH context_1 = (extRefs_in)-[:rel*..2]-(prim_a:PrimaryNode)
-    OPTIONAL MATCH context_2 = (extRefs_out)-[:rel*..2]-(prim_b:PrimaryNode)
-    return count([n, sec]) as count_nodes
-    """.format(label_init, guid)
+    RETURN pa, NODES(pa), RELATIONSHIPS(pa)
+    """.format(label, obj_guid)
+    raw = connector.run_cypher_statement(cy)
+    removedPattern = GraphPattern.from_neo4j_response(raw)
+    removedPattern.get_unified_edge_set()
+    removedPattern.load_rel_attrs(connector=connector)
     # print(cy + '\n --- --- \n')
+    # -- 2 -- calculate embedding of removed component
+    cy_ptrs = """
+    MATCH removeNodes = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[:rel*..10]->(sec:SecondaryNode:{0})
+    WHERE NOT (sec)-[:SIMILAR_TO]-() 
+    OPTIONAL MATCH inclinedPointers = (sec)<-[:rel]-(extPtr_in)-[:SIMILAR_TO]-(a)
+    OPTIONAL MATCH outgoingPointers = (sec)-[:rel]->(extPtr_out)-[:SIMILAR_TO]-(b)
 
-    raw = connector.run_cypher_statement(cy)[0]
-    print(raw)
+    WITH COLLECT(extPtr_out) as outs, COLLECT(extPtr_in) as ins
+    RETURN [val in outs WHERE val is not null] as ptrs_out, [val in ins WHERE val is not null] as ptrs_in
+    """.format(label, obj_guid)
+    raw_outs, raw_ins = connector.run_cypher_statement(cy_ptrs)[0]
+    nodes_outs = NodeItem.fromNeo4jResponse(raw_outs)
+    nodes_ins = NodeItem.fromNeo4jResponse(raw_outs)  # die können eigentlich gar nicht existieren, weil sie sonst einer anderen struktur zugeordnet wären.
+    print('\t Num nodes to be removed: {}'.format(len(removedPattern.get_unified_node_set())))
+    print('\t Num nodes embedding SecondaryReferences: ')
+    for n in nodes_outs:
+        primNode: NodeItem = result.node_matching_table.get_parent_primaryNode(n)
+        cy = "MATCH pa = shortestpath((pn:{0} {{GlobalId: \"{1}\" }})-[*..10]->(e)) WHERE ID(e) = {2} return pa," \
+             " NODES(pa), RELATIONSHIPS(pa)".format(label, primNode.attrs["GlobalId"], n.id)
+        raw = connector.run_cypher_statement(cy)
+        patt = GraphPattern.from_neo4j_response(raw)
+        print('\t\t refNode ID: {:>6} parent: {:>6} path length: {}'.format(n.id, primNode.id,
+                                                                            len(patt.get_unified_node_set())))
+        # print(cy)
+    cy = "MATCH embeddingPrimary = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})<--(c:ConnectionNode)-->(prim:PrimaryNode) " \
+         "RETURN embeddingPrimary, NODES(embeddingPrimary), RELATIONSHIPS(embeddingPrimary)".format(label, obj_guid)
+    # print(cy)
+    raw = connector.run_cypher_statement(cy)
+    primary_embedding_pattern = GraphPattern.from_neo4j_response(raw)
+    primary_embedding_pattern.load_rel_attrs(connector=connector)
+    print('\t Num nodes embedding primary structure (including ConnectionNodes): {}'
+          .format(len(primary_embedding_pattern.get_unified_node_set())))
+    print('\n')
+
+
+print('Run pre-processing and remove all detected pMods with "Trim" attributes. \n')
+remove_trim_errors(result=result)
+print('Preprocessing DONE. \n')
+
+print('REMOVED components:')
+for guid in guids_removed:
+    calcDPO(guid, label_init)
+
+print('')
+print('INSERTED components:')
+for guid in guids_added:
+    calcDPO(guid, label_updt)
 
 connector.disconnect_driver()
 

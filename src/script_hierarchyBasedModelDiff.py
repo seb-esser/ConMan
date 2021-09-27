@@ -1,5 +1,4 @@
-from neo4jGraphDiff.HierarchyPatternDiff import HierarchyPatternDiff
-from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from neo4jGraphDiff.GraphDiff import GraphDiff
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -20,8 +19,10 @@ testcases = {"sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
              "solibri": ("ts20121017T152740", "ts20121017T154702")
              }
 
-ts_init, ts_updated = testcases['new_cuboid']
+case_study = 'solibri'
+ts_init, ts_updated = testcases[case_study]
 
+print('Running Diff on case study: >{}<'.format(case_study))
 print("Do you really want to re-run the diff calculation? ")
 confirm = input("[y, n]")
 
@@ -45,21 +46,22 @@ raw_updated = connector.run_cypher_statement(
 entry_init: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_init)[0]
 entry_updated: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_updated)[0]
 
-pDiff = HierarchyPatternDiff(connector=connector, ts_init=ts_init, ts_updated=ts_updated)
-result = pDiff.diff_subgraphs(entry_init, entry_updated)
+pDiff = GraphDiff(connector=connector, ts_init=ts_init, ts_updated=ts_updated)
+delta = pDiff.diff_subgraphs(entry_init, entry_updated)
 
-u_input = input('Store result object to json? [y, n]')
+u_input = 'y'
+# u_input = input('Store delta object to json? [y, n]')
 
 if u_input == 'y':
     import jsonpickle
-    print('saving result ... ')
-    f = open('result_init{}-updt{}.json'.format(ts_init, ts_updated), 'w')
-    f.write(jsonpickle.dumps(result))
+    print('saving delta ... ')
+    f = open('GraphDelta_init{}-updt{}.json'.format(ts_init, ts_updated), 'w')
+    f.write(jsonpickle.dumps(delta))
     f.close()
-    print('saving result: DONE. ')
+    print('saving delta: DONE. ')
 
 # Create SIMILAR_TO relationships to mark all nodePairs that are matched
-for p in result.node_matching_table.matched_nodes:
+for p in delta.node_matching_table.matched_nodes:
     # print(p)
     cy = """
     MATCH (n) WHERE ID(n)={0}
@@ -68,9 +70,12 @@ for p in result.node_matching_table.matched_nodes:
     """.format(p.init_node.id, p.updated_node.id)
     connector.run_cypher_statement(cy)
 
-# Find all nodes that do not have a SIMILAR_TO relationship
-cy = Neo4jQueryFactory.get_all_nodes_wou_SIMILARTO_rel(ts_updated)
-print(cy)
-raw_res = connector.run_cypher_statement(cy)
-nodes = NodeItem.fromNeo4jResponseWouRel(raw_res)
+# # Find all nodes that do not have a SIMILAR_TO relationship
+# cy = Neo4jQueryFactory.get_all_nodes_wou_SIMILARTO_rel(ts_updated)
+# print(cy)
+# raw_res = connector.run_cypher_statement(cy)
+# nodes = NodeItem.fromNeo4jResponseWouRel(raw_res)
 
+connector.disconnect_driver()
+
+del raw_init, raw_updated, entry_init, entry_updated, p, u_input, confirm, GraphDiff, cy, f, ts_init, ts_updated
