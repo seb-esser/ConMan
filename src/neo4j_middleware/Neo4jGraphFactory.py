@@ -34,6 +34,19 @@ class Neo4jGraphFactory(Neo4jFactory):
         return Neo4jFactory.BuildMultiStatement([create, setGuid, setEntityType, return_id])
 
     @classmethod
+    def create_node_with_attr(cls, label: str, attrs: dict, timestamp: str):
+        """
+        Provides the cypher command to create a node with attributes in the neo4j database.
+        @param label: label for the node (e.g. PrimaryNode)
+        @param attr: dictionary of the cooresponding attributes
+        @param timestamp: identifier for a model
+        @return: cypher command as str
+        """
+        node_attrs = Neo4jFactory.formatDict(attrs)
+        create = 'CREATE(n:{}:{} {})'.format(timestamp, label, node_attrs)
+        return create
+        
+    @classmethod
     def add_attributes_by_node_id(cls, node_id: int, attributes: dict, timestamp: str) -> str:
         """
         Provides the cypher command to attach a given dictionary to a node specified by its node id
@@ -96,6 +109,25 @@ class Neo4jGraphFactory(Neo4jFactory):
 
         return Neo4jFactory.BuildMultiStatement([match, create, merge] + attrs + [returnID])
 
+    @classmethod
+    def create_secondary_node_wouRels(cls, entity_type: str, timestamp: str) -> str:
+        """
+        Provides the cypher command to attach a given dictionary to a node specified by its node id
+        @param parent_id: source node, which is referenced by the newly created secondary node. Can be set to None
+        @param entity_type: reflection of data model class
+        @param rel_attrs: dictionary to be attached to the edge
+        @param timestamp: identifier for a model
+        @return: cypher command as str
+        """
+
+        create = 'CREATE (n:SecondaryNode:{} {{EntityType: "{}" }})'.format(timestamp, entity_type)
+        match = ""
+        merge = ""
+        attrs = []
+        returnID = 'RETURN ID(n)'
+
+        return Neo4jFactory.BuildMultiStatement([match, create, merge] + attrs + [returnID])
+    
     @classmethod
     def create_list_node(cls, parent_id: int, rel_type: str, timestamp: str) -> str:
         """
@@ -228,3 +260,5 @@ class Neo4jGraphFactory(Neo4jFactory):
         detach = 'DETACH'
         delete = 'DELETE n'
         return Neo4jFactory.BuildMultiStatement([match, detach, delete])
+    
+    

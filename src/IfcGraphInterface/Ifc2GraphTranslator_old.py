@@ -1,11 +1,10 @@
 """ package import """
-from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
-from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 import ifcopenshell
 import progressbar
-import concurrent.futures
 
 """ file import """
+from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
+from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 
 
 class IFCGraphGenerator:
@@ -26,8 +25,7 @@ class IFCGraphGenerator:
         try:
             self.model = ifcopenshell.open(model_path)
             ifc_version = self.model.schema
-            self.schema = ifcopenshell.ifcopenshell_wrapper.schema_by_name(
-                ifc_version)
+            self.schema = ifcopenshell.ifcopenshell_wrapper.schema_by_name(ifc_version)
         except:
             print('file path: {}'.format(model_path))
             raise Exception('Unable to open IFC model on given file path')
@@ -36,12 +34,12 @@ class IFCGraphGenerator:
         my_label = 'ts' + self.model.wrapped_data.header.file_name.time_stamp
         my_label = my_label.replace('-', '')
         my_label = my_label.replace(':', '')
-        self.timestamp = my_label
+        self.label = my_label
 
         # set the connector
         self.connector = connector
 
-        # set output
+        # set output 
         self.parserConfig = ParserConfig
         self.printToConsole = False
         self.printToLog = True
@@ -49,7 +47,6 @@ class IFCGraphGenerator:
         super().__init__()
 
     # public entry method to generate the graph out of a given IFC model
-
     def generateGraph(self):
         """
         parses the IFC model into the graph database
@@ -57,122 +54,140 @@ class IFCGraphGenerator:
         """
 
         # delete entire graph if label already exists
-        print('DEBUG INFO: entire graph labeled with >> {} << gets deleted \n'.format(
-            self.timestamp))
-        self.connector.run_cypher_statement(
-            'MATCH(n:{}) DETACH DELETE n'.format(self.timestamp))
+        print('DEBUG INFO: entire graph labeled with >> {} << gets deleted \n'.format(self.label))
+        self.connector.run_cypher_statement('MATCH(n:{}) DETACH DELETE n'.format(self.label))
 
-        print('[IFC_P21 > {} < ]: Generating graph... '.format(self.timestamp))
+        print('[IFC_P21 > {} < ]: Generating graph... '.format(self.label))
 
         # extract model data
+        obj_definitions = self.model.by_type('IfcObjectDefinition')
+        obj_relationships = self.model.by_type('IfcRelationship')
+        props = self.model.by_type('IfcPropertyDefinition')
 
-        entity_list = []
+        # parse rooted node + subgraphs
+        self.__mapEntities(obj_definitions)
 
-        for element in self.model:
-            entity_list.append(element)
+        # parse objectified relationships
+        self.__mapObjRelationships(obj_relationships)
 
-        increment = 100 / (len(entity_list)*2)
-        percent = 0
+        # ToDo: handle IfcPropertyDefinition
 
-        for entity in entity_list:
+        print('[IFC_P21 > {} < ]: Generating graph - DONE. \n '.format(self.label))
 
-            # print progressbar
-            progressbar.printbar(percent)
-
-            # check if the entity is either an ObjectDef or Relationship or neither
-            if entity.is_a('IfcObjectDefinition'):
-                self.__mapEntity(entity, "PrimaryNode")
-            elif entity.is_a('IfcRelationship'):
-                self.__mapEntity(entity, "ConnectionNode")
-            else:
-                self.__mapEntity(entity, "SecondaryNode")
-
-            # add increment to percentage
-            percent += increment
-
-        for entity in entity_list:
-            # print progressbar
-            progressbar.printbar(percent)
-
-            self.build_node_rels(entity)
-
-            # add increment to percentage
-            percent += increment
-
-        progressbar.printbar(percent)
-        print('[IFC_P21 > {} < ]: Generating graph - DONE. \n '.format(self.timestamp))
-
-        self.validateParsingResult()
-        return self.timestamp
+        return self.label
 
     def validateParsingResult(self):
-        """
-        Compares the number of entities in the model with the number of nodes in the graph
-        @return: boolean
+        # ticket_PostEvent-VerifyParsedModel
+
+        # step 1: count entities in IFC model
+
+        # step 2: count number of nodes created in the related graph structure
+        # step 2a: identify the graph by its label (i.e., timestamp)
+        # step 2b: create a new method in the class Neo4jQueryFactory
+        # step 2c: implement a suitable cypher statement into the recently created method in Neo4jQueryFactory
+        # step 2d: run the cypher query using the self.connector.run_cypher_statement() 
+        # step 2e: access the database response
+
+        # step 3: compare num_entities from the IFC model with the number of nodes detected in the graph
+
+        # step 4: print the test result to console. 
+
+        pass
+
+    # public entry
+    def __mapEntities(self, rootedEntities):
+        # data for progressbar
+        increment = 100 / len(rootedEntities)
+        percent = 0
+        # loop over all rooted entities
+        for entity in rootedEntities:
+            # print progressbar
+            progressbar.printbar(percent)
+
+            # get some basic data
+            info = entity.get_info()
+            entityId = info['GlobalId']
+            entityType = info['type']
+
+            # neo4j: build rooted node
+            cypher_statement = Neo4jGraphFactory.create_primary_node(entityId, entityType, self.label)
+            parent_node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
+
+            # get all attrs and children
+            self.build_node_content(entity, 0, parent_node_id)
+
+            # update progressbar
+            percent += increment
+
+        # show last progressbar update
+        progressbar.printbar(percent)
+
+    # private recursive function
+    def build_node_content(self, entity, indent: int, node_id: int):
         """
 
-        # get number of nodes in the graph
-        cy = Neo4jQueryFactory.count_nodes(self.timestamp)
-        count_graph = self.connector.run_cypher_statement(cy, 'count')[0]
-        
-        # get number of entities in the model
-        count_model = len(list(self.model))
-        
-        # compare and calculate diff
-        if count_graph == count_model:
-            print(
-                'Validation successful. Number of entities in the file equal the number of nodes in the graph.')
-            return True
-        else:
-            print('Validation unsuccessful. Number of entities in the file do not equal the number of nodes in the graph.\nDifference: {}'.format(
-                abs(count_graph-count_model)))
-            return False
+        @param entity:
+        @param indent:
+        @param node_id:
+        @return:
+        """
 
-    def __mapEntity(self, entity, label):
-        # get some basic data
+        if self.printToConsole:
+            print("".ljust(indent * 4) + '{}'.format(entity))
+
+        # print atomic attributes: 
         info = entity.get_info()
+        p21_id = info['id']
 
-        # node_attribute_names, single_associations, aggregated_associations = self.separate_attributes(entity)
-        node_attribute_names, _, _ = self.separate_attributes(entity)
+        # separate associations from class attributes
+        node_attribute_names, single_associations, aggregated_associations = self.separate_attributes(entity)
 
-        # create a dictionary of attributes
+        # define dict of attributes that get directly attached to the node
         node_attr_dict = {}
         for a in node_attribute_names:
             node_attr_dict[a] = info[a]
 
-        # rename some keys
-        node_attr_dict['p21_id'] = node_attr_dict.pop('id')
-        node_attr_dict['EntityType'] = node_attr_dict.pop('type')
+        # attach p21_id param
+        node_attr_dict['p21_id'] = p21_id
 
-        # run cypher command
-        cypher_statement = Neo4jGraphFactory.create_node_with_attr(
-            label, node_attr_dict, self.timestamp)
-        # parent_node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
+        # --1-- append node attributes to current node
+        # atomic attrs exist on current node -> map to node
+        cypher_statement = Neo4jGraphFactory.add_attributes_by_node_id(node_id, node_attr_dict, self.label)
         self.connector.run_cypher_statement(cypher_statement)
 
-    def build_node_rels(self, entity):
-        # get info
-        info = entity.get_info()
-        p21_id = info['id']
-
-        # get attribute definitions
-        _, single_associations, aggregated_associations = self.separate_attributes(
-            entity)
+        # --2-- build simple associations with recursive call
+        # query all traversal entities (i.e., associated entity instances)
+        children = self.model.traverse(entity, 1)[1:]
 
         for association in single_associations:
             entity = info[association]
             if entity is None:
                 continue
 
+            entity_type = entity.get_info()['type']
             p21_id_child = entity.get_info()['id']
 
             edge_attrs = {'relType': association}
 
-            # merge with existing
-            cy = Neo4jGraphFactory.merge_on_p21(
-                p21_id, p21_id_child, edge_attrs, self.timestamp)
-            self.connector.run_cypher_statement(cy)
+            node_exists = self.check_node_exists(p21_id_child)
 
+            if node_exists:
+                # merge with existing
+                cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.label)
+                self.connector.run_cypher_statement(cy)
+
+            else:
+                # create new node
+                cy = Neo4jGraphFactory.create_secondary_node(
+                    parent_id=node_id, entity_type=entity_type, rel_attrs=edge_attrs, timestamp=self.label)
+                child_id = self.connector.run_cypher_statement(cy, 'ID(n)')[0]
+
+                # ToDo: consider to kick the recursion after creating all direct associations
+
+                # kick the recursion and attach the attrs to the child node
+                self.build_node_content(entity, indent+1, child_id)
+
+        # --3-- build aggregated associations with recursive call
         for association in aggregated_associations:
             entities = info[association]
             i = 0
@@ -181,8 +196,8 @@ class IFCGraphGenerator:
                 continue
             for entity in entities:
                 try:
+                    entity_type = entity.get_info()['type']
                     p21_id_child = entity.get_info()['id']
-
                 except:
                     raise Exception('Failed to query data from entity.')
 
@@ -191,13 +206,54 @@ class IFCGraphGenerator:
                     'listItem': i
                 }
 
-                # merge with existing
-                cy = Neo4jGraphFactory.merge_on_p21(
-                    p21_id, p21_id_child, edge_attrs, self.timestamp)
-                self.connector.run_cypher_statement(cy)
+                # check if node already exists
+                node_exists = self.check_node_exists(p21_id_child)
+
+                if node_exists:
+                    # merge with existing
+                    cy = Neo4jGraphFactory.merge_on_p21(p21_id, p21_id_child, edge_attrs, self.label)
+                    self.connector.run_cypher_statement(cy)
+
+                else:
+                    # create new node
+                    cy = Neo4jGraphFactory.create_secondary_node(
+                        parent_id=node_id, entity_type=entity_type, rel_attrs=edge_attrs, timestamp=self.label)
+                    child_id = self.connector.run_cypher_statement(cy, 'ID(n)')[0]
+
+                    # kick the recursion and attach the attrs to the child node
+                    self.build_node_content(entity, indent + 1, child_id)
 
                 # increase counter
                 i += 1
+
+        return None
+
+    def check_node_exists(self, p21_id_child: int) -> bool:
+        """
+        check if a node with a specified p21_id already exists in the graph
+        @param p21_id_child:
+        @return: True or False
+        """
+        cy = Neo4jQueryFactory.get_node_exists(p21_id=p21_id_child, label=self.label)
+        node_exists = self.connector.run_cypher_statement(cy)[0][0]
+        return node_exists
+
+    # public entry
+    def __mapObjRelationships(self, objRels):
+
+        # loop over all relationships
+        for entity in objRels:
+            # get some basic data
+            info = entity.get_info()
+            entityId = info['GlobalId']
+            entityType = info['type']
+
+            # neo4j: build rooted node
+            cypher_statement = Neo4jGraphFactory.create_connection_node(entityId, entityType, self.label)
+            node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
+
+            # get all attrs and children
+            self.build_node_content(entity, 0, node_id)
 
     def separate_attributes(self, entity) -> tuple:
         """"
@@ -211,8 +267,8 @@ class IFCGraphGenerator:
         entity_id = info['id']
 
         # remove entity_id and type
-        # info.pop('id')
-        # info.pop('type')
+        info.pop('id')
+        info.pop('type')
 
         # get the class definition for the current instance w.r.t. schema version
         # https://wiki.osarch.org/index.php?title=IfcOpenShell_code_examples#Exploring_IFC_schema
@@ -223,8 +279,7 @@ class IFCGraphGenerator:
         aggregated_associations = []
 
         try:
-            class_definition = self.schema.declaration_by_name(
-                clsName).all_attributes()
+            class_definition = self.schema.declaration_by_name(clsName).all_attributes()
         except:
             raise Exception("Failed to query schema specification in IFC2GraphTranslator.\n "
                             "Schema: {}, Entity: {} ".format(self.schema, clsName))
@@ -244,12 +299,9 @@ class IFCGraphGenerator:
                 attr_type = attr.type_of_attribute()
 
             # get the value structure
-            is_entity = isinstance(
-                attr_type, ifcopenshell.ifcopenshell_wrapper.entity)
-            is_type = isinstance(
-                attr_type, ifcopenshell.ifcopenshell_wrapper.type_declaration)
-            is_select = isinstance(
-                attr_type, ifcopenshell.ifcopenshell_wrapper.select_type)
+            is_entity = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.entity)
+            is_type = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.type_declaration)
+            is_select = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.select_type)
 
             is_pdt_select = False
             is_entity_select = False
@@ -261,17 +313,12 @@ class IFCGraphGenerator:
                 # print(dir(methods))
                 lst = attr.type_of_attribute().declared_type().select_list()
 
-                is_entity_select = all(
-                    [isinstance(x, ifcopenshell.ifcopenshell_wrapper.entity) for x in lst])
-                is_pdt_select = all(
-                    [isinstance(x, ifcopenshell.ifcopenshell_wrapper.type_declaration) for x in lst])
-                is_nested_select = all(
-                    [isinstance(x, ifcopenshell.ifcopenshell_wrapper.select_type) for x in lst])
+                is_entity_select = all([isinstance(x, ifcopenshell.ifcopenshell_wrapper.entity) for x in lst])
+                is_pdt_select = all([isinstance(x, ifcopenshell.ifcopenshell_wrapper.type_declaration) for x in lst])
+                is_nested_select = all([isinstance(x, ifcopenshell.ifcopenshell_wrapper.select_type) for x in lst])
 
-            is_enumeration = isinstance(
-                attr_type, ifcopenshell.ifcopenshell_wrapper.enumeration_type)
-            is_aggregation = isinstance(
-                attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
+            is_enumeration = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.enumeration_type)
+            is_aggregation = isinstance(attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
 
             # catch some weird cases with IfcDimensionalExponents
             #  as this entity doesnt use types but atomic attr declarations
@@ -297,7 +344,7 @@ class IFCGraphGenerator:
                                'LayerFrozen',
                                'LayerBlocked',
                                'ProductDefinitional',
-                               'Scale2',  # IfcCartesianTransformationOperator2DnonUniform
+                               'Scale2',         #IfcCartesianTransformationOperator2DnonUniform
                                'Scale3',
                                'RelatedPriorities',
                                'RelatingPriorities',
@@ -349,8 +396,9 @@ class IFCGraphGenerator:
                     'Trim1',
                     'Trim2',
                     'Orientation',
-                    'RefLongitude',
-                    'RefLatitude'
+
+
+
                 ]:
                     node_attributes.append(attr.name())
                 else:
@@ -358,6 +406,5 @@ class IFCGraphGenerator:
             else:
                 raise Exception('Tried to encode the attribute type of entity #{} clsName: {} attribute {}. '
                                 'Please check your graph translator.'.format(entity_id, clsName, attr.name()))
-        node_attributes.append('id')
-        node_attributes.append('type')
+
         return node_attributes, single_associations, aggregated_associations
