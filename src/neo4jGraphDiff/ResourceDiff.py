@@ -128,6 +128,41 @@ class ResourceDiff(AbsGraphDiff):
 
         return
 
+    def calc_dict_diff(dict_left: dict, dict_right: dict) -> dict:
+        """
+        calculates the difference between two dictionaries and returns a dictionary with the differences in apoc.diff style
+        @param dict_init: the initial attrs of the node 
+        @param node_updated: the updated attrs of the node
+        @return: 
+        """
+        # Same key, different/same value
+        different = {}
+        inCommon = {}
+        for key in dict_left.keys():
+            if key in dict_right:
+                if dict_left[key] != dict_right[key]:
+                    # different value
+                    different[key] = {"left": dict_left[key], "right": dict_right[key]}
+                else:
+                    # same value
+                    inCommon[key] = dict_left[key]
+        
+        # Right only
+        rightOnly = {}
+        for key in dict_right.keys():
+            if not key in dict_left:
+                rightOnly[key] = dict_right[key]
+                
+        # Left only
+        leftOnly = {}
+        for key in dict_left.keys():
+            if not key in dict_right:
+                leftOnly[key] = dict_left[key]
+        
+        # Join dictionaries
+        ret_val = {"leftOnly": leftOnly, "inCommon": inCommon, "different": different, "rightOnly": rightOnly}
+        return ret_val
+    
     def __calc_semantic_delta(self, node_init: NodeItem, node_updated: NodeItem) -> None:
         """
         calculates and captures a semantic modification between two nodes
