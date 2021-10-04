@@ -25,8 +25,16 @@ class GraphDelta:
         self.structure_updates: List[StructureModification] = []
 
     def sort_pMods_by_guid(self):
-        lst = sorted(self.property_updates, key=lambda pmod: pmod.pattern.get_entry_node().attrs['GlobalId'])
-        return lst
+        """
+        sorts the pMods by the globalId attribute
+        @return:
+        """
+        try:
+            lst = sorted(self.property_updates, key=lambda pmod: pmod.pattern.get_entry_node().attrs['GlobalId'])
+            return lst
+        except:
+            print('Sorting failed. Perhaps there is an issue in a pattern for each pMod. ')
+            return self.property_updates
 
     def get_node_list_inserted(self):
         """
