@@ -128,36 +128,36 @@ class ResourceDiff(AbsGraphDiff):
 
         return
 
-    def calc_dict_diff(dict_left: dict, dict_right: dict) -> dict:
+    def calc_dict_diff(dict_init: dict, dict_updated: dict) -> dict:
         """
         calculates the difference between two dictionaries and returns a dictionary with the differences in apoc.diff style
         @param dict_init: the initial attrs of the node 
-        @param node_updated: the updated attrs of the node
+        @param dict_updated: the updated attrs of the node
         @return: 
         """
         # Same key, different/same value
         different = {}
         inCommon = {}
-        for key in dict_left.keys():
-            if key in dict_right:
-                if dict_left[key] != dict_right[key]:
+        for key in dict_init.keys():
+            if key in dict_updated:
+                if dict_init[key] != dict_updated[key]:
                     # different value
-                    different[key] = {"left": dict_left[key], "right": dict_right[key]}
+                    different[key] = {"left": dict_init[key], "right": dict_updated[key]}
                 else:
                     # same value
-                    inCommon[key] = dict_left[key]
+                    inCommon[key] = dict_init[key]
         
         # Right only
         rightOnly = {}
-        for key in dict_right.keys():
-            if not key in dict_left:
-                rightOnly[key] = dict_right[key]
+        for key in dict_updated.keys():
+            if not key in dict_init:
+                rightOnly[key] = dict_updated[key]
                 
         # Left only
         leftOnly = {}
-        for key in dict_left.keys():
-            if not key in dict_right:
-                leftOnly[key] = dict_left[key]
+        for key in dict_init.keys():
+            if not key in dict_updated:
+                leftOnly[key] = dict_init[key]
         
         # Join dictionaries
         ret_val = {"leftOnly": leftOnly, "inCommon": inCommon, "different": different, "rightOnly": rightOnly}
