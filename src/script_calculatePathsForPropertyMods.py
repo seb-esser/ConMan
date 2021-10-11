@@ -6,7 +6,7 @@ import jsonpickle
 
 from neo4jGraphDiff.GraphDelta import GraphDelta
 
-with open('result_initts20121017T152740-updtts20121017T154702.json') as f:
+with open('GraphDelta_initts20121017T152740-updtts20121017T154702.json') as f:
     content = f.read()
     print("[INFO] loading delta json....")
     result: GraphDelta = jsonpickle.decode(content)

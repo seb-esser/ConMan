@@ -82,9 +82,10 @@ def calcDPO(obj_guid: str, label: str):
     """.format(label, obj_guid)
     raw_outs, raw_ins = connector.run_cypher_statement(cy_ptrs)[0]
     nodes_outs = NodeItem.fromNeo4jResponse(raw_outs)
-    nodes_ins = NodeItem.fromNeo4jResponse(raw_outs)  # die können eigentlich gar nicht existieren, weil sie sonst einer anderen struktur zugeordnet wären.
+    nodes_ins = NodeItem.fromNeo4jResponse(raw_outs)
     print('\t Num nodes to be removed: {}'.format(len(removedPattern.get_unified_node_set())))
     print('\t Num nodes embedding SecondaryReferences: ')
+    # print('\t   OUT: ')
     for n in nodes_outs:
         primNode: NodeItem = result.node_matching_table.get_parent_primaryNode(n)
         cy = "MATCH pa = shortestpath((pn:{0} {{GlobalId: \"{1}\" }})-[*..10]->(e)) WHERE ID(e) = {2} return pa," \
@@ -93,7 +94,17 @@ def calcDPO(obj_guid: str, label: str):
         patt = GraphPattern.from_neo4j_response(raw)
         print('\t\t refNode ID: {:>6} parent: {:>6} path length: {}'.format(n.id, primNode.id,
                                                                             len(patt.get_unified_node_set())))
-        # print(cy)
+
+    # print('\t   IN: ')
+    # for n in nodes_ins:
+    #     primNode: NodeItem = result.node_matching_table.get_parent_primaryNode(n)
+    #     cy = "MATCH pa = shortestpath((pn:{0} {{GlobalId: \"{1}\" }})-[*..10]->(e)) WHERE ID(e) = {2} return pa," \
+    #          " NODES(pa), RELATIONSHIPS(pa)".format(label, primNode.attrs["GlobalId"], n.id)
+    #     raw = connector.run_cypher_statement(cy)
+    #     patt = GraphPattern.from_neo4j_response(raw)
+    #     print('\t\t refNode ID: {:>6} parent: {:>6} path length: {}'.format(n.id, primNode.id,
+    #                                                                         len(patt.get_unified_node_set())))
+
     cy = "MATCH embeddingPrimary = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})<--(c:ConnectionNode)-->(prim:PrimaryNode) " \
          "RETURN embeddingPrimary, NODES(embeddingPrimary), RELATIONSHIPS(embeddingPrimary)".format(label, obj_guid)
     # print(cy)
@@ -107,7 +118,30 @@ def calcDPO(obj_guid: str, label: str):
 
 print('Run pre-processing and remove all detected pMods with "Trim" attributes. \n')
 remove_trim_errors(result=result)
+project_renaming = result.property_updates[1]
+result.property_updates.remove(project_renaming)
+result.sort_pMods_by_guid()
+# result.property_updates.append(project_renaming)
 print('Preprocessing DONE. \n')
+
+guids = []
+path_lengths = []
+
+for pm in result.property_updates:
+    entity = pm.pattern.get_entry_node().attrs['EntityType']
+    guid = pm.pattern.get_entry_node().attrs['GlobalId']
+    if guid not in guids:
+         guids.append(guid)
+
+    path_lengths.append(len(pm.pattern.paths[0].segments))
+
+    print("{:>12}\t{:<20}\t{:<25}\t{:<100}\t{:<100}".format(guid, entity, pm.attrName, pm.valueOld, pm.valueNew))
+
+print('Total number of modified components: {}'.format(len(guids)))
+
+print('Average path length: {}'.format(sum(path_lengths)/len(path_lengths)))
+print('Max path length: {}'.format(max(path_lengths)))
+
 
 print('REMOVED components:')
 for guid in guids_removed:
