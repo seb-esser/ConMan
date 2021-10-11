@@ -171,8 +171,8 @@ class ResourceDiff(AbsGraphDiff):
         @return:
         """
         # compare two nodes
-        cypher = Neo4jQueryFactory.diff_nodes(node_init.id, node_updated.id)
-        raw = self.connector.run_cypher_statement(cypher)
+        raw = self.calc_dict_diff(node_init.attrs, node_updated.attrs)
+
 
         # delta between both nodes in raw structure
         attr_delta = NodeDiffData.fromNeo4jResponse(raw)
