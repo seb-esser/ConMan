@@ -128,6 +128,41 @@ class ResourceDiff(AbsGraphDiff):
 
         return
 
+    def calc_dict_diff(dict_init: dict, dict_updated: dict) -> dict:
+        """
+        calculates the difference between two dictionaries and returns a dictionary with the differences in apoc.diff style
+        @param dict_init: the initial attrs of the node 
+        @param dict_updated: the updated attrs of the node
+        @return: 
+        """
+        # Same key, different/same value
+        different = {}
+        inCommon = {}
+        for key in dict_init.keys():
+            if key in dict_updated:
+                if dict_init[key] != dict_updated[key]:
+                    # different value
+                    different[key] = {"left": dict_init[key], "right": dict_updated[key]}
+                else:
+                    # same value
+                    inCommon[key] = dict_init[key]
+        
+        # Right only
+        rightOnly = {}
+        for key in dict_updated.keys():
+            if not key in dict_init:
+                rightOnly[key] = dict_updated[key]
+                
+        # Left only
+        leftOnly = {}
+        for key in dict_init.keys():
+            if not key in dict_updated:
+                leftOnly[key] = dict_init[key]
+        
+        # Join dictionaries
+        ret_val = {"leftOnly": leftOnly, "inCommon": inCommon, "different": different, "rightOnly": rightOnly}
+        return ret_val
+    
     def __calc_semantic_delta(self, node_init: NodeItem, node_updated: NodeItem) -> None:
         """
         calculates and captures a semantic modification between two nodes
@@ -136,8 +171,11 @@ class ResourceDiff(AbsGraphDiff):
         @return:
         """
         # compare two nodes
-        cypher = Neo4jQueryFactory.diff_nodes(node_init.id, node_updated.id)
-        raw = self.connector.run_cypher_statement(cypher)
+        # cypher = Neo4jQueryFactory.diff_nodes(node_init.id, node_updated.id)
+        # raw = self.connector.run_cypher_statement(cypher)
+
+        raw = self.calc_dict_diff(node_init.attrs, node_updated.attrs)
+
 
         # delta between both nodes in raw structure
         attr_delta = NodeDiffData.fromNeo4jResponse(raw)

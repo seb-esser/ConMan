@@ -16,7 +16,8 @@ class NodeDiffData:
 
     @classmethod
     def fromNeo4jResponse(cls, raw):
-        ret_val = cls(raw[0][0]['inCommon'], raw[0][0]['different'], raw[0][0]['rightOnly'], raw[0][0]['leftOnly'])
+        # ret_val = cls(raw[0][0]['inCommon'], raw[0][0]['different'], raw[0][0]['rightOnly'], raw[0][0]['leftOnly'])
+        ret_val = cls(raw['inCommon'], raw['different'], raw['rightOnly'], raw['leftOnly'])
         return ret_val
 
     def __str__(self): 
