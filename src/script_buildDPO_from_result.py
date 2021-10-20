@@ -58,6 +58,9 @@ def calcDPO(obj_guid: str, label: str):
     """
 
     """
+
+    node_counter = 0
+
     print("\tComponent: {}".format(obj_guid))
     # -- 1 -- query nodes to be removed (as a graph pattern)
     cy = """
@@ -83,6 +86,9 @@ def calcDPO(obj_guid: str, label: str):
     raw_outs, raw_ins = connector.run_cypher_statement(cy_ptrs)[0]
     nodes_outs = NodeItem.fromNeo4jResponse(raw_outs)
     nodes_ins = NodeItem.fromNeo4jResponse(raw_outs)
+
+    node_counter += len(removedPattern.get_unified_node_set())
+
     print('\t Num nodes to be removed: {}'.format(len(removedPattern.get_unified_node_set())))
     print('\t Num nodes embedding SecondaryReferences: ')
     # print('\t   OUT: ')
@@ -94,6 +100,7 @@ def calcDPO(obj_guid: str, label: str):
         patt = GraphPattern.from_neo4j_response(raw)
         print('\t\t refNode ID: {:>6} parent: {:>6} path length: {}'.format(n.id, primNode.id,
                                                                             len(patt.get_unified_node_set())))
+        node_counter += len(patt.get_unified_node_set())
 
     # print('\t   IN: ')
     # for n in nodes_ins:
@@ -113,7 +120,10 @@ def calcDPO(obj_guid: str, label: str):
     primary_embedding_pattern.load_rel_attrs(connector=connector)
     print('\t Num nodes embedding primary structure (including ConnectionNodes): {}'
           .format(len(primary_embedding_pattern.get_unified_node_set())))
+
+    node_counter += len(primary_embedding_pattern.get_unified_node_set())
     print('\n')
+    return node_counter
 
 
 print('Run pre-processing and remove all detected pMods with "Trim" attributes. \n')
@@ -137,15 +147,17 @@ for pm in result.property_updates:
 
     print("{:>12}\t{:<20}\t{:<25}\t{:<100}\t{:<100}".format(guid, entity, pm.attrName, pm.valueOld, pm.valueNew))
 
-print('Total number of modified components: {}'.format(len(guids)))
+print('\nTotal number of modified components: {}'.format(len(guids)))
+print('Number of modified attributes: {} \n'.format(len(result.property_updates)))
 
 print('Average path length: {}'.format(sum(path_lengths)/len(path_lengths)))
-print('Max path length: {}'.format(max(path_lengths)))
+print('Min path length: {}'.format(min(path_lengths)))
+print('Max path length: {} \n'.format(max(path_lengths)))
 
 
 print('REMOVED components:')
 for guid in guids_removed:
-    calcDPO(guid, label_init)
+    num_nodes = calcDPO(guid, label_init)
 
 print('')
 print('INSERTED components:')
