@@ -54,6 +54,11 @@ class GrGenSchemaGenerator:
                 attr_name = attr.name()
                 idx = e.attribute_index(attr_name)
                 data_type = e.attribute_by_index(idx).type_of_attribute()
+
+                # print(data_type)
+                # ToDo: get inspired by the separate_attribute() method to sort out associations to other classes and
+                # attributes with simple types
+
                 gm_snippet += "\n\t{}: {};".format(attr_name, data_type)
             # close class skeleton
             gm_snippet += " \n}"
