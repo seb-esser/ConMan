@@ -1,4 +1,5 @@
 import ifcopenshell
+from ifcopenshell.ifcopenshell_wrapper import enumeration_type
 
 
 class GrGenSchemaGenerator:
@@ -14,14 +15,53 @@ class GrGenSchemaGenerator:
 
         schema = ifcopenshell.ifcopenshell_wrapper.schema_by_name("IFC4")
         entities = ifcopenshell.ifcopenshell_wrapper.schema_definition.entities(schema)
+        enums = ifcopenshell.ifcopenshell_wrapper.schema_definition.enumeration_types(schema)
+        types = ifcopenshell.ifcopenshell_wrapper.schema_definition.type_declarations(schema)
+
         for e in entities:
+            # for a in e.attributes():
+            #     print(a)
+            #     print(a.type_of_attribute().declared_type().name())
+            #     ty = schema.declaration_by_name(a.type_of_attribute().declared_type().name())
+            #     print(ty)
+            #
+            #     if ty is enumeration_type:
+            #         print("hello")
+            #
+            #
+            #     # print(dir(a.type_of_attribute().declared_type()))
+            #     print('\n')
+
             name = e.name()
             is_abstract = e.is_abstract()
             supertype = e.supertype()
-            node_attrs, single_associations, aggregated_associations = self.separate_attributes(e)
+            # node_attrs, single_associations, aggregated_associations = self.separate_attributes(e)
+            node_attrs = e.all_attributes()
+            gm_snippet: str = ""
+            if is_abstract:
+                gm_snippet += "abstract "
 
-            gm_snippet: str = """node class {0} {{ }}""".format(name)
-            self.gm_content += gm_snippet + "\n"
+            # write class skeleton
+            gm_snippet += """node class {0} """.format(name)
+
+            # handle extends case
+            if supertype is not None:
+                gm_snippet += "extends {} {{".format(supertype.name())
+            else:
+                gm_snippet += "{"
+            # write attributes
+            for attr in node_attrs:
+                attr_name = attr.name()
+                idx = e.attribute_index(attr_name)
+                data_type = e.attribute_by_index(idx).type_of_attribute()
+                gm_snippet += "\n\t{}: {};".format(attr_name, data_type)
+            # close class skeleton
+            gm_snippet += " \n}"
+            self.gm_content += gm_snippet + "\n\n"
+
+
+
+
         print(self.gm_content)
         return self.gm_content
 
@@ -35,7 +75,7 @@ class GrGenSchemaGenerator:
         @return:
         """
         name = entity.name()
-        class_definition = entity.all_attributes()
+        class_definition = entity.attributes()
 
         # info = entity.get_info()
         # clsName = info['type']
@@ -196,8 +236,8 @@ class GrGenSchemaGenerator:
             else:
                 raise Exception('Failed to encode the attribute type of entity {} attribute {}. '
                                 'Please check your graph translator.'.format(name, attr.name()))
-        node_attributes.append('id')
-        node_attributes.append('type')
+        # node_attributes.append('id')
+        # node_attributes.append('type')
         return node_attributes, single_associations, aggregated_associations
 
 
