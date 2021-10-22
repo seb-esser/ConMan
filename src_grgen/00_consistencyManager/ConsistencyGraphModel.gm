@@ -1,0 +1,27 @@
+node class PrimaryNode {
+	NodeId: int; 
+	EntityType: string; 
+}
+
+node class SecondaryNode {
+	p21Id: int; 
+	EntityType: string; 
+	attrs: string; 
+}
+
+node class ConnectionNode {
+	p21Id: int; 
+	EntityType: string; 
+}
+
+edge class Association {
+	RelType: string; 
+}
+
+edge class SIMILAR_TO {
+	
+}
+
+edge class EQUAL_TO {
+	
+}
