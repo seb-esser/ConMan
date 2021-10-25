@@ -1,3 +1,5 @@
+import re
+
 import ifcopenshell
 from ifcopenshell.ifcopenshell_wrapper import enumeration_type
 
@@ -6,6 +8,15 @@ class GrGenSchemaGenerator:
 
     def __init__(self):
         self.gm_content: str = ""
+        self.enumerations = []
+        self.type_mapping = {
+            "string": "string",
+            "real": "double",
+            "integer": "int",
+            "logical": "boolean",
+            "binary": "string",
+            "boolean": "boolean"
+        }
 
     def generate_gm_file(self):
         """
@@ -15,34 +26,23 @@ class GrGenSchemaGenerator:
 
         schema = ifcopenshell.ifcopenshell_wrapper.schema_by_name("IFC4")
         entities = ifcopenshell.ifcopenshell_wrapper.schema_definition.entities(schema)
-        enums = ifcopenshell.ifcopenshell_wrapper.schema_definition.enumeration_types(schema)
-        selects = ifcopenshell.ifcopenshell_wrapper.schema_definition.select_types(schema)
+        # enums = ifcopenshell.ifcopenshell_wrapper.schema_definition.enumeration_types(schema)
+        # selects = ifcopenshell.ifcopenshell_wrapper.schema_definition.select_types(schema)
 
+        # encodings of entities
         for e in entities:
-            # for a in e.attributes():
-            #     print(a)
-            #     print(a.type_of_attribute().declared_type().name())
-            #     ty = schema.declaration_by_name(a.type_of_attribute().declared_type().name())
-            #     print(ty)
-            #
-            #     if ty is enumeration_type:
-            #         print("hello")
-            #
-            #
-            #     # print(dir(a.type_of_attribute().declared_type()))
-            #     print('\n')
 
-            name = e.name()
+            entity_name = e.name()
             is_abstract = e.is_abstract()
             supertype = e.supertype()
-            node_attrs, single_associations, aggregated_associations = self.separate_attributes(e)
+            node_attrs, single_associations, aggregated_associations, enums = self.separate_attributes(e)
             # node_attrs = e.all_attributes()
             gm_snippet: str = ""
             if is_abstract:
                 gm_snippet += "abstract "
 
             # write class skeleton
-            gm_snippet += """node class {0} """.format(name)
+            gm_snippet += """node class {0} """.format(entity_name)
 
             # handle extends case
             if supertype is not None:
@@ -51,28 +51,51 @@ class GrGenSchemaGenerator:
                 gm_snippet += "{"
             # write attributes
             for attr in node_attrs:
-
-
                 attr_name = attr.name()
                 idx = e.attribute_index(attr_name)
                 data_type = e.attribute_by_index(idx).type_of_attribute()
 
-                is_type = isinstance(data_type, ifcopenshell.ifcopenshell_wrapper.type_declaration)
-                is_enumeration = isinstance(data_type, ifcopenshell.ifcopenshell_wrapper.named_type)
+                # process datatype:
+                s = str(data_type)
+                # print(s)
+                splitt: str = s.split('<')[-1]
+                ty = splitt.translate({ord(i): None for i in ['<', '>']})
 
-                # print(data_type)
-                # ToDo: get inspired by the separate_attribute() method to sort out associations to other classes and
+                try:
+                    grgen_type = self.type_mapping[ty]
+                except:
+                    print(Warning("Skipped parsing of attribute {} of entity {}.". format(attr_name, entity_name)))
+
+                    continue
+                    # raise Exception("the detected datatype has no mapping rule in the dictionary. ")
                 # attributes with simple types
                 try:
-                    gm_snippet += "\n\t{}: {};".format(attr_name, data_type.declared_type())
+                    gm_snippet += "\n\t{}: {};".format(attr_name, grgen_type)
                 except:
+                    print("something was skipped. Please check entity {} attribute {}".format(entity_name, attr_name))
                     continue
             # close class skeleton
             gm_snippet += " \n}"
             self.gm_content += gm_snippet + "\n\n"
 
+        processed_names = []
+        for en in self.enumerations:
+            ty = str(en.type_of_attribute())
+            # format string representation
+            split = ty.split(' ')
+            entity_name = split[1][:-1]
+            if entity_name in processed_names:
+                # enum was already processed, proceed with next one
+                continue
+            enum_values = split[2:]
 
-
+            enum_values[0] = enum_values[0][1:]
+            enum_values[-1] = enum_values[-1][:-2]
+            inner = ""
+            for values in enum_values:
+                inner += (values + " ")
+            self.gm_content += "enum {0} {{ {1} }}\n".format(entity_name, inner)
+            processed_names.append(entity_name)
 
         print(self.gm_content)
         return self.gm_content
@@ -89,38 +112,13 @@ class GrGenSchemaGenerator:
         name = entity.name()
         class_definition = entity.attributes()
 
-        # info = entity.get_info()
-        # clsName = info['type']
-        # entity_id = info['id']
-        #
-        # # remove entity_id and type
-        # # info.pop('id')
-        # # info.pop('type')
-        #
-        # # get the class definition for the current instance w.r.t. schema version
-        # # https://wiki.osarch.org/index.php?title=IfcOpenShell_code_examples#Exploring_IFC_schema
-        #
         # separate attributes into node attributes, simple associations, and sets of associations
         node_attributes = []
         single_associations = []
         aggregated_associations = []
-        #
-        # try:
-        #     class_definition = self.schema.declaration_by_name(
-        #         clsName).all_attributes()
-        # except:
-        #     raise Exception("Failed to query schema specification in IFC2GraphTranslator.\n "
-        #                     "Schema: {}, Entity: {} ".format(self.schema, clsName))
+        enums = []
 
         for attr in class_definition:
-            # check if attribute has attr value in the current entity instance
-            # if info[name] is not None:
-            #     print('attribute present')
-            # else:
-            #     print('attribute empty')
-            #     continue
-
-            # this is attr quite weird approach but it works
             try:
                 attr_type = attr.type_of_attribute().declared_type()
             except:
@@ -140,9 +138,6 @@ class GrGenSchemaGenerator:
 
             # ToDo: Distinguish if it is a select of entities or a select of predefinedTypes
             if is_select:
-                # methods = attr.type_of_attribute().declared_type()
-                # print(dir(methods))
-
                 lst = attr.type_of_attribute().declared_type().select_list()
 
                 is_entity_select = all(
@@ -154,6 +149,7 @@ class GrGenSchemaGenerator:
                 # ToDo: mixed cases are not implemented yet:
                 # - select + entities
                 # - select + type declaration (RelatingPropertyDefinition
+                # 'Roles' in IfcActor
                 if not all([is_entity_select, is_pdt_select, is_nested_select]):
                     continue
 
@@ -224,11 +220,21 @@ class GrGenSchemaGenerator:
                                'RelatedPriorities'
                                ]:
                 node_attributes.append(attr)
+            elif is_enumeration:
+                # assign to local return value
+                enums.append(attr)
 
-            elif is_type or is_enumeration or is_pdt_select or is_nested_select:
+                if attr not in self.enumerations:
+                    self.enumerations.append(attr)
+                # continue with next attribute
+                continue
+
+            elif is_type or is_pdt_select or is_nested_select:
                 node_attributes.append(attr)
+                continue
             elif is_entity or is_entity_select:
                 single_associations.append(attr)
+                continue
             elif is_aggregation:
                 # ToDo: check if it is an aggregation of types or an aggregation of entities
                 # https://standards.buildingsmart.org/IFC/RELEASE/IFC4/ADD2_TC1/HTML/link/ifctrimmedcurve.htm -> trimSelect
@@ -240,7 +246,7 @@ class GrGenSchemaGenerator:
                     'MiddleNames',
                     'PrefixTitles',
                     'SuffixTitles',
-                    'Roles',
+
                     'Addresses',
                     'CoordIndex',
                     'InnerCoordIndices',
@@ -259,7 +265,7 @@ class GrGenSchemaGenerator:
                                 'Please check your graph translator.'.format(name, attr))
         # node_attributes.append('id')
         # node_attributes.append('type')
-        return node_attributes, single_associations, aggregated_associations
+        return node_attributes, single_associations, aggregated_associations, enums
 
 
 
