@@ -1,6 +1,7 @@
 node class PrimaryNode {
 	NodeId: int; 
-	EntityType: string; 
+	EntityType: string;
+	SomeEnum: testEnum;
 }
 
 node class SecondaryNode {
@@ -25,3 +26,6 @@ edge class SIMILAR_TO {
 edge class EQUAL_TO {
 	
 }
+
+enum testEnum {TESTA, TESTB}
+ 
