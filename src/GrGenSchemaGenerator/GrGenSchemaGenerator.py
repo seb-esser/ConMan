@@ -16,7 +16,7 @@ class GrGenSchemaGenerator:
         schema = ifcopenshell.ifcopenshell_wrapper.schema_by_name("IFC4")
         entities = ifcopenshell.ifcopenshell_wrapper.schema_definition.entities(schema)
         enums = ifcopenshell.ifcopenshell_wrapper.schema_definition.enumeration_types(schema)
-        types = ifcopenshell.ifcopenshell_wrapper.schema_definition.type_declarations(schema)
+        selects = ifcopenshell.ifcopenshell_wrapper.schema_definition.select_types(schema)
 
         for e in entities:
             # for a in e.attributes():
@@ -35,8 +35,8 @@ class GrGenSchemaGenerator:
             name = e.name()
             is_abstract = e.is_abstract()
             supertype = e.supertype()
-            # node_attrs, single_associations, aggregated_associations = self.separate_attributes(e)
-            node_attrs = e.all_attributes()
+            node_attrs, single_associations, aggregated_associations = self.separate_attributes(e)
+            # node_attrs = e.all_attributes()
             gm_snippet: str = ""
             if is_abstract:
                 gm_snippet += "abstract "
@@ -51,15 +51,22 @@ class GrGenSchemaGenerator:
                 gm_snippet += "{"
             # write attributes
             for attr in node_attrs:
+
+
                 attr_name = attr.name()
                 idx = e.attribute_index(attr_name)
                 data_type = e.attribute_by_index(idx).type_of_attribute()
 
+                is_type = isinstance(data_type, ifcopenshell.ifcopenshell_wrapper.type_declaration)
+                is_enumeration = isinstance(data_type, ifcopenshell.ifcopenshell_wrapper.named_type)
+
                 # print(data_type)
                 # ToDo: get inspired by the separate_attribute() method to sort out associations to other classes and
                 # attributes with simple types
-
-                gm_snippet += "\n\t{}: {};".format(attr_name, data_type)
+                try:
+                    gm_snippet += "\n\t{}: {};".format(attr_name, data_type.declared_type())
+                except:
+                    continue
             # close class skeleton
             gm_snippet += " \n}"
             self.gm_content += gm_snippet + "\n\n"
@@ -167,7 +174,7 @@ class GrGenSchemaGenerator:
                                'Exponent',  # from IfcDerivedUnitElement
                                'Precision',  # from IfcGeometricRepresentationContext
                                'Scale',  # from IfcCartesianPointTransformationOperator3D in 2x3
-                               'Orientation',  # from IfcFaceOuterBound in 2x3
+                               #'Orientation',  # from IfcFaceOuterBound in 2x3
                                'SelfIntersect',  # from IfcCompositeCurve in 2x3
                                'SameSense',  # from IfcCompositeCurveSegment in IFC2x3
                                'SenseAgreement',  # from IfcTrimmedCurve in IFC2x3
@@ -206,14 +213,22 @@ class GrGenSchemaGenerator:
                                'Pixel',
                                'InputPhase',
                                'Degree',
-                               'ImpliedOrder' # IfcRelInterferesElements -> attr
+                               'ImpliedOrder', # IfcRelInterferesElements -> attr
+                               'RefLongitude',
+                               'RefLatitude',
+                               'RemainingUsage',
+                               'Completion',
+                               'ActualUsage',
+                               'ScheduleUsage',
+                               'RelatingPriorities',
+                               'RelatedPriorities'
                                ]:
-                node_attributes.append(attr.name())
+                node_attributes.append(attr)
 
             elif is_type or is_enumeration or is_pdt_select or is_nested_select:
-                node_attributes.append(attr.name())
+                node_attributes.append(attr)
             elif is_entity or is_entity_select:
-                single_associations.append(attr.name())
+                single_associations.append(attr)
             elif is_aggregation:
                 # ToDo: check if it is an aggregation of types or an aggregation of entities
                 # https://standards.buildingsmart.org/IFC/RELEASE/IFC4/ADD2_TC1/HTML/link/ifctrimmedcurve.htm -> trimSelect
@@ -233,14 +248,15 @@ class GrGenSchemaGenerator:
                     'Trim2',
                     'Orientation',
                     'RefLongitude',
-                    'RefLatitude'
+                    'RefLatitude',
+                    'Transparency' # IfcSurfaceStyleShading
                 ]:
-                    node_attributes.append(attr.name())
+                    node_attributes.append(attr)
                 else:
-                    aggregated_associations.append(attr.name())
+                    aggregated_associations.append(attr)
             else:
                 raise Exception('Failed to encode the attribute type of entity {} attribute {}. '
-                                'Please check your graph translator.'.format(name, attr.name()))
+                                'Please check your graph translator.'.format(name, attr))
         # node_attributes.append('id')
         # node_attributes.append('type')
         return node_attributes, single_associations, aggregated_associations
