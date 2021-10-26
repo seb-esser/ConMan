@@ -1,3 +1,10 @@
+// ---------- TUM CMS - 2021 ---------- 
+// gm file to be used within GrGen 
+// sebastian.esser[at]tum.de
+// 
+// ____________________________________
+        
+
 node class IfcActionRequest extends IfcControl {
 	Status: string;
 	LongDescription: string; 
