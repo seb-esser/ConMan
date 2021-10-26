@@ -24,6 +24,8 @@ class GrGenSchemaGenerator:
         @return:
         """
 
+        self.gm_content += self.create_file_header() + '\n\n'
+
         schema = ifcopenshell.ifcopenshell_wrapper.schema_by_name("IFC4")
         entities = ifcopenshell.ifcopenshell_wrapper.schema_definition.entities(schema)
         # enums = ifcopenshell.ifcopenshell_wrapper.schema_definition.enumeration_types(schema)
@@ -97,7 +99,6 @@ class GrGenSchemaGenerator:
             self.gm_content += "enum {0} {{ {1} }}\n".format(entity_name, inner)
             processed_names.append(entity_name)
 
-        print(self.gm_content)
         return self.gm_content
 
 # ToDo: the following method was copied from Ifc2GraphTranslator.py.
@@ -267,7 +268,18 @@ class GrGenSchemaGenerator:
         # node_attributes.append('type')
         return node_attributes, single_associations, aggregated_associations, enums
 
-
+    def create_file_header(self):
+        """
+        Specifies a file header for gm text files
+        @return:
+        """
+        s = """// ---------- TUM CMS - 2021 ---------- 
+// gm file to be used within GrGen 
+// sebastian.esser[at]tum.de
+// 
+// ____________________________________
+        """
+        return s
 
 
 
