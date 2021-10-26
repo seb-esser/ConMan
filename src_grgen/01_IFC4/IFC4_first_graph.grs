@@ -1,0 +1,4 @@
+new graph CreateRule.grg "sampleIFC4"
+
+new :IfcProject(Name="TestProject")
+new :IfcSite(Name="TestSite")
