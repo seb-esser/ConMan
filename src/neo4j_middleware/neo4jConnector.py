@@ -37,8 +37,8 @@ class Neo4jConnector:
     def run_cypher_statement(self, statement, postStatement = None):
         """
         executes a given cypher statement and does some post processing if stated
-        @statement
-        @postStatement
+        @statement: cypher command
+        @postStatement: post processing of response
         @return
         """
 
@@ -48,7 +48,7 @@ class Neo4jConnector:
                     logger.info("[neo4j_connector] Running query: " + str(statement)[:80] + '...')
 
                     res = tx.run(statement)
-                    logger.info("[neo4j_connector] Query result: " + str(res))
+                    logger.info("[neo4j_connector] Query delta: " + str(res))
                     return_val = []
 
                     if postStatement != None:

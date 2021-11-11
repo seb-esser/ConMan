@@ -1,0 +1,3210 @@
+// ---------- TUM CMS - 2021 ---------- 
+// gm file to be used within GrGen 
+// sebastian.esser[at]tum.de
+// 
+// ____________________________________
+        
+
+node class IfcActionRequest extends IfcControl {
+	Status: string;
+	LongDescription: string; 
+}
+
+node class IfcActor extends IfcObject { 
+}
+
+node class IfcActorRole {
+	UserDefinedRole: string;
+	Description: string; 
+}
+
+node class IfcActuator extends IfcDistributionControlElement { 
+}
+
+node class IfcActuatorType extends IfcDistributionControlElementType { 
+}
+
+abstract node class IfcAddress {
+	Description: string;
+	UserDefinedPurpose: string; 
+}
+
+node class IfcAdvancedBrep extends IfcManifoldSolidBrep { 
+}
+
+node class IfcAdvancedBrepWithVoids extends IfcAdvancedBrep { 
+}
+
+node class IfcAdvancedFace extends IfcFaceSurface { 
+}
+
+node class IfcAirTerminal extends IfcFlowTerminal { 
+}
+
+node class IfcAirTerminalBox extends IfcFlowController { 
+}
+
+node class IfcAirTerminalBoxType extends IfcFlowControllerType { 
+}
+
+node class IfcAirTerminalType extends IfcFlowTerminalType { 
+}
+
+node class IfcAirToAirHeatRecovery extends IfcEnergyConversionDevice { 
+}
+
+node class IfcAirToAirHeatRecoveryType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcAlarm extends IfcDistributionControlElement { 
+}
+
+node class IfcAlarmType extends IfcDistributionControlElementType { 
+}
+
+node class IfcAnnotation extends IfcProduct { 
+}
+
+node class IfcAnnotationFillArea extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcApplication {
+	Version: string;
+	ApplicationFullName: string;
+	ApplicationIdentifier: string; 
+}
+
+node class IfcAppliedValue {
+	Name: string;
+	Description: string;
+	ApplicableDate: string;
+	FixedUntilDate: string;
+	Category: string;
+	Condition: string; 
+}
+
+node class IfcApproval {
+	Identifier: string;
+	Name: string;
+	Description: string;
+	TimeOfApproval: string;
+	Status: string;
+	Level: string;
+	Qualifier: string; 
+}
+
+node class IfcApprovalRelationship extends IfcResourceLevelRelationship { 
+}
+
+node class IfcArbitraryClosedProfileDef extends IfcProfileDef { 
+}
+
+node class IfcArbitraryOpenProfileDef extends IfcProfileDef { 
+}
+
+node class IfcArbitraryProfileDefWithVoids extends IfcArbitraryClosedProfileDef { 
+}
+
+node class IfcAsset extends IfcGroup {
+	Identification: string;
+	IncorporationDate: string; 
+}
+
+node class IfcAsymmetricIShapeProfileDef extends IfcParameterizedProfileDef {
+	BottomFlangeWidth: double;
+	OverallDepth: double;
+	WebThickness: double;
+	BottomFlangeThickness: double;
+	BottomFlangeFilletRadius: double;
+	TopFlangeWidth: double;
+	TopFlangeThickness: double;
+	TopFlangeFilletRadius: double;
+	BottomFlangeEdgeRadius: double;
+	BottomFlangeSlope: double;
+	TopFlangeEdgeRadius: double;
+	TopFlangeSlope: double; 
+}
+
+node class IfcAudioVisualAppliance extends IfcFlowTerminal { 
+}
+
+node class IfcAudioVisualApplianceType extends IfcFlowTerminalType { 
+}
+
+node class IfcAxis1Placement extends IfcPlacement { 
+}
+
+node class IfcAxis2Placement2D extends IfcPlacement { 
+}
+
+node class IfcAxis2Placement3D extends IfcPlacement { 
+}
+
+node class IfcBeam extends IfcBuildingElement { 
+}
+
+node class IfcBeamStandardCase extends IfcBeam { 
+}
+
+node class IfcBeamType extends IfcBuildingElementType { 
+}
+
+node class IfcBlobTexture extends IfcSurfaceTexture {
+	RasterFormat: string;
+	RasterCode: string; 
+}
+
+node class IfcBlock extends IfcCsgPrimitive3D {
+	XLength: double;
+	YLength: double;
+	ZLength: double; 
+}
+
+node class IfcBoiler extends IfcEnergyConversionDevice { 
+}
+
+node class IfcBoilerType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcBooleanClippingResult extends IfcBooleanResult { 
+}
+
+node class IfcBooleanResult extends IfcGeometricRepresentationItem { 
+}
+
+abstract node class IfcBoundaryCondition {
+	Name: string; 
+}
+
+node class IfcBoundaryCurve extends IfcCompositeCurveOnSurface { 
+}
+
+node class IfcBoundaryEdgeCondition extends IfcBoundaryCondition { 
+}
+
+node class IfcBoundaryFaceCondition extends IfcBoundaryCondition { 
+}
+
+node class IfcBoundaryNodeCondition extends IfcBoundaryCondition { 
+}
+
+node class IfcBoundaryNodeConditionWarping extends IfcBoundaryNodeCondition { 
+}
+
+abstract node class IfcBoundedCurve extends IfcCurve { 
+}
+
+abstract node class IfcBoundedSurface extends IfcSurface { 
+}
+
+node class IfcBoundingBox extends IfcGeometricRepresentationItem {
+	XDim: double;
+	YDim: double;
+	ZDim: double; 
+}
+
+node class IfcBoxedHalfSpace extends IfcHalfSpaceSolid { 
+}
+
+abstract node class IfcBSplineCurve extends IfcBoundedCurve {
+	Degree: int;
+	ClosedCurve: boolean;
+	SelfIntersect: boolean; 
+}
+
+node class IfcBSplineCurveWithKnots extends IfcBSplineCurve { 
+}
+
+abstract node class IfcBSplineSurface extends IfcBoundedSurface {
+	UDegree: int;
+	VDegree: int;
+	UClosed: boolean;
+	VClosed: boolean;
+	SelfIntersect: boolean; 
+}
+
+node class IfcBSplineSurfaceWithKnots extends IfcBSplineSurface { 
+}
+
+node class IfcBuilding extends IfcSpatialStructureElement {
+	ElevationOfRefHeight: double;
+	ElevationOfTerrain: double; 
+}
+
+abstract node class IfcBuildingElement extends IfcElement { 
+}
+
+node class IfcBuildingElementPart extends IfcElementComponent { 
+}
+
+node class IfcBuildingElementPartType extends IfcElementComponentType { 
+}
+
+node class IfcBuildingElementProxy extends IfcBuildingElement { 
+}
+
+node class IfcBuildingElementProxyType extends IfcBuildingElementType { 
+}
+
+abstract node class IfcBuildingElementType extends IfcElementType { 
+}
+
+node class IfcBuildingStorey extends IfcSpatialStructureElement {
+	Elevation: double; 
+}
+
+node class IfcBuildingSystem extends IfcSystem {
+	LongName: string; 
+}
+
+node class IfcBurner extends IfcEnergyConversionDevice { 
+}
+
+node class IfcBurnerType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcCableCarrierFitting extends IfcFlowFitting { 
+}
+
+node class IfcCableCarrierFittingType extends IfcFlowFittingType { 
+}
+
+node class IfcCableCarrierSegment extends IfcFlowSegment { 
+}
+
+node class IfcCableCarrierSegmentType extends IfcFlowSegmentType { 
+}
+
+node class IfcCableFitting extends IfcFlowFitting { 
+}
+
+node class IfcCableFittingType extends IfcFlowFittingType { 
+}
+
+node class IfcCableSegment extends IfcFlowSegment { 
+}
+
+node class IfcCableSegmentType extends IfcFlowSegmentType { 
+}
+
+node class IfcCartesianPoint extends IfcPoint {
+	Coordinates: double; 
+}
+
+abstract node class IfcCartesianPointList extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcCartesianPointList2D extends IfcCartesianPointList {
+	CoordList: double; 
+}
+
+node class IfcCartesianPointList3D extends IfcCartesianPointList {
+	CoordList: double; 
+}
+
+abstract node class IfcCartesianTransformationOperator extends IfcGeometricRepresentationItem {
+	Scale: double; 
+}
+
+node class IfcCartesianTransformationOperator2D extends IfcCartesianTransformationOperator { 
+}
+
+node class IfcCartesianTransformationOperator2DnonUniform extends IfcCartesianTransformationOperator2D {
+	Scale2: double; 
+}
+
+node class IfcCartesianTransformationOperator3D extends IfcCartesianTransformationOperator { 
+}
+
+node class IfcCartesianTransformationOperator3DnonUniform extends IfcCartesianTransformationOperator3D {
+	Scale2: double;
+	Scale3: double; 
+}
+
+node class IfcCenterLineProfileDef extends IfcArbitraryOpenProfileDef {
+	Thickness: double; 
+}
+
+node class IfcChiller extends IfcEnergyConversionDevice { 
+}
+
+node class IfcChillerType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcChimney extends IfcBuildingElement { 
+}
+
+node class IfcChimneyType extends IfcBuildingElementType { 
+}
+
+node class IfcCircle extends IfcConic {
+	Radius: double; 
+}
+
+node class IfcCircleHollowProfileDef extends IfcCircleProfileDef {
+	WallThickness: double; 
+}
+
+node class IfcCircleProfileDef extends IfcParameterizedProfileDef {
+	Radius: double; 
+}
+
+node class IfcCivilElement extends IfcElement { 
+}
+
+node class IfcCivilElementType extends IfcElementType { 
+}
+
+node class IfcClassification extends IfcExternalInformation {
+	Source: string;
+	Edition: string;
+	EditionDate: string;
+	Name: string;
+	Description: string;
+	Location: string; 
+}
+
+node class IfcClassificationReference extends IfcExternalReference {
+	Description: string;
+	Sort: string; 
+}
+
+node class IfcClosedShell extends IfcConnectedFaceSet { 
+}
+
+node class IfcCoil extends IfcEnergyConversionDevice { 
+}
+
+node class IfcCoilType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcColourRgb extends IfcColourSpecification {
+	Red: double;
+	Green: double;
+	Blue: double; 
+}
+
+node class IfcColourRgbList extends IfcPresentationItem { 
+}
+
+abstract node class IfcColourSpecification extends IfcPresentationItem {
+	Name: string; 
+}
+
+node class IfcColumn extends IfcBuildingElement { 
+}
+
+node class IfcColumnStandardCase extends IfcColumn { 
+}
+
+node class IfcColumnType extends IfcBuildingElementType { 
+}
+
+node class IfcCommunicationsAppliance extends IfcFlowTerminal { 
+}
+
+node class IfcCommunicationsApplianceType extends IfcFlowTerminalType { 
+}
+
+node class IfcComplexProperty extends IfcProperty {
+	UsageName: string; 
+}
+
+node class IfcComplexPropertyTemplate extends IfcPropertyTemplate {
+	UsageName: string; 
+}
+
+node class IfcCompositeCurve extends IfcBoundedCurve {
+	SelfIntersect: boolean; 
+}
+
+node class IfcCompositeCurveOnSurface extends IfcCompositeCurve { 
+}
+
+node class IfcCompositeCurveSegment extends IfcGeometricRepresentationItem {
+	SameSense: boolean; 
+}
+
+node class IfcCompositeProfileDef extends IfcProfileDef {
+	Label: string; 
+}
+
+node class IfcCompressor extends IfcFlowMovingDevice { 
+}
+
+node class IfcCompressorType extends IfcFlowMovingDeviceType { 
+}
+
+node class IfcCondenser extends IfcEnergyConversionDevice { 
+}
+
+node class IfcCondenserType extends IfcEnergyConversionDeviceType { 
+}
+
+abstract node class IfcConic extends IfcCurve { 
+}
+
+node class IfcConnectedFaceSet extends IfcTopologicalRepresentationItem { 
+}
+
+node class IfcConnectionCurveGeometry extends IfcConnectionGeometry { 
+}
+
+abstract node class IfcConnectionGeometry { 
+}
+
+node class IfcConnectionPointEccentricity extends IfcConnectionPointGeometry {
+	EccentricityInX: double;
+	EccentricityInY: double;
+	EccentricityInZ: double; 
+}
+
+node class IfcConnectionPointGeometry extends IfcConnectionGeometry { 
+}
+
+node class IfcConnectionSurfaceGeometry extends IfcConnectionGeometry { 
+}
+
+node class IfcConnectionVolumeGeometry extends IfcConnectionGeometry { 
+}
+
+abstract node class IfcConstraint {
+	Name: string;
+	Description: string;
+	ConstraintSource: string;
+	CreationTime: string;
+	UserDefinedGrade: string; 
+}
+
+node class IfcConstructionEquipmentResource extends IfcConstructionResource { 
+}
+
+node class IfcConstructionEquipmentResourceType extends IfcConstructionResourceType { 
+}
+
+node class IfcConstructionMaterialResource extends IfcConstructionResource { 
+}
+
+node class IfcConstructionMaterialResourceType extends IfcConstructionResourceType { 
+}
+
+node class IfcConstructionProductResource extends IfcConstructionResource { 
+}
+
+node class IfcConstructionProductResourceType extends IfcConstructionResourceType { 
+}
+
+abstract node class IfcConstructionResource extends IfcResource { 
+}
+
+abstract node class IfcConstructionResourceType extends IfcTypeResource { 
+}
+
+abstract node class IfcContext extends IfcObjectDefinition {
+	ObjectType: string;
+	LongName: string;
+	Phase: string; 
+}
+
+node class IfcContextDependentUnit extends IfcNamedUnit {
+	Name: string; 
+}
+
+abstract node class IfcControl extends IfcObject {
+	Identification: string; 
+}
+
+node class IfcController extends IfcDistributionControlElement { 
+}
+
+node class IfcControllerType extends IfcDistributionControlElementType { 
+}
+
+node class IfcConversionBasedUnit extends IfcNamedUnit {
+	Name: string; 
+}
+
+node class IfcConversionBasedUnitWithOffset extends IfcConversionBasedUnit {
+	ConversionOffset: double; 
+}
+
+node class IfcCooledBeam extends IfcEnergyConversionDevice { 
+}
+
+node class IfcCooledBeamType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcCoolingTower extends IfcEnergyConversionDevice { 
+}
+
+node class IfcCoolingTowerType extends IfcEnergyConversionDeviceType { 
+}
+
+abstract node class IfcCoordinateOperation { 
+}
+
+abstract node class IfcCoordinateReferenceSystem {
+	Name: string;
+	Description: string;
+	GeodeticDatum: string;
+	VerticalDatum: string; 
+}
+
+node class IfcCostItem extends IfcControl { 
+}
+
+node class IfcCostSchedule extends IfcControl {
+	Status: string;
+	SubmittedOn: string;
+	UpdateDate: string; 
+}
+
+node class IfcCostValue extends IfcAppliedValue { 
+}
+
+node class IfcCovering extends IfcBuildingElement { 
+}
+
+node class IfcCoveringType extends IfcBuildingElementType { 
+}
+
+node class IfcCrewResource extends IfcConstructionResource { 
+}
+
+node class IfcCrewResourceType extends IfcConstructionResourceType { 
+}
+
+abstract node class IfcCsgPrimitive3D extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcCsgSolid extends IfcSolidModel { 
+}
+
+node class IfcCShapeProfileDef extends IfcParameterizedProfileDef {
+	Depth: double;
+	Width: double;
+	WallThickness: double;
+	Girth: double;
+	InternalFilletRadius: double; 
+}
+
+node class IfcCurrencyRelationship extends IfcResourceLevelRelationship {
+	ExchangeRate: double;
+	RateDateTime: string; 
+}
+
+node class IfcCurtainWall extends IfcBuildingElement { 
+}
+
+node class IfcCurtainWallType extends IfcBuildingElementType { 
+}
+
+abstract node class IfcCurve extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcCurveBoundedPlane extends IfcBoundedSurface { 
+}
+
+node class IfcCurveBoundedSurface extends IfcBoundedSurface {
+	ImplicitOuter: boolean; 
+}
+
+node class IfcCurveStyle extends IfcPresentationStyle {
+	ModelOrDraughting: boolean; 
+}
+
+node class IfcCurveStyleFont extends IfcPresentationItem {
+	Name: string; 
+}
+
+node class IfcCurveStyleFontAndScaling extends IfcPresentationItem {
+	Name: string;
+	CurveFontScaling: double; 
+}
+
+node class IfcCurveStyleFontPattern extends IfcPresentationItem {
+	VisibleSegmentLength: double;
+	InvisibleSegmentLength: double; 
+}
+
+node class IfcCylindricalSurface extends IfcElementarySurface {
+	Radius: double; 
+}
+
+node class IfcDamper extends IfcFlowController { 
+}
+
+node class IfcDamperType extends IfcFlowControllerType { 
+}
+
+node class IfcDerivedProfileDef extends IfcProfileDef {
+	Label: string; 
+}
+
+node class IfcDerivedUnit {
+	UserDefinedType: string; 
+}
+
+node class IfcDerivedUnitElement {
+	Exponent: int; 
+}
+
+node class IfcDimensionalExponents {
+	LengthExponent: int;
+	MassExponent: int;
+	TimeExponent: int;
+	ElectricCurrentExponent: int;
+	ThermodynamicTemperatureExponent: int;
+	AmountOfSubstanceExponent: int;
+	LuminousIntensityExponent: int; 
+}
+
+node class IfcDirection extends IfcGeometricRepresentationItem {
+	DirectionRatios: double; 
+}
+
+node class IfcDiscreteAccessory extends IfcElementComponent { 
+}
+
+node class IfcDiscreteAccessoryType extends IfcElementComponentType { 
+}
+
+node class IfcDistributionChamberElement extends IfcDistributionFlowElement { 
+}
+
+node class IfcDistributionChamberElementType extends IfcDistributionFlowElementType { 
+}
+
+node class IfcDistributionCircuit extends IfcDistributionSystem { 
+}
+
+node class IfcDistributionControlElement extends IfcDistributionElement { 
+}
+
+abstract node class IfcDistributionControlElementType extends IfcDistributionElementType { 
+}
+
+node class IfcDistributionElement extends IfcElement { 
+}
+
+node class IfcDistributionElementType extends IfcElementType { 
+}
+
+node class IfcDistributionFlowElement extends IfcDistributionElement { 
+}
+
+abstract node class IfcDistributionFlowElementType extends IfcDistributionElementType { 
+}
+
+node class IfcDistributionPort extends IfcPort { 
+}
+
+node class IfcDistributionSystem extends IfcSystem {
+	LongName: string; 
+}
+
+node class IfcDocumentInformation extends IfcExternalInformation {
+	Identification: string;
+	Name: string;
+	Description: string;
+	Location: string;
+	Purpose: string;
+	IntendedUse: string;
+	Scope: string;
+	Revision: string;
+	CreationTime: string;
+	LastRevisionTime: string;
+	ElectronicFormat: string;
+	ValidFrom: string;
+	ValidUntil: string; 
+}
+
+node class IfcDocumentInformationRelationship extends IfcResourceLevelRelationship {
+	RelationshipType: string; 
+}
+
+node class IfcDocumentReference extends IfcExternalReference {
+	Description: string; 
+}
+
+node class IfcDoor extends IfcBuildingElement {
+	OverallHeight: double;
+	OverallWidth: double;
+	UserDefinedOperationType: string; 
+}
+
+node class IfcDoorLiningProperties extends IfcPreDefinedPropertySet {
+	LiningDepth: double;
+	LiningThickness: double;
+	ThresholdDepth: double;
+	ThresholdThickness: double;
+	TransomThickness: double;
+	TransomOffset: double;
+	LiningOffset: double;
+	ThresholdOffset: double;
+	CasingThickness: double;
+	CasingDepth: double;
+	LiningToPanelOffsetX: double;
+	LiningToPanelOffsetY: double; 
+}
+
+node class IfcDoorPanelProperties extends IfcPreDefinedPropertySet {
+	PanelDepth: double;
+	PanelWidth: double; 
+}
+
+node class IfcDoorStandardCase extends IfcDoor { 
+}
+
+node class IfcDoorStyle extends IfcTypeProduct {
+	ParameterTakesPrecedence: boolean;
+	Sizeable: boolean; 
+}
+
+node class IfcDoorType extends IfcBuildingElementType {
+	ParameterTakesPrecedence: boolean;
+	UserDefinedOperationType: string; 
+}
+
+node class IfcDraughtingPreDefinedColour extends IfcPreDefinedColour { 
+}
+
+node class IfcDraughtingPreDefinedCurveFont extends IfcPreDefinedCurveFont { 
+}
+
+node class IfcDuctFitting extends IfcFlowFitting { 
+}
+
+node class IfcDuctFittingType extends IfcFlowFittingType { 
+}
+
+node class IfcDuctSegment extends IfcFlowSegment { 
+}
+
+node class IfcDuctSegmentType extends IfcFlowSegmentType { 
+}
+
+node class IfcDuctSilencer extends IfcFlowTreatmentDevice { 
+}
+
+node class IfcDuctSilencerType extends IfcFlowTreatmentDeviceType { 
+}
+
+node class IfcEdge extends IfcTopologicalRepresentationItem { 
+}
+
+node class IfcEdgeCurve extends IfcEdge {
+	SameSense: boolean; 
+}
+
+node class IfcEdgeLoop extends IfcLoop { 
+}
+
+node class IfcElectricAppliance extends IfcFlowTerminal { 
+}
+
+node class IfcElectricApplianceType extends IfcFlowTerminalType { 
+}
+
+node class IfcElectricDistributionBoard extends IfcFlowController { 
+}
+
+node class IfcElectricDistributionBoardType extends IfcFlowControllerType { 
+}
+
+node class IfcElectricFlowStorageDevice extends IfcFlowStorageDevice { 
+}
+
+node class IfcElectricFlowStorageDeviceType extends IfcFlowStorageDeviceType { 
+}
+
+node class IfcElectricGenerator extends IfcEnergyConversionDevice { 
+}
+
+node class IfcElectricGeneratorType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcElectricMotor extends IfcEnergyConversionDevice { 
+}
+
+node class IfcElectricMotorType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcElectricTimeControl extends IfcFlowController { 
+}
+
+node class IfcElectricTimeControlType extends IfcFlowControllerType { 
+}
+
+abstract node class IfcElement extends IfcProduct {
+	Tag: string; 
+}
+
+abstract node class IfcElementarySurface extends IfcSurface { 
+}
+
+node class IfcElementAssembly extends IfcElement { 
+}
+
+node class IfcElementAssemblyType extends IfcElementType { 
+}
+
+abstract node class IfcElementComponent extends IfcElement { 
+}
+
+abstract node class IfcElementComponentType extends IfcElementType { 
+}
+
+node class IfcElementQuantity extends IfcQuantitySet {
+	MethodOfMeasurement: string; 
+}
+
+abstract node class IfcElementType extends IfcTypeProduct {
+	ElementType: string; 
+}
+
+node class IfcEllipse extends IfcConic {
+	SemiAxis1: double;
+	SemiAxis2: double; 
+}
+
+node class IfcEllipseProfileDef extends IfcParameterizedProfileDef {
+	SemiAxis1: double;
+	SemiAxis2: double; 
+}
+
+node class IfcEnergyConversionDevice extends IfcDistributionFlowElement { 
+}
+
+abstract node class IfcEnergyConversionDeviceType extends IfcDistributionFlowElementType { 
+}
+
+node class IfcEngine extends IfcEnergyConversionDevice { 
+}
+
+node class IfcEngineType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcEvaporativeCooler extends IfcEnergyConversionDevice { 
+}
+
+node class IfcEvaporativeCoolerType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcEvaporator extends IfcEnergyConversionDevice { 
+}
+
+node class IfcEvaporatorType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcEvent extends IfcProcess {
+	UserDefinedEventTriggerType: string; 
+}
+
+node class IfcEventTime extends IfcSchedulingTime {
+	ActualDate: string;
+	EarlyDate: string;
+	LateDate: string;
+	ScheduleDate: string; 
+}
+
+node class IfcEventType extends IfcTypeProcess {
+	UserDefinedEventTriggerType: string; 
+}
+
+abstract node class IfcExtendedProperties extends IfcPropertyAbstraction {
+	Name: string;
+	Description: string; 
+}
+
+abstract node class IfcExternalInformation { 
+}
+
+node class IfcExternallyDefinedHatchStyle extends IfcExternalReference { 
+}
+
+node class IfcExternallyDefinedSurfaceStyle extends IfcExternalReference { 
+}
+
+node class IfcExternallyDefinedTextFont extends IfcExternalReference { 
+}
+
+abstract node class IfcExternalReference {
+	Location: string;
+	Identification: string;
+	Name: string; 
+}
+
+node class IfcExternalReferenceRelationship extends IfcResourceLevelRelationship { 
+}
+
+node class IfcExternalSpatialElement extends IfcExternalSpatialStructureElement { 
+}
+
+abstract node class IfcExternalSpatialStructureElement extends IfcSpatialElement { 
+}
+
+node class IfcExtrudedAreaSolid extends IfcSweptAreaSolid {
+	Depth: double; 
+}
+
+node class IfcExtrudedAreaSolidTapered extends IfcExtrudedAreaSolid { 
+}
+
+node class IfcFace extends IfcTopologicalRepresentationItem { 
+}
+
+node class IfcFaceBasedSurfaceModel extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcFaceBound extends IfcTopologicalRepresentationItem {
+	Orientation: boolean; 
+}
+
+node class IfcFaceOuterBound extends IfcFaceBound { 
+}
+
+node class IfcFaceSurface extends IfcFace {
+	SameSense: boolean; 
+}
+
+node class IfcFacetedBrep extends IfcManifoldSolidBrep { 
+}
+
+node class IfcFacetedBrepWithVoids extends IfcFacetedBrep { 
+}
+
+node class IfcFailureConnectionCondition extends IfcStructuralConnectionCondition {
+	TensionFailureX: double;
+	TensionFailureY: double;
+	TensionFailureZ: double;
+	CompressionFailureX: double;
+	CompressionFailureY: double;
+	CompressionFailureZ: double; 
+}
+
+node class IfcFan extends IfcFlowMovingDevice { 
+}
+
+node class IfcFanType extends IfcFlowMovingDeviceType { 
+}
+
+node class IfcFastener extends IfcElementComponent { 
+}
+
+node class IfcFastenerType extends IfcElementComponentType { 
+}
+
+abstract node class IfcFeatureElement extends IfcElement { 
+}
+
+abstract node class IfcFeatureElementAddition extends IfcFeatureElement { 
+}
+
+abstract node class IfcFeatureElementSubtraction extends IfcFeatureElement { 
+}
+
+node class IfcFillAreaStyle extends IfcPresentationStyle {
+	ModelorDraughting: boolean; 
+}
+
+node class IfcFillAreaStyleHatching extends IfcGeometricRepresentationItem {
+	HatchLineAngle: double; 
+}
+
+node class IfcFillAreaStyleTiles extends IfcGeometricRepresentationItem {
+	TilingScale: double; 
+}
+
+node class IfcFilter extends IfcFlowTreatmentDevice { 
+}
+
+node class IfcFilterType extends IfcFlowTreatmentDeviceType { 
+}
+
+node class IfcFireSuppressionTerminal extends IfcFlowTerminal { 
+}
+
+node class IfcFireSuppressionTerminalType extends IfcFlowTerminalType { 
+}
+
+node class IfcFixedReferenceSweptAreaSolid extends IfcSweptAreaSolid {
+	StartParam: double;
+	EndParam: double; 
+}
+
+node class IfcFlowController extends IfcDistributionFlowElement { 
+}
+
+abstract node class IfcFlowControllerType extends IfcDistributionFlowElementType { 
+}
+
+node class IfcFlowFitting extends IfcDistributionFlowElement { 
+}
+
+abstract node class IfcFlowFittingType extends IfcDistributionFlowElementType { 
+}
+
+node class IfcFlowInstrument extends IfcDistributionControlElement { 
+}
+
+node class IfcFlowInstrumentType extends IfcDistributionControlElementType { 
+}
+
+node class IfcFlowMeter extends IfcFlowController { 
+}
+
+node class IfcFlowMeterType extends IfcFlowControllerType { 
+}
+
+node class IfcFlowMovingDevice extends IfcDistributionFlowElement { 
+}
+
+abstract node class IfcFlowMovingDeviceType extends IfcDistributionFlowElementType { 
+}
+
+node class IfcFlowSegment extends IfcDistributionFlowElement { 
+}
+
+abstract node class IfcFlowSegmentType extends IfcDistributionFlowElementType { 
+}
+
+node class IfcFlowStorageDevice extends IfcDistributionFlowElement { 
+}
+
+abstract node class IfcFlowStorageDeviceType extends IfcDistributionFlowElementType { 
+}
+
+node class IfcFlowTerminal extends IfcDistributionFlowElement { 
+}
+
+abstract node class IfcFlowTerminalType extends IfcDistributionFlowElementType { 
+}
+
+node class IfcFlowTreatmentDevice extends IfcDistributionFlowElement { 
+}
+
+abstract node class IfcFlowTreatmentDeviceType extends IfcDistributionFlowElementType { 
+}
+
+node class IfcFooting extends IfcBuildingElement { 
+}
+
+node class IfcFootingType extends IfcBuildingElementType { 
+}
+
+node class IfcFurnishingElement extends IfcElement { 
+}
+
+node class IfcFurnishingElementType extends IfcElementType { 
+}
+
+node class IfcFurniture extends IfcFurnishingElement { 
+}
+
+node class IfcFurnitureType extends IfcFurnishingElementType { 
+}
+
+node class IfcGeographicElement extends IfcElement { 
+}
+
+node class IfcGeographicElementType extends IfcElementType { 
+}
+
+node class IfcGeometricCurveSet extends IfcGeometricSet { 
+}
+
+node class IfcGeometricRepresentationContext extends IfcRepresentationContext {
+	CoordinateSpaceDimension: int;
+	Precision: double; 
+}
+
+abstract node class IfcGeometricRepresentationItem extends IfcRepresentationItem { 
+}
+
+node class IfcGeometricRepresentationSubContext extends IfcGeometricRepresentationContext {
+	TargetScale: double;
+	UserDefinedTargetView: string; 
+}
+
+node class IfcGeometricSet extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcGrid extends IfcProduct { 
+}
+
+node class IfcGridAxis {
+	AxisTag: string;
+	SameSense: boolean; 
+}
+
+node class IfcGridPlacement extends IfcObjectPlacement { 
+}
+
+node class IfcGroup extends IfcObject { 
+}
+
+node class IfcHalfSpaceSolid extends IfcGeometricRepresentationItem {
+	AgreementFlag: boolean; 
+}
+
+node class IfcHeatExchanger extends IfcEnergyConversionDevice { 
+}
+
+node class IfcHeatExchangerType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcHumidifier extends IfcEnergyConversionDevice { 
+}
+
+node class IfcHumidifierType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcImageTexture extends IfcSurfaceTexture {
+	URLReference: string; 
+}
+
+node class IfcIndexedColourMap extends IfcPresentationItem {
+	Opacity: double; 
+}
+
+node class IfcIndexedPolyCurve extends IfcBoundedCurve {
+	SelfIntersect: boolean; 
+}
+
+node class IfcIndexedPolygonalFace extends IfcTessellatedItem {
+	CoordIndex: int; 
+}
+
+node class IfcIndexedPolygonalFaceWithVoids extends IfcIndexedPolygonalFace {
+	InnerCoordIndices: int; 
+}
+
+abstract node class IfcIndexedTextureMap extends IfcTextureCoordinate { 
+}
+
+node class IfcIndexedTriangleTextureMap extends IfcIndexedTextureMap { 
+}
+
+node class IfcInterceptor extends IfcFlowTreatmentDevice { 
+}
+
+node class IfcInterceptorType extends IfcFlowTreatmentDeviceType { 
+}
+
+node class IfcIntersectionCurve extends IfcSurfaceCurve { 
+}
+
+node class IfcInventory extends IfcGroup {
+	LastUpdateDate: string; 
+}
+
+node class IfcIrregularTimeSeries extends IfcTimeSeries { 
+}
+
+node class IfcIrregularTimeSeriesValue {
+	TimeStamp: string; 
+}
+
+node class IfcIShapeProfileDef extends IfcParameterizedProfileDef {
+	OverallWidth: double;
+	OverallDepth: double;
+	WebThickness: double;
+	FlangeThickness: double;
+	FilletRadius: double;
+	FlangeEdgeRadius: double;
+	FlangeSlope: double; 
+}
+
+node class IfcJunctionBox extends IfcFlowFitting { 
+}
+
+node class IfcJunctionBoxType extends IfcFlowFittingType { 
+}
+
+node class IfcLaborResource extends IfcConstructionResource { 
+}
+
+node class IfcLaborResourceType extends IfcConstructionResourceType { 
+}
+
+node class IfcLagTime extends IfcSchedulingTime { 
+}
+
+node class IfcLamp extends IfcFlowTerminal { 
+}
+
+node class IfcLampType extends IfcFlowTerminalType { 
+}
+
+node class IfcLibraryInformation extends IfcExternalInformation {
+	Name: string;
+	Version: string;
+	VersionDate: string;
+	Location: string;
+	Description: string; 
+}
+
+node class IfcLibraryReference extends IfcExternalReference {
+	Description: string;
+	Language: string; 
+}
+
+node class IfcLightDistributionData {
+	MainPlaneAngle: double; 
+}
+
+node class IfcLightFixture extends IfcFlowTerminal { 
+}
+
+node class IfcLightFixtureType extends IfcFlowTerminalType { 
+}
+
+node class IfcLightIntensityDistribution { 
+}
+
+abstract node class IfcLightSource extends IfcGeometricRepresentationItem {
+	Name: string;
+	AmbientIntensity: double;
+	Intensity: double; 
+}
+
+node class IfcLightSourceAmbient extends IfcLightSource { 
+}
+
+node class IfcLightSourceDirectional extends IfcLightSource { 
+}
+
+node class IfcLightSourceGoniometric extends IfcLightSource {
+	ColourTemperature: double;
+	LuminousFlux: double; 
+}
+
+node class IfcLightSourcePositional extends IfcLightSource {
+	Radius: double;
+	ConstantAttenuation: double;
+	DistanceAttenuation: double;
+	QuadricAttenuation: double; 
+}
+
+node class IfcLightSourceSpot extends IfcLightSourcePositional {
+	ConcentrationExponent: double;
+	SpreadAngle: double;
+	BeamWidthAngle: double; 
+}
+
+node class IfcLine extends IfcCurve { 
+}
+
+node class IfcLocalPlacement extends IfcObjectPlacement { 
+}
+
+node class IfcLoop extends IfcTopologicalRepresentationItem { 
+}
+
+node class IfcLShapeProfileDef extends IfcParameterizedProfileDef {
+	Depth: double;
+	Width: double;
+	Thickness: double;
+	FilletRadius: double;
+	EdgeRadius: double;
+	LegSlope: double; 
+}
+
+abstract node class IfcManifoldSolidBrep extends IfcSolidModel { 
+}
+
+node class IfcMapConversion extends IfcCoordinateOperation {
+	Eastings: double;
+	Northings: double;
+	OrthogonalHeight: double;
+	XAxisAbscissa: double;
+	XAxisOrdinate: double;
+	Scale: double; 
+}
+
+node class IfcMappedItem extends IfcRepresentationItem { 
+}
+
+node class IfcMaterial extends IfcMaterialDefinition {
+	Name: string;
+	Description: string;
+	Category: string; 
+}
+
+node class IfcMaterialClassificationRelationship { 
+}
+
+node class IfcMaterialConstituent extends IfcMaterialDefinition {
+	Name: string;
+	Description: string;
+	Fraction: double;
+	Category: string; 
+}
+
+node class IfcMaterialConstituentSet extends IfcMaterialDefinition {
+	Name: string;
+	Description: string; 
+}
+
+abstract node class IfcMaterialDefinition { 
+}
+
+node class IfcMaterialDefinitionRepresentation extends IfcProductRepresentation { 
+}
+
+node class IfcMaterialLayer extends IfcMaterialDefinition {
+	LayerThickness: double;
+	IsVentilated: boolean;
+	Name: string;
+	Description: string;
+	Category: string;
+	Priority: int; 
+}
+
+node class IfcMaterialLayerSet extends IfcMaterialDefinition {
+	LayerSetName: string;
+	Description: string; 
+}
+
+node class IfcMaterialLayerSetUsage extends IfcMaterialUsageDefinition {
+	OffsetFromReferenceLine: double;
+	ReferenceExtent: double; 
+}
+
+node class IfcMaterialLayerWithOffsets extends IfcMaterialLayer { 
+}
+
+node class IfcMaterialList { 
+}
+
+node class IfcMaterialProfile extends IfcMaterialDefinition {
+	Name: string;
+	Description: string;
+	Priority: int;
+	Category: string; 
+}
+
+node class IfcMaterialProfileSet extends IfcMaterialDefinition {
+	Name: string;
+	Description: string; 
+}
+
+node class IfcMaterialProfileSetUsage extends IfcMaterialUsageDefinition {
+	CardinalPoint: int;
+	ReferenceExtent: double; 
+}
+
+node class IfcMaterialProfileSetUsageTapering extends IfcMaterialProfileSetUsage {
+	CardinalEndPoint: int; 
+}
+
+node class IfcMaterialProfileWithOffsets extends IfcMaterialProfile { 
+}
+
+node class IfcMaterialProperties extends IfcExtendedProperties { 
+}
+
+node class IfcMaterialRelationship extends IfcResourceLevelRelationship {
+	Expression: string; 
+}
+
+abstract node class IfcMaterialUsageDefinition { 
+}
+
+node class IfcMeasureWithUnit { 
+}
+
+node class IfcMechanicalFastener extends IfcElementComponent {
+	NominalDiameter: double;
+	NominalLength: double; 
+}
+
+node class IfcMechanicalFastenerType extends IfcElementComponentType {
+	NominalDiameter: double;
+	NominalLength: double; 
+}
+
+node class IfcMedicalDevice extends IfcFlowTerminal { 
+}
+
+node class IfcMedicalDeviceType extends IfcFlowTerminalType { 
+}
+
+node class IfcMember extends IfcBuildingElement { 
+}
+
+node class IfcMemberStandardCase extends IfcMember { 
+}
+
+node class IfcMemberType extends IfcBuildingElementType { 
+}
+
+node class IfcMetric extends IfcConstraint {
+	ValueSource: string; 
+}
+
+node class IfcMirroredProfileDef extends IfcDerivedProfileDef { 
+}
+
+node class IfcMonetaryUnit {
+	Currency: string; 
+}
+
+node class IfcMotorConnection extends IfcEnergyConversionDevice { 
+}
+
+node class IfcMotorConnectionType extends IfcEnergyConversionDeviceType { 
+}
+
+abstract node class IfcNamedUnit { 
+}
+
+abstract node class IfcObject extends IfcObjectDefinition {
+	ObjectType: string; 
+}
+
+abstract node class IfcObjectDefinition extends IfcRoot { 
+}
+
+node class IfcObjective extends IfcConstraint {
+	UserDefinedQualifier: string; 
+}
+
+abstract node class IfcObjectPlacement { 
+}
+
+node class IfcOccupant extends IfcActor { 
+}
+
+node class IfcOffsetCurve2D extends IfcCurve {
+	Distance: double;
+	SelfIntersect: boolean; 
+}
+
+node class IfcOffsetCurve3D extends IfcCurve {
+	Distance: double;
+	SelfIntersect: boolean; 
+}
+
+node class IfcOpeningElement extends IfcFeatureElementSubtraction { 
+}
+
+node class IfcOpeningStandardCase extends IfcOpeningElement { 
+}
+
+node class IfcOpenShell extends IfcConnectedFaceSet { 
+}
+
+node class IfcOrganization {
+	Identification: string;
+	Name: string;
+	Description: string; 
+}
+
+node class IfcOrganizationRelationship extends IfcResourceLevelRelationship { 
+}
+
+node class IfcOrientedEdge extends IfcEdge {
+	Orientation: boolean; 
+}
+
+node class IfcOuterBoundaryCurve extends IfcBoundaryCurve { 
+}
+
+node class IfcOutlet extends IfcFlowTerminal { 
+}
+
+node class IfcOutletType extends IfcFlowTerminalType { 
+}
+
+node class IfcOwnerHistory {
+	LastModifiedDate: int;
+	CreationDate: int; 
+}
+
+abstract node class IfcParameterizedProfileDef extends IfcProfileDef { 
+}
+
+node class IfcPath extends IfcTopologicalRepresentationItem { 
+}
+
+node class IfcPcurve extends IfcCurve { 
+}
+
+node class IfcPerformanceHistory extends IfcControl {
+	LifeCyclePhase: string; 
+}
+
+node class IfcPermeableCoveringProperties extends IfcPreDefinedPropertySet {
+	FrameDepth: double;
+	FrameThickness: double; 
+}
+
+node class IfcPermit extends IfcControl {
+	Status: string;
+	LongDescription: string; 
+}
+
+node class IfcPerson {
+	Identification: string;
+	FamilyName: string;
+	GivenName: string;
+	MiddleNames: string;
+	PrefixTitles: string;
+	SuffixTitles: string; 
+}
+
+node class IfcPersonAndOrganization { 
+}
+
+node class IfcPhysicalComplexQuantity extends IfcPhysicalQuantity {
+	Discrimination: string;
+	Quality: string;
+	Usage: string; 
+}
+
+abstract node class IfcPhysicalQuantity {
+	Name: string;
+	Description: string; 
+}
+
+abstract node class IfcPhysicalSimpleQuantity extends IfcPhysicalQuantity { 
+}
+
+node class IfcPile extends IfcBuildingElement { 
+}
+
+node class IfcPileType extends IfcBuildingElementType { 
+}
+
+node class IfcPipeFitting extends IfcFlowFitting { 
+}
+
+node class IfcPipeFittingType extends IfcFlowFittingType { 
+}
+
+node class IfcPipeSegment extends IfcFlowSegment { 
+}
+
+node class IfcPipeSegmentType extends IfcFlowSegmentType { 
+}
+
+node class IfcPixelTexture extends IfcSurfaceTexture {
+	Width: int;
+	Height: int;
+	ColourComponents: int;
+	Pixel: string; 
+}
+
+abstract node class IfcPlacement extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcPlanarBox extends IfcPlanarExtent { 
+}
+
+node class IfcPlanarExtent extends IfcGeometricRepresentationItem {
+	SizeInX: double;
+	SizeInY: double; 
+}
+
+node class IfcPlane extends IfcElementarySurface { 
+}
+
+node class IfcPlate extends IfcBuildingElement { 
+}
+
+node class IfcPlateStandardCase extends IfcPlate { 
+}
+
+node class IfcPlateType extends IfcBuildingElementType { 
+}
+
+abstract node class IfcPoint extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcPointOnCurve extends IfcPoint {
+	PointParameter: double; 
+}
+
+node class IfcPointOnSurface extends IfcPoint {
+	PointParameterU: double;
+	PointParameterV: double; 
+}
+
+node class IfcPolygonalBoundedHalfSpace extends IfcHalfSpaceSolid { 
+}
+
+node class IfcPolygonalFaceSet extends IfcTessellatedFaceSet {
+	Closed: boolean; 
+}
+
+node class IfcPolyline extends IfcBoundedCurve { 
+}
+
+node class IfcPolyLoop extends IfcLoop { 
+}
+
+abstract node class IfcPort extends IfcProduct { 
+}
+
+node class IfcPostalAddress extends IfcAddress {
+	InternalLocation: string;
+	PostalBox: string;
+	Town: string;
+	Region: string;
+	PostalCode: string;
+	Country: string; 
+}
+
+abstract node class IfcPreDefinedColour extends IfcPreDefinedItem { 
+}
+
+abstract node class IfcPreDefinedCurveFont extends IfcPreDefinedItem { 
+}
+
+abstract node class IfcPreDefinedItem extends IfcPresentationItem {
+	Name: string; 
+}
+
+abstract node class IfcPreDefinedProperties extends IfcPropertyAbstraction { 
+}
+
+abstract node class IfcPreDefinedPropertySet extends IfcPropertySetDefinition { 
+}
+
+abstract node class IfcPreDefinedTextFont extends IfcPreDefinedItem { 
+}
+
+abstract node class IfcPresentationItem { 
+}
+
+node class IfcPresentationLayerAssignment {
+	Name: string;
+	Description: string;
+	Identifier: string; 
+}
+
+node class IfcPresentationLayerWithStyle extends IfcPresentationLayerAssignment {
+	LayerOn: boolean;
+	LayerFrozen: boolean;
+	LayerBlocked: boolean; 
+}
+
+abstract node class IfcPresentationStyle {
+	Name: string; 
+}
+
+node class IfcPresentationStyleAssignment { 
+}
+
+node class IfcProcedure extends IfcProcess { 
+}
+
+node class IfcProcedureType extends IfcTypeProcess { 
+}
+
+abstract node class IfcProcess extends IfcObject {
+	Identification: string;
+	LongDescription: string; 
+}
+
+abstract node class IfcProduct extends IfcObject { 
+}
+
+node class IfcProductDefinitionShape extends IfcProductRepresentation { 
+}
+
+abstract node class IfcProductRepresentation {
+	Name: string;
+	Description: string; 
+}
+
+node class IfcProfileDef {
+	ProfileName: string; 
+}
+
+node class IfcProfileProperties extends IfcExtendedProperties { 
+}
+
+node class IfcProject extends IfcContext { 
+}
+
+node class IfcProjectedCRS extends IfcCoordinateReferenceSystem {
+	MapProjection: string;
+	MapZone: string; 
+}
+
+node class IfcProjectionElement extends IfcFeatureElementAddition { 
+}
+
+node class IfcProjectLibrary extends IfcContext { 
+}
+
+node class IfcProjectOrder extends IfcControl {
+	Status: string;
+	LongDescription: string; 
+}
+
+abstract node class IfcProperty extends IfcPropertyAbstraction {
+	Name: string;
+	Description: string; 
+}
+
+abstract node class IfcPropertyAbstraction { 
+}
+
+node class IfcPropertyBoundedValue extends IfcSimpleProperty { 
+}
+
+abstract node class IfcPropertyDefinition extends IfcRoot { 
+}
+
+node class IfcPropertyDependencyRelationship extends IfcResourceLevelRelationship {
+	Expression: string; 
+}
+
+node class IfcPropertyEnumeratedValue extends IfcSimpleProperty { 
+}
+
+node class IfcPropertyEnumeration extends IfcPropertyAbstraction {
+	Name: string; 
+}
+
+node class IfcPropertyListValue extends IfcSimpleProperty { 
+}
+
+node class IfcPropertyReferenceValue extends IfcSimpleProperty {
+	UsageName: string; 
+}
+
+node class IfcPropertySet extends IfcPropertySetDefinition { 
+}
+
+abstract node class IfcPropertySetDefinition extends IfcPropertyDefinition { 
+}
+
+node class IfcPropertySetTemplate extends IfcPropertyTemplateDefinition {
+	ApplicableEntity: string; 
+}
+
+node class IfcPropertySingleValue extends IfcSimpleProperty { 
+}
+
+node class IfcPropertyTableValue extends IfcSimpleProperty {
+	Expression: string; 
+}
+
+abstract node class IfcPropertyTemplate extends IfcPropertyTemplateDefinition { 
+}
+
+abstract node class IfcPropertyTemplateDefinition extends IfcPropertyDefinition { 
+}
+
+node class IfcProtectiveDevice extends IfcFlowController { 
+}
+
+node class IfcProtectiveDeviceTrippingUnit extends IfcDistributionControlElement { 
+}
+
+node class IfcProtectiveDeviceTrippingUnitType extends IfcDistributionControlElementType { 
+}
+
+node class IfcProtectiveDeviceType extends IfcFlowControllerType { 
+}
+
+node class IfcProxy extends IfcProduct {
+	Tag: string; 
+}
+
+node class IfcPump extends IfcFlowMovingDevice { 
+}
+
+node class IfcPumpType extends IfcFlowMovingDeviceType { 
+}
+
+node class IfcQuantityArea extends IfcPhysicalSimpleQuantity {
+	AreaValue: double;
+	Formula: string; 
+}
+
+node class IfcQuantityCount extends IfcPhysicalSimpleQuantity {
+	Formula: string; 
+}
+
+node class IfcQuantityLength extends IfcPhysicalSimpleQuantity {
+	LengthValue: double;
+	Formula: string; 
+}
+
+abstract node class IfcQuantitySet extends IfcPropertySetDefinition { 
+}
+
+node class IfcQuantityTime extends IfcPhysicalSimpleQuantity {
+	TimeValue: double;
+	Formula: string; 
+}
+
+node class IfcQuantityVolume extends IfcPhysicalSimpleQuantity {
+	VolumeValue: double;
+	Formula: string; 
+}
+
+node class IfcQuantityWeight extends IfcPhysicalSimpleQuantity {
+	WeightValue: double;
+	Formula: string; 
+}
+
+node class IfcRailing extends IfcBuildingElement { 
+}
+
+node class IfcRailingType extends IfcBuildingElementType { 
+}
+
+node class IfcRamp extends IfcBuildingElement { 
+}
+
+node class IfcRampFlight extends IfcBuildingElement { 
+}
+
+node class IfcRampFlightType extends IfcBuildingElementType { 
+}
+
+node class IfcRampType extends IfcBuildingElementType { 
+}
+
+node class IfcRationalBSplineCurveWithKnots extends IfcBSplineCurveWithKnots {
+	WeightsData: double; 
+}
+
+node class IfcRationalBSplineSurfaceWithKnots extends IfcBSplineSurfaceWithKnots {
+	WeightsData: double; 
+}
+
+node class IfcRectangleHollowProfileDef extends IfcRectangleProfileDef {
+	WallThickness: double;
+	InnerFilletRadius: double;
+	OuterFilletRadius: double; 
+}
+
+node class IfcRectangleProfileDef extends IfcParameterizedProfileDef {
+	XDim: double;
+	YDim: double; 
+}
+
+node class IfcRectangularPyramid extends IfcCsgPrimitive3D {
+	XLength: double;
+	YLength: double;
+	Height: double; 
+}
+
+node class IfcRectangularTrimmedSurface extends IfcBoundedSurface {
+	U1: double;
+	V1: double;
+	U2: double;
+	V2: double;
+	Usense: boolean;
+	Vsense: boolean; 
+}
+
+node class IfcRecurrencePattern {
+	Position: int;
+	Interval: int;
+	Occurrences: int; 
+}
+
+node class IfcReference {
+	TypeIdentifier: string;
+	AttributeIdentifier: string;
+	InstanceName: string; 
+}
+
+node class IfcRegularTimeSeries extends IfcTimeSeries {
+	TimeStep: double; 
+}
+
+node class IfcReinforcementBarProperties extends IfcPreDefinedProperties {
+	TotalCrossSectionArea: double;
+	SteelGrade: string;
+	EffectiveDepth: double;
+	NominalBarDiameter: double; 
+}
+
+node class IfcReinforcementDefinitionProperties extends IfcPreDefinedPropertySet {
+	DefinitionType: string; 
+}
+
+node class IfcReinforcingBar extends IfcReinforcingElement {
+	NominalDiameter: double;
+	CrossSectionArea: double;
+	BarLength: double; 
+}
+
+node class IfcReinforcingBarType extends IfcReinforcingElementType {
+	NominalDiameter: double;
+	CrossSectionArea: double;
+	BarLength: double;
+	BendingShapeCode: string; 
+}
+
+abstract node class IfcReinforcingElement extends IfcElementComponent {
+	SteelGrade: string; 
+}
+
+abstract node class IfcReinforcingElementType extends IfcElementComponentType { 
+}
+
+node class IfcReinforcingMesh extends IfcReinforcingElement {
+	MeshLength: double;
+	MeshWidth: double;
+	LongitudinalBarNominalDiameter: double;
+	TransverseBarNominalDiameter: double;
+	LongitudinalBarCrossSectionArea: double;
+	TransverseBarCrossSectionArea: double;
+	LongitudinalBarSpacing: double;
+	TransverseBarSpacing: double; 
+}
+
+node class IfcReinforcingMeshType extends IfcReinforcingElementType {
+	MeshLength: double;
+	MeshWidth: double;
+	LongitudinalBarNominalDiameter: double;
+	TransverseBarNominalDiameter: double;
+	LongitudinalBarCrossSectionArea: double;
+	TransverseBarCrossSectionArea: double;
+	LongitudinalBarSpacing: double;
+	TransverseBarSpacing: double;
+	BendingShapeCode: string; 
+}
+
+node class IfcRelAggregates extends IfcRelDecomposes { 
+}
+
+abstract node class IfcRelAssigns extends IfcRelationship { 
+}
+
+node class IfcRelAssignsToActor extends IfcRelAssigns { 
+}
+
+node class IfcRelAssignsToControl extends IfcRelAssigns { 
+}
+
+node class IfcRelAssignsToGroup extends IfcRelAssigns { 
+}
+
+node class IfcRelAssignsToGroupByFactor extends IfcRelAssignsToGroup {
+	Factor: double; 
+}
+
+node class IfcRelAssignsToProcess extends IfcRelAssigns { 
+}
+
+node class IfcRelAssignsToProduct extends IfcRelAssigns { 
+}
+
+node class IfcRelAssignsToResource extends IfcRelAssigns { 
+}
+
+abstract node class IfcRelAssociates extends IfcRelationship { 
+}
+
+node class IfcRelAssociatesApproval extends IfcRelAssociates { 
+}
+
+node class IfcRelAssociatesClassification extends IfcRelAssociates { 
+}
+
+node class IfcRelAssociatesConstraint extends IfcRelAssociates {
+	Intent: string; 
+}
+
+node class IfcRelAssociatesDocument extends IfcRelAssociates { 
+}
+
+node class IfcRelAssociatesLibrary extends IfcRelAssociates { 
+}
+
+node class IfcRelAssociatesMaterial extends IfcRelAssociates { 
+}
+
+abstract node class IfcRelationship extends IfcRoot { 
+}
+
+abstract node class IfcRelConnects extends IfcRelationship { 
+}
+
+node class IfcRelConnectsElements extends IfcRelConnects { 
+}
+
+node class IfcRelConnectsPathElements extends IfcRelConnectsElements {
+	RelatingPriorities: int;
+	RelatedPriorities: int; 
+}
+
+node class IfcRelConnectsPorts extends IfcRelConnects { 
+}
+
+node class IfcRelConnectsPortToElement extends IfcRelConnects { 
+}
+
+node class IfcRelConnectsStructuralActivity extends IfcRelConnects { 
+}
+
+node class IfcRelConnectsStructuralMember extends IfcRelConnects {
+	SupportedLength: double; 
+}
+
+node class IfcRelConnectsWithEccentricity extends IfcRelConnectsStructuralMember { 
+}
+
+node class IfcRelConnectsWithRealizingElements extends IfcRelConnectsElements {
+	ConnectionType: string; 
+}
+
+node class IfcRelContainedInSpatialStructure extends IfcRelConnects { 
+}
+
+node class IfcRelCoversBldgElements extends IfcRelConnects { 
+}
+
+node class IfcRelCoversSpaces extends IfcRelConnects { 
+}
+
+node class IfcRelDeclares extends IfcRelationship { 
+}
+
+abstract node class IfcRelDecomposes extends IfcRelationship { 
+}
+
+abstract node class IfcRelDefines extends IfcRelationship { 
+}
+
+node class IfcRelDefinesByObject extends IfcRelDefines { 
+}
+
+node class IfcRelDefinesByProperties extends IfcRelDefines { 
+}
+
+node class IfcRelDefinesByTemplate extends IfcRelDefines { 
+}
+
+node class IfcRelDefinesByType extends IfcRelDefines { 
+}
+
+node class IfcRelFillsElement extends IfcRelConnects { 
+}
+
+node class IfcRelFlowControlElements extends IfcRelConnects { 
+}
+
+node class IfcRelInterferesElements extends IfcRelConnects {
+	InterferenceType: string;
+	ImpliedOrder: boolean; 
+}
+
+node class IfcRelNests extends IfcRelDecomposes { 
+}
+
+node class IfcRelProjectsElement extends IfcRelDecomposes { 
+}
+
+node class IfcRelReferencedInSpatialStructure extends IfcRelConnects { 
+}
+
+node class IfcRelSequence extends IfcRelConnects {
+	UserDefinedSequenceType: string; 
+}
+
+node class IfcRelServicesBuildings extends IfcRelConnects { 
+}
+
+node class IfcRelSpaceBoundary extends IfcRelConnects { 
+}
+
+node class IfcRelSpaceBoundary1stLevel extends IfcRelSpaceBoundary { 
+}
+
+node class IfcRelSpaceBoundary2ndLevel extends IfcRelSpaceBoundary1stLevel { 
+}
+
+node class IfcRelVoidsElement extends IfcRelDecomposes { 
+}
+
+node class IfcReparametrisedCompositeCurveSegment extends IfcCompositeCurveSegment {
+	ParamLength: double; 
+}
+
+abstract node class IfcRepresentation {
+	RepresentationIdentifier: string;
+	RepresentationType: string; 
+}
+
+abstract node class IfcRepresentationContext {
+	ContextIdentifier: string;
+	ContextType: string; 
+}
+
+abstract node class IfcRepresentationItem { 
+}
+
+node class IfcRepresentationMap { 
+}
+
+abstract node class IfcResource extends IfcObject {
+	Identification: string;
+	LongDescription: string; 
+}
+
+node class IfcResourceApprovalRelationship extends IfcResourceLevelRelationship { 
+}
+
+node class IfcResourceConstraintRelationship extends IfcResourceLevelRelationship { 
+}
+
+abstract node class IfcResourceLevelRelationship {
+	Name: string;
+	Description: string; 
+}
+
+node class IfcResourceTime extends IfcSchedulingTime {
+	ScheduleWork: string;
+	ScheduleUsage: double;
+	ScheduleStart: string;
+	ScheduleFinish: string;
+	ScheduleContour: string;
+	LevelingDelay: string;
+	IsOverAllocated: boolean;
+	StatusTime: string;
+	ActualWork: string;
+	ActualUsage: double;
+	ActualStart: string;
+	ActualFinish: string;
+	RemainingWork: string;
+	RemainingUsage: double;
+	Completion: double; 
+}
+
+node class IfcRevolvedAreaSolid extends IfcSweptAreaSolid {
+	Angle: double; 
+}
+
+node class IfcRevolvedAreaSolidTapered extends IfcRevolvedAreaSolid { 
+}
+
+node class IfcRightCircularCone extends IfcCsgPrimitive3D {
+	Height: double;
+	BottomRadius: double; 
+}
+
+node class IfcRightCircularCylinder extends IfcCsgPrimitive3D {
+	Height: double;
+	Radius: double; 
+}
+
+node class IfcRoof extends IfcBuildingElement { 
+}
+
+node class IfcRoofType extends IfcBuildingElementType { 
+}
+
+abstract node class IfcRoot {
+	GlobalId: string;
+	Name: string;
+	Description: string; 
+}
+
+node class IfcRoundedRectangleProfileDef extends IfcRectangleProfileDef {
+	RoundingRadius: double; 
+}
+
+node class IfcSanitaryTerminal extends IfcFlowTerminal { 
+}
+
+node class IfcSanitaryTerminalType extends IfcFlowTerminalType { 
+}
+
+abstract node class IfcSchedulingTime {
+	Name: string;
+	UserDefinedDataOrigin: string; 
+}
+
+node class IfcSeamCurve extends IfcSurfaceCurve { 
+}
+
+node class IfcSectionedSpine extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcSectionProperties extends IfcPreDefinedProperties { 
+}
+
+node class IfcSectionReinforcementProperties extends IfcPreDefinedProperties {
+	LongitudinalStartPosition: double;
+	LongitudinalEndPosition: double;
+	TransversePosition: double; 
+}
+
+node class IfcSensor extends IfcDistributionControlElement { 
+}
+
+node class IfcSensorType extends IfcDistributionControlElementType { 
+}
+
+node class IfcShadingDevice extends IfcBuildingElement { 
+}
+
+node class IfcShadingDeviceType extends IfcBuildingElementType { 
+}
+
+node class IfcShapeAspect {
+	Name: string;
+	Description: string;
+	ProductDefinitional: boolean; 
+}
+
+abstract node class IfcShapeModel extends IfcRepresentation { 
+}
+
+node class IfcShapeRepresentation extends IfcShapeModel { 
+}
+
+node class IfcShellBasedSurfaceModel extends IfcGeometricRepresentationItem { 
+}
+
+abstract node class IfcSimpleProperty extends IfcProperty { 
+}
+
+node class IfcSimplePropertyTemplate extends IfcPropertyTemplate {
+	PrimaryMeasureType: string;
+	SecondaryMeasureType: string;
+	Expression: string; 
+}
+
+node class IfcSite extends IfcSpatialStructureElement {
+	RefLatitude: int;
+	RefLongitude: int;
+	RefElevation: double;
+	LandTitleNumber: string; 
+}
+
+node class IfcSIUnit extends IfcNamedUnit { 
+}
+
+node class IfcSlab extends IfcBuildingElement { 
+}
+
+node class IfcSlabElementedCase extends IfcSlab { 
+}
+
+node class IfcSlabStandardCase extends IfcSlab { 
+}
+
+node class IfcSlabType extends IfcBuildingElementType { 
+}
+
+node class IfcSlippageConnectionCondition extends IfcStructuralConnectionCondition {
+	SlippageX: double;
+	SlippageY: double;
+	SlippageZ: double; 
+}
+
+node class IfcSolarDevice extends IfcEnergyConversionDevice { 
+}
+
+node class IfcSolarDeviceType extends IfcEnergyConversionDeviceType { 
+}
+
+abstract node class IfcSolidModel extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcSpace extends IfcSpatialStructureElement {
+	ElevationWithFlooring: double; 
+}
+
+node class IfcSpaceHeater extends IfcFlowTerminal { 
+}
+
+node class IfcSpaceHeaterType extends IfcFlowTerminalType { 
+}
+
+node class IfcSpaceType extends IfcSpatialStructureElementType {
+	LongName: string; 
+}
+
+abstract node class IfcSpatialElement extends IfcProduct {
+	LongName: string; 
+}
+
+abstract node class IfcSpatialElementType extends IfcTypeProduct {
+	ElementType: string; 
+}
+
+abstract node class IfcSpatialStructureElement extends IfcSpatialElement { 
+}
+
+abstract node class IfcSpatialStructureElementType extends IfcSpatialElementType { 
+}
+
+node class IfcSpatialZone extends IfcSpatialElement { 
+}
+
+node class IfcSpatialZoneType extends IfcSpatialElementType {
+	LongName: string; 
+}
+
+node class IfcSphere extends IfcCsgPrimitive3D {
+	Radius: double; 
+}
+
+node class IfcSphericalSurface extends IfcElementarySurface {
+	Radius: double; 
+}
+
+node class IfcStackTerminal extends IfcFlowTerminal { 
+}
+
+node class IfcStackTerminalType extends IfcFlowTerminalType { 
+}
+
+node class IfcStair extends IfcBuildingElement { 
+}
+
+node class IfcStairFlight extends IfcBuildingElement {
+	NumberOfRisers: int;
+	NumberOfTreads: int;
+	RiserHeight: double;
+	TreadLength: double; 
+}
+
+node class IfcStairFlightType extends IfcBuildingElementType { 
+}
+
+node class IfcStairType extends IfcBuildingElementType { 
+}
+
+abstract node class IfcStructuralAction extends IfcStructuralActivity {
+	DestabilizingLoad: boolean; 
+}
+
+abstract node class IfcStructuralActivity extends IfcProduct { 
+}
+
+node class IfcStructuralAnalysisModel extends IfcSystem { 
+}
+
+abstract node class IfcStructuralConnection extends IfcStructuralItem { 
+}
+
+abstract node class IfcStructuralConnectionCondition {
+	Name: string; 
+}
+
+node class IfcStructuralCurveAction extends IfcStructuralAction { 
+}
+
+node class IfcStructuralCurveConnection extends IfcStructuralConnection { 
+}
+
+node class IfcStructuralCurveMember extends IfcStructuralMember { 
+}
+
+node class IfcStructuralCurveMemberVarying extends IfcStructuralCurveMember { 
+}
+
+node class IfcStructuralCurveReaction extends IfcStructuralReaction { 
+}
+
+abstract node class IfcStructuralItem extends IfcProduct { 
+}
+
+node class IfcStructuralLinearAction extends IfcStructuralCurveAction { 
+}
+
+abstract node class IfcStructuralLoad {
+	Name: string; 
+}
+
+node class IfcStructuralLoadCase extends IfcStructuralLoadGroup { 
+}
+
+node class IfcStructuralLoadConfiguration extends IfcStructuralLoad { 
+}
+
+node class IfcStructuralLoadGroup extends IfcGroup {
+	Coefficient: double;
+	Purpose: string; 
+}
+
+node class IfcStructuralLoadLinearForce extends IfcStructuralLoadStatic {
+	LinearForceX: double;
+	LinearForceY: double;
+	LinearForceZ: double;
+	LinearMomentX: double;
+	LinearMomentY: double;
+	LinearMomentZ: double; 
+}
+
+abstract node class IfcStructuralLoadOrResult extends IfcStructuralLoad { 
+}
+
+node class IfcStructuralLoadPlanarForce extends IfcStructuralLoadStatic {
+	PlanarForceX: double;
+	PlanarForceY: double;
+	PlanarForceZ: double; 
+}
+
+node class IfcStructuralLoadSingleDisplacement extends IfcStructuralLoadStatic {
+	DisplacementX: double;
+	DisplacementY: double;
+	DisplacementZ: double;
+	RotationalDisplacementRX: double;
+	RotationalDisplacementRY: double;
+	RotationalDisplacementRZ: double; 
+}
+
+node class IfcStructuralLoadSingleDisplacementDistortion extends IfcStructuralLoadSingleDisplacement {
+	Distortion: double; 
+}
+
+node class IfcStructuralLoadSingleForce extends IfcStructuralLoadStatic {
+	ForceX: double;
+	ForceY: double;
+	ForceZ: double;
+	MomentX: double;
+	MomentY: double;
+	MomentZ: double; 
+}
+
+node class IfcStructuralLoadSingleForceWarping extends IfcStructuralLoadSingleForce {
+	WarpingMoment: double; 
+}
+
+abstract node class IfcStructuralLoadStatic extends IfcStructuralLoadOrResult { 
+}
+
+node class IfcStructuralLoadTemperature extends IfcStructuralLoadStatic {
+	DeltaTConstant: double;
+	DeltaTY: double;
+	DeltaTZ: double; 
+}
+
+abstract node class IfcStructuralMember extends IfcStructuralItem { 
+}
+
+node class IfcStructuralPlanarAction extends IfcStructuralSurfaceAction { 
+}
+
+node class IfcStructuralPointAction extends IfcStructuralAction { 
+}
+
+node class IfcStructuralPointConnection extends IfcStructuralConnection { 
+}
+
+node class IfcStructuralPointReaction extends IfcStructuralReaction { 
+}
+
+abstract node class IfcStructuralReaction extends IfcStructuralActivity { 
+}
+
+node class IfcStructuralResultGroup extends IfcGroup {
+	IsLinear: boolean; 
+}
+
+node class IfcStructuralSurfaceAction extends IfcStructuralAction { 
+}
+
+node class IfcStructuralSurfaceConnection extends IfcStructuralConnection { 
+}
+
+node class IfcStructuralSurfaceMember extends IfcStructuralMember {
+	Thickness: double; 
+}
+
+node class IfcStructuralSurfaceMemberVarying extends IfcStructuralSurfaceMember { 
+}
+
+node class IfcStructuralSurfaceReaction extends IfcStructuralReaction { 
+}
+
+node class IfcStyledItem extends IfcRepresentationItem {
+	Name: string; 
+}
+
+node class IfcStyledRepresentation extends IfcStyleModel { 
+}
+
+abstract node class IfcStyleModel extends IfcRepresentation { 
+}
+
+node class IfcSubContractResource extends IfcConstructionResource { 
+}
+
+node class IfcSubContractResourceType extends IfcConstructionResourceType { 
+}
+
+node class IfcSubedge extends IfcEdge { 
+}
+
+abstract node class IfcSurface extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcSurfaceCurve extends IfcCurve { 
+}
+
+node class IfcSurfaceCurveSweptAreaSolid extends IfcSweptAreaSolid {
+	StartParam: double;
+	EndParam: double; 
+}
+
+node class IfcSurfaceFeature extends IfcFeatureElement { 
+}
+
+node class IfcSurfaceOfLinearExtrusion extends IfcSweptSurface {
+	Depth: double; 
+}
+
+node class IfcSurfaceOfRevolution extends IfcSweptSurface { 
+}
+
+node class IfcSurfaceReinforcementArea extends IfcStructuralLoadOrResult {
+	ShearReinforcement: double; 
+}
+
+node class IfcSurfaceStyle extends IfcPresentationStyle { 
+}
+
+node class IfcSurfaceStyleLighting extends IfcPresentationItem { 
+}
+
+node class IfcSurfaceStyleRefraction extends IfcPresentationItem {
+	RefractionIndex: double;
+	DispersionFactor: double; 
+}
+
+node class IfcSurfaceStyleRendering extends IfcSurfaceStyleShading { 
+}
+
+node class IfcSurfaceStyleShading extends IfcPresentationItem {
+	Transparency: double; 
+}
+
+node class IfcSurfaceStyleWithTextures extends IfcPresentationItem { 
+}
+
+abstract node class IfcSurfaceTexture extends IfcPresentationItem {
+	RepeatS: boolean;
+	RepeatT: boolean;
+	Mode: string; 
+}
+
+abstract node class IfcSweptAreaSolid extends IfcSolidModel { 
+}
+
+node class IfcSweptDiskSolid extends IfcSolidModel {
+	Radius: double;
+	InnerRadius: double;
+	StartParam: double;
+	EndParam: double; 
+}
+
+node class IfcSweptDiskSolidPolygonal extends IfcSweptDiskSolid {
+	FilletRadius: double; 
+}
+
+abstract node class IfcSweptSurface extends IfcSurface { 
+}
+
+node class IfcSwitchingDevice extends IfcFlowController { 
+}
+
+node class IfcSwitchingDeviceType extends IfcFlowControllerType { 
+}
+
+node class IfcSystem extends IfcGroup { 
+}
+
+node class IfcSystemFurnitureElement extends IfcFurnishingElement { 
+}
+
+node class IfcSystemFurnitureElementType extends IfcFurnishingElementType { 
+}
+
+node class IfcTable {
+	Name: string; 
+}
+
+node class IfcTableColumn {
+	Identifier: string;
+	Name: string;
+	Description: string; 
+}
+
+node class IfcTableRow {
+	IsHeading: boolean; 
+}
+
+node class IfcTank extends IfcFlowStorageDevice { 
+}
+
+node class IfcTankType extends IfcFlowStorageDeviceType { 
+}
+
+node class IfcTask extends IfcProcess {
+	Status: string;
+	WorkMethod: string;
+	IsMilestone: boolean;
+	Priority: int; 
+}
+
+node class IfcTaskTime extends IfcSchedulingTime {
+	ScheduleDuration: string;
+	ScheduleStart: string;
+	ScheduleFinish: string;
+	EarlyStart: string;
+	EarlyFinish: string;
+	LateStart: string;
+	LateFinish: string;
+	FreeFloat: string;
+	TotalFloat: string;
+	IsCritical: boolean;
+	StatusTime: string;
+	ActualDuration: string;
+	ActualStart: string;
+	ActualFinish: string;
+	RemainingTime: string;
+	Completion: double; 
+}
+
+node class IfcTaskTimeRecurring extends IfcTaskTime { 
+}
+
+node class IfcTaskType extends IfcTypeProcess {
+	WorkMethod: string; 
+}
+
+node class IfcTelecomAddress extends IfcAddress {
+	PagerNumber: string;
+	WWWHomePageURL: string; 
+}
+
+node class IfcTendon extends IfcReinforcingElement {
+	NominalDiameter: double;
+	CrossSectionArea: double;
+	TensionForce: double;
+	PreStress: double;
+	FrictionCoefficient: double;
+	AnchorageSlip: double;
+	MinCurvatureRadius: double; 
+}
+
+node class IfcTendonAnchor extends IfcReinforcingElement { 
+}
+
+node class IfcTendonAnchorType extends IfcReinforcingElementType { 
+}
+
+node class IfcTendonType extends IfcReinforcingElementType {
+	NominalDiameter: double;
+	CrossSectionArea: double;
+	SheathDiameter: double; 
+}
+
+abstract node class IfcTessellatedFaceSet extends IfcTessellatedItem { 
+}
+
+abstract node class IfcTessellatedItem extends IfcGeometricRepresentationItem { 
+}
+
+node class IfcTextLiteral extends IfcGeometricRepresentationItem {
+	Literal: string; 
+}
+
+node class IfcTextLiteralWithExtent extends IfcTextLiteral {
+	BoxAlignment: string; 
+}
+
+node class IfcTextStyle extends IfcPresentationStyle {
+	ModelOrDraughting: boolean; 
+}
+
+node class IfcTextStyleFontModel extends IfcPreDefinedTextFont {
+	FontStyle: string;
+	FontVariant: string;
+	FontWeight: string; 
+}
+
+node class IfcTextStyleForDefinedFont extends IfcPresentationItem { 
+}
+
+node class IfcTextStyleTextModel extends IfcPresentationItem {
+	TextAlign: string;
+	TextDecoration: string;
+	TextTransform: string; 
+}
+
+abstract node class IfcTextureCoordinate extends IfcPresentationItem { 
+}
+
+node class IfcTextureCoordinateGenerator extends IfcTextureCoordinate {
+	Mode: string; 
+}
+
+node class IfcTextureMap extends IfcTextureCoordinate { 
+}
+
+node class IfcTextureVertex extends IfcPresentationItem {
+	Coordinates: double; 
+}
+
+node class IfcTextureVertexList extends IfcPresentationItem { 
+}
+
+node class IfcTimePeriod {
+	StartTime: string;
+	EndTime: string; 
+}
+
+abstract node class IfcTimeSeries {
+	Name: string;
+	Description: string;
+	StartTime: string;
+	EndTime: string;
+	UserDefinedDataOrigin: string; 
+}
+
+node class IfcTimeSeriesValue { 
+}
+
+abstract node class IfcTopologicalRepresentationItem extends IfcRepresentationItem { 
+}
+
+node class IfcTopologyRepresentation extends IfcShapeModel { 
+}
+
+node class IfcToroidalSurface extends IfcElementarySurface {
+	MajorRadius: double;
+	MinorRadius: double; 
+}
+
+node class IfcTransformer extends IfcEnergyConversionDevice { 
+}
+
+node class IfcTransformerType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcTransportElement extends IfcElement { 
+}
+
+node class IfcTransportElementType extends IfcElementType { 
+}
+
+node class IfcTrapeziumProfileDef extends IfcParameterizedProfileDef {
+	BottomXDim: double;
+	TopXDim: double;
+	YDim: double;
+	TopXOffset: double; 
+}
+
+node class IfcTriangulatedFaceSet extends IfcTessellatedFaceSet {
+	Closed: boolean;
+	CoordIndex: int; 
+}
+
+node class IfcTrimmedCurve extends IfcBoundedCurve {
+	SenseAgreement: boolean; 
+}
+
+node class IfcTShapeProfileDef extends IfcParameterizedProfileDef {
+	Depth: double;
+	FlangeWidth: double;
+	WebThickness: double;
+	FlangeThickness: double;
+	FilletRadius: double;
+	FlangeEdgeRadius: double;
+	WebEdgeRadius: double;
+	WebSlope: double;
+	FlangeSlope: double; 
+}
+
+node class IfcTubeBundle extends IfcEnergyConversionDevice { 
+}
+
+node class IfcTubeBundleType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcTypeObject extends IfcObjectDefinition {
+	ApplicableOccurrence: string; 
+}
+
+abstract node class IfcTypeProcess extends IfcTypeObject {
+	Identification: string;
+	LongDescription: string;
+	ProcessType: string; 
+}
+
+node class IfcTypeProduct extends IfcTypeObject {
+	Tag: string; 
+}
+
+abstract node class IfcTypeResource extends IfcTypeObject {
+	Identification: string;
+	LongDescription: string;
+	ResourceType: string; 
+}
+
+node class IfcUnitaryControlElement extends IfcDistributionControlElement { 
+}
+
+node class IfcUnitaryControlElementType extends IfcDistributionControlElementType { 
+}
+
+node class IfcUnitaryEquipment extends IfcEnergyConversionDevice { 
+}
+
+node class IfcUnitaryEquipmentType extends IfcEnergyConversionDeviceType { 
+}
+
+node class IfcUnitAssignment { 
+}
+
+node class IfcUShapeProfileDef extends IfcParameterizedProfileDef {
+	Depth: double;
+	FlangeWidth: double;
+	WebThickness: double;
+	FlangeThickness: double;
+	FilletRadius: double;
+	EdgeRadius: double;
+	FlangeSlope: double; 
+}
+
+node class IfcValve extends IfcFlowController { 
+}
+
+node class IfcValveType extends IfcFlowControllerType { 
+}
+
+node class IfcVector extends IfcGeometricRepresentationItem {
+	Magnitude: double; 
+}
+
+node class IfcVertex extends IfcTopologicalRepresentationItem { 
+}
+
+node class IfcVertexLoop extends IfcLoop { 
+}
+
+node class IfcVertexPoint extends IfcVertex { 
+}
+
+node class IfcVibrationIsolator extends IfcElementComponent { 
+}
+
+node class IfcVibrationIsolatorType extends IfcElementComponentType { 
+}
+
+node class IfcVirtualElement extends IfcElement { 
+}
+
+node class IfcVirtualGridIntersection { 
+}
+
+node class IfcVoidingFeature extends IfcFeatureElementSubtraction { 
+}
+
+node class IfcWall extends IfcBuildingElement { 
+}
+
+node class IfcWallElementedCase extends IfcWall { 
+}
+
+node class IfcWallStandardCase extends IfcWall { 
+}
+
+node class IfcWallType extends IfcBuildingElementType { 
+}
+
+node class IfcWasteTerminal extends IfcFlowTerminal { 
+}
+
+node class IfcWasteTerminalType extends IfcFlowTerminalType { 
+}
+
+node class IfcWindow extends IfcBuildingElement {
+	OverallHeight: double;
+	OverallWidth: double;
+	UserDefinedPartitioningType: string; 
+}
+
+node class IfcWindowLiningProperties extends IfcPreDefinedPropertySet {
+	LiningDepth: double;
+	LiningThickness: double;
+	TransomThickness: double;
+	MullionThickness: double;
+	FirstTransomOffset: double;
+	SecondTransomOffset: double;
+	FirstMullionOffset: double;
+	SecondMullionOffset: double;
+	LiningOffset: double;
+	LiningToPanelOffsetX: double;
+	LiningToPanelOffsetY: double; 
+}
+
+node class IfcWindowPanelProperties extends IfcPreDefinedPropertySet {
+	FrameDepth: double;
+	FrameThickness: double; 
+}
+
+node class IfcWindowStandardCase extends IfcWindow { 
+}
+
+node class IfcWindowStyle extends IfcTypeProduct {
+	ParameterTakesPrecedence: boolean;
+	Sizeable: boolean; 
+}
+
+node class IfcWindowType extends IfcBuildingElementType {
+	ParameterTakesPrecedence: boolean;
+	UserDefinedPartitioningType: string; 
+}
+
+node class IfcWorkCalendar extends IfcControl { 
+}
+
+abstract node class IfcWorkControl extends IfcControl {
+	CreationDate: string;
+	Purpose: string;
+	Duration: string;
+	TotalFloat: string;
+	StartTime: string;
+	FinishTime: string; 
+}
+
+node class IfcWorkPlan extends IfcWorkControl { 
+}
+
+node class IfcWorkSchedule extends IfcWorkControl { 
+}
+
+node class IfcWorkTime extends IfcSchedulingTime {
+	Start: string;
+	Finish: string; 
+}
+
+node class IfcZone extends IfcSystem {
+	LongName: string; 
+}
+
+node class IfcZShapeProfileDef extends IfcParameterizedProfileDef {
+	Depth: double;
+	FlangeWidth: double;
+	WebThickness: double;
+	FlangeThickness: double;
+	FilletRadius: double;
+	EdgeRadius: double; 
+}
+
+enum IfcActionRequestTypeEnum { EMAIL, FAX, NOTDEFINED, PHONE, POST, USERDEFINED, VERBAL  }
+enum IfcRoleEnum { ARCHITECT, BUILDINGOPERATOR, BUILDINGOWNER, CIVILENGINEER, CLIENT, COMMISSIONINGENGINEER, CONSTRUCTIONMANAGER, CONSULTANT, CONTRACTOR, COSTENGINEER, ELECTRICALENGINEER, ENGINEER, FACILITIESMANAGER, FIELDCONSTRUCTIONMANAGER, MANUFACTURER, MECHANICALENGINEER, OWNER, PROJECTMANAGER, RESELLER, STRUCTURALENGINEER, SUBCONTRACTOR, SUPPLIER, USERDEFINED  }
+enum IfcActuatorTypeEnum { ELECTRICACTUATOR, HANDOPERATEDACTUATOR, HYDRAULICACTUATOR, NOTDEFINED, PNEUMATICACTUATOR, THERMOSTATICACTUATOR, USERDEFINED  }
+enum IfcAddressTypeEnum { DISTRIBUTIONPOINT, HOME, OFFICE, SITE, USERDEFINED  }
+enum IfcAirTerminalTypeEnum { DIFFUSER, GRILLE, LOUVRE, NOTDEFINED, REGISTER, USERDEFINED  }
+enum IfcAirTerminalBoxTypeEnum { CONSTANTFLOW, NOTDEFINED, USERDEFINED, VARIABLEFLOWPRESSUREDEPENDANT, VARIABLEFLOWPRESSUREINDEPENDANT  }
+enum IfcAirToAirHeatRecoveryTypeEnum { FIXEDPLATECOUNTERFLOWEXCHANGER, FIXEDPLATECROSSFLOWEXCHANGER, FIXEDPLATEPARALLELFLOWEXCHANGER, HEATPIPE, NOTDEFINED, ROTARYWHEEL, RUNAROUNDCOILLOOP, THERMOSIPHONCOILTYPEHEATEXCHANGERS, THERMOSIPHONSEALEDTUBEHEATEXCHANGERS, TWINTOWERENTHALPYRECOVERYLOOPS, USERDEFINED  }
+enum IfcAlarmTypeEnum { BELL, BREAKGLASSBUTTON, LIGHT, MANUALPULLBOX, NOTDEFINED, SIREN, USERDEFINED, WHISTLE  }
+enum IfcArithmeticOperatorEnum { ADD, DIVIDE, MULTIPLY, SUBTRACT  }
+enum IfcAudioVisualApplianceTypeEnum { AMPLIFIER, CAMERA, DISPLAY, MICROPHONE, NOTDEFINED, PLAYER, PROJECTOR, RECEIVER, SPEAKER, SWITCHER, TELEPHONE, TUNER, USERDEFINED  }
+enum IfcBeamTypeEnum { BEAM, HOLLOWCORE, JOIST, LINTEL, NOTDEFINED, SPANDREL, T_BEAM, USERDEFINED  }
+enum IfcBoilerTypeEnum { NOTDEFINED, STEAM, USERDEFINED, WATER  }
+enum IfcBooleanOperator { DIFFERENCE, INTERSECTION, UNION  }
+enum IfcBSplineCurveForm { CIRCULAR_ARC, ELLIPTIC_ARC, HYPERBOLIC_ARC, PARABOLIC_ARC, POLYLINE_FORM, UNSPECIFIED  }
+enum IfcKnotType { PIECEWISE_BEZIER_KNOTS, QUASI_UNIFORM_KNOTS, UNIFORM_KNOTS, UNSPECIFIED  }
+enum IfcBSplineSurfaceForm { CONICAL_SURF, CYLINDRICAL_SURF, GENERALISED_CONE, PLANE_SURF, QUADRIC_SURF, RULED_SURF, SPHERICAL_SURF, SURF_OF_LINEAR_EXTRUSION, SURF_OF_REVOLUTION, TOROIDAL_SURF, UNSPECIFIED  }
+enum IfcBuildingElementPartTypeEnum { INSULATION, NOTDEFINED, PRECASTPANEL, USERDEFINED  }
+enum IfcBuildingElementProxyTypeEnum { COMPLEX, ELEMENT, NOTDEFINED, PARTIAL, PROVISIONFORSPACE, PROVISIONFORVOID, USERDEFINED  }
+enum IfcBuildingSystemTypeEnum { FENESTRATION, FOUNDATION, LOADBEARING, NOTDEFINED, OUTERSHELL, SHADING, TRANSPORT, USERDEFINED  }
+enum IfcBurnerTypeEnum { NOTDEFINED, USERDEFINED  }
+enum IfcCableCarrierFittingTypeEnum { BEND, CROSS, NOTDEFINED, REDUCER, TEE, USERDEFINED  }
+enum IfcCableCarrierSegmentTypeEnum { CABLELADDERSEGMENT, CABLETRAYSEGMENT, CABLETRUNKINGSEGMENT, CONDUITSEGMENT, NOTDEFINED, USERDEFINED  }
+enum IfcCableFittingTypeEnum { CONNECTOR, ENTRY, EXIT, JUNCTION, NOTDEFINED, TRANSITION, USERDEFINED  }
+enum IfcCableSegmentTypeEnum { BUSBARSEGMENT, CABLESEGMENT, CONDUCTORSEGMENT, CORESEGMENT, NOTDEFINED, USERDEFINED  }
+enum IfcChillerTypeEnum { AIRCOOLED, HEATRECOVERY, NOTDEFINED, USERDEFINED, WATERCOOLED  }
+enum IfcChimneyTypeEnum { NOTDEFINED, USERDEFINED  }
+enum IfcCoilTypeEnum { DXCOOLINGCOIL, ELECTRICHEATINGCOIL, GASHEATINGCOIL, HYDRONICCOIL, NOTDEFINED, STEAMHEATINGCOIL, USERDEFINED, WATERCOOLINGCOIL, WATERHEATINGCOIL  }
+enum IfcColumnTypeEnum { COLUMN, NOTDEFINED, PILASTER, USERDEFINED  }
+enum IfcCommunicationsApplianceTypeEnum { ANTENNA, COMPUTER, FAX, GATEWAY, MODEM, NETWORKAPPLIANCE, NETWORKBRIDGE, NETWORKHUB, NOTDEFINED, PRINTER, REPEATER, ROUTER, SCANNER, USERDEFINED  }
+enum IfcComplexPropertyTemplateTypeEnum { P_COMPLEX, Q_COMPLEX  }
+enum IfcTransitionCode { CONTINUOUS, CONTSAMEGRADIENT, CONTSAMEGRADIENTSAMECURVATURE, DISCONTINUOUS  }
+enum IfcCompressorTypeEnum { BOOSTER, DYNAMIC, HERMETIC, NOTDEFINED, OPENTYPE, RECIPROCATING, ROLLINGPISTON, ROTARY, ROTARYVANE, SCROLL, SEMIHERMETIC, SINGLESCREW, SINGLESTAGE, TROCHOIDAL, TWINSCREW, USERDEFINED, WELDEDSHELLHERMETIC  }
+enum IfcCondenserTypeEnum { AIRCOOLED, EVAPORATIVECOOLED, NOTDEFINED, USERDEFINED, WATERCOOLED, WATERCOOLEDBRAZEDPLATE, WATERCOOLEDSHELLCOIL, WATERCOOLEDSHELLTUBE, WATERCOOLEDTUBEINTUBE  }
+enum IfcConstraintEnum { ADVISORY, HARD, NOTDEFINED, SOFT, USERDEFINED  }
+enum IfcConstructionEquipmentResourceTypeEnum { DEMOLISHING, EARTHMOVING, ERECTING, HEATING, LIGHTING, NOTDEFINED, PAVING, PUMPING, TRANSPORTING, USERDEFINED  }
+enum IfcConstructionMaterialResourceTypeEnum { AGGREGATES, CONCRETE, DRYWALL, FUEL, GYPSUM, MASONRY, METAL, NOTDEFINED, PLASTIC, USERDEFINED, WOOD  }
+enum IfcConstructionProductResourceTypeEnum { ASSEMBLY, FORMWORK, NOTDEFINED, USERDEFINED  }
+enum IfcControllerTypeEnum { FLOATING, MULTIPOSITION, NOTDEFINED, PROGRAMMABLE, PROPORTIONAL, TWOPOSITION, USERDEFINED  }
+enum IfcCooledBeamTypeEnum { ACTIVE, NOTDEFINED, PASSIVE, USERDEFINED  }
+enum IfcCoolingTowerTypeEnum { MECHANICALFORCEDDRAFT, MECHANICALINDUCEDDRAFT, NATURALDRAFT, NOTDEFINED, USERDEFINED  }
+enum IfcCostItemTypeEnum { NOTDEFINED, USERDEFINED  }
+enum IfcCostScheduleTypeEnum { BUDGET, COSTPLAN, ESTIMATE, NOTDEFINED, PRICEDBILLOFQUANTITIES, SCHEDULEOFRATES, TENDER, UNPRICEDBILLOFQUANTITIES, USERDEFINED  }
+enum IfcCoveringTypeEnum { CEILING, CLADDING, FLOORING, INSULATION, MEMBRANE, MOLDING, NOTDEFINED, ROOFING, SKIRTINGBOARD, SLEEVING, USERDEFINED, WRAPPING  }
+enum IfcCrewResourceTypeEnum { NOTDEFINED, OFFICE, SITE, USERDEFINED  }
+enum IfcCurtainWallTypeEnum { NOTDEFINED, USERDEFINED  }
+enum IfcDamperTypeEnum { BACKDRAFTDAMPER, BALANCINGDAMPER, BLASTDAMPER, CONTROLDAMPER, FIREDAMPER, FIRESMOKEDAMPER, FUMEHOODEXHAUST, GRAVITYDAMPER, GRAVITYRELIEFDAMPER, NOTDEFINED, RELIEFDAMPER, SMOKEDAMPER, USERDEFINED  }
+enum IfcDerivedUnitEnum { ACCELERATIONUNIT, ANGULARVELOCITYUNIT, AREADENSITYUNIT, COMPOUNDPLANEANGLEUNIT, CURVATUREUNIT, DYNAMICVISCOSITYUNIT, HEATFLUXDENSITYUNIT, HEATINGVALUEUNIT, INTEGERCOUNTRATEUNIT, IONCONCENTRATIONUNIT, ISOTHERMALMOISTURECAPACITYUNIT, KINEMATICVISCOSITYUNIT, LINEARFORCEUNIT, LINEARMOMENTUNIT, LINEARSTIFFNESSUNIT, LINEARVELOCITYUNIT, LUMINOUSINTENSITYDISTRIBUTIONUNIT, MASSDENSITYUNIT, MASSFLOWRATEUNIT, MASSPERLENGTHUNIT, MODULUSOFELASTICITYUNIT, MODULUSOFLINEARSUBGRADEREACTIONUNIT, MODULUSOFROTATIONALSUBGRADEREACTIONUNIT, MODULUSOFSUBGRADEREACTIONUNIT, MOISTUREDIFFUSIVITYUNIT, MOLECULARWEIGHTUNIT, MOMENTOFINERTIAUNIT, PHUNIT, PLANARFORCEUNIT, ROTATIONALFREQUENCYUNIT, ROTATIONALMASSUNIT, ROTATIONALSTIFFNESSUNIT, SECTIONAREAINTEGRALUNIT, SECTIONMODULUSUNIT, SHEARMODULUSUNIT, SOUNDPOWERLEVELUNIT, SOUNDPOWERUNIT, SOUNDPRESSURELEVELUNIT, SOUNDPRESSUREUNIT, SPECIFICHEATCAPACITYUNIT, TEMPERATUREGRADIENTUNIT, TEMPERATURERATEOFCHANGEUNIT, THERMALADMITTANCEUNIT, THERMALCONDUCTANCEUNIT, THERMALEXPANSIONCOEFFICIENTUNIT, THERMALRESISTANCEUNIT, THERMALTRANSMITTANCEUNIT, TORQUEUNIT, USERDEFINED, VAPORPERMEABILITYUNIT, VOLUMETRICFLOWRATEUNIT, WARPINGCONSTANTUNIT, WARPINGMOMENTUNIT  }
+enum IfcDiscreteAccessoryTypeEnum { ANCHORPLATE, BRACKET, NOTDEFINED, SHOE, USERDEFINED  }
+enum IfcDistributionChamberElementTypeEnum { FORMEDDUCT, INSPECTIONCHAMBER, INSPECTIONPIT, MANHOLE, METERCHAMBER, NOTDEFINED, SUMP, TRENCH, USERDEFINED, VALVECHAMBER  }
+enum IfcFlowDirectionEnum { NOTDEFINED, SINK, SOURCE, SOURCEANDSINK  }
+enum IfcDistributionPortTypeEnum { CABLE, CABLECARRIER, DUCT, NOTDEFINED, PIPE, USERDEFINED  }
+enum IfcDistributionSystemEnum { AIRCONDITIONING, AUDIOVISUAL, CHEMICAL, CHILLEDWATER, COMMUNICATION, COMPRESSEDAIR, CONDENSERWATER, CONTROL, CONVEYING, DATA, DISPOSAL, DOMESTICCOLDWATER, DOMESTICHOTWATER, DRAINAGE, EARTHING, ELECTRICAL, ELECTROACOUSTIC, EXHAUST, FIREPROTECTION, FUEL, GAS, HAZARDOUS, HEATING, LIGHTING, LIGHTNINGPROTECTION, MUNICIPALSOLIDWASTE, NOTDEFINED, OIL, OPERATIONAL, POWERGENERATION, RAINWATER, REFRIGERATION, SECURITY, SEWAGE, SIGNAL, STORMWATER, TELEPHONE, TV, USERDEFINED, VACUUM, VENT, VENTILATION, WASTEWATER, WATERSUPPLY  }
+enum IfcDocumentConfidentialityEnum { CONFIDENTIAL, NOTDEFINED, PERSONAL, PUBLIC, RESTRICTED, USERDEFINED  }
+enum IfcDocumentStatusEnum { DRAFT, FINAL, FINALDRAFT, NOTDEFINED, REVISION  }
+enum IfcDoorTypeEnum { DOOR, GATE, NOTDEFINED, TRAPDOOR, USERDEFINED  }
+enum IfcDoorTypeOperationEnum { DOUBLE_DOOR_DOUBLE_SWING, DOUBLE_DOOR_FOLDING, DOUBLE_DOOR_SINGLE_SWING, DOUBLE_DOOR_SINGLE_SWING_OPPOSITE_LEFT, DOUBLE_DOOR_SINGLE_SWING_OPPOSITE_RIGHT, DOUBLE_DOOR_SLIDING, DOUBLE_SWING_LEFT, DOUBLE_SWING_RIGHT, FOLDING_TO_LEFT, FOLDING_TO_RIGHT, NOTDEFINED, REVOLVING, ROLLINGUP, SINGLE_SWING_LEFT, SINGLE_SWING_RIGHT, SLIDING_TO_LEFT, SLIDING_TO_RIGHT, SWING_FIXED_LEFT, SWING_FIXED_RIGHT, USERDEFINED  }
+enum IfcDoorPanelOperationEnum { DOUBLE_ACTING, FIXEDPANEL, FOLDING, NOTDEFINED, REVOLVING, ROLLINGUP, SLIDING, SWINGING, USERDEFINED  }
+enum IfcDoorPanelPositionEnum { LEFT, MIDDLE, NOTDEFINED, RIGHT  }
+enum IfcDoorStyleOperationEnum { DOUBLE_DOOR_DOUBLE_SWING, DOUBLE_DOOR_FOLDING, DOUBLE_DOOR_SINGLE_SWING, DOUBLE_DOOR_SINGLE_SWING_OPPOSITE_LEFT, DOUBLE_DOOR_SINGLE_SWING_OPPOSITE_RIGHT, DOUBLE_DOOR_SLIDING, DOUBLE_SWING_LEFT, DOUBLE_SWING_RIGHT, FOLDING_TO_LEFT, FOLDING_TO_RIGHT, NOTDEFINED, REVOLVING, ROLLINGUP, SINGLE_SWING_LEFT, SINGLE_SWING_RIGHT, SLIDING_TO_LEFT, SLIDING_TO_RIGHT, USERDEFINED  }
+enum IfcDoorStyleConstructionEnum { ALUMINIUM, ALUMINIUM_PLASTIC, ALUMINIUM_WOOD, HIGH_GRADE_STEEL, NOTDEFINED, PLASTIC, STEEL, USERDEFINED, WOOD  }
+enum IfcDuctFittingTypeEnum { BEND, CONNECTOR, ENTRY, EXIT, JUNCTION, NOTDEFINED, OBSTRUCTION, TRANSITION, USERDEFINED  }
+enum IfcDuctSegmentTypeEnum { FLEXIBLESEGMENT, NOTDEFINED, RIGIDSEGMENT, USERDEFINED  }
+enum IfcDuctSilencerTypeEnum { FLATOVAL, NOTDEFINED, RECTANGULAR, ROUND, USERDEFINED  }
+enum IfcElectricApplianceTypeEnum { DISHWASHER, ELECTRICCOOKER, FREESTANDINGELECTRICHEATER, FREESTANDINGFAN, FREESTANDINGWATERCOOLER, FREESTANDINGWATERHEATER, FREEZER, FRIDGE_FREEZER, HANDDRYER, KITCHENMACHINE, MICROWAVE, NOTDEFINED, PHOTOCOPIER, REFRIGERATOR, TUMBLEDRYER, USERDEFINED, VENDINGMACHINE, WASHINGMACHINE  }
+enum IfcElectricDistributionBoardTypeEnum { CONSUMERUNIT, DISTRIBUTIONBOARD, MOTORCONTROLCENTRE, NOTDEFINED, SWITCHBOARD, USERDEFINED  }
+enum IfcElectricFlowStorageDeviceTypeEnum { BATTERY, CAPACITORBANK, HARMONICFILTER, INDUCTORBANK, NOTDEFINED, UPS, USERDEFINED  }
+enum IfcElectricGeneratorTypeEnum { CHP, ENGINEGENERATOR, NOTDEFINED, STANDALONE, USERDEFINED  }
+enum IfcElectricMotorTypeEnum { DC, INDUCTION, NOTDEFINED, POLYPHASE, RELUCTANCESYNCHRONOUS, SYNCHRONOUS, USERDEFINED  }
+enum IfcElectricTimeControlTypeEnum { NOTDEFINED, RELAY, TIMECLOCK, TIMEDELAY, USERDEFINED  }
+enum IfcAssemblyPlaceEnum { FACTORY, NOTDEFINED, SITE  }
+enum IfcElementAssemblyTypeEnum { ACCESSORY_ASSEMBLY, ARCH, BEAM_GRID, BRACED_FRAME, GIRDER, NOTDEFINED, REINFORCEMENT_UNIT, RIGID_FRAME, SLAB_FIELD, TRUSS, USERDEFINED  }
+enum IfcEngineTypeEnum { EXTERNALCOMBUSTION, INTERNALCOMBUSTION, NOTDEFINED, USERDEFINED  }
+enum IfcEvaporativeCoolerTypeEnum { DIRECTEVAPORATIVEAIRWASHER, DIRECTEVAPORATIVEPACKAGEDROTARYAIRCOOLER, DIRECTEVAPORATIVERANDOMMEDIAAIRCOOLER, DIRECTEVAPORATIVERIGIDMEDIAAIRCOOLER, DIRECTEVAPORATIVESLINGERSPACKAGEDAIRCOOLER, INDIRECTDIRECTCOMBINATION, INDIRECTEVAPORATIVECOOLINGTOWERORCOILCOOLER, INDIRECTEVAPORATIVEPACKAGEAIRCOOLER, INDIRECTEVAPORATIVEWETCOIL, NOTDEFINED, USERDEFINED  }
+enum IfcEvaporatorTypeEnum { DIRECTEXPANSION, DIRECTEXPANSIONBRAZEDPLATE, DIRECTEXPANSIONSHELLANDTUBE, DIRECTEXPANSIONTUBEINTUBE, FLOODEDSHELLANDTUBE, NOTDEFINED, SHELLANDCOIL, USERDEFINED  }
+enum IfcEventTypeEnum { ENDEVENT, INTERMEDIATEEVENT, NOTDEFINED, STARTEVENT, USERDEFINED  }
+enum IfcEventTriggerTypeEnum { EVENTCOMPLEX, EVENTMESSAGE, EVENTRULE, EVENTTIME, NOTDEFINED, USERDEFINED  }
+enum IfcExternalSpatialElementTypeEnum { EXTERNAL, EXTERNAL_EARTH, EXTERNAL_FIRE, EXTERNAL_WATER, NOTDEFINED, USERDEFINED  }
+enum IfcFanTypeEnum { CENTRIFUGALAIRFOIL, CENTRIFUGALBACKWARDINCLINEDCURVED, CENTRIFUGALFORWARDCURVED, CENTRIFUGALRADIAL, NOTDEFINED, PROPELLORAXIAL, TUBEAXIAL, USERDEFINED, VANEAXIAL  }
+enum IfcFastenerTypeEnum { GLUE, MORTAR, NOTDEFINED, USERDEFINED, WELD  }
+enum IfcFilterTypeEnum { AIRPARTICLEFILTER, COMPRESSEDAIRFILTER, NOTDEFINED, ODORFILTER, OILFILTER, STRAINER, USERDEFINED, WATERFILTER  }
+enum IfcFireSuppressionTerminalTypeEnum { BREECHINGINLET, FIREHYDRANT, HOSEREEL, NOTDEFINED, SPRINKLER, SPRINKLERDEFLECTOR, USERDEFINED  }
+enum IfcFlowInstrumentTypeEnum { AMMETER, FREQUENCYMETER, NOTDEFINED, PHASEANGLEMETER, POWERFACTORMETER, PRESSUREGAUGE, THERMOMETER, USERDEFINED, VOLTMETER_PEAK, VOLTMETER_RMS  }
+enum IfcFlowMeterTypeEnum { ENERGYMETER, GASMETER, NOTDEFINED, OILMETER, USERDEFINED, WATERMETER  }
+enum IfcFootingTypeEnum { CAISSON_FOUNDATION, FOOTING_BEAM, NOTDEFINED, PAD_FOOTING, PILE_CAP, STRIP_FOOTING, USERDEFINED  }
+enum IfcFurnitureTypeEnum { BED, CHAIR, DESK, FILECABINET, NOTDEFINED, SHELF, SOFA, TABLE, USERDEFINED  }
+enum IfcGeographicElementTypeEnum { NOTDEFINED, TERRAIN, USERDEFINED  }
+enum IfcGeometricProjectionEnum { ELEVATION_VIEW, GRAPH_VIEW, MODEL_VIEW, NOTDEFINED, PLAN_VIEW, REFLECTED_PLAN_VIEW, SECTION_VIEW, SKETCH_VIEW, USERDEFINED  }
+enum IfcGridTypeEnum { IRREGULAR, NOTDEFINED, RADIAL, RECTANGULAR, TRIANGULAR, USERDEFINED  }
+enum IfcHeatExchangerTypeEnum { NOTDEFINED, PLATE, SHELLANDTUBE, USERDEFINED  }
+enum IfcHumidifierTypeEnum { ADIABATICAIRWASHER, ADIABATICATOMIZING, ADIABATICCOMPRESSEDAIRNOZZLE, ADIABATICPAN, ADIABATICRIGIDMEDIA, ADIABATICULTRASONIC, ADIABATICWETTEDELEMENT, ASSISTEDBUTANE, ASSISTEDELECTRIC, ASSISTEDNATURALGAS, ASSISTEDPROPANE, ASSISTEDSTEAM, NOTDEFINED, STEAMINJECTION, USERDEFINED  }
+enum IfcInterceptorTypeEnum { CYCLONIC, GREASE, NOTDEFINED, OIL, PETROL, USERDEFINED  }
+enum IfcInventoryTypeEnum { ASSETINVENTORY, FURNITUREINVENTORY, NOTDEFINED, SPACEINVENTORY, USERDEFINED  }
+enum IfcJunctionBoxTypeEnum { DATA, NOTDEFINED, POWER, USERDEFINED  }
+enum IfcLaborResourceTypeEnum { ADMINISTRATION, CARPENTRY, CLEANING, CONCRETE, DRYWALL, ELECTRIC, FINISHING, FLOORING, GENERAL, HVAC, LANDSCAPING, MASONRY, NOTDEFINED, PAINTING, PAVING, PLUMBING, ROOFING, SITEGRADING, STEELWORK, SURVEYING, USERDEFINED  }
+enum IfcTaskDurationEnum { ELAPSEDTIME, NOTDEFINED, WORKTIME  }
+enum IfcLampTypeEnum { COMPACTFLUORESCENT, FLUORESCENT, HALOGEN, HIGHPRESSUREMERCURY, HIGHPRESSURESODIUM, LED, METALHALIDE, NOTDEFINED, OLED, TUNGSTENFILAMENT, USERDEFINED  }
+enum IfcLightFixtureTypeEnum { DIRECTIONSOURCE, NOTDEFINED, POINTSOURCE, SECURITYLIGHTING, USERDEFINED  }
+enum IfcLightDistributionCurveEnum { NOTDEFINED, TYPE_A, TYPE_B, TYPE_C  }
+enum IfcLightEmissionSourceEnum { COMPACTFLUORESCENT, FLUORESCENT, HIGHPRESSUREMERCURY, HIGHPRESSURESODIUM, LIGHTEMITTINGDIODE, LOWPRESSURESODIUM, LOWVOLTAGEHALOGEN, MAINVOLTAGEHALOGEN, METALHALIDE, NOTDEFINED, TUNGSTENFILAMENT  }
+enum IfcLayerSetDirectionEnum { AXIS1, AXIS2, AXIS3  }
+enum IfcDirectionSenseEnum { NEGATIVE, POSITIVE  }
+enum IfcMechanicalFastenerTypeEnum { ANCHORBOLT, BOLT, DOWEL, NAIL, NAILPLATE, NOTDEFINED, RIVET, SCREW, SHEARCONNECTOR, STAPLE, STUDSHEARCONNECTOR, USERDEFINED  }
+enum IfcMedicalDeviceTypeEnum { AIRSTATION, FEEDAIRUNIT, NOTDEFINED, OXYGENGENERATOR, OXYGENPLANT, USERDEFINED, VACUUMSTATION  }
+enum IfcMemberTypeEnum { BRACE, CHORD, COLLAR, MEMBER, MULLION, NOTDEFINED, PLATE, POST, PURLIN, RAFTER, STRINGER, STRUT, STUD, USERDEFINED  }
+enum IfcBenchmarkEnum { EQUALTO, GREATERTHAN, GREATERTHANOREQUALTO, INCLUDEDIN, INCLUDES, LESSTHAN, LESSTHANOREQUALTO, NOTEQUALTO, NOTINCLUDEDIN, NOTINCLUDES  }
+enum IfcMotorConnectionTypeEnum { BELTDRIVE, COUPLING, DIRECTDRIVE, NOTDEFINED, USERDEFINED  }
+enum IfcUnitEnum { ABSORBEDDOSEUNIT, AMOUNTOFSUBSTANCEUNIT, AREAUNIT, DOSEEQUIVALENTUNIT, ELECTRICCAPACITANCEUNIT, ELECTRICCHARGEUNIT, ELECTRICCONDUCTANCEUNIT, ELECTRICCURRENTUNIT, ELECTRICRESISTANCEUNIT, ELECTRICVOLTAGEUNIT, ENERGYUNIT, FORCEUNIT, FREQUENCYUNIT, ILLUMINANCEUNIT, INDUCTANCEUNIT, LENGTHUNIT, LUMINOUSFLUXUNIT, LUMINOUSINTENSITYUNIT, MAGNETICFLUXDENSITYUNIT, MAGNETICFLUXUNIT, MASSUNIT, PLANEANGLEUNIT, POWERUNIT, PRESSUREUNIT, RADIOACTIVITYUNIT, SOLIDANGLEUNIT, THERMODYNAMICTEMPERATUREUNIT, TIMEUNIT, USERDEFINED, VOLUMEUNIT  }
+enum IfcLogicalOperatorEnum { LOGICALAND, LOGICALNOTAND, LOGICALNOTOR, LOGICALOR, LOGICALXOR  }
+enum IfcObjectiveEnum { CODECOMPLIANCE, CODEWAIVER, DESIGNINTENT, EXTERNAL, HEALTHANDSAFETY, MERGECONFLICT, MODELVIEW, NOTDEFINED, PARAMETER, REQUIREMENT, SPECIFICATION, TRIGGERCONDITION, USERDEFINED  }
+enum IfcOccupantTypeEnum { ASSIGNEE, ASSIGNOR, LESSEE, LESSOR, LETTINGAGENT, NOTDEFINED, OWNER, TENANT, USERDEFINED  }
+enum IfcOpeningElementTypeEnum { NOTDEFINED, OPENING, RECESS, USERDEFINED  }
+enum IfcOutletTypeEnum { AUDIOVISUALOUTLET, COMMUNICATIONSOUTLET, DATAOUTLET, NOTDEFINED, POWEROUTLET, TELEPHONEOUTLET, USERDEFINED  }
+enum IfcStateEnum { LOCKED, READONLY, READONLYLOCKED, READWRITE, READWRITELOCKED  }
+enum IfcChangeActionEnum { ADDED, DELETED, MODIFIED, NOCHANGE, NOTDEFINED  }
+enum IfcPerformanceHistoryTypeEnum { NOTDEFINED, USERDEFINED  }
+enum IfcPermeableCoveringOperationEnum { GRILL, LOUVER, NOTDEFINED, SCREEN, USERDEFINED  }
+enum IfcWindowPanelPositionEnum { BOTTOM, LEFT, MIDDLE, NOTDEFINED, RIGHT, TOP  }
+enum IfcPermitTypeEnum { ACCESS, BUILDING, NOTDEFINED, USERDEFINED, WORK  }
+enum IfcPileTypeEnum { BORED, COHESION, DRIVEN, FRICTION, JETGROUTING, NOTDEFINED, SUPPORT, USERDEFINED  }
+enum IfcPileConstructionEnum { CAST_IN_PLACE, COMPOSITE, NOTDEFINED, PRECAST_CONCRETE, PREFAB_STEEL, USERDEFINED  }
+enum IfcPipeFittingTypeEnum { BEND, CONNECTOR, ENTRY, EXIT, JUNCTION, NOTDEFINED, OBSTRUCTION, TRANSITION, USERDEFINED  }
+enum IfcPipeSegmentTypeEnum { CULVERT, FLEXIBLESEGMENT, GUTTER, NOTDEFINED, RIGIDSEGMENT, SPOOL, USERDEFINED  }
+enum IfcPlateTypeEnum { CURTAIN_PANEL, NOTDEFINED, SHEET, USERDEFINED  }
+enum IfcProcedureTypeEnum { ADVICE_CAUTION, ADVICE_NOTE, ADVICE_WARNING, CALIBRATION, DIAGNOSTIC, NOTDEFINED, SHUTDOWN, STARTUP, USERDEFINED  }
+enum IfcProfileTypeEnum { AREA, CURVE  }
+enum IfcProjectionElementTypeEnum { NOTDEFINED, USERDEFINED  }
+enum IfcProjectOrderTypeEnum { CHANGEORDER, MAINTENANCEWORKORDER, MOVEORDER, NOTDEFINED, PURCHASEORDER, USERDEFINED, WORKORDER  }
+enum IfcPropertySetTemplateTypeEnum { NOTDEFINED, PSET_OCCURRENCEDRIVEN, PSET_PERFORMANCEDRIVEN, PSET_TYPEDRIVENONLY, PSET_TYPEDRIVENOVERRIDE, QTO_OCCURRENCEDRIVEN, QTO_TYPEDRIVENONLY, QTO_TYPEDRIVENOVERRIDE  }
+enum IfcCurveInterpolationEnum { LINEAR, LOG_LINEAR, LOG_LOG, NOTDEFINED  }
+enum IfcProtectiveDeviceTypeEnum { CIRCUITBREAKER, EARTHINGSWITCH, EARTHLEAKAGECIRCUITBREAKER, FUSEDISCONNECTOR, NOTDEFINED, RESIDUALCURRENTCIRCUITBREAKER, RESIDUALCURRENTSWITCH, USERDEFINED, VARISTOR  }
+enum IfcProtectiveDeviceTrippingUnitTypeEnum { ELECTROMAGNETIC, ELECTRONIC, NOTDEFINED, RESIDUALCURRENT, THERMAL, USERDEFINED  }
+enum IfcObjectTypeEnum { ACTOR, CONTROL, GROUP, NOTDEFINED, PROCESS, PRODUCT, PROJECT, RESOURCE  }
+enum IfcPumpTypeEnum { CIRCULATOR, ENDSUCTION, NOTDEFINED, SPLITCASE, SUBMERSIBLEPUMP, SUMPPUMP, USERDEFINED, VERTICALINLINE, VERTICALTURBINE  }
+enum IfcRailingTypeEnum { BALUSTRADE, GUARDRAIL, HANDRAIL, NOTDEFINED, USERDEFINED  }
+enum IfcRampTypeEnum { HALF_TURN_RAMP, NOTDEFINED, QUARTER_TURN_RAMP, SPIRAL_RAMP, STRAIGHT_RUN_RAMP, TWO_QUARTER_TURN_RAMP, TWO_STRAIGHT_RUN_RAMP, USERDEFINED  }
+enum IfcRampFlightTypeEnum { NOTDEFINED, SPIRAL, STRAIGHT, USERDEFINED  }
+enum IfcRecurrenceTypeEnum { BY_DAY_COUNT, BY_WEEKDAY_COUNT, DAILY, MONTHLY_BY_DAY_OF_MONTH, MONTHLY_BY_POSITION, WEEKLY, YEARLY_BY_DAY_OF_MONTH, YEARLY_BY_POSITION  }
+enum IfcReinforcingBarSurfaceEnum { PLAIN, TEXTURED  }
+enum IfcReinforcingBarTypeEnum { ANCHORING, EDGE, LIGATURE, MAIN, NOTDEFINED, PUNCHING, RING, SHEAR, STUD, USERDEFINED  }
+enum IfcReinforcingMeshTypeEnum { NOTDEFINED, USERDEFINED  }
+enum IfcConnectionTypeEnum { ATEND, ATPATH, ATSTART, NOTDEFINED  }
+enum IfcSequenceEnum { FINISH_FINISH, FINISH_START, NOTDEFINED, START_FINISH, START_START, USERDEFINED  }
+enum IfcPhysicalOrVirtualEnum { NOTDEFINED, PHYSICAL, VIRTUAL  }
+enum IfcInternalOrExternalEnum { EXTERNAL, EXTERNAL_EARTH, EXTERNAL_FIRE, EXTERNAL_WATER, INTERNAL, NOTDEFINED  }
+enum IfcRoofTypeEnum { BARREL_ROOF, BUTTERFLY_ROOF, DOME_ROOF, FLAT_ROOF, FREEFORM, GABLE_ROOF, GAMBREL_ROOF, HIPPED_GABLE_ROOF, HIP_ROOF, MANSARD_ROOF, NOTDEFINED, PAVILION_ROOF, RAINBOW_ROOF, SHED_ROOF, USERDEFINED  }
+enum IfcSanitaryTerminalTypeEnum { BATH, BIDET, CISTERN, NOTDEFINED, SANITARYFOUNTAIN, SHOWER, SINK, TOILETPAN, URINAL, USERDEFINED, WASHHANDBASIN, WCSEAT  }
+enum IfcDataOriginEnum { MEASURED, NOTDEFINED, PREDICTED, SIMULATED, USERDEFINED  }
+enum IfcSectionTypeEnum { TAPERED, UNIFORM  }
+enum IfcReinforcingBarRoleEnum { ANCHORING, EDGE, LIGATURE, MAIN, NOTDEFINED, PUNCHING, RING, SHEAR, STUD, USERDEFINED  }
+enum IfcSensorTypeEnum { CO2SENSOR, CONDUCTANCESENSOR, CONTACTSENSOR, COSENSOR, FIRESENSOR, FLOWSENSOR, FROSTSENSOR, GASSENSOR, HEATSENSOR, HUMIDITYSENSOR, IDENTIFIERSENSOR, IONCONCENTRATIONSENSOR, LEVELSENSOR, LIGHTSENSOR, MOISTURESENSOR, MOVEMENTSENSOR, NOTDEFINED, PHSENSOR, PRESSURESENSOR, RADIATIONSENSOR, RADIOACTIVITYSENSOR, SMOKESENSOR, SOUNDSENSOR, TEMPERATURESENSOR, USERDEFINED, WINDSENSOR  }
+enum IfcShadingDeviceTypeEnum { AWNING, JALOUSIE, NOTDEFINED, SHUTTER, USERDEFINED  }
+enum IfcSimplePropertyTemplateTypeEnum { P_BOUNDEDVALUE, P_ENUMERATEDVALUE, P_LISTVALUE, P_REFERENCEVALUE, P_SINGLEVALUE, P_TABLEVALUE, Q_AREA, Q_COUNT, Q_LENGTH, Q_TIME, Q_VOLUME, Q_WEIGHT  }
+enum IfcSIPrefix { ATTO, CENTI, DECA, DECI, EXA, FEMTO, GIGA, HECTO, KILO, MEGA, MICRO, MILLI, NANO, PETA, PICO, TERA  }
+enum IfcSIUnitName { AMPERE, BECQUEREL, CANDELA, COULOMB, CUBIC_METRE, DEGREE_CELSIUS, FARAD, GRAM, GRAY, HENRY, HERTZ, JOULE, KELVIN, LUMEN, LUX, METRE, MOLE, NEWTON, OHM, PASCAL, RADIAN, SECOND, SIEMENS, SIEVERT, SQUARE_METRE, STERADIAN, TESLA, VOLT, WATT, WEBER  }
+enum IfcSlabTypeEnum { BASESLAB, FLOOR, LANDING, NOTDEFINED, ROOF, USERDEFINED  }
+enum IfcSolarDeviceTypeEnum { NOTDEFINED, SOLARCOLLECTOR, SOLARPANEL, USERDEFINED  }
+enum IfcSpaceTypeEnum { EXTERNAL, GFA, INTERNAL, NOTDEFINED, PARKING, SPACE, USERDEFINED  }
+enum IfcSpaceHeaterTypeEnum { CONVECTOR, NOTDEFINED, RADIATOR, USERDEFINED  }
+enum IfcElementCompositionEnum { COMPLEX, ELEMENT, PARTIAL  }
+enum IfcSpatialZoneTypeEnum { CONSTRUCTION, FIRESAFETY, LIGHTING, NOTDEFINED, OCCUPANCY, SECURITY, THERMAL, TRANSPORT, USERDEFINED, VENTILATION  }
+enum IfcStackTerminalTypeEnum { BIRDCAGE, COWL, NOTDEFINED, RAINWATERHOPPER, USERDEFINED  }
+enum IfcStairTypeEnum { CURVED_RUN_STAIR, DOUBLE_RETURN_STAIR, HALF_TURN_STAIR, HALF_WINDING_STAIR, NOTDEFINED, QUARTER_TURN_STAIR, QUARTER_WINDING_STAIR, SPIRAL_STAIR, STRAIGHT_RUN_STAIR, THREE_QUARTER_TURN_STAIR, THREE_QUARTER_WINDING_STAIR, TWO_CURVED_RUN_STAIR, TWO_QUARTER_TURN_STAIR, TWO_QUARTER_WINDING_STAIR, TWO_STRAIGHT_RUN_STAIR, USERDEFINED  }
+enum IfcStairFlightTypeEnum { CURVED, FREEFORM, NOTDEFINED, SPIRAL, STRAIGHT, USERDEFINED, WINDER  }
+enum IfcGlobalOrLocalEnum { GLOBAL_COORDS, LOCAL_COORDS  }
+enum IfcAnalysisModelTypeEnum { IN_PLANE_LOADING_2D, LOADING_3D, NOTDEFINED, OUT_PLANE_LOADING_2D, USERDEFINED  }
+enum IfcProjectedOrTrueLengthEnum { PROJECTED_LENGTH, TRUE_LENGTH  }
+enum IfcStructuralCurveActivityTypeEnum { CONST, DISCRETE, EQUIDISTANT, LINEAR, NOTDEFINED, PARABOLA, POLYGONAL, SINUS, USERDEFINED  }
+enum IfcStructuralCurveMemberTypeEnum { CABLE, COMPRESSION_MEMBER, NOTDEFINED, PIN_JOINED_MEMBER, RIGID_JOINED_MEMBER, TENSION_MEMBER, USERDEFINED  }
+enum IfcLoadGroupTypeEnum { LOAD_CASE, LOAD_COMBINATION, LOAD_GROUP, NOTDEFINED, USERDEFINED  }
+enum IfcActionTypeEnum { EXTRAORDINARY_A, NOTDEFINED, PERMANENT_G, USERDEFINED, VARIABLE_Q  }
+enum IfcActionSourceTypeEnum { BRAKES, BUOYANCY, COMPLETION_G1, CREEP, CURRENT, DEAD_LOAD_G, EARTHQUAKE_E, ERECTION, FIRE, ICE, IMPACT, IMPULSE, LACK_OF_FIT, LIVE_LOAD_Q, NOTDEFINED, PRESTRESSING_P, PROPPING, RAIN, SETTLEMENT_U, SHRINKAGE, SNOW_S, SYSTEM_IMPERFECTION, TEMPERATURE_T, TRANSPORT, USERDEFINED, WAVE, WIND_W  }
+enum IfcAnalysisTheoryTypeEnum { FIRST_ORDER_THEORY, FULL_NONLINEAR_THEORY, NOTDEFINED, SECOND_ORDER_THEORY, THIRD_ORDER_THEORY, USERDEFINED  }
+enum IfcStructuralSurfaceActivityTypeEnum { BILINEAR, CONST, DISCRETE, ISOCONTOUR, NOTDEFINED, USERDEFINED  }
+enum IfcStructuralSurfaceMemberTypeEnum { BENDING_ELEMENT, MEMBRANE_ELEMENT, NOTDEFINED, SHELL, USERDEFINED  }
+enum IfcSubContractResourceTypeEnum { NOTDEFINED, PURCHASE, USERDEFINED, WORK  }
+enum IfcPreferredSurfaceCurveRepresentation { CURVE3D, PCURVE_S1, PCURVE_S2  }
+enum IfcSurfaceFeatureTypeEnum { MARK, NOTDEFINED, TAG, TREATMENT, USERDEFINED  }
+enum IfcSurfaceSide { BOTH, NEGATIVE, POSITIVE  }
+enum IfcReflectanceMethodEnum { BLINN, FLAT, GLASS, MATT, METAL, MIRROR, NOTDEFINED, PHONG, PLASTIC, STRAUSS  }
+enum IfcSwitchingDeviceTypeEnum { CONTACTOR, DIMMERSWITCH, EMERGENCYSTOP, KEYPAD, MOMENTARYSWITCH, NOTDEFINED, SELECTORSWITCH, STARTER, SWITCHDISCONNECTOR, TOGGLESWITCH, USERDEFINED  }
+enum IfcSystemFurnitureElementTypeEnum { NOTDEFINED, PANEL, USERDEFINED, WORKSURFACE  }
+enum IfcTankTypeEnum { BASIN, BREAKPRESSURE, EXPANSION, FEEDANDEXPANSION, NOTDEFINED, PRESSUREVESSEL, STORAGE, USERDEFINED, VESSEL  }
+enum IfcTaskTypeEnum { ATTENDANCE, CONSTRUCTION, DEMOLITION, DISMANTLE, DISPOSAL, INSTALLATION, LOGISTIC, MAINTENANCE, MOVE, NOTDEFINED, OPERATION, REMOVAL, RENOVATION, USERDEFINED  }
+enum IfcTendonTypeEnum { BAR, COATED, NOTDEFINED, STRAND, USERDEFINED, WIRE  }
+enum IfcTendonAnchorTypeEnum { COUPLER, FIXED_END, NOTDEFINED, TENSIONING_END, USERDEFINED  }
+enum IfcTextPath { DOWN, LEFT, RIGHT, UP  }
+enum IfcTimeSeriesDataTypeEnum { CONTINUOUS, DISCRETE, DISCRETEBINARY, NOTDEFINED, PIECEWISEBINARY, PIECEWISECONSTANT, PIECEWISECONTINUOUS  }
+enum IfcTransformerTypeEnum { CURRENT, FREQUENCY, INVERTER, NOTDEFINED, RECTIFIER, USERDEFINED, VOLTAGE  }
+enum IfcTransportElementTypeEnum { CRANEWAY, ELEVATOR, ESCALATOR, LIFTINGGEAR, MOVINGWALKWAY, NOTDEFINED, USERDEFINED  }
+enum IfcTrimmingPreference { CARTESIAN, PARAMETER, UNSPECIFIED  }
+enum IfcTubeBundleTypeEnum { FINNED, NOTDEFINED, USERDEFINED  }
+enum IfcUnitaryControlElementTypeEnum { ALARMPANEL, CONTROLPANEL, GASDETECTIONPANEL, HUMIDISTAT, INDICATORPANEL, MIMICPANEL, NOTDEFINED, THERMOSTAT, USERDEFINED, WEATHERSTATION  }
+enum IfcUnitaryEquipmentTypeEnum { AIRCONDITIONINGUNIT, AIRHANDLER, DEHUMIDIFIER, NOTDEFINED, ROOFTOPUNIT, SPLITSYSTEM, USERDEFINED  }
+enum IfcValveTypeEnum { AIRRELEASE, ANTIVACUUM, CHANGEOVER, CHECK, COMMISSIONING, DIVERTING, DOUBLECHECK, DOUBLEREGULATING, DRAWOFFCOCK, FAUCET, FLUSHING, GASCOCK, GASTAP, ISOLATING, MIXING, NOTDEFINED, PRESSUREREDUCING, PRESSURERELIEF, REGULATING, SAFETYCUTOFF, STEAMTRAP, STOPCOCK, USERDEFINED  }
+enum IfcVibrationIsolatorTypeEnum { COMPRESSION, NOTDEFINED, SPRING, USERDEFINED  }
+enum IfcVoidingFeatureTypeEnum { CHAMFER, CUTOUT, EDGE, HOLE, MITER, NOTCH, NOTDEFINED, USERDEFINED  }
+enum IfcWallTypeEnum { ELEMENTEDWALL, MOVABLE, NOTDEFINED, PARAPET, PARTITIONING, PLUMBINGWALL, POLYGONAL, SHEAR, SOLIDWALL, STANDARD, USERDEFINED  }
+enum IfcWasteTerminalTypeEnum { FLOORTRAP, FLOORWASTE, GULLYSUMP, GULLYTRAP, NOTDEFINED, ROOFDRAIN, USERDEFINED, WASTEDISPOSALUNIT, WASTETRAP  }
+enum IfcWindowTypeEnum { LIGHTDOME, NOTDEFINED, SKYLIGHT, USERDEFINED, WINDOW  }
+enum IfcWindowTypePartitioningEnum { DOUBLE_PANEL_HORIZONTAL, DOUBLE_PANEL_VERTICAL, NOTDEFINED, SINGLE_PANEL, TRIPLE_PANEL_BOTTOM, TRIPLE_PANEL_HORIZONTAL, TRIPLE_PANEL_LEFT, TRIPLE_PANEL_RIGHT, TRIPLE_PANEL_TOP, TRIPLE_PANEL_VERTICAL, USERDEFINED  }
+enum IfcWindowPanelOperationEnum { BOTTOMHUNG, FIXEDCASEMENT, NOTDEFINED, OTHEROPERATION, PIVOTHORIZONTAL, PIVOTVERTICAL, REMOVABLECASEMENT, SIDEHUNGLEFTHAND, SIDEHUNGRIGHTHAND, SLIDINGHORIZONTAL, SLIDINGVERTICAL, TILTANDTURNLEFTHAND, TILTANDTURNRIGHTHAND, TOPHUNG  }
+enum IfcWindowStyleConstructionEnum { ALUMINIUM, ALUMINIUM_WOOD, HIGH_GRADE_STEEL, NOTDEFINED, OTHER_CONSTRUCTION, PLASTIC, STEEL, WOOD  }
+enum IfcWindowStyleOperationEnum { DOUBLE_PANEL_HORIZONTAL, DOUBLE_PANEL_VERTICAL, NOTDEFINED, SINGLE_PANEL, TRIPLE_PANEL_BOTTOM, TRIPLE_PANEL_HORIZONTAL, TRIPLE_PANEL_LEFT, TRIPLE_PANEL_RIGHT, TRIPLE_PANEL_TOP, TRIPLE_PANEL_VERTICAL, USERDEFINED  }
+enum IfcWorkCalendarTypeEnum { FIRSTSHIFT, NOTDEFINED, SECONDSHIFT, THIRDSHIFT, USERDEFINED  }
+enum IfcWorkPlanTypeEnum { ACTUAL, BASELINE, NOTDEFINED, PLANNED, USERDEFINED  }
+enum IfcWorkScheduleTypeEnum { ACTUAL, BASELINE, NOTDEFINED, PLANNED, USERDEFINED  }

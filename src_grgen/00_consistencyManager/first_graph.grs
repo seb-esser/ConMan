@@ -1,0 +1,9 @@
+new graph CreateRule.grg "my_sample_model"
+
+new :PrimaryNode($="1", NodeId=1, EntityType = "IfcProject", SomeEnum = TESTB)
+new :PrimaryNode($="2", NodeId=2, EntityType = "IfcSite", SomeEnum = TESTA)
+new :ConnectionNode($=con1, EntityType="IfcRelContainedInSpatialStructure")
+
+new @(con1)-:Association(RelType="relatingStructure")->@("1")
+
+new @(con1)-:Association(RelType="relatedStructure")->@("2")

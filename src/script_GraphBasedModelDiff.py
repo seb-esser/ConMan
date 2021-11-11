@@ -1,15 +1,9 @@
 ""
 
-import asyncio
 # import numpy as np
-import time
 
-import PatchManager.PatchGenerator
-from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.GraphDiff import GraphDiff
-from neo4jGraphDiff.SecondaryNodeDiff import DfsIsomorphismCalculator
-from neo4jGraphDiff.Caption.ResultGenerator import ResultGenerator
-from neo4jGraphDiff.PrimaryNodeDiff import PrimaryNodeDiff
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 # -- ... --
@@ -32,10 +26,24 @@ label_init, label_updated = testcases['new_cuboid']
 
 # async def main():
 def main():
+    # get topmost entry nodes
+    raw_init = connector.run_cypher_statement(
+        """
+        MATCH (n:PrimaryNode:{} {{EntityType: "IfcProject"}})
+        RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)
+        """.format(label_init))
+    raw_updated = connector.run_cypher_statement(
+        """
+        MATCH (n:PrimaryNode:{} {{EntityType: "IfcProject"}})
+        RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)
+        """.format(label_updated))
 
-    diff = GraphDiff(label_init, label_updated)
-    patch = diff.run_diff(connector=connector)
-    patch.print_report()
+    entry_init: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_init)[0]
+    entry_updated: NodeItem = NodeItem.fromNeo4jResponseWouRel(raw_updated)[0]
+
+    diff = GraphDiff(connector, label_init, label_updated)
+    delta = diff.diff_subgraphs(entry_init, entry_updated)
+    print(delta)
 
 # asyncio.run(main())
 main()

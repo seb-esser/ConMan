@@ -178,7 +178,7 @@ class DiffSettings:
     def __init__(self):
         # ignore settings
         self.diffIgnoreAttrs = ["p21_id", "GlobalId"]
-        self.diffIgnoreEntityTypes = ["IfcOwnerHistory"]
+        self.diffIgnoreEntityTypes = []
         self.MatchingType_RootedNodes = MatchCriteriaEnum.OnGuid  # sets how rooted nodes get matched
         self.MatchingType_Childs = MatchCriteriaEnum.OnRelType  # sets how child nodes get matched
 

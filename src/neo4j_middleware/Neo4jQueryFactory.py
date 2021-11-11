@@ -116,9 +116,9 @@ class Neo4jQueryFactory(Neo4jFactory):
         @param parent_node_id: the node id of the parent node
         @return: cypher query string
         """
-        match = 'MATCH (n:{})-[r]->(c)'.format(label)
+        match = 'MATCH (n:{})-[r:rel]->(c)'.format(label)
         where = 'WHERE ID(n) = {}'.format(parent_node_id)
-        ret = 'RETURN ID(c), PROPERTIES(r), c.EntityType, PROPERTIES(c), LABELS(n)'
+        ret = 'RETURN ID(c), PROPERTIES(r), c.EntityType, PROPERTIES(c), LABELS(c)'
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     @classmethod
@@ -184,7 +184,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match_start = 'MATCH(n) WHERE ID(n) = {}'.format(node_id_start)
         match_target = 'MATCH(m) WHERE ID(m) = {}'.format(node_id_target)
-        path = 'MATCH p = shortestPath((n)-[*..10]->(m))' # max path length is hardcoded to 10
+        path = 'MATCH p = shortestPath((n)-[*..15]->(m))' # max path length is hardcoded to 15
         ret = 'RETURN p as path, NODES(p), RELATIONSHIPS(p)'
         return Neo4jFactory.BuildMultiStatement([match_start, match_target, path, ret])
 
@@ -363,4 +363,11 @@ class Neo4jQueryFactory(Neo4jFactory):
         """.format(ts_init, ts_updt)
 
 # ticket_PostEvent-VerifyParsedModel
-# -- create a new method GetNumberOfNodesInGraph(cls, label) here --
+    @classmethod
+    def count_nodes(cls, timestamp):
+        """
+        Provides the cypher command to return the number of nodes of a graph
+        @param timestamp: timestamp of the graph
+        @return: cypher command as str
+        """
+        return 'Match(n:{}) RETURN count(n) AS count'.format(timestamp)
