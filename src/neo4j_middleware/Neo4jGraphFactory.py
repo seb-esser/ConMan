@@ -44,7 +44,8 @@ class Neo4jGraphFactory(Neo4jFactory):
         """
         node_attrs = Neo4jFactory.formatDict(attrs)
         create = 'CREATE(n:{}:{} {})'.format(timestamp, label, node_attrs)
-        return create
+        return_id = 'RETURN ID(n)'
+        return Neo4jFactory.BuildMultiStatement([create, return_id])
         
     @classmethod
     def add_attributes_by_node_id(cls, node_id: int, attributes: dict, timestamp: str) -> str:
