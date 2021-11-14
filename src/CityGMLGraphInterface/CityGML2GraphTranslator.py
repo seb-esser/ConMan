@@ -4,6 +4,7 @@ import re
 """ file import """
 from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 import xml.etree.ElementTree as ET
+import progressbar
 
 class CityGMLGraphGenerator:
     
@@ -25,6 +26,9 @@ class CityGMLGraphGenerator:
         my_label = my_label.replace(' ', '')
         self.label = my_label
         
+        # data for progressbar
+        self.increment = 100 / len(self.root.findall(".//*"))
+        self.percent = 0
     
     def generateGraph(self):
         """
@@ -66,6 +70,9 @@ class CityGMLGraphGenerator:
     
     def __mapEntity(self, entity, label):
         
+        # print the progressbar
+        progressbar.printbar(self.percent)
+        
         # get the tag of the entity (remove the namespace)
         tag = re.sub("[\{].*?[\}]", "", entity.tag)
         my_dict = {'EntityType': tag}
@@ -74,5 +81,8 @@ class CityGMLGraphGenerator:
         cypher_statement = Neo4jGraphFactory.create_node_with_attr(
             label , my_dict, self.label)
         node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
+        
+        # increment the percentage and return the id
+        self.percent += self.increment
         return node_id
         
