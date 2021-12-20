@@ -25,6 +25,14 @@ namespace TransactionTracker
                     new EventHandler<Autodesk.Revit.DB.Events.DocumentOpenedEventArgs>(application_DocumentOpened);
                 application.ControlledApplication.DocumentSaved +=
                     new EventHandler<Autodesk.Revit.DB.Events.DocumentSavedEventArgs>(application_DocumentSaved);
+
+                application.ControlledApplication.DocumentCreated +=
+                    new EventHandler<DocumentCreatedEventArgs>(document_created);
+
+                application.ControlledApplication.DocumentChanged +=
+                    new EventHandler<DocumentChangedEventArgs>(document_changed);
+
+
                 Debug.WriteLine("[Transaction Tracker] Mounted Transaction tracker successfully. ");
             }
             catch (Exception)
@@ -36,7 +44,6 @@ namespace TransactionTracker
 
             return Result.Succeeded;
         }
-
 
         public Result OnShutdown(UIControlledApplication application)
         {
@@ -77,6 +84,77 @@ namespace TransactionTracker
         {
             Debug.WriteLine("[Transaction Tracker] Triggered event listener");
         }
+
+        /// <summary>
+        /// Event method observing changes made to a Revit document
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void document_changed(object sender, DocumentChangedEventArgs e)
+        {
+            var transactionNames = e.GetTransactionNames();
+            
+            var addedElementIds = e.GetAddedElementIds();
+            var deletedElementIds = e.GetDeletedElementIds();
+            var modifiedElementIds = e.GetModifiedElementIds();
+
+            // sometimes, transactions might happen without affecting elements but global settings.
+            // Therefore, check beforehand if the event contains interesting knowledge. 
+            if (addedElementIds == null && deletedElementIds == null && modifiedElementIds == null)
+            {
+                return;
+            }
+
+            var doc = e.GetDocument();
+
+            foreach (var id in addedElementIds)
+            {
+
+                var ifcGuid = doc.GetElement(id).get_Parameter(BuiltInParameter.IFC_GUID);
+                if (ifcGuid != null)
+                {
+                    Debug.WriteLine("[Transaction Tracker] - ADDED: " + ifcGuid.AsString());
+                }
+                else
+                {
+                    Debug.WriteLine("[Transaction Tracker] - ADDED: NoGUID" + " ElementId: " + id);
+                }
+            }
+
+            foreach (var id in deletedElementIds)
+            {
+                var ifcGuid = doc.GetElement(id).get_Parameter(BuiltInParameter.IFC_GUID);
+                if (ifcGuid != null)
+                {
+                    Debug.WriteLine("[Transaction Tracker] - DELETED: " + ifcGuid.AsString());
+                }
+                else
+                {
+                    Debug.WriteLine("[Transaction Tracker] - DELETED: NoGUID");
+                }
+            }
+
+            foreach (var id in modifiedElementIds)
+            {
+                var ifcGuid = doc.GetElement(id).get_Parameter(BuiltInParameter.IFC_GUID);
+                if (ifcGuid != null)
+                {
+                    Debug.WriteLine("[Transaction Tracker] - MODIFIED: IfcGUID:" + ifcGuid.AsString() + " ElementId: " + id);
+                }
+                else
+                {
+                    Debug.WriteLine("[Transaction Tracker] - MODIFIED: IfcGUID: NoGUID" + " ElementId: " + id);
+                }
+            }
+
+        }
+
+        private void document_created(object sender, DocumentCreatedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }
