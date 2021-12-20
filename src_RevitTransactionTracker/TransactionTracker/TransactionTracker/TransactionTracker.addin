@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+	<AddIn Type="Application">
+		<Name>TransactionTracker</Name>
+		<Assembly>C:\Users\ga38hep\dev\consistencyManager\src_RevitTransactionTracker\TransactionTracker\TransactionTracker\bin\Debug\TransactionTracker.dll</Assembly>
+		<AddInId>804B1052-F742-4951-8576-C261D1993107</AddInId>
+		<ClientId>e7ab025c-7447-47e4-b056-8afd9636e676</ClientId>
+		<FullClassName>TransactionTrackerClass</FullClassName>
+		<VendorId>SebastianEsser</VendorId>
+		<VendorDescription>Sebastian Esser</VendorDescription>
+
+	</AddIn>
+</RevitAddIns>
