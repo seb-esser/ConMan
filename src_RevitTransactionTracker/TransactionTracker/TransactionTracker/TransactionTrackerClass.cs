@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
+using System.Linq;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Analysis;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 
@@ -99,57 +102,75 @@ namespace TransactionTracker
             var deletedElementIds = e.GetDeletedElementIds();
             var modifiedElementIds = e.GetModifiedElementIds();
 
+            var names = transactionNames.Aggregate("", (current, name) => current + (name + ", "));
+            Debug.WriteLine($"[Transaction Tracker] Transaction Names: {names}");
+
             // sometimes, transactions might happen without affecting elements but global settings.
             // Therefore, check beforehand if the event contains interesting knowledge. 
             if (addedElementIds == null && deletedElementIds == null && modifiedElementIds == null)
             {
                 return;
             }
+            Debug.WriteLine("-- -- -- --");
 
             var doc = e.GetDocument();
 
             foreach (var id in addedElementIds)
             {
+                var uniqueId = doc.GetElement(id).UniqueId;
+                var elemName = doc.GetElement(id)?.Name;
+                var ifcGuid = doc.GetElement(id)?.get_Parameter(BuiltInParameter.IFC_GUID);
 
-                var ifcGuid = doc.GetElement(id).get_Parameter(BuiltInParameter.IFC_GUID);
                 if (ifcGuid != null)
                 {
-                    Debug.WriteLine("[Transaction Tracker] - ADDED: " + ifcGuid.AsString());
+                    Debug.WriteLine($"[Transaction Tracker] Elem: >{elemName}< - ADDED: IfcGUID " + ifcGuid.AsString() + " ElementId: " + id);
                 }
                 else
                 {
-                    Debug.WriteLine("[Transaction Tracker] - ADDED: NoGUID" + " ElementId: " + id);
+                    Debug.WriteLine($"[Transaction Tracker] Elem: >{elemName}< - ADDED: NoGUID" + " ElementId: " + id);
                 }
             }
 
             foreach (var id in deletedElementIds)
             {
-                var ifcGuid = doc.GetElement(id).get_Parameter(BuiltInParameter.IFC_GUID);
+                var uniqueId = doc.GetElement(id)?.UniqueId;
+                var elemName = doc.GetElement(id)?.Name;
+                var ifcGuid = doc.GetElement(id)?.get_Parameter(BuiltInParameter.IFC_GUID);
+
                 if (ifcGuid != null)
                 {
-                    Debug.WriteLine("[Transaction Tracker] - DELETED: " + ifcGuid.AsString());
+                    Debug.WriteLine($"[Transaction Tracker] Elem: >{elemName}< - DELETED: IfcGUID " + ifcGuid.AsString() + " ElementId: " + id);
                 }
                 else
                 {
-                    Debug.WriteLine("[Transaction Tracker] - DELETED: NoGUID");
+                    Debug.WriteLine($"[Transaction Tracker] Elem: >{elemName}< - DELETED: " + " ElementId: " + id);
                 }
             }
 
             foreach (var id in modifiedElementIds)
             {
-                var ifcGuid = doc.GetElement(id).get_Parameter(BuiltInParameter.IFC_GUID);
+                var uniqueId = doc.GetElement(id)?.UniqueId;
+                var elemName = doc.GetElement(id)?.Name;
+                var ifcGuid = doc.GetElement(id)?.get_Parameter(BuiltInParameter.IFC_GUID);
+
                 if (ifcGuid != null)
                 {
-                    Debug.WriteLine("[Transaction Tracker] - MODIFIED: IfcGUID:" + ifcGuid.AsString() + " ElementId: " + id);
+                    Debug.WriteLine($"[Transaction Tracker] Elem: >{elemName}< - MODIFIED: IfcGUID: " + ifcGuid.AsString() + " ElementId: " + id);
                 }
                 else
                 {
-                    Debug.WriteLine("[Transaction Tracker] - MODIFIED: IfcGUID: NoGUID" + " ElementId: " + id);
+                    Debug.WriteLine($"[Transaction Tracker] Elem: >{elemName}< - MODIFIED: " +  "ElementId: " + id);
                 }
             }
-
+            Debug.WriteLine("-- -- -- --");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="NotImplementedException"></exception>
         private void document_created(object sender, DocumentCreatedEventArgs e)
         {
             throw new NotImplementedException();
