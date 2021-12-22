@@ -1,10 +1,10 @@
 """ package import """
-import progressbar
-from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 import re
 import xml.etree.ElementTree as ET
 
 """ file import """
+from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
+import progressbar
 
 
 class CityGMLGraphGenerator:
@@ -49,32 +49,43 @@ class CityGMLGraphGenerator:
         self.__buildNodes(self.root, root_id)
 
     def __buildNodes(self, entity, parent_id):
-        # recursive method
+        """
+        Recursive Method to map to build all nodes beginning from the root
+        """
 
-        attributes = self.filterNodesToAttributes(entity)
+        # get the attribute dictionary of child entites which only contain information about the parent nodes
+        attributes = self.filterEntitiesToAttributes(entity)
 
         # map the entity
         entity_id = self.__mapEntity(entity, 'SecondaryNode', attributes)
 
+        # merge with parent node
         cypher_statement = Neo4jGraphFactory.merge_on_node_ids(
             parent_id, entity_id)
         self.connector.run_cypher_statement(cypher_statement)
 
         # get all children (1 level below)
         children = entity.findall('./')
+        
+        # exit statement
         if not children:
             pass
         else:
             # iterate over all children
             for child in children:
-
+                
+                # check the tags (again)
                 if not self.checkTags(child):
 
                     # recursive call
                     self.__buildNodes(child, entity_id)
 
+
     def __mapEntity(self, entity, label, attributes=None):
 
+        """
+        Maps an entity to the database with a given label and attribute dict
+        """
         # print the progressbar
         progressbar.printbar(self.percent)
 
@@ -115,28 +126,47 @@ class CityGMLGraphGenerator:
         self.percent += self.increment
         return node_id
 
-    def filterNodesToAttributes(self, entity):
+    def filterEntitiesToAttributes(self, entity):
+        """
+        Filters entities and converts them to attributes of the parent node 
+        """
 
+        # create an empty dictionary
         attrs = {}
+        
+        # iterate over all direct childs (1 level down)
         for child in entity.findall('./'):
-            if self.checkTags(child):
-                if self.removeNs(child.tag) == 'measureAttribute' or self.removeNs(child.tag) == 'stringAttribute':
 
+            # check whether the entity is within the list
+            if self.checkTags(child):
+
+                # measureAttribute and stringAttribute always have a name and a child entity which carries the value
+                if self.removeNs(child.tag) == 'measureAttribute' or self.removeNs(child.tag) == 'stringAttribute':
+                    
+                    # get the name from the attribute dictionary
                     attr_name = child.attrib['name']
+                    
+                    # get the child
                     child2 = child.findall('./')[0]
 
+                    # if that child has a unit of measurement, add that to the attribute name
                     if 'uom' in child2.attrib.keys():
                         attr_name = attr_name + child2.attrib['uom']
 
+                    # add the new key and value to the dictionary
                     attrs[attr_name] = child2.text
 
-                else:  # child.text:
+                # most oter entites simply contain text
+                else:
                     attrs[self.removeNs(child.tag)] = child.text
 
+        # return the dictionary
         return attrs
 
     def checkTags(self, entity):
-        # check if a node should actually be an attribute of the parent node
+        """
+        Checks the tag of an entity to determine whether it should be an attribute of the parent node
+        """
         # xml namespaces
         core = '{http://www.opengis.net/citygml/2.0}'
         bldg = '{http://www.opengis.net/citygml/building/2.0}'
@@ -170,4 +200,7 @@ class CityGMLGraphGenerator:
             return False
 
     def removeNs(self, text):
+        """
+        Removes the namespace in front of a tag
+        """
         return re.sub("[\{].*?[\}]", "", text)
