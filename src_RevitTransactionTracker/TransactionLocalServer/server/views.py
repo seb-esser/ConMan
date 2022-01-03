@@ -1,5 +1,5 @@
 from server import app
-from flask import render_template, jsonify, request
+from flask import render_template, jsonify, request, make_response
 
 
 @app.route('/')
@@ -7,11 +7,19 @@ def render_landing_page():
     return render_template("index.html")
 
 
-@app.route('/api/stations/', methods=["GET"])
-def get_station_by_name():
+@app.route('/api/ReportTransaction', methods=["POST"])
+def report_transaction():
     # decode request args
-    args = request.args.get('station')
+
+    bdy = request.json
+    print(bdy)
+
 
     # respond with a json object
-    return ""
+    response_json = {
+        "status": "ok"
+    }
+
+    return jsonify(response_json)
+
 
