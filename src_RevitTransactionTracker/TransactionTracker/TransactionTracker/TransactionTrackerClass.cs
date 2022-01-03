@@ -13,6 +13,14 @@ namespace TransactionTracker
 {
     public class TransactionTrackerClass : IExternalApplication
     {
+        #region Properties
+
+        readonly ServerConnector _connector = new ServerConnector();
+
+
+        #endregion
+
+
         #region IExternalApplication
 
         public Result OnStartup(UIControlledApplication application)
@@ -129,6 +137,11 @@ namespace TransactionTracker
                 {
                     Debug.WriteLine($"[Transaction Tracker] Elem: >{elemName}< - ADDED: NoGUID" + " ElementId: " + id);
                 }
+
+                // send event to server
+                var msg = new TransactionMessage("ADDED", id.IntegerValue, elemName, uniqueId);
+                _connector.PerformPostRequest("/api/ReportTransaction", msg);
+
             }
 
             foreach (var id in deletedElementIds)
@@ -145,6 +158,10 @@ namespace TransactionTracker
                 {
                     Debug.WriteLine($"[Transaction Tracker] Elem: >{elemName}< - DELETED: " + " ElementId: " + id);
                 }
+
+                // send event to server
+                var msg = new TransactionMessage("DELETED", id.IntegerValue, elemName, uniqueId);
+                _connector.PerformPostRequest("/api/ReportTransaction", msg);
             }
 
             foreach (var id in modifiedElementIds)
@@ -161,6 +178,10 @@ namespace TransactionTracker
                 {
                     Debug.WriteLine($"[Transaction Tracker] Elem: >{elemName}< - MODIFIED: " +  "ElementId: " + id);
                 }
+
+                // send event to server
+                var msg = new TransactionMessage("MODIFIED", id.IntegerValue, elemName, uniqueId);
+                _connector.PerformPostRequest("/api/ReportTransaction", msg);
             }
             Debug.WriteLine("-- -- -- --");
         }
