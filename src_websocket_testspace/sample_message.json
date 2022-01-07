@@ -1,0 +1,29 @@
+{
+  "author": "sender_id",
+  "topic": "project/domain/phase/model",
+
+  "payload":
+  [
+    {
+      "graph_identifier": "timestamp/label",
+      "replacement_type": "STRUCTURAL_MODIFICATION",
+      "graph_rewriting_rule":
+      {
+        "LHS": "lhs_definition",
+        "INTERFACE": "the interface definition",
+        "RHS": "rhs_definition"
+      }
+    },
+    {
+      "graph_identifier": "timestamp/label",
+      "replacement_type": "PROPERTY_MODIFICATION",
+      "graph_rewriting_rule":
+      {
+        "PATH": "graph_path_definition",
+        "ATTRIBUTE_NAME": "attribute_name",
+        "INITIAL_VALUE": "some_value of simple datatype (bool, str, int, double, ..)",
+        "UPDATED_VALUE": "some_value of simple datatype (bool, str, int, double, ..)"
+      }
+    }
+  ]
+}
