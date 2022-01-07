@@ -323,7 +323,8 @@ class IFCGraphGenerator:
                                'NumberOfTreads',
                                'Pixel',
                                'InputPhase',
-                               'Degree'
+                               'Degree',
+                               'CurveFont'
                                ]:
                 node_attributes.append(attr.name())
 

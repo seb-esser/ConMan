@@ -26,8 +26,8 @@ def main():
     #    paths.append(filepath)
     # print(paths)
 
-    paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresentation_01.ifc',  # same representation
-             './00_sampleData/IFC_stepP21/GeomRepresentation_01/Update_GeomRepresentation_01.ifc',  # two representations
+    # paths = ['./00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresentation_01.ifc',  # same representation
+    # './00_sampleData/IFC_stepP21/GeomRepresentation_01/Update_GeomRepresentation_01.ifc',  # two representations
     #          './00_sampleData/IFC_stepP21/GeomRepresentation_02/Initial_GeomRepresentation_02.ifc',  # two representations
     #          './00_sampleData/IFC_stepP21/GeomRepresentation_02/Update_GeomRepresentation_02.ifc', # elevated cuboid height -> PMod
     #          './00_sampleData/IFC_stepP21/GeomRepresentation_03/Initial_GeomRepresentation_03.ifc',  # 1 proxy as cuboid
@@ -46,13 +46,13 @@ def main():
     #          './00_sampleData/IFC_stepP21/SpatialStructure_01/spatial_updated.ifc',
     #          './00_sampleData/IFC_stepP21/LocalPlacement_01/Initial_LocalPlacement_01.ifc',
     #          './00_sampleData/IFC_stepP21/LocalPlacement_01/Update_LocalPlacement_01.ifc',
-              './00_sampleData/IFC_stepP21/Storey_01/SingleStorey_init.ifc',
-              './00_sampleData/IFC_stepP21/Storey_01/SingleStorey_updated.ifc'
+    # './00_sampleData/IFC_stepP21/Storey_01/SingleStorey_init.ifc',
+    # './00_sampleData/IFC_stepP21/Storey_01/SingleStorey_updated.ifc'
     #          # # moved wall, new window and subsequent change in parent wall
-              ]
-    # paths = ['./00_sampleData/IFC_stepP21/solibri_example/pretty_SolibriBuilding.ifc',
-    #          './00_sampleData/IFC_stepP21/solibri_example/pretty_SolibriBuilding-modified.ifc'
-    #         ]
+    #          ]
+    paths = ['./00_sampleData/IFC_stepP21/solibri_example/pretty_SolibriBuilding.ifc',
+             './00_sampleData/IFC_stepP21/solibri_example/pretty_SolibriBuilding-modified.ifc'
+             ]
 
     for p in paths:
         print(p)
