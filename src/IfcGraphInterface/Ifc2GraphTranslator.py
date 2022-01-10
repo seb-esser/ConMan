@@ -324,7 +324,15 @@ class IFCGraphGenerator:
                                'Pixel',
                                'InputPhase',
                                'Degree',
-                               'CurveFont'
+                               'CurveFont',
+                               'DiffuseColour',
+                               'TransmissionColour',
+                               'DiffuseTransmissionColour',
+                               'ReflectionColour',
+                               'SpecularColour',
+                               'ColourList',
+                               'ColourIndex'
+
                                ]:
                 node_attributes.append(attr.name())
 
@@ -351,7 +359,8 @@ class IFCGraphGenerator:
                     'Trim2',
                     'Orientation',
                     'RefLongitude',
-                    'RefLatitude'
+                    'RefLatitude',
+
                 ]:
                     node_attributes.append(attr.name())
                 else:
