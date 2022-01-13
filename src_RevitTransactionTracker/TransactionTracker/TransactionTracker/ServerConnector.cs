@@ -8,9 +8,7 @@ namespace TransactionTracker
         public string BaseUrl
         {
             get => "http://localhost:5000";
-            set
-            {
-            }
+            set => throw new System.NotImplementedException();
         }
 
         public ServerConnector()

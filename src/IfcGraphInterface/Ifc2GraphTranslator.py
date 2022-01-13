@@ -81,11 +81,11 @@ class IFCGraphGenerator:
 
             # check if the entity is either an ObjectDef or Relationship or neither
             if entity.is_a('IfcObjectDefinition'):
-                self.__mapEntity(entity, "PrimaryNode")
+                self.__map_entity(entity, "PrimaryNode")
             elif entity.is_a('IfcRelationship'):
-                self.__mapEntity(entity, "ConnectionNode")
+                self.__map_entity(entity, "ConnectionNode")
             else:
-                self.__mapEntity(entity, "SecondaryNode")
+                self.__map_entity(entity, "SecondaryNode")
 
             # add increment to percentage
             percent += increment
@@ -124,30 +124,41 @@ class IFCGraphGenerator:
                 'Validation successful. Number of entities in the file equal the number of nodes in the graph.')
             return True
         else:
-            print('Validation unsuccessful. Number of entities in the file do not equal the number of nodes in the graph.\nDifference: {}'.format(
-                abs(count_graph-count_model)))
+            print('Validation unsuccessful. '
+                  'Number of entities in the file do not equal the number of nodes in the graph.'
+                  '\nDifference: {}'.format(abs(count_graph-count_model)))
             return False
 
-    def __mapEntity(self, entity, label):
+    def __map_entity(self, entity, label) -> None:
+        """
+        translates an IFC instance into a neo4j node
+        """
         # get some basic data
         info = entity.get_info()
 
-        # node_attribute_names, single_associations, aggregated_associations = self.separate_attributes(entity)
-        node_attribute_names, _, _ = self.separate_attributes(entity)
+        # node_properties, single_associations, aggregated_associations = self.separate_attributes(entity)
+        node_properties, _, _ = self.separate_attributes(entity)
 
-        # create a dictionary of attributes
-        node_attr_dict = {}
-        for a in node_attribute_names:
-            node_attr_dict[a] = info[a]
+        # create a dictionary of properties
+        node_properties_dict = {}
+        for p_name in node_properties:
+            p_val = info[p_name]
+
+            if isinstance(p_val, str):
+                if p_name is "NominalValue":
+                    print()
+                if "'" in list(p_val)[1:-1]:
+                    print("modifying property value")
+            node_properties_dict[p_name] = p_val
 
         # rename some keys
-        node_attr_dict['p21_id'] = node_attr_dict.pop('id')
-        node_attr_dict['EntityType'] = node_attr_dict.pop('type')
+        node_properties_dict['p21_id'] = node_properties_dict.pop('id')
+        node_properties_dict['EntityType'] = node_properties_dict.pop('type')
 
         # run cypher command
         cypher_statement = Neo4jGraphFactory.create_node_with_attr(
-            label, node_attr_dict, self.timestamp)
-        # parent_node_id = self.connector.run_cypher_statement(cypher_statement, 'ID(n)')[0]
+            label, node_properties_dict, self.timestamp)
+
         self.connector.run_cypher_statement(cypher_statement)
 
     def build_node_rels(self, entity):

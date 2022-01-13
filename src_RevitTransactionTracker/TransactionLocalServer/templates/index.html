@@ -12,6 +12,8 @@
     <!-- Bootstrap lib -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
+
+
     <!--Link the js file-->
    <script src="js/index.js" type="javascript"></script>
 
@@ -44,6 +46,18 @@
         </tbody>
     </table>
 </div>
+
+<!-- SocketIO lib -->
+<script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    const socket = io();
+
+    socket.on('newTransaction', function(msg) {
+
+        console.log(msg.MsgBundle)
+    });
+</script>
+
 
 </body>
 
