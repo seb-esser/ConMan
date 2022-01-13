@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="ServerConnector.cs" />
     <Compile Include="TransactionMessage.cs" />
+    <Compile Include="TransactionMsgBundle.cs" />
     <Compile Include="TransactionTrackerClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

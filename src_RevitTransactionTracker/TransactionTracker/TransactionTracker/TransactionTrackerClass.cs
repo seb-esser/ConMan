@@ -116,7 +116,7 @@ namespace TransactionTracker
             // sometimes, transactions might happen without affecting elements but global settings.
             // Therefore, check beforehand if the event contains interesting knowledge. 
 
-            var msgCollection = new List<TransactionMessage>();
+            var msgCollection = new TransactionMsgBundle();
 
             if (addedElementIds == null && deletedElementIds == null && modifiedElementIds == null)
             {
@@ -143,7 +143,7 @@ namespace TransactionTracker
 
                 // send event to server
                 var msg = new TransactionMessage("ADDED", id.IntegerValue, elemName, uniqueId);
-                msgCollection.Add(msg);
+                msgCollection.AddMessage(msg);
             }
 
             foreach (var id in deletedElementIds)
@@ -163,7 +163,7 @@ namespace TransactionTracker
 
                 // send event to server
                 var msg = new TransactionMessage("DELETED", id.IntegerValue, elemName, uniqueId);
-                msgCollection.Add(msg);
+                msgCollection.AddMessage(msg);
             }
 
             foreach (var id in modifiedElementIds)
@@ -183,7 +183,7 @@ namespace TransactionTracker
 
                 // send event to server
                 var msg = new TransactionMessage("MODIFIED", id.IntegerValue, elemName, uniqueId); 
-                msgCollection.Add(msg);
+                msgCollection.AddMessage(msg);
                 
             }
 
