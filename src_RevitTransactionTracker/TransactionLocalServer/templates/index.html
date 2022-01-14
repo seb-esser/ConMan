@@ -37,30 +37,36 @@
     <h1>Transaction Tracker | Dashboard </h1>
 </div>
 
-<div class="accordion" id="transactionDisplay">
-</div>
 
-<div>
-    <dl class="row">
-        <dt class="col-sm-1">Header <a href="#" class="closed">Details</a></dt>
-        <dd class="col-sm-9">Text</dd>
-    </dl>
-    <dl class="row">
-        <dt class="col-sm-1">Header 2<a href="#" class="closed">Details</a></dt>
-        <dd class="col-sm-9">Text 2</dd>
-    </dl>
+
+<div id="app">
+    <ol>
+        <todo-item
+                v-for="item in groceryList"
+                v-bind:todo="item"
+                v-bind:key="item.id"
+        ></todo-item>
+    </ol>
 </div>
 
 <script>
-    $(document).ready(function () {
-        $('.accordion-title').click(function () {
-            $(this).toggleClass('open');
-            $accordion_content = $(this).next('.accordion-content');
-            $('.accordion-content').not($accordion_content).slideUp();
-            $('.accordion-content').not($accordion_content).prev('.accordion-title').removeClass('open');
-            $accordion_content.stop(true, true).slideToggle(400);
-        });
-    });</script>
+
+    Vue.component('todo-item', {
+        props: ['todo'],
+        template: '<li>{{ todo }}</li>'
+    })
+
+    var app2 = new Vue({
+        el: '#app',
+        data: {
+            groceryList: [
+                {id: 0, text: 'Vegetables'},
+                {id: 1, text: 'Cheese'},
+                {id: 2, text: 'Whatever else humans are supposed to eat'}
+            ]
+        }
+    })
+</script>
 
 <script type="text/javascript" charset="utf-8">
     const socket = io();
@@ -78,43 +84,9 @@
         var time = today.getHours() + "_" + today.getMinutes() + "_" + today.getSeconds();
 
 
-        $('#transactionDisplay').append('<div class="accordion-item" id="' + transactionHeader + '" />');
-        $(transactionHeader).append('<h2 class="accordion-header" id=>' + time + ' </h2>');
-        $(transactionHeader).append('<h2 class="accordion-body"> accordion body </h2>');
-
-        {#        var elem = `#}
-        {#<div class="accordion-item">#}
-        {#        <h2 class="accordion-header" id=$time>#}
-        {#            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"#}
-        {#                    data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">#}
-        {#                $time#}
-        {#            </button>#}
-        {#        </h2>#}
-        {#        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"#}
-        {#             data-bs-parent="#accordionExample">#}
-        {#            <div class="accordion-body">#}
-        {#                <table>#}
-        {# <tr>#}
-        {#    <th>Company</th>#}
-        {#    <th>Contact</th>#}
-        {#    <th>Country</th>#}
-        {#  </tr>#}
-        {#  <tr>#}
-        {#    <td>Alfreds Futterkiste</td>#}
-        {#    <td>Maria Anders</td>#}
-        {#    <td>Germany</td>#}
-        {#  </tr>#}
-        {#</table>#}
-        {#            </div>#}
-        {#        </div>#}
-        {#    </div>#}
-        {#`;#}
-        <!-- display.insertAdjacentHTML("afterend", elem); -->
     });
 </script>
 
-<!--Link the js file-->
-<script src="js/index.js" type="javascript"></script>
 
 </body>
 
