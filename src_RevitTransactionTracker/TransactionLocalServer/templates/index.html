@@ -21,52 +21,32 @@
             integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
             crossorigin="anonymous"></script>
 
-    {#    Make fancy things #}
-    <!-- development version, includes helpful console warnings -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-
     <title>Transaction Tracker</title>
 
 </head>
-
 
 <body>
 
 <!-- CSS only -->
 <div class="container">
     <h1>Transaction Tracker | Dashboard </h1>
+    <div id="Logging">
+        <table id="TransactionTable" class="table table-striped">
+            <thead>
+            <tr>
+                <th>Type</th>
+                <th>ElementId</th>
+                <th>UniqueId</th>
+                <th>ElementName</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
 </div>
 
-
-
-<div id="app">
-    <ol>
-        <todo-item
-                v-for="item in groceryList"
-                v-bind:todo="item"
-                v-bind:key="item.id"
-        ></todo-item>
-    </ol>
-</div>
-
-<script>
-
-    Vue.component('todo-item', {
-        props: ['todo'],
-        template: '<li>{{ todo }}</li>'
-    })
-
-    var app2 = new Vue({
-        el: '#app',
-        data: {
-            groceryList: [
-                {id: 0, text: 'Vegetables'},
-                {id: 1, text: 'Cheese'},
-                {id: 2, text: 'Whatever else humans are supposed to eat'}
-            ]
-        }
-    })
-</script>
 
 <script type="text/javascript" charset="utf-8">
     const socket = io();
@@ -82,6 +62,28 @@
 
         var today = new Date();
         var time = today.getHours() + "_" + today.getMinutes() + "_" + today.getSeconds();
+
+        $('#TransactionTable > tbody').append('<tr><td colspan="4"> <strong>Transaction ' + transactionHeader + '</strong></td></tr>');
+
+        msg.MsgBundle.forEach((tr, item) => {
+            $('#TransactionTable > tbody').append(
+                '<tr>' +
+                '<td>' +
+                item.TransactionType +
+                '</td>' +
+                '<td>' +
+                tr.ElementId +
+                '</td>' +
+                '<td>' +
+                tr.ElementUniqueId +
+                '</td>' +
+                '<td>' +
+                tr.ElementName +
+                '</td>' +
+                '</tr>'
+            )
+            ;
+        });
 
 
     });
