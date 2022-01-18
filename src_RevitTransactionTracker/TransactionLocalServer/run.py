@@ -6,8 +6,9 @@ from static.globalVariables import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
+app.config['CORS_HEADERS'] = 'Content-Type'
 socketio = SocketIO(app)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:8080"}})
 
 
 @app.errorhandler(HTTPException)
