@@ -1,12 +1,14 @@
 from flask import Flask, request, jsonify, render_template, json
 from werkzeug.exceptions import HTTPException
 from flask_socketio import send, emit, SocketIO
-
+from flask_cors import CORS
 from static.globalVariables import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
+app.config['CORS_HEADERS'] = 'Content-Type'
 socketio = SocketIO(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:8080"}})
 
 
 @app.errorhandler(HTTPException)
@@ -59,6 +61,16 @@ def report_transaction():
 @socketio.on('message')
 def handle_message(data):
     print('[WS] received message: ' + data)
+
+
+@socketio.event
+def connect():
+    print("[WS]: New client has connected via websocket. ")
+
+
+@socketio.event
+def disconnect():
+    print("[WS]: Existing client has disconnected via websocket. ")
 
 
 if __name__ == "__main__":
