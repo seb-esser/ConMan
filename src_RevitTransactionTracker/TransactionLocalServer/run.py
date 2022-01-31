@@ -1,14 +1,14 @@
 from flask import Flask, request, jsonify, render_template, json
 from werkzeug.exceptions import HTTPException
 from flask_socketio import send, emit, SocketIO
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from static.globalVariables import *
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['CORS_HEADERS'] = 'Content-Type'
-socketio = SocketIO(app)
-CORS(app, resources={r"/*": {"origins": "http://localhost:8080"}})
+CORS(app, resource={r"/*": {"origins": "*"}})
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 
 @app.errorhandler(HTTPException)
@@ -59,6 +59,7 @@ def report_transaction():
 
 
 @socketio.on('message')
+@cross_origin()
 def handle_message(data):
     print('[WS] received message: ' + data)
 
