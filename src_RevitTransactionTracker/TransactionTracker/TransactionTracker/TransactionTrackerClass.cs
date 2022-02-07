@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Diagnostics;
 using System.Linq;
@@ -7,7 +8,9 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Analysis;
 using Autodesk.Revit.DB.Events;
+using Autodesk.Revit.Exceptions;
 using Autodesk.Revit.UI;
+using ApplicationException = Autodesk.Revit.Exceptions.ApplicationException;
 
 namespace TransactionTracker
 {
@@ -16,6 +19,7 @@ namespace TransactionTracker
         #region Properties
 
         readonly ServerConnector _connector = new ServerConnector();
+        private List<ElementCopy> _elementCopies = new List<ElementCopy>();
 
 
         #endregion
@@ -34,6 +38,10 @@ namespace TransactionTracker
                 //application.ControlledApplication.DocumentOpened += application_DocumentOpened;
                 application.ControlledApplication.DocumentOpened +=
                     new EventHandler<Autodesk.Revit.DB.Events.DocumentOpenedEventArgs>(application_DocumentOpened);
+
+                application.ControlledApplication.DocumentClosed +=
+                    new EventHandler<Autodesk.Revit.DB.Events.DocumentClosedEventArgs>(application_DocumentClosed);
+
                 application.ControlledApplication.DocumentSaved +=
                     new EventHandler<Autodesk.Revit.DB.Events.DocumentSavedEventArgs>(application_DocumentSaved);
 
@@ -56,11 +64,16 @@ namespace TransactionTracker
             return Result.Succeeded;
         }
 
+       
+
         public Result OnShutdown(UIControlledApplication application)
         {
-            // remove the event.
-            application.ControlledApplication.DocumentOpened -= application_DocumentOpened;
+            // remove the events
+            application.ControlledApplication.DocumentOpened -= application_DocumentOpened; 
+            application.ControlledApplication.DocumentClosed -= application_DocumentClosed;
             application.ControlledApplication.DocumentSaved -= application_DocumentSaved;
+            application.ControlledApplication.DocumentChanged -= document_changed;
+            application.ControlledApplication.DocumentCreated -= document_created;
 
             Debug.WriteLine("[Transaction Tracker] Unmounted Transaction tracker successfully. ");
             return Result.Succeeded;
@@ -80,15 +93,33 @@ namespace TransactionTracker
                 // get document from event args.
                 Document doc = args.Document;
 
-                var currentTime = DateTime.Now.ToFileTimeUtc().ToString();
-                string loggingPath = @"C:\Users\ga38hep\dev\logging.txt";
-                File.AppendAllText(loggingPath, currentTime + "TEST \n");
+                FilteredElementCollector coll = new FilteredElementCollector(doc).WherePasses(
+                    new LogicalOrFilter(
+                    new ElementIsElementTypeFilter(false),
+                    new ElementIsElementTypeFilter(true))
+                );
+
+                Debug.WriteLine("count coll: " + coll.Count());
+
+                foreach (var element in coll)
+                {
+                    _elementCopies.Add(new ElementCopy(element));
+                }
+
+
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 Debug.WriteLine(e);
             }
+        }
+
+        private void application_DocumentClosed(object sender, DocumentClosedEventArgs e)
+        {
+
+            // clear list on plugin level 
+            _elementCopies.Clear();
         }
 
         private void application_DocumentSaved(object sender, DocumentSavedEventArgs e)
@@ -128,9 +159,11 @@ namespace TransactionTracker
 
             foreach (var id in addedElementIds)
             {
-                var uniqueId = doc.GetElement(id).UniqueId;
-                var elemName = doc.GetElement(id)?.Name;
-                var ifcGuid = doc.GetElement(id)?.get_Parameter(BuiltInParameter.IFC_GUID);
+                var elem = doc.GetElement(id);
+
+                var uniqueId = elem.UniqueId;
+                var elemName = elem?.Name;
+                var ifcGuid = elem?.get_Parameter(BuiltInParameter.IFC_GUID);
 
                 if (ifcGuid != null)
                 {
@@ -144,13 +177,18 @@ namespace TransactionTracker
                 // send event to server
                 var msg = new TransactionMessage("ADDED", id.IntegerValue, elemName, uniqueId);
                 msgCollection.AddMessage(msg);
+
+                // write to shadow
+                _elementCopies.Add(new ElementCopy(elem));
             }
 
             foreach (var id in deletedElementIds)
             {
-                var uniqueId = doc.GetElement(id)?.UniqueId;
-                var elemName = doc.GetElement(id)?.Name;
-                var ifcGuid = doc.GetElement(id)?.get_Parameter(BuiltInParameter.IFC_GUID);
+                var elem = doc.GetElement(id);
+
+                var uniqueId = elem?.UniqueId;
+                var elemName = elem?.Name;
+                var ifcGuid = elem?.get_Parameter(BuiltInParameter.IFC_GUID);
 
                 if (ifcGuid != null)
                 {
@@ -164,6 +202,13 @@ namespace TransactionTracker
                 // send event to server
                 var msg = new TransactionMessage("DELETED", id.IntegerValue, elemName, uniqueId);
                 msgCollection.AddMessage(msg);
+
+                // write update to shadow
+                var elementCopies = _elementCopies.RemoveAll(a=>a.id == id.IntegerValue);
+                if (elementCopies > 1)
+                {
+                    throw new Exception("Deleted more than one Element. ");
+                }
             }
 
             foreach (var id in modifiedElementIds)
@@ -200,7 +245,22 @@ namespace TransactionTracker
         /// <exception cref="NotImplementedException"></exception>
         private void document_created(object sender, DocumentCreatedEventArgs e)
         {
-            throw new NotImplementedException();
+            // get document from event args.
+            Document doc = e.Document;
+
+            FilteredElementCollector coll = new FilteredElementCollector(doc).WherePasses(
+                new LogicalOrFilter(
+                    new ElementIsElementTypeFilter(false),
+                    new ElementIsElementTypeFilter(true))
+            );
+
+            Debug.WriteLine("count coll: " + coll.Count());
+
+            // add to shadow list 
+            foreach (var element in coll)
+            {
+                _elementCopies.Add(new ElementCopy(element));
+            }
         }
 
         #endregion

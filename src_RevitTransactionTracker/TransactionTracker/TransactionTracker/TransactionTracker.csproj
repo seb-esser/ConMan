@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ElementCopy.cs" />
     <Compile Include="ServerConnector.cs" />
     <Compile Include="TransactionMessage.cs" />
     <Compile Include="TransactionMsgBundle.cs" />
