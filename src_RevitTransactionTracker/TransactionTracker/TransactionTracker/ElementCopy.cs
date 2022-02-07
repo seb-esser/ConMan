@@ -5,8 +5,8 @@ namespace TransactionTracker
     public class ElementCopy
     {
         public int id;
-        private string name;
-        private string uniqueId;
+        public string name;
+        public string uniqueId;
 
         /// <summary>
         /// Constructor with extracted params
@@ -27,9 +27,9 @@ namespace TransactionTracker
         /// <param name="element"></param>
         public ElementCopy(Element element)
         {
-            var id = element.Id.IntegerValue;
-            var name = element.Name;
-            var uniqueId = element.UniqueId;
+            this.id = element.Id.IntegerValue;
+            this.name = element.Name;
+            this.uniqueId = element.UniqueId;
         }
 
     }

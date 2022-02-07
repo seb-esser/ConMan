@@ -175,7 +175,7 @@ namespace TransactionTracker
                 }
 
                 // send event to server
-                var msg = new TransactionMessage("ADDED", id.IntegerValue, elemName, uniqueId);
+                var msg = new TransactionMessage("ADDED", id.IntegerValue, elemName, uniqueId, ifcGuid?.AsString());
                 msgCollection.AddMessage(msg);
 
                 // write to shadow
@@ -185,9 +185,28 @@ namespace TransactionTracker
             foreach (var id in deletedElementIds)
             {
                 var elem = doc.GetElement(id);
+                var elemCopy = _elementCopies.Find(a => a.id == id.IntegerValue);
 
                 var uniqueId = elem?.UniqueId;
+                if (uniqueId == null)
+                {
+                    uniqueId = elemCopy?.uniqueId;
+                }
+                if (uniqueId == null)
+                {
+                    uniqueId = "n/a";
+                }
+
                 var elemName = elem?.Name;
+                if (elemName == null)
+                {
+                    elemName = elemCopy?.name;
+                }
+                if (elemName == null)
+                {
+                    elemName = "n/a";
+                }
+
                 var ifcGuid = elem?.get_Parameter(BuiltInParameter.IFC_GUID);
 
                 if (ifcGuid != null)
@@ -200,7 +219,7 @@ namespace TransactionTracker
                 }
 
                 // send event to server
-                var msg = new TransactionMessage("DELETED", id.IntegerValue, elemName, uniqueId);
+                var msg = new TransactionMessage("DELETED", id.IntegerValue, elemName, uniqueId, ifcGuid?.AsString());
                 msgCollection.AddMessage(msg);
 
                 // write update to shadow
@@ -227,7 +246,7 @@ namespace TransactionTracker
                 }
 
                 // send event to server
-                var msg = new TransactionMessage("MODIFIED", id.IntegerValue, elemName, uniqueId); 
+                var msg = new TransactionMessage("MODIFIED", id.IntegerValue, elemName, uniqueId, ifcGuid?.AsString()); 
                 msgCollection.AddMessage(msg);
                 
             }
