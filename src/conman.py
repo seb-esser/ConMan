@@ -1,14 +1,20 @@
+""" package import """
 import argparse
 import os
 import glob
+
+""" file import """
 import scripts.Ifc2Graph as ifc2graph
 import scripts.CityGML2Graph as citygml2graph
 import scripts.Graph2Ifc as graph2ifc
+import scripts.GraphBasedModelDiff as graphbaseddiff
+
+# --- Script ---
 
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-i", "--input", type=str,
-                    help="Specifies the input type", choices=["ifc", "citygml", "graph"])
+                    help="Specifies the input type. If 'diff' is selected, all other args will be ignored.\nEdit diff in scripts/GraphBasedModelDiff.py", choices=["ifc", "citygml", "graph", "diff"])
 parser.add_argument("-o", "--output", type=str,
                     help="Specifies the output type.", choices=["ifc", "graph"])
 parser.add_argument("-p", "--path", type=str,
@@ -58,3 +64,6 @@ elif args.input == "graph":
 
     else:
         raise Exception("Types do not match.")
+
+elif args.input == "diff":
+    graphbaseddiff.diff()
