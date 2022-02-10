@@ -23,7 +23,7 @@ class ResourceDiff(AbsGraphDiff):
         # capture delta
         self.result = GraphDelta(label_init=label_init, label_updated=label_updated)
 
-    def get_delta(self):
+    def get_delta(self) -> GraphDelta:
         """
         returns the calculated delta
         """
@@ -128,7 +128,7 @@ class ResourceDiff(AbsGraphDiff):
 
         return
 
-    def calc_dict_diff(dict_init: dict, dict_updated: dict) -> dict:
+    def calc_dict_diff(self, dict_init: dict, dict_updated: dict) -> dict:
         """
         calculates the difference between two dictionaries and returns a dictionary with the differences in apoc.diff style
         @param dict_init: the initial attrs of the node 

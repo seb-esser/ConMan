@@ -31,7 +31,7 @@ fig = plt.bar(y_pos, performance, align='center', alpha=0.5)
 plt.xticks(y_pos, objects, rotation=90)
 
 plt.ylabel('No of num_elems')
-plt.title('IFC entity types frequency')
+plt.title('IFC primary_node_type types frequency')
 # # Pad margins so that markers don't get clipped by the axes
 # plt.margins(0.2)
 # Tweak spacing to prevent clipping of tick-labels

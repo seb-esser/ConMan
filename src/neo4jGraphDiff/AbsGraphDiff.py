@@ -62,7 +62,7 @@ class AbsGraphDiff(abc.ABC):
 
         # ToDo: Logging: Add info statement that ignoreNodes got applied.
 
-        # get entity types that shall be ignored in the subgraph diff
+        # get primary_node_type types that shall be ignored in the subgraph diff
         ignore_entityTypes = self.configuration.DiffSettings.diffIgnoreEntityTypes  # list of strings
 
         # stop here if no entityTypes should be ignored

@@ -3,6 +3,7 @@ from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
 from neo4jGraphDiff.Caption.StructureModification import StructureModification
 from neo4jGraphDiff.Config.Configuration import Configuration
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
+from neo4jGraphDiff.GraphDelta import GraphDelta
 from neo4jGraphDiff.ResourceDiff import ResourceDiff
 from neo4jGraphDiff.SetCalculator import SetCalculator
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
@@ -35,8 +36,10 @@ class GraphDiff(AbsGraphDiff):
         self.__move_level_down(entry_init, entry_updated)
 
         #  --- post processing ---
-        prim_nodes_init = [x.init_node for x in self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
-        prim_nodes_updt = [x.updated_node for x in self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
+        prim_nodes_init = [x.init_node for x in
+                           self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
+        prim_nodes_updt = [x.updated_node for x in
+                           self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
 
         con_init = NodeItem.fromNeo4jResponseWouRel(
             self.connector.run_cypher_statement(
@@ -130,7 +133,7 @@ class GraphDiff(AbsGraphDiff):
         next_nodes_init = [x for x in next_nodes_init if x not in rmv_lst_init]
         next_nodes_upd = [x for x in next_nodes_upd if x not in rmv_lst_updt]
 
-        #ToDo: refactor and clean up code here
+        # ToDo: refactor and clean up code here
 
         # calc node intersection
         set_calculator = SetCalculator()
@@ -150,7 +153,8 @@ class GraphDiff(AbsGraphDiff):
 
         # kick recursion for next hierarchy level if pair was not already visited
         for pair in unc:
-            if NodePair(pair[0], pair[1]) not in self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs():
+            if NodePair(pair[0],
+                        pair[1]) not in self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs():
                 self.__move_level_down(pair[0], pair[1])
                 # ToDo: here is the entry point for each primary node which is necessary for pMods
 
@@ -177,3 +181,26 @@ class GraphDiff(AbsGraphDiff):
             edges.append(edge)
 
         return edges
+
+    def get_result(self) -> GraphDelta:
+        res: GraphDelta = self.resource_diff.get_delta()
+        return res
+
+    def get_result_json(self):
+        import jsonpickle
+        print('saving delta ... ')
+        f = open('GraphDelta_init{}-updt{}.json'.format(self.label_init, self.label_updated), 'w')
+        f.write(jsonpickle.dumps(self.resource_diff.get_delta()))
+        f.close()
+        print('saving delta: DONE. ')
+
+    def build_equivalentTO_edges(self):
+        delta = self.get_result()
+        for p in delta.node_matching_table.matched_nodes:
+            # print(p)
+            cy = """
+                MATCH (n) WHERE ID(n)={0}
+                MATCH (m) WHERE ID(m)= {1}
+                MERGE (n)-[:EQUIVALENT_TO]->(m)
+                """.format(p.init_node.id, p.updated_node.id)
+            self.connector.run_cypher_statement(cy)
