@@ -1,0 +1,15 @@
+{
+    "author": "author credentials",
+    "date_authored": "yyyy-mm-dd",
+    "graphIdentifier_initial": "ts1", 
+    "graphIdentifier_updated": "ts2", 
+    "transformation_rules": [
+        {
+            "structuralTransformation": {
+                "LHS": "(n1:{color: 'blue'})-[e1:rel{number: 1}]->(n2:{color: 'pink'})<-[e2:rel{number: 2}]-(n3:{color: 'green'})",
+                "Interface": "(n1:{color: 'blue'})-[e1:rel{number: 1}]->(n2:{color: 'pink'})",
+                "RHS": "(n1:{color: 'blue'})-[e1:rel{number: 1}]->(n2:{color: 'pink'}), (n1)<-[e3:rel{number: 3}]-(n3:{color: 'green'})"
+            }
+        }
+    ]
+}

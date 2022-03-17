@@ -410,14 +410,3 @@ class GraphPattern:
                 n2: NodeItem = e.startNode
                 n1.tidy_attrs(remove_None_values=False)
                 n2.tidy_attrs(remove_None_values=False)
-
-    def compare_pattern(self, other):
-        """
-
-        @param other:
-        @return:
-        """
-
-        return False
-
-
