@@ -79,7 +79,7 @@ class IFCGraphGenerator:
             # print progressbar
             progressbar.printbar(percent)
 
-            # check if the entity is either an ObjectDef or Relationship or neither
+            # check if the primary_node_type is either an ObjectDef or Relationship or neither
             if entity.is_a('IfcObjectDefinition'):
                 self.__map_entity(entity, "PrimaryNode")
             elif entity.is_a('IfcRelationship'):
@@ -136,7 +136,7 @@ class IFCGraphGenerator:
         # get some basic data
         info = entity.get_info()
 
-        # node_properties, single_associations, aggregated_associations = self.separate_attributes(entity)
+        # node_properties, single_associations, aggregated_associations = self.separate_attributes(primary_node_type)
         node_properties, _, _ = self.separate_attributes(entity)
 
         # create a dictionary of properties
@@ -195,7 +195,7 @@ class IFCGraphGenerator:
                     p21_id_child = entity.get_info()['id']
 
                 except:
-                    raise Exception('Failed to query data from entity.')
+                    raise Exception('Failed to query data from primary_node_type.')
 
                 edge_attrs = {
                     'relType': association,
@@ -212,9 +212,9 @@ class IFCGraphGenerator:
 
     def separate_attributes(self, entity) -> tuple:
         """"
-        Queries all attributes of the corresponding entity definition and returns if an attribute has
-        attr type value, an entity value or is an aggregation of entities
-        @entity:
+        Queries all attributes of the corresponding primary_node_type definition and returns if an attribute has
+        attr type value, an primary_node_type value or is an aggregation of entities
+        @primary_node_type:
         @return:
         """
         info = entity.get_info()
@@ -241,7 +241,7 @@ class IFCGraphGenerator:
                             "Schema: {}, Entity: {} ".format(self.schema, clsName))
 
         for attr in class_definition:
-            # check if attribute has attr value in the current entity instance
+            # check if attribute has attr value in the current primary_node_type instance
             # if info[name] is not None:
             #     print('attribute present')
             # else:
@@ -285,7 +285,7 @@ class IFCGraphGenerator:
                 attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
 
             # catch some weird cases with IfcDimensionalExponents
-            #  as this entity doesnt use types but atomic attr declarations
+            #  as this primary_node_type doesnt use types but atomic attr declarations
             if attr.name() in ['LengthExponent',
                                'MassExponent',
                                'TimeExponent',
@@ -377,7 +377,7 @@ class IFCGraphGenerator:
                 else:
                     aggregated_associations.append(attr.name())
             else:
-                raise Exception('Tried to encode the attribute type of entity #{} clsName: {} attribute {}. '
+                raise Exception('Tried to encode the attribute type of primary_node_type #{} clsName: {} attribute {}. '
                                 'Please check your graph translator.'.format(entity_id, clsName, attr.name()))
         node_attributes.append('id')
         node_attributes.append('type')

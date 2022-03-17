@@ -102,7 +102,7 @@ class SetCalculator(object):
     def __get_intersection_byEntityType(self, A, B):
         """
         Calculates the boolean intersection between set A and set B
-        by comparing the items' entity types
+        by comparing the items' primary_node_type types
         @param A: a (distinct) set of nodes
         @param B: a (distinct) set of nodes
         @return: a list of tuples as the delta of the intersection operation
@@ -112,7 +112,7 @@ class SetCalculator(object):
     def __get_intersection_byEntityTypeAndRelType(self, A, B):
         """
         Calculates the boolean intersection between set A and set B
-        by comparing the items' entity types and rel types
+        by comparing the items' primary_node_type types and rel types
         @param A: a (distinct) set of nodes
         @param B: a (distinct) set of nodes
         @return: a list of tuples as the delta of the intersection operation

@@ -33,7 +33,7 @@ class Graph2IfcTranslator:
 
     def build_entity(self, graph_node_id: int, class_name: str, attributes: dict):
         """
-        builds an entity and adds it into the ifc model
+        builds an primary_node_type and adds it into the ifc model
         @param graph_node_id:
         @param class_name:
         @param attributes:
@@ -41,7 +41,7 @@ class Graph2IfcTranslator:
         """
 
         try:
-            print('building entity {}'.format(class_name))
+            print('building primary_node_type {}'.format(class_name))
 
             # for key, val in attributes.items():
             #     if key in [
@@ -71,7 +71,7 @@ class Graph2IfcTranslator:
         except:
             print('class: {}'.format(class_name))
             print('attrs: {}'.format(attributes))
-            raise Exception("Error in creating ifc entity. ")
+            raise Exception("Error in creating ifc primary_node_type. ")
 
     def build_association(self, parent_node_id: int, child_node_id: int, association_name: str):
         """
@@ -141,7 +141,7 @@ class Graph2IfcTranslator:
             # check if IFC counterpart to current node was already initialized
             spf_id = self.lookup_ifc_counterpart_exists(c.id)
             if spf_id == -1:
-                # build IFC entity
+                # build IFC primary_node_type
                 self.build_entity(c.id, c.entityType, c.attrs)
 
             # build association
@@ -152,9 +152,9 @@ class Graph2IfcTranslator:
 
     def lookup_ifc_counterpart_exists(self, node_id) -> int:
         """
-        checks if an ifc entity already exists in the model, which models the current graph node
+        checks if an ifc primary_node_type already exists in the model, which models the current graph node
         @param node_id: the graph node
-        @return: -1 if entity doesnt exist, spf_id otherwise
+        @return: -1 if primary_node_type doesnt exist, spf_id otherwise
         """
         if node_id in self.node_id_2_spf_id:
             return self.node_id_2_spf_id[node_id]
@@ -196,7 +196,7 @@ class Graph2IfcTranslator:
 
             n.tidy_attrs()
 
-            # build IFC entity
+            # build IFC primary_node_type
             self.build_entity(n.id, n.entityType, n.attrs)
 
             self.build_childs(n, True)
@@ -218,7 +218,7 @@ class Graph2IfcTranslator:
 
             cnode.tidy_attrs()
 
-            # build IFC entity
+            # build IFC primary_node_type
             self.build_entity(cnode.id, cnode.entityType, cnode.attrs)
 
             # build the childs (non-recursive)

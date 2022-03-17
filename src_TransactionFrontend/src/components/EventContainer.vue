@@ -1,15 +1,17 @@
 <template>
-  <div>
+  <div class="border border-secondary">
 
-    <h4 class="mb-3">Event</h4>
+    <h4 class="m-0"><p align="left">Event</p></h4>
 
     <TransactionItem
-        v-for="i in bundle.MsgBundle"
-        :key="i.ElementId"
-        :ElementId=i.ElementId
-        :ElementName=i.ElementName
-        :ElementUniqueId=i.ElementUniqueId
-        :TransactionType=i.TransactionType>
+        v-for="{ElementId, ElementName, ElementUniqueId, TransactionType, IfcGuid} in bundle.MsgBundle"
+        :key="ElementId"
+        :ElementId=ElementId
+        :ElementName=ElementName
+        :ElementUniqueId=ElementUniqueId
+        :TransactionType=TransactionType
+        :IfcGuid=IfcGuid
+    >
 
     </TransactionItem>
 

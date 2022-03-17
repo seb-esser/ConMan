@@ -19,10 +19,11 @@ testcases = {"sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
              "residential": ("ts20210219T121203", "ts20210219T121608"),
              "4x3_bridges": ("ts20210118T211240", "ts20210227T133609"),
              "Storey": ("ts20210521T074802", "ts20210521T074934"),
-             "new_cuboid": ("ts20210623T091748", "ts20210623T091749")
+             "new_cuboid": ("ts20210623T091748", "ts20210623T091749"),
+             "wallSpace": ("ts20220210T102821", "ts20220210T103359")
              }
 
-label_init, label_updated = testcases['new_cuboid']
+label_init, label_updated = testcases['wallSpace']
 
 # async def main():
 def main():
@@ -43,7 +44,9 @@ def main():
 
     diff = GraphDiff(connector, label_init, label_updated)
     delta = diff.diff_subgraphs(entry_init, entry_updated)
-    print(delta)
+    res = diff.get_result_json()
+    print(res)
+
 
 # asyncio.run(main())
 main()

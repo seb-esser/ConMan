@@ -66,7 +66,7 @@ class GrGenSchemaGenerator:
                 try:
                     grgen_type = self.type_mapping[ty]
                 except:
-                    print(Warning("Skipped parsing of attribute {} of entity {}.". format(attr_name, entity_name)))
+                    print(Warning("Skipped parsing of attribute {} of primary_node_type {}.". format(attr_name, entity_name)))
 
                     continue
                     # raise Exception("the detected datatype has no mapping rule in the dictionary. ")
@@ -74,7 +74,7 @@ class GrGenSchemaGenerator:
                 try:
                     gm_snippet += "\n\t{}: {};".format(attr_name, grgen_type)
                 except:
-                    print("something was skipped. Please check entity {} attribute {}".format(entity_name, attr_name))
+                    print("something was skipped. Please check primary_node_type {} attribute {}".format(entity_name, attr_name))
                     continue
             # close class skeleton
             gm_snippet += " \n}"
@@ -105,9 +105,9 @@ class GrGenSchemaGenerator:
 #  Consider to introduce a global utility module that provides both classes a suitable implementation
     def separate_attributes(self, entity) -> tuple:
         """"
-        Queries all attributes of the corresponding entity definition and returns if an attribute has
-        attr type value, an entity value or is an aggregation of entities
-        @entity:
+        Queries all attributes of the corresponding primary_node_type definition and returns if an attribute has
+        attr type value, an primary_node_type value or is an aggregation of entities
+        @primary_node_type:
         @return:
         """
         name = entity.name()
@@ -160,7 +160,7 @@ class GrGenSchemaGenerator:
                 attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
 
             # catch some weird cases with IfcDimensionalExponents
-            #  as this entity doesnt use types but atomic attr declarations
+            #  as this primary_node_type doesnt use types but atomic attr declarations
             if attr.name() in ['LengthExponent',
                                'MassExponent',
                                'TimeExponent',
@@ -262,7 +262,7 @@ class GrGenSchemaGenerator:
                 else:
                     aggregated_associations.append(attr)
             else:
-                raise Exception('Failed to encode the attribute type of entity {} attribute {}. '
+                raise Exception('Failed to encode the attribute type of primary_node_type {} attribute {}. '
                                 'Please check your graph translator.'.format(name, attr))
         # node_attributes.append('id')
         # node_attributes.append('type')

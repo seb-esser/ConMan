@@ -13,4 +13,5 @@
 </RevitAddIns>
 
 <!--This file works if Revit is set as an external app inside the debug menu of this sln -->
+<!--Place it here: C:\Users\ga38hep\AppData\Roaming\Autodesk\Revit\Addins\2022 -->
 

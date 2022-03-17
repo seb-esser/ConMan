@@ -56,7 +56,7 @@ class CityGMLGraphGenerator:
         # get the attribute dictionary of child entites which only contain information about the parent nodes
         attributes = self.filterEntitiesToAttributes(entity)
 
-        # map the entity
+        # map the primary_node_type
         entity_id = self.__mapEntity(entity, 'SecondaryNode', attributes)
 
         # merge with parent node
@@ -84,12 +84,12 @@ class CityGMLGraphGenerator:
     def __mapEntity(self, entity, label, attributes=None):
 
         """
-        Maps an entity to the database with a given label and attribute dict
+        Maps an primary_node_type to the database with a given label and attribute dict
         """
         # print the progressbar
         progressbar.printbar(self.percent)
 
-        # get the attribute dictionary of the entity
+        # get the attribute dictionary of the primary_node_type
         attrs = entity.attrib
 
         # remove all the namespaces
@@ -98,7 +98,7 @@ class CityGMLGraphGenerator:
             new_key = self.removeNs(key)
             attrs[new_key] = attrs.pop(key)
 
-        # get the tag of the entity (remove the namespace)
+        # get the tag of the primary_node_type (remove the namespace)
         tag = self.removeNs(entity.tag)
         attrs["EntityType"] = tag
 
@@ -137,10 +137,10 @@ class CityGMLGraphGenerator:
         # iterate over all direct childs (1 level down)
         for child in entity.findall('./'):
 
-            # check whether the entity is within the list
+            # check whether the primary_node_type is within the list
             if self.checkTags(child):
 
-                # measureAttribute and stringAttribute always have a name and a child entity which carries the value
+                # measureAttribute and stringAttribute always have a name and a child primary_node_type which carries the value
                 if self.removeNs(child.tag) == 'measureAttribute' or self.removeNs(child.tag) == 'stringAttribute':
                     
                     # get the name from the attribute dictionary
@@ -165,7 +165,7 @@ class CityGMLGraphGenerator:
 
     def checkTags(self, entity):
         """
-        Checks the tag of an entity to determine whether it should be an attribute of the parent node
+        Checks the tag of an primary_node_type to determine whether it should be an attribute of the parent node
         """
         # xml namespaces
         core = '{http://www.opengis.net/citygml/2.0}'
