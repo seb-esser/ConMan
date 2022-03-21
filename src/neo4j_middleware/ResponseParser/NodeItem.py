@@ -16,13 +16,17 @@ class NodeItem:
         @param entity_type: the reflected Ifc Entity name
         """
         self.id = node_id
-        self.entity_type = entity_type
         self.rel_type = rel_type
         self.attrs = None
         self.node_type = node_type
+        self.labels = []
+
+    def get_entity_type(self):
+        return self.attrs["EntityType"]
 
     def __repr__(self):
-        return 'NodeItem: id: {} EntityType: {}'.format(self.id, self.entity_type)
+        ty = self.get_entity_type()
+        return 'NodeItem: id: {} EntityType: {}'.format(self.id, ty)
 
     def __eq__(self, other):
         """
@@ -41,7 +45,7 @@ class NodeItem:
         ret_val = []
         for inst in raw:
             node_type = inst[4][0]
-            child = cls(nodeId=int(inst[0]), relType=inst[1]['rel_type'], entityType=inst[2], nodeType=node_type)
+            child = cls(node_id=int(inst[0]), rel_type=inst[1]['rel_type'], entity_type=inst[2], node_type=node_type)
             if 'listItem' in inst[1]:
                 child.rel_type = inst[1]['rel_type'] + '__listItem{}'.format(inst[1]['listItem'])
                 # ToDo: consider to re-model the recursive Diff approach by incorporating edgeItems
@@ -56,7 +60,7 @@ class NodeItem:
         for inst in raw:
             node_labels = list(inst[3])
             node_type = [x for x in node_labels if not x.startswith('ts')][0]
-            child = cls(nodeId=int(inst[0]), relType=None, entityType=inst[1], nodeType=node_type)
+            child = cls(node_id=int(inst[0]), rel_type=None, entity_type=inst[1], node_type=node_type)
             attrs = inst[2]
             child.attrs = attrs
             ret_val.append(child)
@@ -73,9 +77,8 @@ class NodeItem:
         for node_raw in raw:
             node_labels = list(node_raw.labels)
             node_labels[:] = [x for x in node_labels if not x.startswith('ts')]
-            node = cls(nodeId=int(node_raw.id), nodeType=node_labels[0], relType=None, entityType=None)
+            node = cls(node_id=int(node_raw.id), node_type=node_labels[0], rel_type=None, entity_type=None)
             node.set_node_attributes(dict(node_raw._properties))
-            node.entity_type = node.attrs['EntityType']
             ret_val.append(node)
 
         return ret_val

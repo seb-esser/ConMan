@@ -25,6 +25,7 @@ testcases = {"sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
 
 label_init, label_updated = testcases['wallSpace']
 
+
 # async def main():
 def main():
     # get topmost entry nodes
@@ -49,4 +50,5 @@ def main():
 
 
 # asyncio.run(main())
-main()
+if __name__ == "__main__":
+    main()

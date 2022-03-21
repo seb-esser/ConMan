@@ -100,7 +100,7 @@ class NodePair:
 
     def __repr__(self):
         return 'NodePair: entity_type: {} ID_init: {} ID_updated: {}'.format(
-            self.init_node.entity_type,
+            self.init_node.get_entity_type(),
             self.init_node.id,
             self.updated_node.id)
 

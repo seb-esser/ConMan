@@ -71,12 +71,6 @@ class ResourceDiff(AbsGraphDiff):
                 print("".ljust(indent * 4) + ' leaf node.')
             return
 
-        # calc hashes if necessary for matching method
-        if matching_method == MatchCriteriaEnum.OnHash:
-            # calc hashes for init and updated
-            children_init = self.__get_hashes_of_nodes(self.label_init, children_init, indent)
-            children_updated = self.__get_hashes_of_nodes(self.label_updated, children_updated, indent)
-
         # compare children and raise an dissimilarity if necessary.
         [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(children_init, children_updated,
                                                                                      matching_method)

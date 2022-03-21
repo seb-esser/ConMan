@@ -72,7 +72,7 @@ class AbsGraphDiff(abc.ABC):
         return_list = node_list
 
         for node in node_list:
-            if node.entity_type in ignore_entityTypes:
+            if node.get_entity_type() in ignore_entityTypes:
                 return_list.remove(node)
 
         # ToDo: Logging: Add info statement if nodes got removed or not

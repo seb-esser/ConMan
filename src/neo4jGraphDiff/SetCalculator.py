@@ -84,7 +84,7 @@ class SetCalculator(object):
         @param B: a (distinct) set of nodes
         @return: a list of tuples as the delta of the intersection operation
             """
-        return ((x, y) for x, y in itertools.product(A, B) if x.entity_type == y.entity_type)
+        return ((x, y) for x, y in itertools.product(A, B) if x.get_entity_type() == y.get_entity_type())
 
     def __get_intersection_byEntityTypeAndRelType(self, A, B):
         """
@@ -94,7 +94,7 @@ class SetCalculator(object):
         @param B: a (distinct) set of nodes
         @return: a list of tuples as the delta of the intersection operation
             """
-        return ((x, y) for x, y in itertools.product(A, B) if x.entity_type == y.entity_type and x.rel_type == y.rel_type)
+        return ((x, y) for x, y in itertools.product(A, B) if x.get_entity_type() == y.get_entity_type() and x.rel_type == y.rel_type)
 
     def __get_intersection_byGlobalId(self, A, B):
         """
