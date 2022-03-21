@@ -70,10 +70,10 @@ class GraphDiff(AbsGraphDiff):
 
         # log added and deleted nodes on primary structure
         for ad in added:
-            self.resource_diff.result.node_matching_table.add_matched_nodes(NodeItem(nodeId=-1), ad)
+            self.resource_diff.result.node_matching_table.add_matched_nodes(NodeItem(node_id=-1), ad)
             self.resource_diff.result.capture_structure_mod(entry_init, ad, 'added')
         for de in deleted:
-            self.resource_diff.result.node_matching_table.add_matched_nodes(de, NodeItem(nodeId=-1))
+            self.resource_diff.result.node_matching_table.add_matched_nodes(de, NodeItem(node_id=-1))
             self.resource_diff.result.capture_structure_mod(entry_init, de, 'deleted')
         # -- compare edgeSet --
 
@@ -144,12 +144,12 @@ class GraphDiff(AbsGraphDiff):
         for ad in added:
             self.resource_diff.result.structure_updates.append(
                 StructureModification(parent=entry_updated, child=ad, modification_type="added"))
-            self.resource_diff.result.node_matching_table.add_matched_nodes(NodeItem(nodeId=-1), ad)
+            self.resource_diff.result.node_matching_table.add_matched_nodes(NodeItem(node_id=-1), ad)
 
         for de in deleted:
             self.resource_diff.result.structure_updates.append(
                 StructureModification(parent=entry_init, child=de, modification_type="deleted"))
-            self.resource_diff.result.node_matching_table.add_matched_nodes(de, NodeItem(nodeId=-1))
+            self.resource_diff.result.node_matching_table.add_matched_nodes(de, NodeItem(node_id=-1))
 
         # kick recursion for next hierarchy level if pair was not already visited
         for pair in unc:

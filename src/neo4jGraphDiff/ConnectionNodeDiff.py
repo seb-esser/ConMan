@@ -19,7 +19,7 @@ class ConnectionNodeDiff:
         self.ts_init = label_init
         self.ts_updated = label_updated
 
-    def diff_connectionNodes(self):
+    def diff_connection_nodes(self):
         """
 
         @return:
@@ -27,28 +27,17 @@ class ConnectionNodeDiff:
 
         cy = Neo4jQueryFactory.get_connection_nodes(self.ts_init)
         raw_res = self.connector.run_cypher_statement(cy)
-        con_nodes_init: list[NodeItem] = NodeItem.fromNeo4jResponseWouRel(raw_res)
+        con_nodes_init = NodeItem.fromNeo4jResponseWouRel(raw_res)
 
         cy = Neo4jQueryFactory.get_connection_nodes(self.ts_updated)
         raw_res = self.connector.run_cypher_statement(cy)
         con_nodes_updated = NodeItem.fromNeo4jResponseWouRel(raw_res)
 
-        # calc node intersection based on hash and exclude guid as the GUIDs typically change among repeating export
-        for n in con_nodes_init:
-            cy = Neo4jQueryFactory.get_hash_by_nodeId(label=self.ts_init, nodeId=n.id, attrIgnoreList=['GlobalId', 'p21_id'])
-            hash_sum = self.connector.run_cypher_statement(cy, 'hash')[0]
-            n.set_hash(hash_sum)
-
-        for n in con_nodes_updated:
-            cy = Neo4jQueryFactory.get_hash_by_nodeId(label=self.ts_updated, nodeId=n.id, attrIgnoreList=['GlobalId', 'p21_id'])
-            hash_sum = self.connector.run_cypher_statement(cy, 'hash')[0]
-            n.set_hash(hash_sum)
-
         calculator = SetCalculator()
         [nodes_unchanged, nodes_added, nodes_deleted] = calculator.calc_intersection(
             con_nodes_init,
             con_nodes_updated,
-            MatchCriteriaEnum.OnHash)
+            MatchCriteriaEnum.OnGuid)
 
         patterns_init = []
         for node in con_nodes_init:

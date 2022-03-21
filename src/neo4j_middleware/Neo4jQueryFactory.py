@@ -124,7 +124,7 @@ class Neo4jQueryFactory(Neo4jFactory):
     @classmethod
     def get_node_data_by_id(cls, nodeId: int) -> str:
         """
-        Query the ID and the entityType attribute
+        Query the ID and the entity_type attribute
         @param nodeId: the node id in the neo4j database
         @return: cypher query string
         """
@@ -209,7 +209,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match1 = 'match p = (n) Where ID(n)={}'.format(node_id)
         match2 = 'match (n)-[r]->(f)'
-        ret = 'UNWIND r.relType as mylist RETURN mylist'
+        ret = 'UNWIND r.rel_type as mylist RETURN mylist'
         return Neo4jFactory.BuildMultiStatement([match1, match2, ret])
 
     @classmethod

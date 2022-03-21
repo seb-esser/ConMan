@@ -1,35 +1,28 @@
 from neo4j_middleware.Neo4jFactory import Neo4jFactory
 import re
-import json
+
 
 class NodeItem:
     """
     reflects the node structure from neo4j
     """
 
-    def __init__(self, nodeId: int, relType: str = None, entityType: str = None, nodeType: str = None):
+    def __init__(self, node_id: int, rel_type: str = None, entity_type: str = None, node_type: str = None):
         """
 
-        @type nodeType: the classification of PrimaryNode, SecondaryNode or ConnectionNode
-        @param nodeId: node id in the graph database
-        @param relType: relType of edge pointing to this node
-        @param entityType: the reflected Ifc Entity name
+        @type node_type: the classification of PrimaryNode, SecondaryNode or ConnectionNode
+        @param node_id: node id in the graph database
+        @param rel_type: rel_type of edge pointing to this node
+        @param entity_type: the reflected Ifc Entity name
         """
-        self.id = nodeId
-        self.entityType = entityType
-        self.hash_value = None
-        self.relType = relType
+        self.id = node_id
+        self.entity_type = entity_type
+        self.rel_type = rel_type
         self.attrs = None
-        self.nodeType = nodeType
-
-    def set_hash(self, hash_val: str):
-        self.hash_value = hash_val
-
-    def get_hash(self):
-        return self.hash_value
+        self.node_type = node_type
 
     def __repr__(self):
-        return 'NodeItem: id: {} EntityType: {}'.format(self.id, self.entityType)
+        return 'NodeItem: id: {} EntityType: {}'.format(self.id, self.entity_type)
 
     def __eq__(self, other):
         """
@@ -41,15 +34,16 @@ class NodeItem:
             return True
         else:
             return False
+        # ToDo: eq comparison is not valid for cypher-based DPO
 
     @classmethod
     def fromNeo4jResponseWithRel(cls, raw: str) -> list:
         ret_val = []
         for inst in raw:
             node_type = inst[4][0]
-            child = cls(nodeId=int(inst[0]), relType=inst[1]['relType'], entityType=inst[2], nodeType=node_type)
+            child = cls(nodeId=int(inst[0]), relType=inst[1]['rel_type'], entityType=inst[2], nodeType=node_type)
             if 'listItem' in inst[1]:
-                child.relType = inst[1]['relType'] + '__listItem{}'.format(inst[1]['listItem'])
+                child.rel_type = inst[1]['rel_type'] + '__listItem{}'.format(inst[1]['listItem'])
                 # ToDo: consider to re-model the recursive Diff approach by incorporating edgeItems
             attrs = inst[3]
             child.attrs = attrs
@@ -81,7 +75,7 @@ class NodeItem:
             node_labels[:] = [x for x in node_labels if not x.startswith('ts')]
             node = cls(nodeId=int(node_raw.id), nodeType=node_labels[0], relType=None, entityType=None)
             node.setNodeAttributes(dict(node_raw._properties))
-            node.entityType = node.attrs['EntityType']
+            node.entity_type = node.attrs['EntityType']
             ret_val.append(node)
 
         return ret_val
@@ -141,12 +135,12 @@ class NodeItem:
 
     def tidy_attrs(self, remove_None_values: bool = True):
         """
-        removes entityType and p21_id from attr dict
+        removes entity_type and p21_id from attr dict
         @return:
         """
         self.attrs.pop("EntityType", None)
         self.attrs.pop("p21_id", None)
-        self.attrs.pop('relType', None)
+        self.attrs.pop('rel_type', None)
 
         if remove_None_values is True:
             # remove attrs that have a none value assigned
@@ -174,7 +168,7 @@ class NodeItem:
             ts = ':{}'.format(timestamp)
 
         if include_nodeType_label:
-            ts += ':{}'.format(self.nodeType)
+            ts += ':{}'.format(self.node_type)
 
         # remove p21_id attribute
         cleaned_node_attrs = self.attrs

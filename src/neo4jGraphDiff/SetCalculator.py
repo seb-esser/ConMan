@@ -38,9 +38,7 @@ class SetCalculator(object):
         switcher = {
             MatchCriteriaEnum.OnGuid: self.__get_intersection_byGlobalId(A, B),
             MatchCriteriaEnum.OnRelType: self.__get_intersection_byRelType(A, B),
-            MatchCriteriaEnum.OnEntityType: self.__get_intersection_byEntityType(A, B),
-            MatchCriteriaEnum.OnHash: self.__get_intersection_byHash(A, B),
-            MatchCriteriaEnum.OnHashAndOnRelType: self.__get_intersection_byHashAnRelType(A, B)
+            MatchCriteriaEnum.OnEntityType: self.__get_intersection_byEntityType(A, B)
         }
 
         matched_pairs = switcher[intersection_method]
@@ -69,27 +67,6 @@ class SetCalculator(object):
         return [(a, b) for a in set_a for b in set_b]
 
     # ---- Matching rules ----
-
-    def __get_intersection_byHash(self, A, B):
-        """
-        Calculates the boolean intersection between set A and set B
-        by comparing the items' hashes
-        @param A: a (distinct) set of nodes
-        @param B: a (distinct) set of nodes
-        @return: a list of tuples as the delta of the intersection operation
-        """
-        return ((x, y) for x, y in itertools.product(A, B) if x.hash_value == y.hash_value)
-
-    def __get_intersection_byHashAnRelType(self, A, B):
-        """
-        Calculates the boolean intersection between set A and set B
-        by comparing the items' hashes and relTypes
-        @param A: a (distinct) set of nodes
-        @param B: a (distinct) set of nodes
-        @return: a list of tuples as the delta of the intersection operation
-        """
-        return ((x, y) for x, y in itertools.product(A, B) if x.hash_value == y.hash_value and x.relType == y.relType)
-
     def __get_intersection_byRelType(self, A, B):
         """
         Calculates the boolean intersection between set A and set B by comparing the relTypes
@@ -97,7 +74,7 @@ class SetCalculator(object):
         @param B: a (distinct) set of nodes
         @return: a list of tuples as the delta of the intersection operation
         """
-        return( ( x ,y) for x ,y in itertools.product(A, B) if x.relType == y.relType)
+        return(( x ,y) for x ,y in itertools.product(A, B) if x.rel_type == y.rel_type)
 
     def __get_intersection_byEntityType(self, A, B):
         """
@@ -107,7 +84,7 @@ class SetCalculator(object):
         @param B: a (distinct) set of nodes
         @return: a list of tuples as the delta of the intersection operation
             """
-        return ((x, y) for x, y in itertools.product(A, B) if x.entityType == y.entityType)
+        return ((x, y) for x, y in itertools.product(A, B) if x.entity_type == y.entity_type)
 
     def __get_intersection_byEntityTypeAndRelType(self, A, B):
         """
@@ -117,7 +94,7 @@ class SetCalculator(object):
         @param B: a (distinct) set of nodes
         @return: a list of tuples as the delta of the intersection operation
             """
-        return ((x, y) for x, y in itertools.product(A, B) if x.entityType == y.entityType and x.relType == y.relType)
+        return ((x, y) for x, y in itertools.product(A, B) if x.entity_type == y.entity_type and x.rel_type == y.rel_type)
 
     def __get_intersection_byGlobalId(self, A, B):
         """

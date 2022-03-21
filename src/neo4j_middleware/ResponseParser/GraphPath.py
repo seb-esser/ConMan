@@ -50,7 +50,7 @@ class GraphPath:
         if entry_node_identifier is not None:
             start_node = entry_node_identifier
         else:
-            start_node = self.segments[0].startNode.entityType
+            start_node = self.segments[0].startNode.entity_type
 
         # init cypher statement
         if path_number is not None:
@@ -62,7 +62,7 @@ class GraphPath:
 
         # loop over all segments of the current path
         for segment in self.segments:
-            end_node_type: str = segment.endNode.entityType
+            end_node_type: str = segment.endNode.entity_type
             end_node_attrs: dict = {k: v for k, v in segment.endNode.attrs.items() if v is not None} # segment.endNode.attrs
 
             end_node_attrs.pop('p21_id', None)

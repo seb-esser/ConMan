@@ -6,8 +6,6 @@ class MatchCriteriaEnum(enum.Enum):
     OnGuid = 1
     OnRelType = 2
     OnEntityType = 3
-    OnHash = 4
-    OnHashAndOnRelType = 5
 
 
 class LoggingLevelEnum(enum.Enum):

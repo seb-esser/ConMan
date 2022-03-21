@@ -167,7 +167,7 @@ class IFCGraphGenerator:
             entity_type = entity.get_info()['type']
             p21_id_child = entity.get_info()['id']
 
-            edge_attrs = {'relType': association}
+            edge_attrs = {'rel_type': association}
 
             node_exists = self.check_node_exists(p21_id_child)
 
@@ -202,7 +202,7 @@ class IFCGraphGenerator:
                     raise Exception('Failed to query data from primary_node_type.')
 
                 edge_attrs = {
-                    'relType': association,
+                    'rel_type': association,
                     'listItem': i
                 }
 

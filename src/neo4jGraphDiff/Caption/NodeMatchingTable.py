@@ -61,7 +61,7 @@ class NodeMatchingTable:
 
     def get_all_primaryNode_pairs(self):
         return [p for p in self.matched_nodes if
-                (p.init_node.nodeType == "PrimaryNode" and p.updated_node.nodeType == "PrimaryNode")]
+                (p.init_node.node_type == "PrimaryNode" and p.updated_node.node_type == "PrimaryNode")]
 
     def __repr__(self):
         return 'NodeMatchingTable NumEntries: {}'.format(len(self.matched_nodes))
@@ -86,7 +86,7 @@ class NodeMatchingTable:
             node_list = self.get_all_updated_nodes()[:lst_position]
 
         # find next primaryNode in the list by reversing and find first index
-        parent_primary_node = [prim_node for prim_node in node_list[::-1] if prim_node.nodeType == "PrimaryNode"][0]
+        parent_primary_node = [prim_node for prim_node in node_list[::-1] if prim_node.node_type == "PrimaryNode"][0]
 
         # return node_list[::-1].index(parent_primary_node)
         return parent_primary_node
@@ -99,8 +99,8 @@ class NodePair:
         self.updated_node: NodeItem = updated
 
     def __repr__(self):
-        return 'NodePair: entityType: {} ID_init: {} ID_updated: {}'.format(
-            self.init_node.entityType,
+        return 'NodePair: entity_type: {} ID_init: {} ID_updated: {}'.format(
+            self.init_node.entity_type,
             self.init_node.id,
             self.updated_node.id)
 

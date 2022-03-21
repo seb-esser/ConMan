@@ -41,27 +41,13 @@ class PrimaryNodeDiff:
 		nodes_init = self.__get_primary_nodes(label_init)
 		nodes_updated = self.__get_primary_nodes(label_updated)
 
-		# load attrIgnore list from config
-		attr_ignore_list = self.configuration.DiffSettings.diffIgnoreAttrs
-
-		for node in nodes_init: 
-			# load hash_value value
-			cy = Neo4jQueryFactory.get_hash_by_nodeId(label_init, node.id, attr_ignore_list)
-			res = self.connector.run_cypher_statement(cy)
-			node.hash_value = res[0][0]
-
-		for node in nodes_updated: 
-			cy = Neo4jQueryFactory.get_hash_by_nodeId(label_updated, node.id, attr_ignore_list)
-			res = self.connector.run_cypher_statement(cy)
-			node.hash_value = res[0][0]
-
 		# calc matching of node sets
-		matchingMethod = self.configuration.DiffSettings.MatchingType_RootedNodes
+		matching_method = self.configuration.DiffSettings.MatchingType_RootedNodes
 
 		if self.toConsole():
-			print('Matching Method for rooted nodes: {}'.format(matchingMethod))
+			print('Matching Method for rooted nodes: {}'.format(matching_method))
 
-		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(nodes_init, nodes_updated, matchingMethod)
+		[nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(nodes_init, nodes_updated, matching_method)
 
 		if self.toConsole(): 
 			print('Unchanged rooted nodes: {}'.format(nodes_unchanged))

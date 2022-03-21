@@ -34,23 +34,23 @@ class DeltaReporter:
     #             ('\t  init: NodeId:{:<5} EntityType: {:<26} updated: NodeId:{:<5} EntityType: {:<26}'.format(item[0].id,
     #                                                                                                          item
     #                                                                                                          [
-    #                                                                                                              0].entityType,
+    #                                                                                                              0].entity_type,
     #                                                                                                          item[1].id,
     #                                                                                                          item
     #                                                                                                          [
-    #                                                                                                              1].entityType))
+    #                                                                                                              1].entity_type))
     #
     #     print('\n\t NODES ADDED:')
     #     if len(self.ResultPrimaryDiff['added']) > 0:
     #         for item in self.ResultPrimaryDiff['added']:
-    #             print('\t  NodeId:{:<5} EntityType: {:<20}'.format(item.id, item.entityType))
+    #             print('\t  NodeId:{:<5} EntityType: {:<20}'.format(item.id, item.entity_type))
     #     else:
     #         print('\t  EMPTY')
     #
     #     print('\n\t NODES DELETED:')
     #     if len(self.ResultPrimaryDiff['deleted']) > 0:
     #         for item in self.ResultPrimaryDiff['deleted']:
-    #             print('\t  NodeId:{:<5} EntityType: {:<20}'.format(item.id, item.entityType))
+    #             print('\t  NodeId:{:<5} EntityType: {:<20}'.format(item.id, item.entity_type))
     #     else:
     #         print('\t  EMPTY')
     #

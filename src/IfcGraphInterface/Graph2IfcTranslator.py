@@ -142,10 +142,10 @@ class Graph2IfcTranslator:
             spf_id = self.lookup_ifc_counterpart_exists(c.id)
             if spf_id == -1:
                 # build IFC primary_node_type
-                self.build_entity(c.id, c.entityType, c.attrs)
+                self.build_entity(c.id, c.entity_type, c.attrs)
 
             # build association
-            self.build_association(n.id, c.id, c.relType)
+            self.build_association(n.id, c.id, c.rel_type)
 
             if rec:
                 self.build_childs(c, True)
@@ -197,7 +197,7 @@ class Graph2IfcTranslator:
             n.tidy_attrs()
 
             # build IFC primary_node_type
-            self.build_entity(n.id, n.entityType, n.attrs)
+            self.build_entity(n.id, n.entity_type, n.attrs)
 
             self.build_childs(n, True)
 
@@ -219,7 +219,7 @@ class Graph2IfcTranslator:
             cnode.tidy_attrs()
 
             # build IFC primary_node_type
-            self.build_entity(cnode.id, cnode.entityType, cnode.attrs)
+            self.build_entity(cnode.id, cnode.entity_type, cnode.attrs)
 
             # build the childs (non-recursive)
             self.build_childs(cnode, False)

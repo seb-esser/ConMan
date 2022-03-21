@@ -44,7 +44,7 @@ class AbsGraphDiff(abc.ABC):
         @return:
         """
 
-        # queries all directed children, their relType and their node hashes
+        # queries all directed children, their rel_type and their node hashes
         cypher = Neo4jQueryFactory.get_child_nodes(label, parent_node_id)
         raw = self.connector.run_cypher_statement(cypher)
 
@@ -72,7 +72,7 @@ class AbsGraphDiff(abc.ABC):
         return_list = node_list
 
         for node in node_list:
-            if node.entityType in ignore_entityTypes:
+            if node.entity_type in ignore_entityTypes:
                 return_list.remove(node)
 
         # ToDo: Logging: Add info statement if nodes got removed or not
