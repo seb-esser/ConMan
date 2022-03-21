@@ -25,7 +25,7 @@ class GraphPath:
         raw_nodes = raw[0][1]
         raw_edges = raw[0][2]
 
-        nodes = NodeItem.fromNeo4jResponse(raw_nodes)
+        nodes = NodeItem.from_neo4j_response(raw_nodes)
         segments = EdgeItem.from_neo4j_response(raw_edges, nodes)
 
         return cls(segments)

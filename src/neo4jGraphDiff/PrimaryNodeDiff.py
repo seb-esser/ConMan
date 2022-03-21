@@ -61,13 +61,13 @@ class PrimaryNodeDiff:
 		raw = self.connector.run_cypher_statement(cy)
 
 		# unpack neo4j response into a list if NodeItem instances
-		res = NodeItem.fromNeo4jResponseWouRel(raw)
+		res = NodeItem.from_neo4j_response_wou_rel(raw)
 
 		return res
 
 	def __get_con_nodes(self, label):
 		cy_conn = Neo4jQueryFactory.get_connection_nodes(label)
 		raw_con = self.connector.run_cypher_statement(cy_conn)
-		con_nodes = NodeItem.fromNeo4jResponseWouRel(raw_con)
+		con_nodes = NodeItem.from_neo4j_response_wou_rel(raw_con)
 		return con_nodes
 

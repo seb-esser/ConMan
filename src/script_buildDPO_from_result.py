@@ -84,8 +84,8 @@ def calcDPO(obj_guid: str, label: str):
     RETURN [val in outs WHERE val is not null] as ptrs_out, [val in ins WHERE val is not null] as ptrs_in
     """.format(label, obj_guid)
     raw_outs, raw_ins = connector.run_cypher_statement(cy_ptrs)[0]
-    nodes_outs = NodeItem.fromNeo4jResponse(raw_outs)
-    nodes_ins = NodeItem.fromNeo4jResponse(raw_outs)
+    nodes_outs = NodeItem.from_neo4j_response(raw_outs)
+    nodes_ins = NodeItem.from_neo4j_response(raw_outs)
 
     node_counter += len(removedPattern.get_unified_node_set())
 

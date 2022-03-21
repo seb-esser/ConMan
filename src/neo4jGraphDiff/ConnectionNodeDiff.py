@@ -27,11 +27,11 @@ class ConnectionNodeDiff:
 
         cy = Neo4jQueryFactory.get_connection_nodes(self.ts_init)
         raw_res = self.connector.run_cypher_statement(cy)
-        con_nodes_init = NodeItem.fromNeo4jResponseWouRel(raw_res)
+        con_nodes_init = NodeItem.from_neo4j_response_wou_rel(raw_res)
 
         cy = Neo4jQueryFactory.get_connection_nodes(self.ts_updated)
         raw_res = self.connector.run_cypher_statement(cy)
-        con_nodes_updated = NodeItem.fromNeo4jResponseWouRel(raw_res)
+        con_nodes_updated = NodeItem.from_neo4j_response_wou_rel(raw_res)
 
         calculator = SetCalculator()
         [nodes_unchanged, nodes_added, nodes_deleted] = calculator.calc_intersection(

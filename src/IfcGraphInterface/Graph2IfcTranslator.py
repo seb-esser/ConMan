@@ -122,7 +122,7 @@ class Graph2IfcTranslator:
         raw_res = self.connector.run_cypher_statement(cy)
 
         # cast cypher response in a list of node items
-        child_nodes = NodeItem.fromNeo4jResponseWithRel(raw_res)
+        child_nodes = NodeItem.from_neo4j_response_with_rel(raw_res)
 
         # check if leaf node was found
         if len(child_nodes) == 0:
@@ -134,7 +134,7 @@ class Graph2IfcTranslator:
             raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
 
             # assign properties to node object
-            c.setNodeAttributes(raw_res)
+            c.set_node_attributes(raw_res)
 
             c.tidy_attrs()
 
@@ -184,7 +184,7 @@ class Graph2IfcTranslator:
         raw_res = self.connector.run_cypher_statement(cy)
 
         # cast cypher response in a list of node items
-        nodes = NodeItem.fromNeo4jResponseWouRel(raw_res)
+        nodes = NodeItem.from_neo4j_response_wou_rel(raw_res)
 
         print('---- Building primary & secondary nodes. ----')
         for n in nodes:
@@ -192,7 +192,7 @@ class Graph2IfcTranslator:
             cy = Neo4jQueryFactory.get_node_properties_by_id(n.id)
             raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
             # assign properties to node object
-            n.setNodeAttributes(raw_res)
+            n.set_node_attributes(raw_res)
 
             n.tidy_attrs()
 
@@ -207,14 +207,14 @@ class Graph2IfcTranslator:
         cn = Neo4jQueryFactory.get_connection_nodes(self.ts)
         raw_res = self.connector.run_cypher_statement(cn)
 
-        connection_nodes = NodeItem.fromNeo4jResponseWouRel(raw_res)
+        connection_nodes = NodeItem.from_neo4j_response_wou_rel(raw_res)
 
         print('---- Building connection nodes. ----')
         for cnode in connection_nodes:
             cy = Neo4jQueryFactory.get_node_properties_by_id(cnode.id)
             raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
             # assign properties to node object
-            cnode.setNodeAttributes(raw_res)
+            cnode.set_node_attributes(raw_res)
 
             cnode.tidy_attrs()
 

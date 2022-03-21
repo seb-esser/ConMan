@@ -37,7 +37,7 @@ class NodeItem:
         # ToDo: eq comparison is not valid for cypher-based DPO
 
     @classmethod
-    def fromNeo4jResponseWithRel(cls, raw: str) -> list:
+    def from_neo4j_response_with_rel(cls, raw: str) -> list:
         ret_val = []
         for inst in raw:
             node_type = inst[4][0]
@@ -51,7 +51,7 @@ class NodeItem:
         return ret_val
 
     @classmethod
-    def fromNeo4jResponseWouRel(cls, raw: str) -> list:
+    def from_neo4j_response_wou_rel(cls, raw: str) -> list:
         ret_val = []
         for inst in raw:
             node_labels = list(inst[3])
@@ -63,7 +63,7 @@ class NodeItem:
         return ret_val
 
     @classmethod
-    def fromNeo4jResponse(cls, raw) -> list:
+    def from_neo4j_response(cls, raw) -> list:
         """
         creates a List of NodeItem instances from a given neo4j response
         @param raw: neo4j response string
@@ -74,7 +74,7 @@ class NodeItem:
             node_labels = list(node_raw.labels)
             node_labels[:] = [x for x in node_labels if not x.startswith('ts')]
             node = cls(nodeId=int(node_raw.id), nodeType=node_labels[0], relType=None, entityType=None)
-            node.setNodeAttributes(dict(node_raw._properties))
+            node.set_node_attributes(dict(node_raw._properties))
             node.entity_type = node.attrs['EntityType']
             ret_val.append(node)
 
@@ -121,7 +121,7 @@ class NodeItem:
         # return newly created nodeItem
         return node
 
-    def setNodeAttributes(self, attrs):
+    def set_node_attributes(self, attrs):
         """
         assigns attributes to node item
         @param attrs: dict or list

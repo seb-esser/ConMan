@@ -41,15 +41,13 @@ class GraphDiff(AbsGraphDiff):
         prim_nodes_updt = [x.updated_node for x in
                            self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
 
-        con_init = NodeItem.fromNeo4jResponseWouRel(
-            self.connector.run_cypher_statement(
-                Neo4jQueryFactory.get_connection_nodes(self.label_init)
-            ))
+        con_init = NodeItem.from_neo4j_response_wou_rel(self.connector.run_cypher_statement(
+            Neo4jQueryFactory.get_connection_nodes(self.label_init)
+        ))
 
-        con_updt = NodeItem.fromNeo4jResponseWouRel(
-            self.connector.run_cypher_statement(
-                Neo4jQueryFactory.get_connection_nodes(self.label_updated)
-            ))
+        con_updt = NodeItem.from_neo4j_response_wou_rel(self.connector.run_cypher_statement(
+            Neo4jQueryFactory.get_connection_nodes(self.label_updated)
+        ))
 
         for n in prim_nodes_init:
             if n.id == -1:
@@ -112,8 +110,8 @@ class GraphDiff(AbsGraphDiff):
         raw_init = self.connector.run_cypher_statement(cy_next_nodes_init)
         raw_updated = self.connector.run_cypher_statement(cy_next_nodes_upd)
 
-        next_nodes_init = NodeItem.fromNeo4jResponseWouRel(raw_init)
-        next_nodes_upd = NodeItem.fromNeo4jResponseWouRel(raw_updated)
+        next_nodes_init = NodeItem.from_neo4j_response_wou_rel(raw_init)
+        next_nodes_upd = NodeItem.from_neo4j_response_wou_rel(raw_updated)
 
         # check if no new children got found:
         if len(next_nodes_init) == 0 and len(next_nodes_upd) == 0:
