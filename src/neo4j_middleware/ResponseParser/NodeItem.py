@@ -1,5 +1,6 @@
 from neo4j_middleware.Neo4jFactory import Neo4jFactory
-
+import re
+import json
 
 class NodeItem:
     """
@@ -84,6 +85,47 @@ class NodeItem:
             ret_val.append(node)
 
         return ret_val
+
+    @classmethod
+    def from_cypher_fragment(cls, raw):
+
+        # regex definitions
+        reg_attr_extractor = r"\{([^]]+)\}"
+        reg_attr_separator = r"(.+?):(.+?),"
+        reg_node_var = r"^(.+?):"
+        reg_node_labels = r":([^]]+)\{"
+
+        # information to be extracted using regex
+        node_var = ""
+        labels = ""
+        attributes = ""
+
+        # get variable def in current cypher query (unique to each query)
+        node_var = re.findall(reg_node_var, raw)[0]
+
+        # get node labels
+        node_label_raw = re.findall(reg_node_labels, raw)
+        if len(node_label_raw) != 0:
+            labels = node_label_raw[0].replace(" ", "").split(":")
+
+        # get attributes
+        attributes_raw = re.findall(reg_attr_extractor, raw)
+        if len(attributes_raw) != 0:
+            attributes = attributes_raw[0] + ", "
+
+        all_attributes_raw = re.findall(reg_attr_separator, attributes)
+
+        # parse attributes
+        attr_dict = {}
+        for t in all_attributes_raw:
+            attr_dict[t[0].replace("'", "").replace(" ", "")] = t[1]
+            # ToDo: cast datatypes properly
+
+        # init new node item
+        node = cls(nodeId=0)
+        node.attrs = attr_dict
+        # return newly created nodeItem
+        return node
 
     def setNodeAttributes(self, attrs):
         """

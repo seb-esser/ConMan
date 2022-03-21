@@ -1,4 +1,5 @@
 from typing import List
+import re
 
 from neo4j_middleware import neo4jConnector
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
@@ -26,6 +27,37 @@ class GraphPattern:
             paths.append(path)
 
         return cls(paths)
+
+    @classmethod
+    def from_cypher_statement(cls, cypher_statement: str):
+
+        # ToDo: manage cases with multiple cypher lines
+        # split into fragments
+        fragments = [cypher_statement]
+
+        for cy_fragment in fragments:
+
+            regex_nodes = r"\(([^]]+)\)"
+            regex_edges_undirected = r"-\[([^]]+)\]-"
+            regex_edges_directed_left = r"<-\[([^]]+)\]-"
+            regex_edges_directed_right = r"-\[([^]]+)\]->"
+
+            raw_nodes = re.findall(regex_nodes, cy_fragment, re.MULTILINE)
+            edges_undirected = re.findall(regex_edges_undirected, cy_fragment, re.MULTILINE)
+            edges_directed_left = re.findall(regex_edges_directed_left, cy_fragment, re.MULTILINE)
+            edges_directed_right = re.findall(regex_edges_directed_right, cy_fragment, re.MULTILINE)
+
+            # loop over nodes
+            for raw_node in raw_nodes:
+                node = NodeItem.from_cypher_fragment(raw_node)
+                print(node)
+
+            for matchNum, match in enumerate(edges_directed_left, start=1):
+                raw_edge = match.group()
+                print(raw_edge)
+                # ToDo: process an edge item out of the pattern already knowing the start and end node
+
+        return cls(paths=None)
 
     def get_entry_node(self) -> NodeItem:
         """
