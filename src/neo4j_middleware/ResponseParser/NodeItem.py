@@ -18,11 +18,32 @@ class NodeItem:
         self.id = node_id
         self.rel_type = rel_type
         self.attrs = None
-        self.node_type = node_type
+        # self.node_type = node_type
         self.labels = []
 
-    def get_entity_type(self):
+    def get_entity_type(self) -> str:
+        """
+        returns the entityType label of the node
+        """
         return self.attrs["EntityType"]
+
+    def get_timestamps(self) -> list:
+        """
+        returns the attached timestamp labels of the given node
+        """
+        ts = [x for x in self.labels if x.startswith('ts')]
+        return ts
+
+    def get_node_type(self) -> str:
+        """
+        returns the node type label (either primary, secondary, or connectionNode).
+        returns "VirtualNode" in case of a non-existent (i.e., -1) node
+        """
+        try:
+            node_type = [x for x in self.labels if not x.startswith('ts')][0]
+        except:
+            node_type = "VirtualNode"
+        return node_type
 
     def __repr__(self):
         ty = self.get_entity_type()
@@ -45,7 +66,8 @@ class NodeItem:
         ret_val = []
         for inst in raw:
             node_type = inst[4][0]
-            child = cls(node_id=int(inst[0]), rel_type=inst[1]['rel_type'], entity_type=inst[2], node_type=node_type)
+            child = cls(node_id=int(inst[0]), rel_type=inst[1]['rel_type'], entity_type=inst[2])
+            child.labels.append(node_type)
             if 'listItem' in inst[1]:
                 child.rel_type = inst[1]['rel_type'] + '__listItem{}'.format(inst[1]['listItem'])
                 # ToDo: consider to re-model the recursive Diff approach by incorporating edgeItems
@@ -60,7 +82,8 @@ class NodeItem:
         for inst in raw:
             node_labels = list(inst[3])
             node_type = [x for x in node_labels if not x.startswith('ts')][0]
-            child = cls(node_id=int(inst[0]), rel_type=None, entity_type=inst[1], node_type=node_type)
+            child = cls(node_id=int(inst[0]), rel_type=None, entity_type=inst[1])
+            child.labels.append(node_type)
             attrs = inst[2]
             child.attrs = attrs
             ret_val.append(child)
@@ -171,7 +194,7 @@ class NodeItem:
             ts = ':{}'.format(timestamp)
 
         if include_nodeType_label:
-            ts += ':{}'.format(self.node_type)
+            ts += ':{}'.format(self.get_node_type())
 
         # remove p21_id attribute
         cleaned_node_attrs = self.attrs

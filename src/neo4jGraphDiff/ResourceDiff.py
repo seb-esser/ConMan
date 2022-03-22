@@ -170,7 +170,6 @@ class ResourceDiff(AbsGraphDiff):
 
         raw = self.calc_dict_diff(node_init.attrs, node_updated.attrs)
 
-
         # delta between both nodes in raw structure
         attr_delta = NodeDiffData.fromNeo4jResponse(raw)
 
@@ -205,31 +204,6 @@ class ResourceDiff(AbsGraphDiff):
                 # Note: the modification is captured even though it might be already recognized by another path.
                 # please use the unify methods in the GraphDelta class to filter detected modifications afterwards
                 self.result.capture_property_mod_instance(pm)
-
-    def __get_hashes_of_nodes(self, label: str, node_list: List[NodeItem], indent=0) -> List[NodeItem]:
-        """
-        calculates the hash_value sum for each node in a given node list
-        @param label: the model identifier
-        @param node_list: a list of nodes the hash value should be calculated
-        @param indent: printing stuff (might be removed soon)
-        @return:
-        """
-
-        ignore_attrs = self.configuration.DiffSettings.diffIgnoreAttrs  # list of strings
-        # calc corresponding hash_value
-        for node in node_list:
-            # calc hash_value of current node
-            cypher_hash = Neo4jQueryFactory.get_hash_by_nodeId(label, node.id, ignore_attrs)
-            hash_value = self.connector.run_cypher_statement(cypher_hash)[0][0]
-
-            node.set_hash(hash_value)
-
-        if self.toConsole():
-            print("".ljust(indent * 4) + 'Calculated hashes for model >> {} <<:'.format(label))
-            for node in node_list:
-                print("".ljust(indent * 4) + '\t NodeID: {:<4} \t hash_value: {}'.format(node.id, node.hash_value))
-
-        return node_list
 
     def __get_pattern(self, root_node_id: int, current_node_id: int) -> GraphPattern:
         """

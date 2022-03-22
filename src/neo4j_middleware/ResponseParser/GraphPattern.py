@@ -185,7 +185,7 @@ class GraphPattern:
 
         node_dict = {}
         for n in all_nodes:
-            node_dict[n.id] = 'n{0}'.format(n.id, n.node_type)
+            node_dict[n.id] = 'n{0}'.format(n.id, n.get_node_type())
 
         # init cypher query
         cy_list = []
@@ -249,7 +249,7 @@ class GraphPattern:
 
         node_dict = {}
         for n in all_nodes:
-            node_dict[n.id] = 'n{0}'.format(n.id, n.node_type)
+            node_dict[n.id] = 'n{0}'.format(n.id, n.get_node_type())
 
         # init cypher query
         cy_list = []
@@ -301,7 +301,7 @@ class GraphPattern:
 
         node_dict = {}
         for n in all_nodes:
-            node_dict[n.id] = 'n{0}'.format(n.id, n.node_type)
+            node_dict[n.id] = 'n{0}'.format(n.id, n.get_node_type())
 
         # init cypher query
         cy_list = []
