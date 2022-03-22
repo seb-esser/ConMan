@@ -7,18 +7,14 @@ class NodeItem:
     reflects the node structure from neo4j
     """
 
-    def __init__(self, node_id: int, rel_type: str = None, entity_type: str = None, node_type: str = None):
+    def __init__(self, node_id: int, rel_type: str = None):
         """
-
-        @type node_type: the classification of PrimaryNode, SecondaryNode or ConnectionNode
         @param node_id: node id in the graph database
         @param rel_type: rel_type of edge pointing to this node
-        @param entity_type: the reflected Ifc Entity name
         """
         self.id = node_id
         self.rel_type = rel_type
         self.attrs = None
-        # self.node_type = node_type
         self.labels = []
 
     def get_entity_type(self) -> str:
@@ -66,7 +62,8 @@ class NodeItem:
         ret_val = []
         for inst in raw:
             node_type = inst[4][0]
-            child = cls(node_id=int(inst[0]), rel_type=inst[1]['rel_type'], entity_type=inst[2])
+            # child = cls(node_id=int(inst[0]), rel_type=inst[1]['rel_type'], entity_type=inst[2])
+            child = cls(node_id=int(inst[0]), rel_type=inst[1]['rel_type'])
             child.labels.append(node_type)
             if 'listItem' in inst[1]:
                 child.rel_type = inst[1]['rel_type'] + '__listItem{}'.format(inst[1]['listItem'])
@@ -82,7 +79,7 @@ class NodeItem:
         for inst in raw:
             node_labels = list(inst[3])
             node_type = [x for x in node_labels if not x.startswith('ts')][0]
-            child = cls(node_id=int(inst[0]), rel_type=None, entity_type=inst[1])
+            child = cls(node_id=int(inst[0]), rel_type=None)
             child.labels.append(node_type)
             attrs = inst[2]
             child.attrs = attrs
@@ -99,9 +96,9 @@ class NodeItem:
         ret_val = []
         for node_raw in raw:
             node_labels = list(node_raw.labels)
-            node_labels[:] = [x for x in node_labels if not x.startswith('ts')]
-            node = cls(node_id=int(node_raw.id), node_type=node_labels[0], rel_type=None, entity_type=None)
+            node = cls(node_id=int(node_raw.id), rel_type=None)
             node.set_node_attributes(dict(node_raw._properties))
+            node.labels = node_labels
             ret_val.append(node)
 
         return ret_val
