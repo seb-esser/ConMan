@@ -370,7 +370,8 @@ class IFCGraphGenerator:
                                'NumberOfTreads',
                                'Pixel',
                                'InputPhase',
-                               'Degree'
+                               'Degree',
+                               'NominalValue'
                                ]:
                 node_attributes.append(attr.name())
 
@@ -395,10 +396,7 @@ class IFCGraphGenerator:
                     'InnerCoordIndices',
                     'Trim1',
                     'Trim2',
-                    'Orientation',
-
-
-
+                    'Orientation'
                 ]:
                     node_attributes.append(attr.name())
                 else:

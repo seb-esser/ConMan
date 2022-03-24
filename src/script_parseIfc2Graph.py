@@ -50,8 +50,11 @@ def main():
     # './00_sampleData/IFC_stepP21/Storey_01/SingleStorey_updated.ifc'
     #          # # moved wall, new window and subsequent change in parent wall
     #          ]
-    paths = ['./00_sampleData/IFC_stepP21/WallSpace/SpaceWallExample.ifc',
-             './00_sampleData/IFC_stepP21/WallSpace/SpaceWallExample_wallMoved.ifc'
+    # paths = ['./00_sampleData/IFC_stepP21/WallSpace/SpaceWallExample.ifc',
+    #          './00_sampleData/IFC_stepP21/WallSpace/SpaceWallExample_wallMoved.ifc'
+    #          ]
+    paths = ['./00_sampleData/IFC_stepP21/solibri_example/pretty_SolibriBuilding.ifc',
+             './00_sampleData/IFC_stepP21/solibri_example/pretty_SolibriBuilding-modified.ifc'
              ]
 
     for p in paths:

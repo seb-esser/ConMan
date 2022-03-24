@@ -117,8 +117,7 @@ class CityGMLGraphGenerator:
             attrs.update(attributes)
 
         # run cypher command
-        cypher_statement = Neo4jGraphFactory.create_node_with_attr(
-            label, attrs, self.label)
+        cypher_statement = Neo4jGraphFactory.merge_node_with_attr(label, attrs, self.label)
         node_id = self.connector.run_cypher_statement(
             cypher_statement, 'ID(n)')[0]
 
