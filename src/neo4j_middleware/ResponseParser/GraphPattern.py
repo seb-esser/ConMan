@@ -32,6 +32,8 @@ class GraphPattern:
     @classmethod
     def from_cypher_statement(cls, cypher_statement: str):
 
+        paths = []
+
         # ToDo: manage cases with multiple cypher lines
         # split into fragments
         fragments = [cypher_statement]
@@ -52,10 +54,13 @@ class GraphPattern:
             edge_collection = []
 
             # loop over nodes
+            i = 0
             for raw_node in raw_nodes:
                 node = NodeItem.from_cypher_fragment(raw_node)
+                node.id = i
                 print(node)
                 node_collection.append(node)
+                i += 1
 
             counter_left = 0
             counter_right = 1
@@ -69,8 +74,10 @@ class GraphPattern:
 
                 counter_left += 1
                 counter_right += 1
+            path = GraphPath(segments=edge_collection)
+            paths.append(path)
         print()
-        return cls(paths=None)
+        return cls(paths=paths)
 
     def get_entry_node(self) -> NodeItem:
         """
