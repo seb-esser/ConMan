@@ -37,6 +37,9 @@ class GraphPattern:
 
         for cy_fragment in fragments:
 
+            #pre-processing steps to make regex statements easier
+            cy_fragment = cy_fragment.replace("--", "-[]-")
+
             regex_nodes = r"\(([^]]+)\)"
             regex_edges_undirected = r"-\[([^]]+)\]-"
             regex_edges_directed_left = r"<-\[([^]]+)\]-"

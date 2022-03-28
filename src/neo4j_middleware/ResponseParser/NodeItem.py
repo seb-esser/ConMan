@@ -16,6 +16,7 @@ class NodeItem:
         self.rel_type = rel_type
         self.attrs = None
         self.labels = []
+        self.node_identifier = ""
 
     def get_entity_type(self) -> str:
         """
@@ -42,7 +43,8 @@ class NodeItem:
         return node_type
 
     def __repr__(self):
-        return 'NodeItem: id: {} attrs: {} labels: {}'.format(self.id, self.attrs, self.labels)
+        return 'NodeItem: id: {} var: {} attrs: {} labels: {}'\
+            .format(self.id, self.node_identifier, self.attrs, self.labels)
 
     def __eq__(self, other):
         """
@@ -103,12 +105,16 @@ class NodeItem:
         return ret_val
 
     @classmethod
-    def from_cypher_fragment(cls, raw):
+    def from_cypher_fragment(cls, raw: str):
+
+        # pre-processing
+        if raw[-1] != "}":
+            raw += ":{}"
 
         # regex definitions
         reg_attr_extractor = r"\{([^]]+)\}"
         reg_attr_separator = r"(.+?):(.+?),"
-        reg_node_var = r"^(.+?)(:|)"
+        reg_node_var = r"^(.+?)(:|^)"
         reg_node_labels = r":([^]]+)\{"
 
         # information to be extracted using regex
@@ -117,7 +123,7 @@ class NodeItem:
         attributes = ""
 
         # get variable def in current cypher query (unique to each query)
-        node_var = re.findall(reg_node_var, raw)[0]
+        node_var = re.findall(reg_node_var, raw)[0][0]
 
         # get node labels
         node_label_raw = re.findall(reg_node_labels, raw)
@@ -142,6 +148,8 @@ class NodeItem:
         node = cls(node_id=0)
         node.attrs = attr_dict
         node.labels = labels
+        node.node_identifier = node_var
+
         # return newly created nodeItem
         return node
 
