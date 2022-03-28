@@ -1,19 +1,25 @@
 from typing import Dict
+import re
 
+from neo4j_middleware.CypherUtilities import CypherUtilities
 from neo4j_middleware.ResponseParser import NodeItem
 from neo4j_middleware.Neo4jFactory import Neo4jFactory
 
 
 class EdgeItem:
     def __init__(self, start_node: NodeItem, end_node: NodeItem, rel_id: int):
-        self.startNode: NodeItem = start_node
-        self.endNode: NodeItem = end_node
+        self.start_node: NodeItem = start_node
+        self.end_node: NodeItem = end_node
         self.edge_id: int = rel_id
         self.attributes: dict = {}
+        self.labels = []
+        self.edge_identifier = ""
+        self.is_undirected = False
 
     def __repr__(self):
-        return 'EdgeItem object: startId: {} - edgeId: {} -> targetId: {}'\
-            .format(self.startNode.id, self.edge_id, self.endNode.id)
+        return '  EdgeItem: id: {} var: {} fromNode: {} toNode {} attrs: {} labels: {}'\
+            .format(
+            self.edge_id, self.edge_identifier, self.start_node.id, self.end_node.id, self.attributes, self.labels)
 
     def __eq__(self, other):
         """
@@ -22,8 +28,8 @@ class EdgeItem:
         @return:
         """
 
-        # start_equal = self.startNode == other.startNode
-        # end_equal = self.endNode == other.endNode
+        # start_equal = self.start_node == other.start_node
+        # end_equal = self.end_node == other.end_node
         # rel_attrs_equal = self.attributes == other.attributes
         id_equal = self.edge_id == other.edge_id
         # if all([start_equal, end_equal, rel_attrs_equal]):
@@ -53,6 +59,58 @@ class EdgeItem:
 
         return edges
 
+    @classmethod
+    def from_cypher_fragment(cls, raw_edge, node_left: NodeItem, node_right: NodeItem):
+
+        edge_semantics = raw_edge[1]
+        # pre-processing
+        if edge_semantics[-1] != "}":
+            edge_semantics += "{}"
+
+        reg_attr_extractor = r"\{([^]]+)\}"
+        reg_attr_separator = r"(.+?):(.+?),"
+        reg_node_labels = r":([^]]+)\{"
+        reg_edge_var = r"^(.+?)(:|^)"
+
+        # get edge var
+        try:
+            edge_var = re.findall(reg_edge_var, edge_semantics)[0][0]
+        except:
+            edge_var = ""
+
+        # get edge labels
+        labels = []
+        node_label_raw = re.findall(reg_node_labels, edge_semantics)
+        if len(node_label_raw) != 0:
+            labels = node_label_raw[0].replace(" ", "").split(":")
+
+        # get attributes
+        attributes = ""
+        attributes_raw = re.findall(reg_attr_extractor, edge_semantics)
+        if len(attributes_raw) != 0:
+            attributes = attributes_raw[0] + ", "
+
+        # get attributes with regex
+        all_attributes_raw = re.findall(reg_attr_separator, attributes)
+        # cast attributes to python dict
+        attr_dict = CypherUtilities.parse_attrs(all_attributes_raw)
+
+        # instantiate a new edge item
+        if raw_edge[0] == "<":
+            edge = cls(start_node=node_right, end_node=node_left, rel_id=0)
+        else:
+            edge = cls(start_node=node_left, end_node=node_right, rel_id=0)
+
+        # assign extracted semantics
+        edge.labels = labels
+        edge.attributes = attr_dict
+        edge.edge_identifier = edge_var
+
+        if len(raw_edge[0]) == 0 and len(raw_edge[2]) == 0:
+            edge.is_undirected = True
+
+        return edge
+
     def to_cypher(self, source_identifier: str, target_identifier: str) -> str:
         """
         returns a cypher statement to search for this edge item.
@@ -61,9 +119,9 @@ class EdgeItem:
         @return: cypher statement as str
         """
         cy = 'MATCH {0}-[rel{1}]->{2}'.format(
-            self.startNode.to_cypher(timestamp=None, node_identifier=source_identifier),
+            self.start_node.to_cypher(timestamp=None, node_identifier=source_identifier),
             Neo4jFactory.formatDict(self.attributes),
-            self.endNode.to_cypher(timestamp=None, node_identifier=target_identifier))
+            self.end_node.to_cypher(timestamp=None, node_identifier=target_identifier))
         return cy
 
     def to_cypher_fragment(self, target_identifier: str, segment_identifier: int, relationship_iterator: int) -> str:
@@ -76,7 +134,7 @@ class EdgeItem:
         """
         cy = '-[r{3}{2}{0}]->{1}'.format(
             Neo4jFactory.formatDict(self.attributes),
-            self.endNode.to_cypher(timestamp=None, node_identifier=target_identifier),
+            self.end_node.to_cypher(timestamp=None, node_identifier=target_identifier),
             relationship_iterator, segment_identifier)
         return cy
 
@@ -106,11 +164,11 @@ class EdgeItem:
 
     def to_cypher_individual_merge(self, target_timestamp: str, segment_identifier: int, relationship_iterator: int):
         cy1 = 'MERGE {}'.format(
-            self.startNode.to_cypher(
+            self.start_node.to_cypher(
                 node_identifier='a', include_nodeType_label=True, timestamp=target_timestamp)
         )
         cy2 = 'MERGE {}'.format(
-            self.endNode.to_cypher(
+            self.end_node.to_cypher(
                 node_identifier='b', include_nodeType_label=True, timestamp=target_timestamp)
         )
         cy3 = 'MERGE (a)-[r{0}{1}:rel{2}]->(b)'.format(
@@ -125,7 +183,6 @@ class EdgeItem:
         @return: Nothing
         """
         self.attributes = attrs
-
 
 
 

@@ -1,3 +1,4 @@
+from neo4j_middleware.CypherUtilities import CypherUtilities
 from neo4j_middleware.Neo4jFactory import Neo4jFactory
 import re
 
@@ -129,20 +130,18 @@ class NodeItem:
         node_label_raw = re.findall(reg_node_labels, raw)
         if len(node_label_raw) != 0:
             labels = node_label_raw[0].replace(" ", "").split(":")
+            if '' in labels:
+                labels.remove('')
 
         # get attributes
         attributes_raw = re.findall(reg_attr_extractor, raw)
         if len(attributes_raw) != 0:
             attributes = attributes_raw[0] + ", "
 
+        # get attributes with regex
         all_attributes_raw = re.findall(reg_attr_separator, attributes)
-
-        # parse attributes
-        attr_dict = {}
-        for t in all_attributes_raw:
-            # t is a tuple
-            attr_dict[t[0].replace("'", "").replace(" ", "")] = t[1].replace(" ", "")
-            # ToDo: cast datatypes properly
+        # cast attributes to python dict
+        attr_dict = CypherUtilities.parse_attrs(all_attributes_raw)
 
         # init new node item
         node = cls(node_id=0)

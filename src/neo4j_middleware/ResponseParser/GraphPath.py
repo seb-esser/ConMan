@@ -11,7 +11,7 @@ class GraphPath:
         self.segments = segments
 
     def get_start_node(self) -> NodeItem:
-        return self.segments[0].startNode
+        return self.segments[0].start_node
 
     @classmethod
     def from_neo4j_response(cls, raw: str):
@@ -50,7 +50,7 @@ class GraphPath:
         if entry_node_identifier is not None:
             start_node = entry_node_identifier
         else:
-            start_node = self.segments[0].startNode.get_entity_type()
+            start_node = self.segments[0].start_node.get_entity_type()
 
         # init cypher statement
         if path_number is not None:
@@ -62,8 +62,8 @@ class GraphPath:
 
         # loop over all segments of the current path
         for segment in self.segments:
-            end_node_type: str = segment.endNode.get_entity_type()
-            end_node_attrs: dict = {k: v for k, v in segment.endNode.attrs.items() if v is not None}
+            end_node_type: str = segment.end_node.get_entity_type()
+            end_node_attrs: dict = {k: v for k, v in segment.end_node.attrs.items() if v is not None}
 
             end_node_attrs.pop('p21_id', None)
 
@@ -102,4 +102,4 @@ class GraphPath:
         returns the first node of the path
         @return:
         """
-        return self.segments[0].startNode
+        return self.segments[0].start_node

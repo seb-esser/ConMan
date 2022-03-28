@@ -3,6 +3,7 @@ import re
 
 from neo4j_middleware import neo4jConnector
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
@@ -37,28 +38,38 @@ class GraphPattern:
 
         for cy_fragment in fragments:
 
-            #pre-processing steps to make regex statements easier
-            cy_fragment = cy_fragment.replace("--", "-[]-")
+            # pre-processing steps to make regex statements easier
+            cy_fragment = cy_fragment.replace("--", "-[:]-")
 
             regex_nodes = r"\(([^]]+)\)"
-            regex_edges_undirected = r"-\[([^]]+)\]-"
-            regex_edges_directed_left = r"<-\[([^]]+)\]-"
-            regex_edges_directed_right = r"-\[([^]]+)\]->"
-
-            regex_edge_generic = r"\(([^]]+)\)(.?)-\[([^]]+)\]-(.?)\(([^]]+)\)"
+            regex_edge_generic = r"(<?)-\[([^]]+)\]-(>?)"
 
             raw_nodes = re.findall(regex_nodes, cy_fragment, re.MULTILINE)
             raw_edges = re.findall(regex_edge_generic, cy_fragment, re.MULTILINE)
+
+            # sorted list specific to currently processed cypher fragment
+            node_collection = []
+            edge_collection = []
 
             # loop over nodes
             for raw_node in raw_nodes:
                 node = NodeItem.from_cypher_fragment(raw_node)
                 print(node)
+                node_collection.append(node)
 
+            counter_left = 0
+            counter_right = 1
             for raw_edge in raw_edges:
-                print('Edge: {}'.format(raw_edge))
-                # ToDo: process an edge item out of the pattern already knowing the start and end node
+                node_left = node_collection[counter_left]
+                node_right = node_collection[counter_right]
 
+                edge = EdgeItem.from_cypher_fragment(raw_edge, node_left, node_right)
+                edge_collection.append(edge)
+                print(edge)
+
+                counter_left += 1
+                counter_right += 1
+        print()
         return cls(paths=None)
 
     def get_entry_node(self) -> NodeItem:
@@ -124,7 +135,7 @@ class GraphPattern:
         # loop over all paths. Each path contains a list of segments
         for unified_path in self.paths:
             # build start of cypher subquery
-            start = unified_path.segments[0].startNode
+            start = unified_path.segments[0].start_node
             # cy_list.append('MATCH path{0} = ({1})'.format(path_iterator, node_dict[start.id]))
 
             cy_start = 'MATCH path{0} = {1}'.format(path_iterator, start.to_cypher(node_identifier=node_dict[start.id]))
@@ -134,7 +145,7 @@ class GraphPattern:
             edge_iterator = 0
             for edge in unified_path.segments:
 
-                end = edge.endNode
+                end = edge.end_node
                 cy_frag = edge.to_cypher_fragment(
                     target_identifier=node_dict[end.id],
                     segment_identifier=path_iterator,
@@ -213,7 +224,7 @@ class GraphPattern:
         # loop over all paths. Each path contains a list of segments
         for unified_path in self.paths:
             # build start of cypher subquery
-            start = unified_path.segments[0].startNode
+            start = unified_path.segments[0].start_node
             # cy_list.append('MATCH path{0} = ({1})'.format(path_iterator, node_dict[start.id]))
 
             cy_start = 'CREATE path{0} = ({1})'.format(path_iterator, node_dict[start.id])
@@ -222,7 +233,7 @@ class GraphPattern:
             # define path section
             edge_iterator = 0
             for edge in unified_path.segments:
-                end = edge.endNode
+                end = edge.end_node
                 cy_frag = edge.to_cypher_create(
                     target_identifier=node_dict[end.id],
                     segment_identifier=path_iterator,
@@ -262,17 +273,17 @@ class GraphPattern:
         # loop over all paths. Each path contains a list of segments
         for unified_path in self.paths:
             # build start of cypher subquery
-            start = unified_path.segments[0].startNode
+            start = unified_path.segments[0].start_node
             # cy_list.append('MATCH path{0} = ({1})'.format(path_iterator, node_dict[start.id]))
             edge_iterator = 0
             for edge in unified_path.segments:
-                startNode = edge.startNode
-                endNode = edge.endNode
-                cy = 'MERGE {}'.format(edge.startNode.to_cypher(timestamp=timestamp,
-                                                                   node_identifier='a{}{}'.format(
+                startNode = edge.start_node
+                endNode = edge.end_node
+                cy = 'MERGE {}'.format(edge.start_node.to_cypher(timestamp=timestamp,
+                                                                 node_identifier='a{}{}'.format(
                                                                        path_iterator,
                                                                        edge_iterator),
-                                                                   include_nodeType_label=True))\
+                                                                 include_nodeType_label=True))\
                      + edge.to_cypher_merge(
                     target_node=endNode,
                     target_identifier='b{}{}'.format(path_iterator,edge_iterator),
@@ -346,8 +357,8 @@ class GraphPattern:
         unified_pattern_node_list = []
         for path in self.paths:
             for segment in path.segments:
-                start_node = segment.startNode
-                end_node = segment.endNode
+                start_node = segment.start_node
+                end_node = segment.end_node
                 if start_node not in unified_pattern_node_list:
                     unified_pattern_node_list.append(start_node)
                 if end_node not in unified_pattern_node_list:
@@ -411,7 +422,7 @@ class GraphPattern:
                 cutted_path = path.segments[1:]
                 path_object = GraphPath(cutted_path)
 
-                new_start_node = cutted_path[0].startNode
+                new_start_node = cutted_path[0].start_node
                 if new_start_node not in new_start_nodes:
                     pattern = GraphPattern([path_object])
                     sub_patterns.append(pattern)
@@ -440,7 +451,7 @@ class GraphPattern:
         """
         for p in self.paths:
             for e in p.segments:
-                n1: NodeItem = e.startNode
-                n2: NodeItem = e.startNode
+                n1: NodeItem = e.start_node
+                n2: NodeItem = e.start_node
                 n1.tidy_attrs(remove_None_values=False)
                 n2.tidy_attrs(remove_None_values=False)
