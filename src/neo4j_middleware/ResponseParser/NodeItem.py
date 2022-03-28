@@ -42,8 +42,7 @@ class NodeItem:
         return node_type
 
     def __repr__(self):
-        ty = self.get_entity_type()
-        return 'NodeItem: id: {} EntityType: {}'.format(self.id, ty)
+        return 'NodeItem: id: {} attrs: {} labels: {}'.format(self.id, self.attrs, self.labels)
 
     def __eq__(self, other):
         """
@@ -109,7 +108,7 @@ class NodeItem:
         # regex definitions
         reg_attr_extractor = r"\{([^]]+)\}"
         reg_attr_separator = r"(.+?):(.+?),"
-        reg_node_var = r"^(.+?):"
+        reg_node_var = r"^(.+?)(:|)"
         reg_node_labels = r":([^]]+)\{"
 
         # information to be extracted using regex
@@ -135,12 +134,14 @@ class NodeItem:
         # parse attributes
         attr_dict = {}
         for t in all_attributes_raw:
-            attr_dict[t[0].replace("'", "").replace(" ", "")] = t[1]
+            # t is a tuple
+            attr_dict[t[0].replace("'", "").replace(" ", "")] = t[1].replace(" ", "")
             # ToDo: cast datatypes properly
 
         # init new node item
-        node = cls(nodeId=0)
+        node = cls(node_id=0)
         node.attrs = attr_dict
+        node.labels = labels
         # return newly created nodeItem
         return node
 

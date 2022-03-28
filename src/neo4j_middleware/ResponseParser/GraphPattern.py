@@ -42,19 +42,18 @@ class GraphPattern:
             regex_edges_directed_left = r"<-\[([^]]+)\]-"
             regex_edges_directed_right = r"-\[([^]]+)\]->"
 
+            regex_edge_generic = r"\(([^]]+)\)(.?)-\[([^]]+)\]-(.?)\(([^]]+)\)"
+
             raw_nodes = re.findall(regex_nodes, cy_fragment, re.MULTILINE)
-            edges_undirected = re.findall(regex_edges_undirected, cy_fragment, re.MULTILINE)
-            edges_directed_left = re.findall(regex_edges_directed_left, cy_fragment, re.MULTILINE)
-            edges_directed_right = re.findall(regex_edges_directed_right, cy_fragment, re.MULTILINE)
+            raw_edges = re.findall(regex_edge_generic, cy_fragment, re.MULTILINE)
 
             # loop over nodes
             for raw_node in raw_nodes:
                 node = NodeItem.from_cypher_fragment(raw_node)
                 print(node)
 
-            for matchNum, match in enumerate(edges_directed_left, start=1):
-                raw_edge = match.group()
-                print(raw_edge)
+            for raw_edge in raw_edges:
+                print('Edge: {}'.format(raw_edge))
                 # ToDo: process an edge item out of the pattern already knowing the start and end node
 
         return cls(paths=None)
