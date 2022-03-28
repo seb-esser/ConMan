@@ -57,10 +57,10 @@ class IFCGraphGenerator:
         """
 
         # delete entire graph if label already exists
-        print('DEBUG INFO: entire graph labeled with >> {} << gets deleted \n'.format(
-            self.timestamp))
-        self.connector.run_cypher_statement(
-            'MATCH(n:{}) DETACH DELETE n'.format(self.timestamp))
+        # print('DEBUG INFO: entire graph labeled with >> {} << gets deleted \n'.format(
+        #     self.timestamp))
+        # self.connector.run_cypher_statement(
+        #     'MATCH(n:{}) DETACH DELETE n'.format(self.timestamp))
 
         print('[IFC_P21 > {} < ]: Generating graph... '.format(self.timestamp))
 
@@ -144,11 +144,12 @@ class IFCGraphGenerator:
         for p_name in node_properties:
             p_val = info[p_name]
 
-            if isinstance(p_val, str):
-                if p_name is "NominalValue":
-                    print()
-                if "'" in list(p_val)[1:-1]:
-                    print("modifying property value")
+            if p_name == 'NominalValue':
+                wrapped_val = p_val.wrappedValue
+                p_val = 'IfcLabel({})'.format(str(wrapped_val).replace("'", ""))
+                p_val = str(p_val)
+                # ToDo: consider this workaround when translating a graph back in its SPF representation
+
             node_properties_dict[p_name] = p_val
 
         # rename some keys
@@ -156,8 +157,7 @@ class IFCGraphGenerator:
         node_properties_dict['EntityType'] = node_properties_dict.pop('type')
 
         # run cypher command
-        cypher_statement = Neo4jGraphFactory.create_node_with_attr(
-            label, node_properties_dict, self.timestamp)
+        cypher_statement = Neo4jGraphFactory.merge_node_with_attr(label, node_properties_dict, self.timestamp)
 
         self.connector.run_cypher_statement(cypher_statement)
 
@@ -342,7 +342,8 @@ class IFCGraphGenerator:
                                'ReflectionColour',
                                'SpecularColour',
                                'ColourList',
-                               'ColourIndex'
+                               'ColourIndex',
+                               'NominalValue'
 
                                ]:
                 node_attributes.append(attr.name())
@@ -371,7 +372,7 @@ class IFCGraphGenerator:
                     'Orientation',
                     'RefLongitude',
                     'RefLatitude',
-
+                    'NominalValue'
                 ]:
                     node_attributes.append(attr.name())
                 else:
