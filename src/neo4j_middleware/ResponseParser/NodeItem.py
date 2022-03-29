@@ -203,7 +203,7 @@ class NodeItem:
 
         node_labels = ""
         if len(self.labels) == 0:
-            node_labels = ":rel"
+            raise Exception("Node without any label detected")
         else:
             for label in self.labels:
                 node_labels += ":{}".format(label)

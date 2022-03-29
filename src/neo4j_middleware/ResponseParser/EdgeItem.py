@@ -146,17 +146,28 @@ class EdgeItem:
 
         edge_labels = ""
         if len(self.labels) == 0:
-            edge_labels = "rel"
+            edge_labels = ""
+            # ToDo: catch case when no label is provided but attributes are around
         else:
             for label in self.labels:
                 edge_labels += "{}".format(label)
 
-        cy = '-[r{3}{2}:{4}{0}]->({1})'.format(
-            Neo4jFactory.formatDict(self.attributes),
-            target_identifier,
-            relationship_iterator,
-            segment_identifier,
-            edge_labels)
+        if self.is_undirected:
+
+            cy = '-[r{3}{2}:{4}{0}]-({1})'.format(
+                Neo4jFactory.formatDict(self.attributes),
+                target_identifier,
+                relationship_iterator,
+                segment_identifier,
+                edge_labels)
+        else:
+            cy = '-[r{3}{2}:{4}{0}]->({1})'.format(
+                Neo4jFactory.formatDict(self.attributes),
+                target_identifier,
+                relationship_iterator,
+                segment_identifier,
+                edge_labels)
+
         return cy
 
     def to_cypher_merge(self, target_identifier: str, target_node: NodeItem, target_timestamp: str, segment_identifier: int, relationship_iterator: int):

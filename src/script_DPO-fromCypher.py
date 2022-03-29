@@ -15,7 +15,7 @@ def main():
     # cy = pattern2.to_cypher_create()
     # print('Out: {}\n'.format(cy))
 
-    cypher3 = "(n4:asd{a:23})-[e1:EdgeType{a:\"b\"}]-(n5:nodeTypeE)<--(n6)-->(n7:nodeLabel:nodeLabel2{a: \"a\"})"
+    cypher3 = "(n4:asd{a:23})-[e1:EdgeType{a:\"b\"}]-(n5:nodeTypeE)<--(n6:ty)-->(n7:nodeLabel:nodeLabel2{a: \"a\"})"
     print('UserInput: {}'.format(cypher3))
     pattern3 = GraphPattern.from_cypher_statement(cypher3)
     cy = pattern3.to_cypher_create()

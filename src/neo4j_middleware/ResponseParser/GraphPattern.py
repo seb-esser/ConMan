@@ -244,7 +244,7 @@ class GraphPattern:
             start: NodeItem = unified_path.segments[0].start_node
             # cy_list.append('MATCH path{0} = ({1})'.format(path_iterator, node_dict[start.id]))
 
-            cy_start = 'CREATE path{0} = ({1})'.format(path_iterator, start.get_node_identifier())
+            cy_start = 'MERGE path{0} = ({1})'.format(path_iterator, start.get_node_identifier())
             cy_list.append(cy_start)
 
             # define path section
