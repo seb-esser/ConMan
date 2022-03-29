@@ -143,11 +143,20 @@ class EdgeItem:
         returns a cypher command to create the edge. the edge is labeled with 'rel'
         @return: cypher statement as str
         """
-        cy = '-[r{3}{2}:rel{0}]->({1})'.format(
+
+        edge_labels = ""
+        if len(self.labels) == 0:
+            edge_labels = "rel"
+        else:
+            for label in self.labels:
+                edge_labels += "{}".format(label)
+
+        cy = '-[r{3}{2}:{4}{0}]->({1})'.format(
             Neo4jFactory.formatDict(self.attributes),
             target_identifier,
             relationship_iterator,
-            segment_identifier)
+            segment_identifier,
+            edge_labels)
         return cy
 
     def to_cypher_merge(self, target_identifier: str, target_node: NodeItem, target_timestamp: str, segment_identifier: int, relationship_iterator: int):
@@ -155,11 +164,19 @@ class EdgeItem:
         returns a cypher command to create the edge. the edge is labeled with 'rel'
         @return: cypher statement as str
         """
-        cy = '-[r{3}{2}:rel{0}]->{1}'.format(
+
+        edge_labels = ""
+        if len(self.labels) == 0:
+            edge_labels = "rel"
+        else:
+            edge_labels = ":{}".format(self.labels)
+
+        cy = '-[r{3}{2}:{4}{0}]->{1}'.format(
             Neo4jFactory.formatDict(self.attributes),
             target_node.to_cypher(timestamp=target_timestamp, node_identifier=target_identifier, include_nodeType_label=True),
             relationship_iterator,
-            segment_identifier)
+            segment_identifier,
+            edge_labels)
         return cy
 
     def to_cypher_individual_merge(self, target_timestamp: str, segment_identifier: int, relationship_iterator: int):

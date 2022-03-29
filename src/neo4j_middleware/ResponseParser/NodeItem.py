@@ -43,6 +43,14 @@ class NodeItem:
             node_type = "VirtualNode"
         return node_type
 
+    def get_node_identifier(self):
+        if self.node_identifier == "":
+            return "n{}".format(self.id)
+        else:
+            return self.node_identifier
+
+    # ToDo: consider implementing python properties for managed access
+
     def __repr__(self):
         return 'NodeItem: id: {} var: {} attrs: {} labels: {}'\
             .format(self.id, self.node_identifier, self.attrs, self.labels)
@@ -183,27 +191,26 @@ class NodeItem:
                     cleared_dict[key] = eval(val)
             self.attrs = cleared_dict
 
-    def to_cypher(self, timestamp: str = None, node_identifier: str = None, include_nodeType_label: bool = False):
+    def to_cypher(self):
         """
-        returns a cypher query fragment to search for this node with semantics
+        returns a cypher query fragment to search for or to create this node with semantics
         @param include_nodeType_label: set to True if NodeType should be added to the CREATE statement. False by default
         @param timestamp: specify in which model you'd like to search for the node
         @param node_identifier: the variable name in the cypher query
         @return:
         """
-        if node_identifier is None:
-            node_identifier = 'n'
-        if timestamp is None:
-            ts = ''
-        else:
-            ts = ':{}'.format(timestamp)
+        node_identifier = self.get_node_identifier()
 
-        if include_nodeType_label:
-            ts += ':{}'.format(self.get_node_type())
+        node_labels = ""
+        if len(self.labels) == 0:
+            node_labels = ":rel"
+        else:
+            for label in self.labels:
+                node_labels += ":{}".format(label)
 
         # remove p21_id attribute
         cleaned_node_attrs = self.attrs
         # cleaned_node_attrs.pop('p21_id', None)
 
-        return '({0}{1} {2})'.format(node_identifier, ts, Neo4jFactory.formatDict(self.attrs))
+        return '({0}{1} {2})'.format(node_identifier, node_labels, Neo4jFactory.formatDict(self.attrs))
 

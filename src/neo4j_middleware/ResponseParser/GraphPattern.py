@@ -64,19 +64,23 @@ class GraphPattern:
 
             counter_left = 0
             counter_right = 1
+            edge_counter = 0
             for raw_edge in raw_edges:
                 node_left = node_collection[counter_left]
                 node_right = node_collection[counter_right]
 
                 edge = EdgeItem.from_cypher_fragment(raw_edge, node_left, node_right)
+                edge.edge_id = edge_counter
                 edge_collection.append(edge)
                 print(edge)
 
                 counter_left += 1
                 counter_right += 1
+                edge_counter += 1
+
             path = GraphPath(segments=edge_collection)
             paths.append(path)
-        print()
+
         return cls(paths=paths)
 
     def get_entry_node(self) -> NodeItem:
@@ -192,6 +196,12 @@ class GraphPattern:
         return cy_statement
 
     def to_cypher_create(self, timestamp: str = None, reference_structure = None) -> str:
+        return self.to_cypher(timestamp, reference_structure)
+
+    def to_cypher_merge(self, timestamp: str = None) -> str:
+        return self.to_cypher(timestamp)
+
+    def to_cypher(self, timestamp: str = None, reference_structure=None) -> str:
         """
         creates a cypher query string to create a given graph pattern in a target graph
          without recognizing existing items
@@ -219,7 +229,7 @@ class GraphPattern:
 
         # 1: create all nodes
         for node in all_nodes:
-            cy_node = node.to_cypher(timestamp=timestamp, node_identifier=node_dict[node.id], include_nodeType_label=True)
+            cy_node = node.to_cypher()
             cy_frag = 'MERGE {} '.format(cy_node)
             cy_list.append(cy_frag)
 
@@ -231,73 +241,21 @@ class GraphPattern:
         # loop over all paths. Each path contains a list of segments
         for unified_path in self.paths:
             # build start of cypher subquery
-            start = unified_path.segments[0].start_node
+            start: NodeItem = unified_path.segments[0].start_node
             # cy_list.append('MATCH path{0} = ({1})'.format(path_iterator, node_dict[start.id]))
 
-            cy_start = 'CREATE path{0} = ({1})'.format(path_iterator, node_dict[start.id])
+            cy_start = 'CREATE path{0} = ({1})'.format(path_iterator, start.get_node_identifier())
             cy_list.append(cy_start)
 
             # define path section
             edge_iterator = 0
             for edge in unified_path.segments:
-                end = edge.end_node
+                end: NodeItem = edge.end_node
                 cy_frag = edge.to_cypher_create(
-                    target_identifier=node_dict[end.id],
+                    target_identifier=end.get_node_identifier(),
                     segment_identifier=path_iterator,
                     relationship_iterator=edge_iterator)
                 cy_list.append(cy_frag)
-                edge_iterator += 1
-
-            # increase path iterator by one
-            path_iterator += 1
-            cy_list.append(' ')
-
-        cy_statement = ''.join(cy_list)
-
-        return cy_statement
-
-    def to_cypher_merge(self, timestamp: str = None) -> str:
-        """
-        creates a cypher query string to create a given graph pattern in a target graph
-        without recognizing existing items
-        @param timestamp:
-        @return: cypher query statement as str
-        """
-
-        all_nodes: List[NodeItem] = self.get_unified_node_set()
-        self.get_unified_edge_set()
-
-        node_dict = {}
-        for n in all_nodes:
-            node_dict[n.id] = 'n{0}'.format(n.id, n.get_node_type())
-
-        # init cypher query
-        cy_list = []
-
-        # from here on: only use the node variables stated in the node_dict.
-        # All nodes and their attributes are already created
-        path_iterator = 0
-        # loop over all paths. Each path contains a list of segments
-        for unified_path in self.paths:
-            # build start of cypher subquery
-            start = unified_path.segments[0].start_node
-            # cy_list.append('MATCH path{0} = ({1})'.format(path_iterator, node_dict[start.id]))
-            edge_iterator = 0
-            for edge in unified_path.segments:
-                startNode = edge.start_node
-                endNode = edge.end_node
-                cy = 'MERGE {}'.format(edge.start_node.to_cypher(timestamp=timestamp,
-                                                                 node_identifier='a{}{}'.format(
-                                                                       path_iterator,
-                                                                       edge_iterator),
-                                                                 include_nodeType_label=True))\
-                     + edge.to_cypher_merge(
-                    target_node=endNode,
-                    target_identifier='b{}{}'.format(path_iterator,edge_iterator),
-                    target_timestamp=timestamp,
-                    segment_identifier=path_iterator,
-                    relationship_iterator=edge_iterator)
-                cy_list.append(cy)
                 edge_iterator += 1
 
             # increase path iterator by one
