@@ -17,7 +17,7 @@ class EdgeItem:
         self.is_undirected = False
 
     def __repr__(self):
-        return '  EdgeItem: id: {} var: {} fromNode: {} toNode {} attrs: {} labels: {}'\
+        return 'EdgeItem: id: {} var: {} fromNode: {} toNode {} attrs: {} labels: {}' \
             .format(
             self.edge_id, self.edge_identifier, self.start_node.id, self.end_node.id, self.attributes, self.labels)
 
@@ -83,6 +83,8 @@ class EdgeItem:
         node_label_raw = re.findall(reg_node_labels, edge_semantics)
         if len(node_label_raw) != 0:
             labels = node_label_raw[0].replace(" ", "").split(":")
+        else:
+            raise Exception("Error when parsing edges from cypher statement. Each edge must have at least one label. ")
 
         # get attributes
         attributes = ""
@@ -111,99 +113,6 @@ class EdgeItem:
 
         return edge
 
-    def to_cypher(self, source_identifier: str, target_identifier: str) -> str:
-        """
-        returns a cypher statement to search for this edge item.
-        @param source_identifier:
-        @param target_identifier:
-        @return: cypher statement as str
-        """
-        cy = 'MATCH {0}-[rel{1}]->{2}'.format(
-            self.start_node.to_cypher(timestamp=None, node_identifier=source_identifier),
-            Neo4jFactory.formatDict(self.attributes),
-            self.end_node.to_cypher(timestamp=None, node_identifier=target_identifier))
-        return cy
-
-    def to_cypher_fragment(self, target_identifier: str, segment_identifier: int, relationship_iterator: int) -> str:
-        """
-        returns a fragment of a cypher statement to assemble several edges to a path
-        @param target_identifier:
-        @param segment_identifier:
-        @param relationship_iterator:
-        @return: cypher fragment as str
-        """
-        cy = '-[r{3}{2}{0}]->{1}'.format(
-            Neo4jFactory.formatDict(self.attributes),
-            self.end_node.to_cypher(timestamp=None, node_identifier=target_identifier),
-            relationship_iterator, segment_identifier)
-        return cy
-
-    def to_cypher_create(self, target_identifier: str, segment_identifier: int, relationship_iterator: int):
-        """
-        returns a cypher command to create the edge. the edge is labeled with 'rel'
-        @return: cypher statement as str
-        """
-
-        edge_labels = ""
-        if len(self.labels) == 0:
-            edge_labels = ""
-            # ToDo: catch case when no label is provided but attributes are around
-        else:
-            for label in self.labels:
-                edge_labels += "{}".format(label)
-
-        if self.is_undirected:
-
-            cy = '-[r{3}{2}:{4}{0}]-({1})'.format(
-                Neo4jFactory.formatDict(self.attributes),
-                target_identifier,
-                relationship_iterator,
-                segment_identifier,
-                edge_labels)
-        else:
-            cy = '-[r{3}{2}:{4}{0}]->({1})'.format(
-                Neo4jFactory.formatDict(self.attributes),
-                target_identifier,
-                relationship_iterator,
-                segment_identifier,
-                edge_labels)
-
-        return cy
-
-    def to_cypher_merge(self, target_identifier: str, target_node: NodeItem, target_timestamp: str, segment_identifier: int, relationship_iterator: int):
-        """
-        returns a cypher command to create the edge. the edge is labeled with 'rel'
-        @return: cypher statement as str
-        """
-
-        edge_labels = ""
-        if len(self.labels) == 0:
-            edge_labels = "rel"
-        else:
-            edge_labels = ":{}".format(self.labels)
-
-        cy = '-[r{3}{2}:{4}{0}]->{1}'.format(
-            Neo4jFactory.formatDict(self.attributes),
-            target_node.to_cypher(timestamp=target_timestamp, node_identifier=target_identifier, include_nodeType_label=True),
-            relationship_iterator,
-            segment_identifier,
-            edge_labels)
-        return cy
-
-    def to_cypher_individual_merge(self, target_timestamp: str, segment_identifier: int, relationship_iterator: int):
-        cy1 = 'MERGE {}'.format(
-            self.start_node.to_cypher(
-                node_identifier='a', include_nodeType_label=True, timestamp=target_timestamp)
-        )
-        cy2 = 'MERGE {}'.format(
-            self.end_node.to_cypher(
-                node_identifier='b', include_nodeType_label=True, timestamp=target_timestamp)
-        )
-        cy3 = 'MERGE (a)-[r{0}{1}:rel{2}]->(b)'.format(
-            segment_identifier, relationship_iterator, Neo4jFactory.formatDict(self.attributes))
-
-        return Neo4jFactory.BuildMultiStatement([cy1, cy2, cy3])
-
     def set_attributes(self, attrs: Dict):
         """
         sets the attribute property
@@ -212,5 +121,120 @@ class EdgeItem:
         """
         self.attributes = attrs
 
+    def to_cypher(self,
+                  skip_start_node=False,
+                  skip_end_node=False,
+                  skip_node_attrs=False,
+                  skip_node_labels=False,
+                  skip_edge_attrs=False) -> str:
+        """
+        returns a cypher statement to search for this edge item.
+        @return: cypher statement as str
+        """
 
+        if skip_start_node:
+            print("dont put node start node def in statement")
 
+        # pre-define components of query
+
+        cy_start_node = ""
+        cy_edge_identifier = ""
+        cy_edge_labels = ""
+        cy_edge_attributes = ""
+        cy_directed = ""
+        cy_end_node = ""
+
+        # parse nodes
+        if skip_start_node is False:
+            cy_start_node = self.start_node.to_cypher(
+                skip_attributes=skip_node_attrs, skip_labels=skip_node_labels)
+        if skip_end_node is False:
+            cy_end_node = self.end_node.to_cypher(
+                skip_attributes=skip_node_attrs, skip_labels=skip_node_labels)
+
+        # parse edge attributes, labels and identifiers
+        cy_edge_identifier = self.edge_identifier
+
+        if self.attributes != {}:
+            if skip_edge_attrs is False:
+                cy_edge_attributes = Neo4jFactory.formatDict(self.attributes)
+
+        if len(self.labels) > 0:
+            for label in self.labels:
+                cy_edge_labels += ":{}".format(label)
+
+        # parse direction
+        if self.is_undirected is False:
+            cy_directed = ">"
+
+        # construct statement
+        cy = '{}-[{}{}{}]-{}{}'.format(
+            cy_start_node,
+            cy_edge_identifier,
+            cy_edge_labels,
+            cy_edge_attributes,
+            cy_directed,
+            cy_end_node
+                )
+
+        return cy
+
+# def to_cypher_fragment(self, target_identifier: str, segment_identifier: int, relationship_iterator: int) -> str:
+#     """
+#     returns a fragment of a cypher statement to assemble several edges to a path
+#     @param target_identifier:
+#     @param segment_identifier:
+#     @param relationship_iterator:
+#     @return: cypher fragment as str
+#     """
+#     cy = '-[r{3}{2}{0}]->{1}'.format(
+#         Neo4jFactory.formatDict(self.attributes),
+#         self.end_node.to_cypher(timestamp=None, node_identifier=target_identifier),
+#         relationship_iterator, segment_identifier)
+#     return cy
+
+# def to_cypher_create(self, target_identifier: str, segment_identifier: int, relationship_iterator: int):
+#     """
+#     returns a cypher command to create the edge. the edge is labeled with 'rel'
+#     @return: cypher statement as str
+#     """
+#
+#     edge_labels = ""
+#     if len(self.labels) == 0:
+#         edge_labels = ""
+#         # ToDo: catch case when no label is provided but attributes are around
+#     else:
+#         for label in self.labels:
+#             edge_labels += "{}".format(label)
+#
+#     if self.is_undirected:
+#
+#         cy = '-[r{3}{2}:{4}{0}]-({1})'.format(
+#             Neo4jFactory.formatDict(self.attributes),
+#             target_identifier,
+#             relationship_iterator,
+#             segment_identifier,
+#             edge_labels)
+#     else:
+#         cy = '-[r{3}{2}:{4}{0}]->({1})'.format(
+#             Neo4jFactory.formatDict(self.attributes),
+#             target_identifier,
+#             relationship_iterator,
+#             segment_identifier,
+#             edge_labels)
+#
+#     return cy
+
+# def to_cypher_individual_merge(self, target_timestamp: str, segment_identifier: int, relationship_iterator: int):
+#     cy1 = 'MERGE {}'.format(
+#         self.start_node.to_cypher(
+#             node_identifier='a', include_nodeType_label=True, timestamp=target_timestamp)
+#     )
+#     cy2 = 'MERGE {}'.format(
+#         self.end_node.to_cypher(
+#             node_identifier='b', include_nodeType_label=True, timestamp=target_timestamp)
+#     )
+#     cy3 = 'MERGE (a)-[r{0}{1}:rel{2}]->(b)'.format(
+#         segment_identifier, relationship_iterator, Neo4jFactory.formatDict(self.attributes))
+#
+#     return Neo4jFactory.BuildMultiStatement([cy1, cy2, cy3])

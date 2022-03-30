@@ -58,7 +58,6 @@ class GraphPattern:
             for raw_node in raw_nodes:
                 node = NodeItem.from_cypher_fragment(raw_node)
                 node.id = i
-                print(node)
                 node_collection.append(node)
                 i += 1
 
@@ -72,7 +71,6 @@ class GraphPattern:
                 edge = EdgeItem.from_cypher_fragment(raw_edge, node_left, node_right)
                 edge.edge_id = edge_counter
                 edge_collection.append(edge)
-                print(edge)
 
                 counter_left += 1
                 counter_right += 1
@@ -157,10 +155,10 @@ class GraphPattern:
             for edge in unified_path.segments:
 
                 end = edge.end_node
-                cy_frag = edge.to_cypher_fragment(
-                    target_identifier=node_dict[end.id],
-                    segment_identifier=path_iterator,
-                    relationship_iterator=edge_iterator)
+                cy_frag = edge.to_cypher(
+                    skip_start_node=True)
+                # ToDo: to_cypher_fragment() has been deprecated and replaced by to_cypher.
+                #  Use skip_start_node to achieve similar results than before
                 cy_list.append(cy_frag)
                 edge_iterator += 1
 
@@ -240,27 +238,16 @@ class GraphPattern:
         path_iterator = 0
         # loop over all paths. Each path contains a list of segments
         for unified_path in self.paths:
-            # build start of cypher subquery
-            start: NodeItem = unified_path.segments[0].start_node
-            # cy_list.append('MATCH path{0} = ({1})'.format(path_iterator, node_dict[start.id]))
-
-            cy_start = 'MERGE path{0} = ({1})'.format(path_iterator, start.get_node_identifier())
-            cy_list.append(cy_start)
 
             # define path section
             edge_iterator = 0
             for edge in unified_path.segments:
-                end: NodeItem = edge.end_node
-                cy_frag = edge.to_cypher_create(
-                    target_identifier=end.get_node_identifier(),
-                    segment_identifier=path_iterator,
-                    relationship_iterator=edge_iterator)
+                cy_frag = "MERGE " + edge.to_cypher(skip_node_attrs=True, skip_node_labels=True) + " "
                 cy_list.append(cy_frag)
                 edge_iterator += 1
 
-            # increase path iterator by one
+            # increase path iterator
             path_iterator += 1
-            cy_list.append(' ')
 
         cy_statement = ''.join(cy_list)
 
@@ -297,6 +284,7 @@ class GraphPattern:
                 cy = edge.to_cypher_individual_merge(target_timestamp=timestamp,
                                                 segment_identifier=path_iterator,
                                                 relationship_iterator=edge_iterator)
+                # ToDo: method to_cypher_individual_merge() has been deprecated and replaced by to_cypher()
                 print(cy)
 
             # increase path iterator by one

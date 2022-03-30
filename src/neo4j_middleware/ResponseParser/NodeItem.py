@@ -191,26 +191,27 @@ class NodeItem:
                     cleared_dict[key] = eval(val)
             self.attrs = cleared_dict
 
-    def to_cypher(self):
+    def to_cypher(self, skip_attributes=False, skip_labels=False):
         """
         returns a cypher query fragment to search for or to create this node with semantics
-        @param include_nodeType_label: set to True if NodeType should be added to the CREATE statement. False by default
-        @param timestamp: specify in which model you'd like to search for the node
-        @param node_identifier: the variable name in the cypher query
         @return:
         """
-        node_identifier = self.get_node_identifier()
+        cy_node_identifier = self.get_node_identifier()
+        cy_node_attrs = ""
+        cy_node_labels = ""
 
-        node_labels = ""
-        if len(self.labels) == 0:
-            raise Exception("Node without any label detected")
-        else:
-            for label in self.labels:
-                node_labels += ":{}".format(label)
+        if skip_attributes is False:
+            if self.attrs != {}:
+                cy_node_attrs = Neo4jFactory.formatDict(self.attrs)
+
+        if skip_labels is False:
+            if len(self.labels) > 0:
+                for label in self.labels:
+                    cy_node_labels += ":{}".format(label)
 
         # remove p21_id attribute
         cleaned_node_attrs = self.attrs
         # cleaned_node_attrs.pop('p21_id', None)
 
-        return '({0}{1} {2})'.format(node_identifier, node_labels, Neo4jFactory.formatDict(self.attrs))
+        return '({0}{1}{2})'.format(cy_node_identifier, cy_node_labels, cy_node_attrs)
 
