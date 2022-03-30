@@ -2,8 +2,8 @@ from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 
 
 def main():
-    cypher1 = "(n1:nodeTypeA:label1 {attrName1: \"attrVal\", attrName2: 23})" \
-              "-[e1:EdgeType{edgeAttr: 345}]->(n2:nodeTypeB {boolAttr: TRUE})"
+    cypher1 = "(n1:nodeTypeA:label1 {attrName1: \"attrVal\", attrName2: 23, intVal: 1, doubleVal: -1.34})" \
+              "-[e1:EdgeType{edgeAttr: 345}]->(n2:nodeTypeB {boolAttr: TRUE, bl: false})"
     print('UserInput: {}'.format(cypher1))
     pattern1 = GraphPattern.from_cypher_statement(cypher1)
     cy = pattern1.to_cypher_create()
