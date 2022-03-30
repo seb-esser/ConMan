@@ -33,6 +33,7 @@ class GraphPath:
     def __repr__(self):
         return 'GraphPath instance'
 
+    #ToDo: is it necessary to have a to_patch() method together with to_cypher() ?
     def to_patch(self, node_var: str = 'n', entry_node_identifier: str = None, path_number: int = None):
         """
         serializes the GraphPath object into a string representation
@@ -62,23 +63,7 @@ class GraphPath:
 
         # loop over all segments of the current path
         for segment in self.segments:
-            end_node_type: str = segment.end_node.get_entity_type()
-            end_node_attrs: dict = {k: v for k, v in segment.end_node.attrs.items() if v is not None}
-
-            end_node_attrs.pop('p21_id', None)
-
-            rel_attrs = segment.attributes
-
-            cy = '-[r{0}{1} {2} ]->({3}{0} {4} )'\
-                .format(seg_number,
-                        path_number,
-                        Neo4jFactory.formatDict(rel_attrs),
-                        node_var,
-                        Neo4jFactory.formatDict(end_node_attrs)
-                        # end_node_type
-
-                        )
-            seg_number += 1
+            cy = segment.to_cypher(skip_start_node=True)
             cy_list.append(cy)
         return cy_list
 

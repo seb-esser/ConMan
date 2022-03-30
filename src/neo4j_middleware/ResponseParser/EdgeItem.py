@@ -132,9 +132,6 @@ class EdgeItem:
         @return: cypher statement as str
         """
 
-        if skip_start_node:
-            print("dont put node start node def in statement")
-
         # pre-define components of query
 
         cy_start_node = ""
