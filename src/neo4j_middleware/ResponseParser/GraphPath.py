@@ -45,7 +45,7 @@ class GraphPath:
         cy_list = []
 
         # init match-statement
-        cy = 'path{} ='.format(path_number, self.segments[0].start_node.to_cypher_merge())
+        cy = 'path{} ='.format(path_number, self.segments[0].start_node.to_cypher())
         cy_list.append(cy)
 
         last_end_node: NodeItem
@@ -55,13 +55,16 @@ class GraphPath:
             try:
                 if segment.start_node == last_end_node:
                     # remove last comma
-                    cy_list[-1] = cy_list[-1][-2:]
+                    cy_list[-1] = cy_list[-1][:-2]
 
                     # append edge without specifying the start node again
                     skip_start = True
                     cy = segment.to_cypher(skip_start_node=skip_start)
-
+                else:
+                    cy = segment.to_cypher(skip_start_node=False)
+                    cy += ', '
             except:
+
                 cy = segment.to_cypher(skip_start_node=False)
                 cy += ', '
             cy_list.append(cy)

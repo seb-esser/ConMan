@@ -6,13 +6,13 @@ def main():
     #           "-[e1:EdgeType{edgeAttr: 345}]->(n2:nodeTypeB {boolAttr: TRUE, bl: false})"
     # print('In: {}'.format(cypher1))
     # pattern1 = GraphPattern.from_cypher_statement(cypher1)
-    # cy = pattern1.to_cypher()
+    # cy = pattern1.to_cypher_merge()
     # print('Out: {}\n'.format(cy))
     #
     # cypher2 = "(n3:nodeTypeC {attrName3: \"attrVal\", attrName2: 23})<-[e2:EdgeType]-(n4:nodeTypeD)"
     # print('In: {}'.format(cypher2))
     # pattern2 = GraphPattern.from_cypher_statement(cypher2)
-    # cy = pattern2.to_cypher()
+    # cy = pattern2.to_cypher_merge()
     # print('Out: {}\n'.format(cy))
     #
     # cypher3 = "(n4:asd{a:23})-[e1:EdgeType{a:\"b\"}]-(n5:nodeTypeE)<-[:r]-" \
@@ -20,7 +20,7 @@ def main():
     # print('In: {}'.format(cypher3))
     #
     # pattern3 = GraphPattern.from_cypher_statement(cypher3)
-    # cy = pattern3.to_cypher()
+    # cy = pattern3.to_cypher_merge()
     # print('Out: {}\n'.format(cy))
 
     cypher4 = "(n1:Room)-[:r]->(w1:wall{Name:\"Wall1\"}) \n" \
@@ -29,9 +29,9 @@ def main():
 
     pattern4 = GraphPattern.from_cypher_statement(cypher4)
     cy = pattern4.to_cypher_merge()
-    print('Out match-statement: {}'.format(cy))
-    cy = pattern4.to_cypher_match()
     print('Out merge-statement: {}'.format(cy))
+    cy = pattern4.to_cypher_match()
+    print('Out match-statement: \n{}'.format(cy))
 
 
 if __name__ == "__main__":

@@ -109,7 +109,7 @@ class GraphPattern:
         """
 
         all_nodes: List[NodeItem] = self.get_unified_node_set()
-        self.get_unified_edge_set()
+        # self.get_unified_edge_set()
 
         node_dict = {}
         for n in all_nodes:
@@ -123,25 +123,11 @@ class GraphPattern:
 
         path_iterator = 0
         # loop over all paths. Each path contains a list of segments
-        for unified_path in self.paths:
-            # build start of cypher subquery
-            start = unified_path.segments[0].start_node
-            # cy_list.append('MATCH path{0} = ({1})'.format(path_iterator, node_dict[start.id]))
+        for path in self.paths:
 
-            cy_start = 'MATCH path{0} = {1}'.format(path_iterator, start.to_cypher())
-            cy_list.append(cy_start)
-
-            # define path section
-            edge_iterator = 0
-            # todo: bridges the to_cypher() method of a graphPath instance
-            for edge in unified_path.segments:
-
-                end = edge.end_node
-                cy_frag = edge.to_cypher(skip_start_node=True)
-                # ToDo: to_cypher_fragment() has been deprecated and replaced by to_cypher.
-                #  Use skip_start_node to achieve similar results than before
-                cy_list.append(cy_frag)
-                edge_iterator += 1
+            cy_list.append("MATCH ")
+            cy_l = path.to_cypher(path_number=path_iterator)
+            cy_list.extend(cy_l)
 
             # increase path iterator by one
             path_iterator += 1
@@ -185,10 +171,6 @@ class GraphPattern:
 
         all_nodes: List[NodeItem] = self.get_unified_node_set()
         # self.get_unified_edge_set()
-
-        node_dict = {}
-        for n in all_nodes:
-            node_dict[n.id] = 'n{0}'.format(n.id, n.get_node_type())
 
         # init cypher query
         cy_list = []
