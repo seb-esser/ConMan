@@ -143,11 +143,9 @@ class EdgeItem:
 
         # parse nodes
         if skip_start_node is False:
-            cy_start_node = self.start_node.to_cypher(
-                skip_attributes=skip_node_attrs, skip_labels=skip_node_labels)
+            cy_start_node = self.start_node.to_cypher()
         if skip_end_node is False:
-            cy_end_node = self.end_node.to_cypher(
-                skip_attributes=skip_node_attrs, skip_labels=skip_node_labels)
+            cy_end_node = self.end_node.to_cypher()
 
         # parse edge attributes, labels and identifiers
         cy_edge_identifier = self.edge_identifier

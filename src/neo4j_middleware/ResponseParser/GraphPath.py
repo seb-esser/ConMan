@@ -33,38 +33,42 @@ class GraphPath:
     def __repr__(self):
         return 'GraphPath instance'
 
-    #ToDo: is it necessary to have a to_patch() method together with to_cypher() ?
-    def to_patch(self, node_var: str = 'n', entry_node_identifier: str = None, path_number: int = None):
+    def to_cypher(self, path_number: int = None):
         """
         serializes the GraphPath object into a string representation
-        @param path_number: specify an integer indicating the path number inside a pattern. Otherwise None
-        @param node_var: identifier used inside a graph path
-        @type entry_node_identifier: str representation of the entry node. use cypher style
+        @param path_number: specify an integer indicating the path number inside a pattern, otherwise None
         @return: cypher string fragment
         """
 
         # init local vars of this method
         cy = ''
-        seg_number = 1
         cy_list = []
 
-        if entry_node_identifier is not None:
-            start_node = entry_node_identifier
-        else:
-            start_node = self.segments[0].start_node.get_entity_type()
-
-        # init cypher statement
-        if path_number is not None:
-            cy = 'MATCH path{} = ({})'.format(path_number, start_node)
-        else:
-            cy = 'MATCH ({})'.format(seg_number, start_node)
-
+        # init match-statement
+        cy = 'path{} ='.format(path_number, self.segments[0].start_node.to_cypher_merge())
         cy_list.append(cy)
 
-        # loop over all segments of the current path
+        last_end_node: NodeItem
+
+        # loop over all segments of the current path and append them to the call
         for segment in self.segments:
-            cy = segment.to_cypher(skip_start_node=True)
+            try:
+                if segment.start_node == last_end_node:
+                    # remove last comma
+                    cy_list[-1] = cy_list[-1][-2:]
+
+                    # append edge without specifying the start node again
+                    skip_start = True
+                    cy = segment.to_cypher(skip_start_node=skip_start)
+
+            except:
+                cy = segment.to_cypher(skip_start_node=False)
+                cy += ', '
             cy_list.append(cy)
+
+            # update last_end_node attribute
+            last_end_node = segment.end_node
+
         return cy_list
 
     def remove_segments_by_id(self, segment_ids):

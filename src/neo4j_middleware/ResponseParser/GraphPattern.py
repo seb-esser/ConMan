@@ -101,27 +101,7 @@ class GraphPattern:
                 attr_dict = connector.run_cypher_statement(cy, 'PROPERTIES(r)')[0]
                 segment.attributes = attr_dict
 
-    def to_cypher_query(self) -> str:
-        """
-        creates a cypher query snippet to search for this pattern in a given graph
-        @return: cypher statement snippet
-        """
-
-        alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
-                    'k', 'l', 'm', 'n', 'o', 'path', 'q', 'r']
-
-        cy_statement: str = ""
-        path_iterator = 0
-        for path in self.paths:
-            cy_paths = path.to_patch(node_var=alphabet[path_iterator], entry_node_identifier='en', path_number=path_iterator)
-            cy_path = " ".join(cy_paths)
-
-            cy_statement = cy_statement + ' {}'.format(cy_path)
-            path_iterator += 1
-
-        return cy_statement
-
-    def to_cypher_query_indexed(self, timestamp: str = None) -> str:
+    def to_cypher_match(self, timestamp: str = None) -> str:
         """
         improved version to search for a specified graph pattern using a distinct node set definition
         @type timestamp: optional timestamp string to identify the target graph the pattern should be searched for
@@ -153,6 +133,7 @@ class GraphPattern:
 
             # define path section
             edge_iterator = 0
+            # todo: bridges the to_cypher() method of a graphPath instance
             for edge in unified_path.segments:
 
                 end = edge.end_node
@@ -193,7 +174,7 @@ class GraphPattern:
 
         return cy_statement
 
-    def to_cypher(self, reference_structure=None) -> str:
+    def to_cypher_merge(self, reference_structure=None) -> str:
         """
         creates a cypher query string to create a given graph pattern in a target graph
          without recognizing existing items
@@ -242,48 +223,6 @@ class GraphPattern:
 
             # increase path iterator
             path_iterator += 1
-
-        cy_statement = ''.join(cy_list)
-
-        return cy_statement
-
-    def to_cypher_merge_separated(self, timestamp: str = None) -> str:
-        """
-        creates a cypher query string to create a given graph pattern in a target graph
-        without recognizing existing items
-        @param timestamp:
-        @return: cypher query statement as str
-        """
-
-        all_nodes: List[NodeItem] = self.get_unified_node_set()
-        self.get_unified_edge_set()
-
-        node_dict = {}
-        for n in all_nodes:
-            node_dict[n.id] = 'n{0}'.format(n.id, n.get_node_type())
-
-        # init cypher query
-        cy_list = []
-
-        # 2: create all paths
-
-        # from here on: only use the node variables stated in the node_dict.
-        # All nodes and their attributes are already created
-        path_iterator = 0
-        # loop over all paths. Each path contains a list of segments
-        for unified_path in self.paths:
-            # build start of cypher subquery
-            edge_iterator = 0
-            for edge in unified_path.segments:
-                cy = edge.to_cypher_individual_merge(target_timestamp=timestamp,
-                                                segment_identifier=path_iterator,
-                                                relationship_iterator=edge_iterator)
-                # ToDo: method to_cypher_individual_merge() has been deprecated and replaced by to_cypher()
-                print(cy)
-
-            # increase path iterator by one
-            path_iterator += 1
-            cy_list.append(' ')
 
         cy_statement = ''.join(cy_list)
 

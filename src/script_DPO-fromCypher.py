@@ -23,16 +23,15 @@ def main():
     # cy = pattern3.to_cypher()
     # print('Out: {}\n'.format(cy))
 
-    cypher4 = "(n1:Room)-[:r]->(w1:wall) \n" \
-              "(w3:wall{Name:\"Wall3\"})<-[:r]-(n1)-[:r]->(w2:wall)"
+    cypher4 = "(n1:Room)-[:r]->(w1:wall{Name:\"Wall1\"}) \n" \
+              "(w3:wall{Name:\"Wall3\"})<-[b:r]-(n1)-[a:r]->(w2:wall{Name:\"Wall2\"})-[:e]->(win:window)"
     print('In: {}'.format(cypher4))
+
     pattern4 = GraphPattern.from_cypher_statement(cypher4)
-    cy = pattern4.to_cypher()
-    print('Out: {}\n'.format(cy))
-    cy = pattern4.to_cypher_query()
-    print('Out: {}\n'.format(cy))
-    cy = pattern4.to_cypher_query_indexed()
-    print('Out: {}\n'.format(cy))
+    cy = pattern4.to_cypher_merge()
+    print('Out match-statement: {}'.format(cy))
+    cy = pattern4.to_cypher_match()
+    print('Out merge-statement: {}'.format(cy))
 
 
 if __name__ == "__main__":
