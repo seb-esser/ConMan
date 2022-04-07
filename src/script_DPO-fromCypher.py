@@ -31,7 +31,7 @@ def main():
     cy = pattern4.to_cypher_merge()
     print('Out merge-statement: {}'.format(cy))
     cy = pattern4.to_cypher_match()
-    print('Out match-statement: \n{}'.format(cy))
+    print('Out match-statement: {}'.format(cy))
 
 
 if __name__ == "__main__":

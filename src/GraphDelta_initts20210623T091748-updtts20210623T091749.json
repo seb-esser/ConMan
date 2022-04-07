@@ -1,1 +1,779 @@
-{"py/object": "neo4jGraphDiff.GraphDelta.GraphDelta", "ts_init": "ts20210623T091748", "ts_updated": "ts20210623T091749", "node_matching_table": {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodeMatchingTable", "matched_nodes": [{"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 4, "entityType": "IfcProject", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcProject", "ObjectType": "None", "Phase": "None", "Description": "None", "LongName": "None", "p21_id": 5, "Name": "GeomRep", "GlobalId": "2KrDsiaI1FkRwWUa5EvoNK"}, "nodeType": "PrimaryNode"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 25, "entityType": "IfcProject", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcProject", "ObjectType": "None", "Phase": "None", "Description": "None", "LongName": "None", "p21_id": 5, "Name": "GeomRep", "GlobalId": "2KrDsiaI1FkRwWUa5EvoNK"}, "nodeType": "PrimaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 5, "entityType": "IfcGeometricRepresentationContext", "hash_value": null, "relType": "RepresentationContexts__listItem0", "attrs": {"EntityType": "IfcGeometricRepresentationContext", "ContextType": "Model", "Precision": 0.0001, "ContextIdentifier": "None", "p21_id": 10, "CoordinateSpaceDimension": 3}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 26, "entityType": "IfcGeometricRepresentationContext", "hash_value": null, "relType": "RepresentationContexts__listItem0", "attrs": {"EntityType": "IfcGeometricRepresentationContext", "ContextType": "Model", "Precision": 0.0001, "ContextIdentifier": "None", "p21_id": 10, "CoordinateSpaceDimension": 3}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 8, "entityType": "IfcDirection", "hash_value": null, "relType": "TrueNorth", "attrs": {"EntityType": "IfcDirection", "DirectionRatios": "(0.0, 1.0)", "p21_id": 13}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 29, "entityType": "IfcDirection", "hash_value": null, "relType": "TrueNorth", "attrs": {"EntityType": "IfcDirection", "DirectionRatios": "(0.0, 1.0)", "p21_id": 13}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 6, "entityType": "IfcAxis2Placement3D", "hash_value": null, "relType": "WorldCoordinateSystem", "attrs": {"EntityType": "IfcAxis2Placement3D", "p21_id": 12}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 27, "entityType": "IfcAxis2Placement3D", "hash_value": null, "relType": "WorldCoordinateSystem", "attrs": {"EntityType": "IfcAxis2Placement3D", "p21_id": 12}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 7, "entityType": "IfcCartesianPoint", "hash_value": null, "relType": "Location", "attrs": {"EntityType": "IfcCartesianPoint", "Coordinates": "(0.0, 0.0, 0.0)", "p21_id": 11}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 28, "entityType": "IfcCartesianPoint", "hash_value": null, "relType": "Location", "attrs": {"EntityType": "IfcCartesianPoint", "Coordinates": "(0.0, 0.0, 0.0)", "p21_id": 11}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 0, "entityType": "IfcSite", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcSite", "ObjectType": "None", "Description": "None", "LongName": "None", "RefElevation": "None", "RefLongitude": "None", "LandTitleNumber": "None", "RefLatitude": "None", "p21_id": 4, "CompositionType": "None", "Name": "site", "GlobalId": "2gG1du9OH4eQ4omNt$zfn1"}, "nodeType": "PrimaryNode"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 21, "entityType": "IfcSite", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcSite", "ObjectType": "None", "Description": "None", "LongName": "None", "RefElevation": "None", "RefLongitude": "None", "LandTitleNumber": "None", "RefLatitude": "None", "p21_id": 4, "CompositionType": "None", "Name": "site", "GlobalId": "2gG1du9OH4eQ4omNt$zfn1"}, "nodeType": "PrimaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 1, "entityType": "IfcLocalPlacement", "hash_value": null, "relType": "ObjectPlacement", "attrs": {"EntityType": "IfcLocalPlacement", "p21_id": 3}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 22, "entityType": "IfcLocalPlacement", "hash_value": null, "relType": "ObjectPlacement", "attrs": {"EntityType": "IfcLocalPlacement", "p21_id": 3}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 2, "entityType": "IfcAxis2Placement3D", "hash_value": null, "relType": "RelativePlacement", "attrs": {"EntityType": "IfcAxis2Placement3D", "p21_id": 2}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 23, "entityType": "IfcAxis2Placement3D", "hash_value": null, "relType": "RelativePlacement", "attrs": {"EntityType": "IfcAxis2Placement3D", "p21_id": 2}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 3, "entityType": "IfcCartesianPoint", "hash_value": null, "relType": "Location", "attrs": {"EntityType": "IfcCartesianPoint", "Coordinates": "(0.0, 0.0, 0.0)", "p21_id": 1}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 24, "entityType": "IfcCartesianPoint", "hash_value": null, "relType": "Location", "attrs": {"EntityType": "IfcCartesianPoint", "Coordinates": "(0.0, 0.0, 0.0)", "p21_id": 1}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": -1, "entityType": null, "hash_value": null, "relType": null, "attrs": null, "nodeType": null}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 40, "entityType": "IfcBuildingElementProxy", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcBuildingElementProxy", "ObjectType": "None", "Description": "None", "Tag": "None", "p21_id": 29, "PredefinedType": "None", "Name": "Cuboid2", "GlobalId": "3uuPRBnzbDKvY53sXt1d9w"}, "nodeType": "PrimaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 9, "entityType": "IfcBuildingElementProxy", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcBuildingElementProxy", "ObjectType": "None", "Description": "None", "Tag": "None", "p21_id": 20, "PredefinedType": "None", "Name": "Cuboid1", "GlobalId": "3xn$Io5tr8TOYxqxH15Rkg"}, "nodeType": "PrimaryNode"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 30, "entityType": "IfcBuildingElementProxy", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcBuildingElementProxy", "ObjectType": "None", "Description": "None", "Tag": "None", "p21_id": 20, "PredefinedType": "None", "Name": "Cuboid1", "GlobalId": "3xn$Io5tr8TOYxqxH15Rkg"}, "nodeType": "PrimaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 13, "entityType": "IfcProductDefinitionShape", "hash_value": null, "relType": "Representation", "attrs": {"EntityType": "IfcProductDefinitionShape", "Description": "None", "p21_id": 16, "Name": "None"}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 34, "entityType": "IfcProductDefinitionShape", "hash_value": null, "relType": "Representation", "attrs": {"EntityType": "IfcProductDefinitionShape", "Description": "None", "p21_id": 16, "Name": "None"}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 10, "entityType": "IfcLocalPlacement", "hash_value": null, "relType": "ObjectPlacement", "attrs": {"EntityType": "IfcLocalPlacement", "p21_id": 19}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 31, "entityType": "IfcLocalPlacement", "hash_value": null, "relType": "ObjectPlacement", "attrs": {"EntityType": "IfcLocalPlacement", "p21_id": 19}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 14, "entityType": "IfcShapeRepresentation", "hash_value": null, "relType": "Representations__listItem0", "attrs": {"EntityType": "IfcShapeRepresentation", "RepresentationIdentifier": "Body", "p21_id": 15, "RepresentationType": "SweptSolid"}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 35, "entityType": "IfcShapeRepresentation", "hash_value": null, "relType": "Representations__listItem0", "attrs": {"EntityType": "IfcShapeRepresentation", "RepresentationIdentifier": "Body", "p21_id": 15, "RepresentationType": "SweptSolid"}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 16, "entityType": "IfcExtrudedAreaSolid", "hash_value": null, "relType": "Items__listItem0", "attrs": {"EntityType": "IfcExtrudedAreaSolid", "p21_id": 8, "Depth": 1.35}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 37, "entityType": "IfcExtrudedAreaSolid", "hash_value": null, "relType": "Items__listItem0", "attrs": {"EntityType": "IfcExtrudedAreaSolid", "p21_id": 8, "Depth": 3.02}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 15, "entityType": "IfcGeometricRepresentationSubContext", "hash_value": null, "relType": "ContextOfItems", "attrs": {"EntityType": "IfcGeometricRepresentationSubContext", "ContextType": "Model", "TargetScale": "None", "Precision": "None", "ContextIdentifier": "Body", "TargetView": "MODEL_VIEW", "p21_id": 14, "UserDefinedTargetView": "None", "CoordinateSpaceDimension": "None"}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 36, "entityType": "IfcGeometricRepresentationSubContext", "hash_value": null, "relType": "ContextOfItems", "attrs": {"EntityType": "IfcGeometricRepresentationSubContext", "ContextType": "Model", "TargetScale": "None", "Precision": "None", "ContextIdentifier": "Body", "TargetView": "MODEL_VIEW", "p21_id": 14, "UserDefinedTargetView": "None", "CoordinateSpaceDimension": "None"}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 18, "entityType": "IfcDirection", "hash_value": null, "relType": "ExtrudedDirection", "attrs": {"EntityType": "IfcDirection", "DirectionRatios": "(0.0, 0.0, 1.0)", "p21_id": 9}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 39, "entityType": "IfcDirection", "hash_value": null, "relType": "ExtrudedDirection", "attrs": {"EntityType": "IfcDirection", "DirectionRatios": "(0.0, 0.0, 1.0)", "p21_id": 9}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 17, "entityType": "IfcRectangleProfileDef", "hash_value": null, "relType": "SweptArea", "attrs": {"EntityType": "IfcRectangleProfileDef", "ProfileType": "AREA", "YDim": 6.0, "XDim": 4.0, "ProfileName": "rectangleProfileDef", "p21_id": 7}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 38, "entityType": "IfcRectangleProfileDef", "hash_value": null, "relType": "SweptArea", "attrs": {"EntityType": "IfcRectangleProfileDef", "ProfileType": "AREA", "YDim": 6.0, "XDim": 4.0, "ProfileName": "rectangleProfileDef", "p21_id": 7}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 11, "entityType": "IfcAxis2Placement3D", "hash_value": null, "relType": "RelativePlacement", "attrs": {"EntityType": "IfcAxis2Placement3D", "p21_id": 18}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 32, "entityType": "IfcAxis2Placement3D", "hash_value": null, "relType": "RelativePlacement", "attrs": {"EntityType": "IfcAxis2Placement3D", "p21_id": 18}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 12, "entityType": "IfcCartesianPoint", "hash_value": null, "relType": "Location", "attrs": {"EntityType": "IfcCartesianPoint", "Coordinates": "(2.0, 5.0, 1.0)", "p21_id": 17}, "nodeType": "ts20210623T091748"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 33, "entityType": "IfcCartesianPoint", "hash_value": null, "relType": "Location", "attrs": {"EntityType": "IfcCartesianPoint", "Coordinates": "(2.0, 5.0, 1.0)", "p21_id": 17}, "nodeType": "SecondaryNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 19, "entityType": "IfcRelAggregates", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcRelAggregates", "Description": "None", "p21_id": 6, "Name": "None", "GlobalId": "1U7z3bi0N_4L0UNA$m7S6j"}, "nodeType": "ConnectionNode"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 48, "entityType": "IfcRelAggregates", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcRelAggregates", "Description": "None", "p21_id": 6, "Name": "None", "GlobalId": "1U7z3bi0N_4L0UNA$m7S6j"}, "nodeType": "ConnectionNode"}}, {"py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair", "init_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 20, "entityType": "IfcRelContainedInSpatialStructure", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcRelContainedInSpatialStructure", "Description": "Site Container for Elements", "p21_id": 21, "Name": "Site", "GlobalId": "3FNv6N_ur0zQ8tygS1XDuH"}, "nodeType": "ConnectionNode"}, "updated_node": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 49, "entityType": "IfcRelContainedInSpatialStructure", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcRelContainedInSpatialStructure", "Description": "Site Container for Elements", "p21_id": 21, "Name": "Site", "GlobalId": "3FNv6N_ur0zQ8tygS1XDuH"}, "nodeType": "ConnectionNode"}}]}, "property_updates": [{"py/object": "neo4jGraphDiff.Caption.PropertyModification.PropertyModification", "pattern": {"py/object": "neo4j_middleware.ResponseParser.GraphPattern.GraphPattern", "paths": [{"py/object": "neo4j_middleware.ResponseParser.GraphPath.GraphPath", "segments": [{"py/object": "neo4j_middleware.ResponseParser.EdgeItem.EdgeItem", "startNode": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 9, "entityType": "IfcBuildingElementProxy", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcBuildingElementProxy", "ObjectType": "None", "Description": "None", "Tag": "None", "p21_id": 20, "PredefinedType": "None", "Name": "Cuboid1", "GlobalId": "3xn$Io5tr8TOYxqxH15Rkg"}, "nodeType": "PrimaryNode"}, "endNode": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 13, "entityType": "IfcProductDefinitionShape", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcProductDefinitionShape", "Description": "None", "p21_id": 16, "Name": "None"}, "nodeType": "SecondaryNode"}, "edge_id": 11, "attributes": {}}, {"py/object": "neo4j_middleware.ResponseParser.EdgeItem.EdgeItem", "startNode": {"py/id": 121}, "endNode": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 14, "entityType": "IfcShapeRepresentation", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcShapeRepresentation", "RepresentationIdentifier": "Body", "p21_id": 15, "RepresentationType": "SweptSolid"}, "nodeType": "SecondaryNode"}, "edge_id": 12, "attributes": {}}, {"py/object": "neo4j_middleware.ResponseParser.EdgeItem.EdgeItem", "startNode": {"py/id": 125}, "endNode": {"py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem", "id": 16, "entityType": "IfcExtrudedAreaSolid", "hash_value": null, "relType": null, "attrs": {"EntityType": "IfcExtrudedAreaSolid", "p21_id": 8, "Depth": 1.35}, "nodeType": "SecondaryNode"}, "edge_id": 15, "attributes": {}}]}]}, "node_init": {"py/id": 73}, "node_updated": {"py/id": 75}, "attrName": "Depth", "valueOld": 1.35, "valueNew": 3.02, "modificationType": {"py/reduce": [{"py/type": "neo4jGraphDiff.Caption.PropertyModification.PropertyModificationTypeEnum"}, {"py/tuple": [3]}]}}], "structure_updates": [{"py/object": "neo4jGraphDiff.Caption.StructureModification.StructureModification", "parent": {"py/id": 31}, "child": {"py/id": 50}, "modType": {"py/reduce": [{"py/type": "neo4jGraphDiff.Caption.StructureModification.StructuralModificationTypeEnum"}, {"py/tuple": [1]}]}}]}
+{
+  "py/object": "neo4jGraphDiff.GraphDelta.GraphDelta",
+  "ts_init": "ts20210623T091748",
+  "ts_updated": "ts20210623T091749",
+  "node_matching_table": {
+    "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodeMatchingTable",
+    "matched_nodes": [
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 51,
+          "rel_type": null,
+          "attrs": {
+            "EntityType": "IfcProject",
+            "ObjectType": "None",
+            "Phase": "None",
+            "Description": "None",
+            "LongName": "None",
+            "p21_id": 5,
+            "GlobalId": "2KrDsiaI1FkRwWUa5EvoNK",
+            "Name": "GeomRep"
+          },
+          "labels": [
+            "PrimaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 80,
+          "rel_type": null,
+          "attrs": {
+            "EntityType": "IfcProject",
+            "ObjectType": "None",
+            "Phase": "None",
+            "Description": "None",
+            "LongName": "None",
+            "p21_id": 5,
+            "GlobalId": "2KrDsiaI1FkRwWUa5EvoNK",
+            "Name": "GeomRep"
+          },
+          "labels": [
+            "PrimaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 46,
+          "rel_type": "RepresentationContexts__listItem0",
+          "attrs": {
+            "EntityType": "IfcGeometricRepresentationContext",
+            "ContextType": "Model",
+            "Precision": 0.0001,
+            "ContextIdentifier": "None",
+            "p21_id": 10,
+            "CoordinateSpaceDimension": 3
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 75,
+          "rel_type": "RepresentationContexts__listItem0",
+          "attrs": {
+            "EntityType": "IfcGeometricRepresentationContext",
+            "ContextType": "Model",
+            "Precision": 0.0001,
+            "ContextIdentifier": "None",
+            "p21_id": 10,
+            "CoordinateSpaceDimension": 3
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 43,
+          "rel_type": "TrueNorth",
+          "attrs": {
+            "EntityType": "IfcDirection",
+            "DirectionRatios": "(0.0, 1.0)",
+            "p21_id": 13
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 72,
+          "rel_type": "TrueNorth",
+          "attrs": {
+            "EntityType": "IfcDirection",
+            "DirectionRatios": "(0.0, 1.0)",
+            "p21_id": 13
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 44,
+          "rel_type": "WorldCoordinateSystem",
+          "attrs": {
+            "EntityType": "IfcAxis2Placement3D",
+            "p21_id": 12
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 73,
+          "rel_type": "WorldCoordinateSystem",
+          "attrs": {
+            "EntityType": "IfcAxis2Placement3D",
+            "p21_id": 12
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 45,
+          "rel_type": "Location",
+          "attrs": {
+            "EntityType": "IfcCartesianPoint",
+            "Coordinates": "(0.0, 0.0, 0.0)",
+            "p21_id": 11
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 74,
+          "rel_type": "Location",
+          "attrs": {
+            "EntityType": "IfcCartesianPoint",
+            "Coordinates": "(0.0, 0.0, 0.0)",
+            "p21_id": 11
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 52,
+          "rel_type": null,
+          "attrs": {
+            "EntityType": "IfcSite",
+            "ObjectType": "None",
+            "Description": "None",
+            "LongName": "None",
+            "RefElevation": "None",
+            "RefLatitude": "None",
+            "RefLongitude": "None",
+            "LandTitleNumber": "None",
+            "p21_id": 4,
+            "CompositionType": "None",
+            "GlobalId": "2gG1du9OH4eQ4omNt$zfn1",
+            "Name": "site"
+          },
+          "labels": [
+            "PrimaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 81,
+          "rel_type": null,
+          "attrs": {
+            "EntityType": "IfcSite",
+            "ObjectType": "None",
+            "Description": "None",
+            "LongName": "None",
+            "RefElevation": "None",
+            "RefLatitude": "None",
+            "RefLongitude": "None",
+            "LandTitleNumber": "None",
+            "p21_id": 4,
+            "CompositionType": "None",
+            "GlobalId": "2gG1du9OH4eQ4omNt$zfn1",
+            "Name": "site"
+          },
+          "labels": [
+            "PrimaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 53,
+          "rel_type": "ObjectPlacement",
+          "attrs": {
+            "EntityType": "IfcLocalPlacement",
+            "p21_id": 3
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 82,
+          "rel_type": "ObjectPlacement",
+          "attrs": {
+            "EntityType": "IfcLocalPlacement",
+            "p21_id": 3
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 54,
+          "rel_type": "RelativePlacement",
+          "attrs": {
+            "EntityType": "IfcAxis2Placement3D",
+            "p21_id": 2
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 83,
+          "rel_type": "RelativePlacement",
+          "attrs": {
+            "EntityType": "IfcAxis2Placement3D",
+            "p21_id": 2
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 55,
+          "rel_type": "Location",
+          "attrs": {
+            "EntityType": "IfcCartesianPoint",
+            "Coordinates": "(0.0, 0.0, 0.0)",
+            "p21_id": 1
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 84,
+          "rel_type": "Location",
+          "attrs": {
+            "EntityType": "IfcCartesianPoint",
+            "Coordinates": "(0.0, 0.0, 0.0)",
+            "p21_id": 1
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": -1,
+          "rel_type": null,
+          "attrs": null,
+          "labels": [],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 56,
+          "rel_type": null,
+          "attrs": {
+            "EntityType": "IfcBuildingElementProxy",
+            "ObjectType": "None",
+            "Description": "None",
+            "Tag": "None",
+            "p21_id": 29,
+            "PredefinedType": "None",
+            "Name": "Cuboid2",
+            "GlobalId": "3uuPRBnzbDKvY53sXt1d9w"
+          },
+          "labels": [
+            "PrimaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 36,
+          "rel_type": null,
+          "attrs": {
+            "EntityType": "IfcBuildingElementProxy",
+            "ObjectType": "None",
+            "Description": "None",
+            "Tag": "None",
+            "p21_id": 20,
+            "PredefinedType": "None",
+            "Name": "Cuboid1",
+            "GlobalId": "3xn$Io5tr8TOYxqxH15Rkg"
+          },
+          "labels": [
+            "PrimaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 65,
+          "rel_type": null,
+          "attrs": {
+            "EntityType": "IfcBuildingElementProxy",
+            "ObjectType": "None",
+            "Description": "None",
+            "Tag": "None",
+            "p21_id": 20,
+            "PredefinedType": "None",
+            "Name": "Cuboid1",
+            "GlobalId": "3xn$Io5tr8TOYxqxH15Rkg"
+          },
+          "labels": [
+            "PrimaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 40,
+          "rel_type": "Representation",
+          "attrs": {
+            "EntityType": "IfcProductDefinitionShape",
+            "Description": "None",
+            "p21_id": 16,
+            "Name": "None"
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 69,
+          "rel_type": "Representation",
+          "attrs": {
+            "EntityType": "IfcProductDefinitionShape",
+            "Description": "None",
+            "p21_id": 16,
+            "Name": "None"
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 37,
+          "rel_type": "ObjectPlacement",
+          "attrs": {
+            "EntityType": "IfcLocalPlacement",
+            "p21_id": 19
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 66,
+          "rel_type": "ObjectPlacement",
+          "attrs": {
+            "EntityType": "IfcLocalPlacement",
+            "p21_id": 19
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 41,
+          "rel_type": "Representations__listItem0",
+          "attrs": {
+            "EntityType": "IfcShapeRepresentation",
+            "RepresentationIdentifier": "Body",
+            "p21_id": 15,
+            "RepresentationType": "SweptSolid"
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 70,
+          "rel_type": "Representations__listItem0",
+          "attrs": {
+            "EntityType": "IfcShapeRepresentation",
+            "RepresentationIdentifier": "Body",
+            "p21_id": 15,
+            "RepresentationType": "SweptSolid"
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 48,
+          "rel_type": "Items__listItem0",
+          "attrs": {
+            "EntityType": "IfcExtrudedAreaSolid",
+            "p21_id": 8,
+            "Depth": 1.35
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 77,
+          "rel_type": "Items__listItem0",
+          "attrs": {
+            "EntityType": "IfcExtrudedAreaSolid",
+            "p21_id": 8,
+            "Depth": 1.35
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 42,
+          "rel_type": "ContextOfItems",
+          "attrs": {
+            "EntityType": "IfcGeometricRepresentationSubContext",
+            "TargetScale": "None",
+            "ContextType": "Model",
+            "TargetView": "MODEL_VIEW",
+            "Precision": "None",
+            "ContextIdentifier": "Body",
+            "UserDefinedTargetView": "None",
+            "p21_id": 14,
+            "CoordinateSpaceDimension": "None"
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 71,
+          "rel_type": "ContextOfItems",
+          "attrs": {
+            "EntityType": "IfcGeometricRepresentationSubContext",
+            "TargetScale": "None",
+            "ContextType": "Model",
+            "TargetView": "MODEL_VIEW",
+            "Precision": "None",
+            "ContextIdentifier": "Body",
+            "UserDefinedTargetView": "None",
+            "p21_id": 14,
+            "CoordinateSpaceDimension": "None"
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 47,
+          "rel_type": "ExtrudedDirection",
+          "attrs": {
+            "EntityType": "IfcDirection",
+            "DirectionRatios": "(0.0, 0.0, 1.0)",
+            "p21_id": 9
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 76,
+          "rel_type": "ExtrudedDirection",
+          "attrs": {
+            "EntityType": "IfcDirection",
+            "DirectionRatios": "(0.0, 0.0, 1.0)",
+            "p21_id": 9
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 49,
+          "rel_type": "SweptArea",
+          "attrs": {
+            "EntityType": "IfcRectangleProfileDef",
+            "ProfileType": "AREA",
+            "YDim": 6.0,
+            "XDim": 4.0,
+            "ProfileName": "rectangleProfileDef",
+            "p21_id": 7
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 78,
+          "rel_type": "SweptArea",
+          "attrs": {
+            "EntityType": "IfcRectangleProfileDef",
+            "ProfileType": "AREA",
+            "YDim": 6.0,
+            "XDim": 4.0,
+            "ProfileName": "rectangleProfileDef",
+            "p21_id": 7
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 38,
+          "rel_type": "RelativePlacement",
+          "attrs": {
+            "EntityType": "IfcAxis2Placement3D",
+            "p21_id": 18
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 67,
+          "rel_type": "RelativePlacement",
+          "attrs": {
+            "EntityType": "IfcAxis2Placement3D",
+            "p21_id": 18
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 39,
+          "rel_type": "Location",
+          "attrs": {
+            "EntityType": "IfcCartesianPoint",
+            "Coordinates": "(2.0, 5.0, 1.0)",
+            "p21_id": 17
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 68,
+          "rel_type": "Location",
+          "attrs": {
+            "EntityType": "IfcCartesianPoint",
+            "Coordinates": "(2.0, 5.0, 1.0)",
+            "p21_id": 17
+          },
+          "labels": [
+            "SecondaryNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 35,
+          "rel_type": null,
+          "attrs": {
+            "EntityType": "IfcRelContainedInSpatialStructure",
+            "Description": "Site Container for Elements",
+            "p21_id": 21,
+            "Name": "Site",
+            "GlobalId": "3FNv6N_ur0zQ8tygS1XDuH"
+          },
+          "labels": [
+            "ConnectionNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 64,
+          "rel_type": null,
+          "attrs": {
+            "EntityType": "IfcRelContainedInSpatialStructure",
+            "Description": "Site Container for Elements",
+            "p21_id": 21,
+            "Name": "Site",
+            "GlobalId": "3FNv6N_ur0zQ8tygS1XDuH"
+          },
+          "labels": [
+            "ConnectionNode"
+          ],
+          "node_identifier": ""
+        }
+      },
+      {
+        "py/object": "neo4jGraphDiff.Caption.NodeMatchingTable.NodePair",
+        "init_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 50,
+          "rel_type": null,
+          "attrs": {
+            "EntityType": "IfcRelAggregates",
+            "Description": "None",
+            "p21_id": 6,
+            "GlobalId": "1U7z3bi0N_4L0UNA$m7S6j",
+            "Name": "None"
+          },
+          "labels": [
+            "ConnectionNode"
+          ],
+          "node_identifier": ""
+        },
+        "updated_node": {
+          "py/object": "neo4j_middleware.ResponseParser.NodeItem.NodeItem",
+          "id": 79,
+          "rel_type": null,
+          "attrs": {
+            "EntityType": "IfcRelAggregates",
+            "Description": "None",
+            "p21_id": 6,
+            "GlobalId": "1U7z3bi0N_4L0UNA$m7S6j",
+            "Name": "None"
+          },
+          "labels": [
+            "ConnectionNode"
+          ],
+          "node_identifier": ""
+        }
+      }
+    ]
+  },
+  "property_updates": [],
+  "structure_updates": [
+    {
+      "py/object": "neo4jGraphDiff.Caption.StructureModification.StructureModification",
+      "parent": {
+        "py/id": 42
+      },
+      "child": {
+        "py/id": 69
+      },
+      "modType": {
+        "py/reduce": [
+          {
+            "py/type": "neo4jGraphDiff.Caption.StructureModification.StructuralModificationTypeEnum"
+          },
+          {
+            "py/tuple": [
+              1
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

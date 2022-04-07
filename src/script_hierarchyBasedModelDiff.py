@@ -19,7 +19,7 @@ testcases = {"sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
              "solibri": ("ts20121017T152740", "ts20121017T154702")
              }
 
-case_study = 'solibri'
+case_study = 'new_cuboid'
 ts_init, ts_updated = testcases[case_study]
 
 print('Running Diff on case study: >{}<'.format(case_study))
