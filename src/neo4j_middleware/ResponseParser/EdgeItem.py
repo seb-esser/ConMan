@@ -50,11 +50,17 @@ class EdgeItem:
             raw_startnode_id = edge.start_node.id
             raw_endnode_id = edge.end_node.id
             edge_id = edge.id
+            attrs = edge._properties
+            labels = [edge.type]
+            identifier = "e{}".format(edge_id)
 
             start_node = next(x for x in nodes if x.id == raw_startnode_id)
             end_node = next(x for x in nodes if x.id == raw_endnode_id)
 
             e = cls(start_node, end_node, edge_id)
+            e.attributes = attrs
+            e.labels = labels
+            e.edge_identifier = identifier
             edges.append(e)
 
         return edges

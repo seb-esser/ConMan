@@ -21,3 +21,12 @@ class DoublePushOut:
     def from_json_serialization(cls, raw):
         raise NotImplementedError("not yet implemented")
 
+    def plot_patterns(self):
+        print("DPO cyphers: ")
+        print("LHS:")
+        print(self.left_hand_side.to_cypher_match())
+        print("Interface:")
+        print(self.interface.to_cypher_match())
+        print("RHS:")
+        print(self.right_hand_side.to_cypher_match())
+

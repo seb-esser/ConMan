@@ -56,6 +56,7 @@ class GraphPath:
                 if segment.start_node == last_end_node:
                     # remove last comma
                     cy_list[-1] = cy_list[-1][:-2]
+                    # ToDo: sometimes not the last comma but the closing brackets are cutted away
 
                     # append edge without specifying the start node again
                     skip_start = True

@@ -9,7 +9,13 @@ from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 
 
 class GraphPattern:
-    def __init__(self, paths):
+    def __init__(self, paths=None):
+        """
+        graph pattern carries a pattern consisting of multiple segments
+        @param paths:
+        """
+        if paths is None:
+            paths = []
         self.paths: List[GraphPath] = paths
 
     def __repr__(self):
@@ -320,6 +326,6 @@ class GraphPattern:
         for p in self.paths:
             for e in p.segments:
                 n1: NodeItem = e.start_node
-                n2: NodeItem = e.start_node
+                n2: NodeItem = e.end_node
                 n1.tidy_attrs(remove_None_values=False)
                 n2.tidy_attrs(remove_None_values=False)
