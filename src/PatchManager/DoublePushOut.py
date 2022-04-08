@@ -7,17 +7,17 @@ class DoublePushOut:
         self.interface: GraphPattern = i
         self.right_hand_side: GraphPattern = rhs
 
+    def to_cypher_serialization(self):
+        raise NotImplementedError("not yet implemented")
 
-    def cypher_statement(self):
-        """
+    @classmethod
+    def from_cypher_serialization(cls, raw):
+        raise NotImplementedError("not yet implemented")
 
-        """
-        cy = """match(n1{GlobalId: 1})-[r1]->(n5)<-[r2]-(n4{GlobalId:4}) DELETE r1, r2, n5 return n1, n4"""
+    def to_json_serialization(self):
+        raise NotImplementedError("not yet implemented")
 
+    @classmethod
+    def from_json_serialization(cls, raw):
+        raise NotImplementedError("not yet implemented")
 
-    def calc_stuff_to_be_removed(self):
-        """
-
-        """
-        rmv_nodes = []
-        rmv_edges = []

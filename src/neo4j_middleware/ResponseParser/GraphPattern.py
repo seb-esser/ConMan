@@ -101,7 +101,7 @@ class GraphPattern:
                 attr_dict = connector.run_cypher_statement(cy, 'PROPERTIES(r)')[0]
                 segment.attributes = attr_dict
 
-    def to_cypher_match(self, timestamp: str = None) -> str:
+    def to_cypher_match(self) -> str:
         """
         improved version to search for a specified graph pattern using a distinct node set definition
         @type timestamp: optional timestamp string to identify the target graph the pattern should be searched for
@@ -109,14 +109,14 @@ class GraphPattern:
         """
 
         all_nodes: List[NodeItem] = self.get_unified_node_set()
-        # self.get_unified_edge_set()
+        self.get_unified_edge_set()
 
-        node_dict = {}
-        for n in all_nodes:
-            if timestamp is None:
-                node_dict[n.id] = 'n{}'.format(n.id)
-            else:
-                node_dict[n.id] = 'n{}: {}'.format(n.id, timestamp)
+        # node_dict = {}
+        # for n in all_nodes:
+        #     if timestamp is None:
+        #         node_dict[n.id] = 'n{}'.format(n.id)
+        #     else:
+        #         node_dict[n.id] = 'n{}: {}'.format(n.id, timestamp)
 
         # init cypher query
         cy_list = []

@@ -34,7 +34,7 @@ def calcDPO(obj_guid: str, label: str, connector):
     print("\tComponent: {}".format(obj_guid))
     # -- 1 -- query nodes to be removed (as a graph pattern)
     cy = """
-    MATCH pa = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[*..10]->(sec:SecondaryNode:{0})
+    MATCH pa = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[:rel*..10]->(sec:SecondaryNode:{0})
     WHERE NOT (sec)-[:SIMILAR_TO]->()
     RETURN pa, NODES(pa), RELATIONSHIPS(pa)
     """.format(label, obj_guid)
