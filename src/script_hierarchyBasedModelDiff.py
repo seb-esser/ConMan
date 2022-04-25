@@ -29,7 +29,7 @@ confirm = input("[y, n]")
 if confirm != "y":
     exit()
 
-connector.run_cypher_statement("Match(n:{})-[r:SIMILAR_TO]-(m:{}) DELETE r".format(ts_init, ts_updated))
+connector.run_cypher_statement("Match(n:{})-[r:EQUIVALENT_TO]-(m:{}) DELETE r".format(ts_init, ts_updated))
 
 # get topmost entry nodes
 raw_init = connector.run_cypher_statement(
@@ -60,13 +60,13 @@ if u_input == 'y':
     f.close()
     print('saving delta: DONE. ')
 
-# Create SIMILAR_TO relationships to mark all nodePairs that are matched
+# Create EQUIVALENT_TO relationships to mark all nodePairs that are matched
 for p in delta.node_matching_table.matched_nodes:
     # print(p)
     cy = """
     MATCH (n) WHERE ID(n)={0}
     MATCH (m) WHERE ID(m)= {1}
-    MERGE (n)-[:SIMILAR_TO]->(m)
+    MERGE (n)-[:EQUIVALENT_TO]->(m)
     """.format(p.init_node.id, p.updated_node.id)
     connector.run_cypher_statement(cy)
 
