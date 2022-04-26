@@ -2,6 +2,7 @@ import jsonpickle
 
 from PatchManager.DoublePushOut import DoublePushOut
 from PatchManager.Patch import Patch
+from PatchManager.TransformationRule import TransformationRule
 from neo4jGraphDiff.Caption.StructureModification import StructuralModificationTypeEnum
 from neo4jGraphDiff.GraphDelta import GraphDelta
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
@@ -106,50 +107,13 @@ class DPOService:
                     # add gluing edge
                     gluing_pattern.paths.append(glue.paths[0])
 
-            # finally compile DPO rule
-            lhs = None
-            interface = None
-            rhs = None
+            # init transformation
+            rule = TransformationRule(gluing_pattern=gluing_pattern, push_out_pattern=push_out_pattern,
+                                      context_pattern=context_pattern, operation_type=s_mod.modType)
 
-            if s_mod.modType == StructuralModificationTypeEnum.ADDED:
-                # construct lhs
-                lhs = context_pattern
-                # construct interface
-                interface = context_pattern
-                # construct rhs
-                context_paths = context_pattern.paths
-                pushout_paths = push_out_pattern.paths
-                gluing_paths = gluing_pattern.paths
 
-                paths = context_paths + pushout_paths + gluing_paths
-                rhs = GraphPattern(paths=paths)
-
-            elif s_mod.modType == StructuralModificationTypeEnum.DELETED:
-                # -- construct lhs --
-                context_paths = context_pattern.paths
-                pushout_paths = push_out_pattern.paths
-                gluing_paths = gluing_pattern.paths
-
-                print(gluing_pattern.to_cypher_match())
-                print(push_out_pattern.to_cypher_match())
-
-                paths = context_paths + pushout_paths + gluing_paths
-                lhs = GraphPattern(paths=paths)
-
-                # -- construct rhs --
-                rhs = context_pattern
-                # -- construct interface --
-                interface = context_pattern
-
-            # tidy attributes (e.g., p21 id, etc)
-            lhs.tidy_node_attributes()
-            interface.tidy_node_attributes()
-            rhs.tidy_node_attributes()
-
-            dpo_rule = DoublePushOut(lhs=lhs, i=interface, rhs=rhs)
-
-            # add rule to patch object
-            patch.operations.append(dpo_rule)
+            # add dpo to patch object
+            patch.operations.append(rule)
 
         return patch
 

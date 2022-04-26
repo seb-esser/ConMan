@@ -84,3 +84,43 @@ class GraphDelta:
         @return:
         """
         self.property_updates.append(pm)
+
+    def print_delta(self):
+        """
+        displays the delta onto the console
+        @return:
+        """
+        # collect all primary elements that have been modified
+
+        print("""
+
+        -- DIFF REPORT -- 
+
+        """)
+
+        print("\n__ property changes __\n")
+
+        self.sort_pMods_by_guid()
+
+        for pm in self.property_updates:
+            primary_node_type = pm.pattern.get_entry_node().attrs['EntityType']
+            guid = pm.pattern.get_entry_node().attrs['GlobalId']
+            modified_node = pm.node_init.attrs['EntityType']
+            # if guid not in guids:
+            #     guids.append(guid)
+            print("{:>12}\t{:<20}\t{:<20}\t{:<25}\t{:<100}\t{:<100}".format(guid, primary_node_type, modified_node,
+                                                                            pm.attrName, pm.valueOld, pm.valueNew))
+
+        print("\n__ structural changes __\n")
+
+        for smod in self.structure_updates:
+            parent = smod.parent.attrs['EntityType']
+            parend_id = smod.parent.id
+
+            child = smod.child.attrs['EntityType']
+            child_id = smod.child.id
+
+            ty = smod.modType
+
+            print("{:>12}\t{:<8}\t{:<25}\t{:<25}\t{:<25}".format(parent, parend_id, child, child_id, ty))
+
