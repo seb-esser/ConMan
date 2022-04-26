@@ -15,7 +15,23 @@ class PatchService:
     def __init__(self):
         self.delta = None
 
+    @classmethod
+    def from_existing_delta(cls, delta):
+        """
+        creates PatchService object from existing delta object without loading any jsons
+        @param delta:
+        @return:
+        """
+        inst = cls()
+        inst.delta = delta
+        return inst
+
     def load_delta(self, path: str):
+        """
+        load delta from json
+        @param path:
+        @return:
+        """
         # load graph delta
         with open(path) as f:
             content = f.read()
@@ -25,7 +41,13 @@ class PatchService:
         print("[INFO] loading delta json: DONE.")
 
     def generate_DPO_patch(self, connector) -> Patch:
+        """
+        produces a patch from a given delta
+        @param connector: the neo4j connector instance
+        @return: the patch object
+        """
 
+        print("[INFO] generate patch ....")
         patch = Patch()
 
         try:
@@ -123,10 +145,9 @@ class PatchService:
             rule = TransformationRule(gluing_pattern=gluing_pattern, push_out_pattern=push_out_pattern,
                                       context_pattern=context_pattern, operation_type=s_mod.modType)
 
-
             # add dpo to patch object
             patch.operations.append(rule)
-
+        print("[INFO] generate patch: DONE.")
         return patch
 
     def apply_patch(self, patch: Patch, connector: Neo4jConnector):

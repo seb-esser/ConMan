@@ -192,7 +192,7 @@ class GraphDiff(AbsGraphDiff):
         f.close()
         print('saving delta: DONE. ')
 
-    def build_equivalentTO_edges(self):
+    def build_equivalent_to_edges(self):
         delta = self.get_result()
         for p in delta.node_matching_table.matched_nodes:
             # print(p)
@@ -202,3 +202,4 @@ class GraphDiff(AbsGraphDiff):
                 MERGE (n)-[:EQUIVALENT_TO]->(m)
                 """.format(p.init_node.id, p.updated_node.id)
             self.connector.run_cypher_statement(cy)
+
