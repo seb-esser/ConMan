@@ -1,42 +1,54 @@
 import jsonpickle
 
-from PatchManager.DoublePushOut import DoublePushOut
 from PatchManager.Patch import Patch
 from PatchManager.TransformationRule import TransformationRule
 from neo4jGraphDiff.Caption.StructureModification import StructuralModificationTypeEnum
-from neo4jGraphDiff.GraphDelta import GraphDelta
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
+from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
-class DPOService:
-    def __init__(self, ts_init: str, ts_updated: str):
-        self.ts_init: str = ts_init
-        self.ts_updated: str = ts_updated
+class PatchService:
+    """
+    manages loading and saving of patches and can apply a patch
+    """
+    def __init__(self):
+        self.delta = None
 
+    def load_delta(self, path: str):
         # load graph delta
-        with open('GraphDelta_init{}-updt{}.json'.format(ts_init, ts_updated)) as f:
+        with open(path) as f:
             content = f.read()
 
         print("[INFO] loading delta json....")
-        self.result: GraphDelta = jsonpickle.decode(content)
+        self.delta = jsonpickle.decode(content)
         print("[INFO] loading delta json: DONE.")
 
     def generate_DPO_patch(self, connector) -> Patch:
 
         patch = Patch()
 
+        try:
+            ts_init = self.delta.ts_init
+            ts_updated = self.delta.ts_updated
+        except:
+            raise Exception("Please load a delta before running patch generation")
+
+        # set timestamps in patch object
+        patch.base_timestamp = ts_init
+        patch.resulting_timestamp = ts_updated
+
         # get all structural modifications
-        s_mods = self.result.structure_updates
+        s_mods = self.delta.structure_updates
 
         # loop over structural modifications
         for s_mod in s_mods:
             guid = s_mod.child.attrs["GlobalId"]
 
             if s_mod.modType == StructuralModificationTypeEnum.ADDED:
-                ts = self.ts_updated
+                ts = ts_updated
             elif s_mod.modType == StructuralModificationTypeEnum.DELETED:
-                ts = self.ts_init
+                ts = ts_init
             else:
                 raise Exception("Modification type has not been specified properly. ")
 
@@ -85,7 +97,7 @@ class DPOService:
                 if raw_neighbor != []:
                     context_node = NodeItem.from_neo4j_response(raw_neighbor[0])[0]
                     # get "first visited from"
-                    parent_node = self.result.node_matching_table.get_parent_primaryNode(context_node)
+                    parent_node = self.delta.node_matching_table.get_parent_primaryNode(context_node)
 
                     # calculate the shortest path
                     cy = "MATCH {0}, {1}, p = SHORTESTPATH({2}-[:rel*]->{3}) RETURN p, NODES(p), RELATIONSHIPS(p)".format(
@@ -116,4 +128,42 @@ class DPOService:
             patch.operations.append(rule)
 
         return patch
+
+    def apply_patch(self, patch: Patch, connector: Neo4jConnector):
+        patch.apply(connector=connector)
+
+    def save_patch_to_json(self, patch: Patch):
+        """
+        saves a given patch into json
+        @param patch:
+        @return:
+        """
+
+        ts_init = patch.base_timestamp
+        ts_updated = patch.resulting_timestamp
+
+        print('[INFO] saving patch ... ')
+        f = open('Patch_init{}-updt{}.json'.format(ts_init, ts_updated), 'w')
+        f.write(jsonpickle.dumps(patch))
+        f.close()
+        print('[INFO] saving patch: DONE. ')
+        # return jsonpickle.encode(self)
+
+    def load_patch_from_json(self, path: str) -> Patch:
+        """
+        loads a patch from json
+        @param path:
+        @return:
+        """
+
+        # load graph delta
+        with open(path) as f:
+            content = f.read()
+
+        print("[INFO] loading delta json....")
+        result: Patch = jsonpickle.decode(content)
+        print("[INFO] loading delta json: DONE.")
+
+        return result
+
 
