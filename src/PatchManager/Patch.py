@@ -26,13 +26,17 @@ class Patch(object):
         """
 
         for rule in self.operations:
-
+            print(rule)
             if rule.operation_type == StructuralModificationTypeEnum.ADDED:
 
-                # find context
+                # find context and
+                # -> use the base timestamp here
+                rule.context_pattern.replace_timestamp(self.base_timestamp)
+
                 cy = rule.context_pattern.to_cypher_match()
-                # connector.run_cypher_statement(cy)
-                # print(cy)
+                print(cy)
+                raw = connector.run_cypher_statement(cy)
+                print(raw)
 
                 # insert push out
                 cy = rule.push_out_pattern.to_cypher_merge()
