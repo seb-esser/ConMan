@@ -26,7 +26,6 @@ class Patch(object):
         """
 
         for rule in self.operations:
-            print(rule)
             if rule.operation_type == StructuralModificationTypeEnum.ADDED:
 
                 # find context and
@@ -34,15 +33,31 @@ class Patch(object):
                 rule.context_pattern.replace_timestamp(self.base_timestamp)
 
                 cy = rule.context_pattern.to_cypher_match()
-                print(cy)
+                print("find context:")
+                # print(cy)
                 # raw = connector.run_cypher_statement(cy)
                 # print(raw)
 
                 # insert push out
-                cy = rule.push_out_pattern.to_cypher_merge()
+                rule.push_out_pattern.replace_timestamp(self.base_timestamp)
+                # ToDo: perhaps using the base timestamp for the new graphlet is not the best decision
+                #  to keep the insertion identifiable.
+                #  Consider harmonizing labels after successfully gluing everything together
+                print("insert push out")
+                cy += rule.push_out_pattern.to_cypher_merge()
+                # print(cy)
+                # raw = connector.run_cypher_statement(cy)
+                # print(raw)
 
                 # glue push out and context
-                cy = rule.gluing_pattern.to_cypher_merge()
+                rule.gluing_pattern.replace_timestamp(self.base_timestamp)
+                nodes_push = rule.push_out_pattern.get_unified_node_set() + rule.context_pattern.get_unified_node_set()
+                cy += rule.gluing_pattern.to_cypher_merge(nodes_push)
+                # print("apply glue")
+                # print(cy)
+
+                raw = connector.run_cypher_statement(cy)
+                print(raw)
 
             elif rule.operation_type == StructuralModificationTypeEnum.DELETED:
                 # find push out

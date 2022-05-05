@@ -142,6 +142,10 @@ class PatchService:
                     gluing_pattern.paths.append(glue.paths[0])
 
             # init transformation
+            gluing_pattern.unify_edge_set()
+            push_out_pattern.unify_edge_set()
+            context_pattern.unify_edge_set()
+
             rule = TransformationRule(gluing_pattern=gluing_pattern, push_out_pattern=push_out_pattern,
                                       context_pattern=context_pattern, operation_type=s_mod.modType)
 

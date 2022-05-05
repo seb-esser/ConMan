@@ -54,8 +54,8 @@ class GraphPath:
         for segment in self.segments:
             try:
                 if segment.start_node == last_end_node:
-                    # remove last comma
-                    cy_list[-1] = cy_list[-1][:-2]
+                    # # remove last comma
+                    # cy_list[-1] = cy_list[-1][:-2]
                     # ToDo: sometimes not the last comma but the closing brackets are cutted away
 
                     # append edge without specifying the start node again
@@ -63,11 +63,11 @@ class GraphPath:
                     cy = segment.to_cypher(skip_start_node=skip_start)
                 else:
                     cy = segment.to_cypher(skip_start_node=False)
-                    cy += ', '
+                    # cy += ', '
             except:
 
                 cy = segment.to_cypher(skip_start_node=False)
-                cy += ', '
+                # cy += ', '
             cy_list.append(cy)
 
             # update last_end_node attribute

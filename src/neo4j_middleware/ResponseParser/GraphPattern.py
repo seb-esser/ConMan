@@ -114,15 +114,7 @@ class GraphPattern:
         @return:
         """
 
-        all_nodes: List[NodeItem] = self.get_unified_node_set()
         self.get_unified_edge_set()
-
-        # node_dict = {}
-        # for n in all_nodes:
-        #     if timestamp is None:
-        #         node_dict[n.id] = 'n{}'.format(n.id)
-        #     else:
-        #         node_dict[n.id] = 'n{}: {}'.format(n.id, timestamp)
 
         # init cypher query
         cy_list = []
@@ -139,24 +131,14 @@ class GraphPattern:
             path_iterator += 1
             cy_list.append(' ')
 
-        include_primary_paths = False
-        if include_primary_paths:
-            prm_paths = self.query_primary_paths()
-            cy_list += prm_paths
-
         define_return = True
         if define_return:
             num_paths = self.get_number_of_paths()
-            try:
-                num_primPaths = len(prm_paths)
-            except:
-                num_primPaths = 0
 
             return_cy = 'RETURN '
             for np in range(num_paths):
                 return_cy += 'path{}, '.format(np)
-            for npr in range(num_primPaths):
-                return_cy += 'primPath{}, '.format(npr)
+
             return_cy = return_cy[:-2] # remove last ', '
 
             cy_list.append(return_cy)
@@ -166,46 +148,53 @@ class GraphPattern:
 
         return cy_statement
 
-    def to_cypher_merge(self, reference_structure=None) -> str:
+    def to_cypher_merge(self, nodes_specified=[]) -> str:
         """
         creates a cypher query string to create a given graph pattern in a target graph
          without recognizing existing items
-        @param reference_structure:
-
         @return: cypher query statement as str
         """
-
-        all_nodes: List[NodeItem] = self.get_unified_node_set()
-        # self.get_unified_edge_set()
 
         # init cypher query
         cy_list = []
 
-        if reference_structure is not None:
-            match_reference = reference_structure.to_cypher_indexed()
-            cy_list.append(match_reference)
-
-        # in CREATE statements, each node can be created only once.
-        # therefore, re-use its var name but do not re-create attributes etc
-
-        # 1: create all nodes
-        for node in all_nodes:
-            cy_node = node.to_cypher()
-            cy_frag = 'MERGE {} '.format(cy_node)
-            cy_list.append(cy_frag)
-
-        # 2: create all paths
-
-        # from here on: only use the node variables stated in the node_dict.
-        # All nodes and their attributes are already created
         path_iterator = 0
+
+        # list of nodes that observe which node was already defined in the query
+        nodes_already_specified = []
+
+        if nodes_specified!=[]:
+            nodes_already_specified.extend(nodes_specified)
+
         # loop over all paths. Each path contains a list of segments
         for unified_path in self.paths:
 
             # define path section
             edge_iterator = 0
+
             for edge in unified_path.segments:
-                cy_frag = "MERGE " + edge.to_cypher(skip_node_attrs=True, skip_node_labels=True) + " "
+
+                if edge.start_node not in nodes_already_specified:
+                    skip_start_attrs = False
+                    skip_start_labels = False
+                else:
+                    skip_start_attrs = True
+                    skip_start_labels = True
+                if edge.end_node not in nodes_already_specified:
+                    skip_end_attrs = False
+                    skip_end_labels = False
+                else:
+                    skip_end_attrs = True
+                    skip_end_labels = True
+
+                cy_frag = "MERGE " + edge.to_cypher(skip_start_node_attrs=skip_start_attrs,
+                                                    skip_start_node_labels=skip_start_labels,
+                                                    skip_end_node_attrs=skip_end_attrs,
+                                                    skip_end_node_labels=skip_end_labels) + " "
+
+                nodes_already_specified.append(edge.start_node)
+                nodes_already_specified.append(edge.end_node)
+
                 cy_list.append(cy_frag)
                 edge_iterator += 1
 
@@ -239,7 +228,7 @@ class GraphPattern:
                     unified_pattern_node_list.append(end_node)
         return unified_pattern_node_list
 
-    def get_unified_edge_set(self):
+    def get_unified_edge_set(self)-> List[EdgeItem]:
         """
         unifies the set of edges included in the graph pattern.
         @return:
@@ -264,7 +253,14 @@ class GraphPattern:
 
         # print after state to console
         # self.print_to_console()
-        return self.paths
+        return unified_segments
+
+    def unify_edge_set(self):
+        """
+        unifies the edge set
+        @return:
+        """
+        self.paths = self.get_unified_edge_set()
 
     def print_to_console(self):
         """

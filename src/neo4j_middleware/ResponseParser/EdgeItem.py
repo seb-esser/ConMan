@@ -130,8 +130,10 @@ class EdgeItem:
     def to_cypher(self,
                   skip_start_node=False,
                   skip_end_node=False,
-                  skip_node_attrs=False,
-                  skip_node_labels=False,
+                  skip_start_node_attrs=False,
+                  skip_end_node_attrs=False,
+                  skip_start_node_labels=False,
+                  skip_end_node_labels=False,
                   skip_edge_attrs=False) -> str:
         """
         returns a cypher statement to search for this edge item.
@@ -149,9 +151,16 @@ class EdgeItem:
 
         # parse nodes
         if skip_start_node is False:
-            cy_start_node = self.start_node.to_cypher()
+            cy_start_node = self.start_node.to_cypher(skip_attributes=skip_start_node_attrs,
+                                                      skip_labels=skip_start_node_labels)
+        else:
+            cy_start_node = ''
+
         if skip_end_node is False:
-            cy_end_node = self.end_node.to_cypher()
+            cy_end_node = self.end_node.to_cypher(skip_attributes=skip_end_node_attrs,
+                                                  skip_labels=skip_end_node_labels)
+        else:
+            cy_end_node = ''
 
         # parse edge attributes, labels and identifiers
         cy_edge_identifier = self.edge_identifier

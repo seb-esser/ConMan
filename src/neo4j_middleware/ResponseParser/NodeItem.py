@@ -177,7 +177,7 @@ class NodeItem:
         removes entity_type and p21_id from attr dict
         @return:
         """
-        self.attrs.pop("EntityType", None)
+        # self.attrs.pop("EntityType", None)
         self.attrs.pop("p21_id", None)
         self.attrs.pop('rel_type', None)
 
