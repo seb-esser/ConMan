@@ -77,7 +77,7 @@ class PatchService:
             # generate pushOut Pattern
             cy = """
                    MATCH pa = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[:rel*..10]->(sec:SecondaryNode:{0})
-                   WHERE NOT (sec)-[:SIMILAR_TO]-() 
+                   WHERE NOT (sec)-[:EQUIVALENT_TO]-() 
                    RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
                    """.format(ts, guid)
             raws = connector.run_cypher_statement(cy)
@@ -144,6 +144,8 @@ class PatchService:
             # init transformation
             rule = TransformationRule(gluing_pattern=gluing_pattern, push_out_pattern=push_out_pattern,
                                       context_pattern=context_pattern, operation_type=s_mod.modType)
+
+            rule.run_cleanup()
 
             # add dpo to patch object
             patch.operations.append(rule)

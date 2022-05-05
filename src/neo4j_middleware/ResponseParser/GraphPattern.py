@@ -329,3 +329,19 @@ class GraphPattern:
                 n2: NodeItem = e.end_node
                 n1.tidy_attrs(remove_None_values=False)
                 n2.tidy_attrs(remove_None_values=False)
+
+    def replace_timestamp(self, new_timestamp):
+        """
+        replaces the timestamp label in all nodes of the this graph pattern
+        @param new_timestamp:
+        @return:
+        """
+
+        old_timestamp = self.paths[0].get_start_node().get_timestamps()[0]
+
+        for p in self.paths:
+            for s in p.segments:
+                n1: NodeItem = s.start_node
+                n1.labels = [new_timestamp if item == old_timestamp else item for item in n1.labels]
+                n2: NodeItem = s.end_node
+                n2.labels = [new_timestamp if item == old_timestamp else item for item in n2.labels]

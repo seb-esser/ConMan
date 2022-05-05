@@ -56,3 +56,12 @@ class TransformationRule:
             interface = self.context_pattern
 
         return DoublePushOut(lhs, interface, rhs)
+
+    def run_cleanup(self):
+        """
+        run clean up and remove unnecessary attribues
+        @return:
+        """
+        self.context_pattern.tidy_node_attributes()
+        self.gluing_pattern.tidy_node_attributes()
+        self.push_out_pattern.tidy_node_attributes()
