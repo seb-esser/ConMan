@@ -35,8 +35,8 @@ class Patch(object):
 
                 cy = rule.context_pattern.to_cypher_match()
                 print(cy)
-                raw = connector.run_cypher_statement(cy)
-                print(raw)
+                # raw = connector.run_cypher_statement(cy)
+                # print(raw)
 
                 # insert push out
                 cy = rule.push_out_pattern.to_cypher_merge()

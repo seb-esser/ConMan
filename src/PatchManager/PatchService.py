@@ -111,7 +111,7 @@ class PatchService:
             nodes_pushed_out = push_out_pattern.get_unified_node_set()
 
             for n in nodes_pushed_out:
-                cy_equ_neighbor = "match p = (n)-[r:rel]->(e)-[:SIMILAR_TO]-() WHERE ID(n) = {} return e".format(n.id)
+                cy_equ_neighbor = "match p = (n)-[r:rel]->(e)-[:EQUIVALENT_TO]-() WHERE ID(n) = {} return e".format(n.id)
                 raw_neighbor = connector.run_cypher_statement(cy_equ_neighbor)
 
                 # check if the newly created node has a relationship to another node
