@@ -253,14 +253,13 @@ class GraphPattern:
 
         # print after state to console
         # self.print_to_console()
-        return unified_segments
 
-    def unify_edge_set(self):
+    def unify_edge_set(self) -> None:
         """
         unifies the edge set
         @return:
         """
-        self.paths = self.get_unified_edge_set()
+        self.get_unified_edge_set()
 
     def print_to_console(self):
         """
