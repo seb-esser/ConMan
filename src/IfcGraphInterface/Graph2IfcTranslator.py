@@ -41,7 +41,7 @@ class Graph2IfcTranslator:
         """
 
         try:
-            print('building primary_node_type {}'.format(class_name))
+            # print('building primary_node_type {}'.format(class_name))
 
             # for key, val in attributes.items():
             #     if key in [
@@ -62,6 +62,7 @@ class Graph2IfcTranslator:
             #         'RefLongitude']:
             #         print(val)
 
+            del attributes['EntityType']
             e = self.model.create_entity(class_name, **attributes)
 
             # save node id 2 spf id in dict
@@ -186,22 +187,13 @@ class Graph2IfcTranslator:
         # cast cypher response in a list of node items
         nodes = NodeItem.from_neo4j_response_wou_rel(raw_res)
 
-        print('---- Building primary & secondary nodes. ----')
         for n in nodes:
-            # query all node properties of n
-            cy = Neo4jQueryFactory.get_node_properties_by_id(n.id)
-            raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
-            # assign properties to node object
-            n.set_node_attributes(raw_res)
 
             n.tidy_attrs()
 
             # build IFC primary_node_type
             self.build_entity(n.id, n.get_entity_type(), n.attrs)
-
-            self.build_childs(n, True)
-
-        print('---- Primary & secondary nodes done. ----')
+            self.build_childs(n, rec=True)
 
         # get all connection nodes
         cn = Neo4jQueryFactory.get_connection_nodes(self.ts)
@@ -209,7 +201,6 @@ class Graph2IfcTranslator:
 
         connection_nodes = NodeItem.from_neo4j_response_wou_rel(raw_res)
 
-        print('---- Building connection nodes. ----')
         for cnode in connection_nodes:
             cy = Neo4jQueryFactory.get_node_properties_by_id(cnode.id)
             raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
@@ -224,4 +215,3 @@ class Graph2IfcTranslator:
             # build the childs (non-recursive)
             self.build_childs(cnode, False)
 
-        print('---- Connection Nodes done. ----')
