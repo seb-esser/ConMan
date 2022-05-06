@@ -131,17 +131,17 @@ class GraphPattern:
             path_iterator += 1
             cy_list.append(' ')
 
-        define_return = True
-        if define_return:
-            num_paths = self.get_number_of_paths()
-
-            return_cy = 'RETURN '
-            for np in range(num_paths):
-                return_cy += 'path{}, '.format(np)
-
-            return_cy = return_cy[:-2] # remove last ', '
-
-            cy_list.append(return_cy)
+        # define_return = False
+        # if define_return:
+        #     num_paths = self.get_number_of_paths()
+        #
+        #     return_cy = 'RETURN '
+        #     for np in range(num_paths):
+        #         return_cy += 'path{}, '.format(np)
+        #
+        #     return_cy = return_cy[:-2] # remove last ', '
+        #
+        #     cy_list.append(return_cy)
 
         # build the final cypher statement
         cy_statement = ''.join(cy_list)

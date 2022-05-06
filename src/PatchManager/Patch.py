@@ -39,7 +39,7 @@ class Patch(object):
                 # print(raw)
 
                 # insert push out
-                rule.push_out_pattern.replace_timestamp(self.base_timestamp)
+                # rule.push_out_pattern.replace_timestamp(self.base_timestamp)
                 # ToDo: perhaps using the base timestamp for the new graphlet is not the best decision
                 #  to keep the insertion identifiable.
                 #  Consider harmonizing labels after successfully gluing everything together
@@ -57,7 +57,7 @@ class Patch(object):
                 # print(cy)
 
                 raw = connector.run_cypher_statement(cy)
-                print(raw)
+                # print(raw)
 
             elif rule.operation_type == StructuralModificationTypeEnum.DELETED:
                 # find push out

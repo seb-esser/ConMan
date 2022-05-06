@@ -1,4 +1,3 @@
-from PatchManager.Patch import Patch
 from PatchManager.PatchService import PatchService
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
