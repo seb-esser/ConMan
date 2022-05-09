@@ -341,23 +341,6 @@ class GraphPattern:
                 n2: NodeItem = s.end_node
                 n2.labels = [new_timestamp if item == old_timestamp else item for item in n2.labels]
 
-    def to_cypher_edge_delete(self) -> str:
-        """
-        removes all edges specified in the pattern but keeps the nodes.
-        This method is primarily made to remove gluing edges in case of a removal modification
-        @return:
-        """
-
-        cy = ""
-        cy_match = self.to_cypher_match()
-        cy += cy_match
-        for path in self.paths:
-            for seg in path.segments:
-                cy_del = "DELETE {} ".format(seg.edge_identifier)
-                cy += cy_del
-
-        return cy
-
     def to_cypher_pattern_delete(self) -> str:
         """
         removes a pattern. Prerequisite is that the pattern is entirely decoupled.
@@ -365,7 +348,7 @@ class GraphPattern:
         """
         cy = self.to_cypher_match()
         num_paths = self.get_number_of_paths()
-        cy += 'DELETE '
+        cy += 'DETACH DELETE '
         for np in range(num_paths):
             cy += 'path{}, '.format(np)
         cy = cy[:-2]  # remove last ', '

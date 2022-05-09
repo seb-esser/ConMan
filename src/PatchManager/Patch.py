@@ -61,32 +61,38 @@ class Patch(object):
 
             elif rule.operation_type == StructuralModificationTypeEnum.DELETED:
 
-                # find context
-                cy = rule.context_pattern.to_cypher_match()
-
-                # find glue and remove gluing edges
-                cy += rule.gluing_pattern.to_cypher_edge_delete()
-                # print(cy)
-                connector.run_cypher_statement(cy)
-
-                # Pushout pattern is now detached and can be removed
                 cy = rule.push_out_pattern.to_cypher_pattern_delete()
-                # print(cy)
                 connector.run_cypher_statement(cy)
 
-        # finally: update labels of all nodes
+            print("[INFO] Adjusting timestamps... ")
+            label_from = self.base_timestamp
+            label_to = self.resulting_timestamp
+
+            connector.run_cypher_statement("MATCH (n) REMOVE n:{} SET n:{}".format(label_from, label_to))
+            print("[INFO] Adjusting timestamps: DONE.")
 
     def apply_inverse(self, connector: Neo4jConnector):
+        """
+        applies the given patch inversely
+        @param connector:
+        @return:
+        """
 
         # loop over all transformations
         for r in self.operations:
+            print("[INFO] inversing patterns ...")
             # swap transformation type
             if r.operation_type == StructuralModificationTypeEnum.ADDED:
                 r.operation_type = StructuralModificationTypeEnum.DELETED
             elif r.operation_type == StructuralModificationTypeEnum.DELETED:
                 r.operation_type = StructuralModificationTypeEnum.ADDED
 
+            # swap timestamps
+            self.base_timestamp, self.resulting_timestamp = self.resulting_timestamp, self.base_timestamp
+            print("[INFO] applying transformation ...")
             self.apply(connector=connector)
+            print("[INFO] applying transformation: DONE.")
+
 
 
 
