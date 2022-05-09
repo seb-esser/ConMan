@@ -159,6 +159,9 @@ class PatchService:
     def apply_patch(self, patch: Patch, connector: Neo4jConnector):
         patch.apply(connector=connector)
 
+    def apply_patch_inverse(self, patch: Patch, connector: Neo4jConnector):
+        patch.apply_inverse(connector=connector)
+
     def save_patch_to_json(self, patch: Patch):
         """
         saves a given patch into json
