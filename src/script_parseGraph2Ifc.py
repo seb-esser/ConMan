@@ -2,20 +2,25 @@
 from IfcGraphInterface.Graph2IfcTranslator import Graph2IfcTranslator
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
-connector = Neo4jConnector()
-connector.connect_driver()
+def main():
+    connector = Neo4jConnector()
+    connector.connect_driver()
 
-ts = "ts20210623T091749"
+    ts = "ts20220510T140041"
 
-# init generator instance
-generator = Graph2IfcTranslator(connector=connector, ts=ts)
+    # init generator instance
+    generator = Graph2IfcTranslator(connector=connector, ts=ts)
 
-# load data into IFC
-generator.generateSPF()
+    # load data into IFC
+    generator.generateSPF()
 
-# save model as IFC SPF file
-generator.save_model('solibri_fromGraph_initial')
+    # save model as IFC SPF file
+    path = "C:\dev\out\{}".format(ts)
+    generator.save_model(path=path)
 
-# disconnect driver
-connector.disconnect_driver()
+    # disconnect driver
+    connector.disconnect_driver()
 
+
+if __name__ == "__main__":
+    main()

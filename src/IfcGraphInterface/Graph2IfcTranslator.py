@@ -1,5 +1,5 @@
 """ File content copy-pasted from: http://academy.ifcopenshell.org/creating-a-simple-wall-with-property-set-and-quantity-information/ """
-
+import ast
 import uuid
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
@@ -43,36 +43,43 @@ class Graph2IfcTranslator:
         try:
             # print('building primary_node_type {}'.format(class_name))
 
-            # for key, val in attributes.items():
-            #     if key in [
-            #         'Coordinates',
-            #         'DirectionRatios',
-            #         'CoordList',
-            #         'segments',
-            #         'MiddleNames',
-            #         'PrefixTitles',
-            #         'SuffixTitles',
-            #         'Roles',
-            #         'Addresses',
-            #         'CoordIndex',
-            #         'InnerCoordIndices',
-            #         'Trim1',
-            #         'Trim2',
-            #         'Orientation',
-            #         'RefLongitude']:
-            #         print(val)
+            for key, val in attributes.items():
+                if key in [
+                    # 'Coordinates',
+                    # 'DirectionRatios',
+                    'CoordList',
+                    'segments',
+                    #         'MiddleNames',
+                    #         'PrefixTitles',
+                    #         'SuffixTitles',
+                    #         'Roles',
+                    #         'Addresses',
+                    'CoordIndex',
+                    'InnerCoordIndices',
+                    'Trim1',
+                    'Trim2',
+                    #         'Orientation',
+                    'RefLongitude',
+                    'RefLatitude'
+                ]:
+                    attributes[key] = ast.literal_eval(val)
+                    # https://stackoverflow.com/questions/24004241/convert-string-to-nested-tuple-python
+
+                elif key in [ 'ValueComponent']:
+                    attributes[key] = 0.017453292519943278
+                    # todo
+                    # https://academy.ifcopenshell.org/posts/using-the-parsing-functionality-of-ifcopenshell-interactively/
 
             del attributes['EntityType']
             e = self.model.create_entity(class_name, **attributes)
-
+            print(e)
             # save node id 2 spf id in dict
             self.node_id_2_spf_id[graph_node_id] = e.id()
 
             return e.id()
         except:
-            print('class: {}'.format(class_name))
-            print('attrs: {}'.format(attributes))
-            raise Exception("Error in creating ifc primary_node_type. ")
+
+            raise Exception("Error in creating instance of {} with attributes {} ".format(class_name, attributes))
 
     def build_association(self, parent_node_id: int, child_node_id: int, association_name: str):
         """
@@ -188,7 +195,6 @@ class Graph2IfcTranslator:
         nodes = NodeItem.from_neo4j_response_wou_rel(raw_res)
 
         for n in nodes:
-
             n.tidy_attrs()
 
             # build IFC primary_node_type
@@ -214,4 +220,3 @@ class Graph2IfcTranslator:
 
             # build the childs (non-recursive)
             self.build_childs(cnode, False)
-

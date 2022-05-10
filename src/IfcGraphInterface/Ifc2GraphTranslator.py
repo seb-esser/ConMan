@@ -265,6 +265,10 @@ class IFCGraphGenerator:
             is_pdt_select = False
             is_entity_select = False
             is_nested_select = False
+            is_enumeration = isinstance(
+                attr_type, ifcopenshell.ifcopenshell_wrapper.enumeration_type)
+            is_aggregation = isinstance(
+                attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
 
             # ToDo: Distinguish if it is a select of entities or a select of predefinedTypes
             if is_select:
@@ -279,10 +283,10 @@ class IFCGraphGenerator:
                 is_nested_select = all(
                     [isinstance(x, ifcopenshell.ifcopenshell_wrapper.select_type) for x in lst])
 
-            is_enumeration = isinstance(
-                attr_type, ifcopenshell.ifcopenshell_wrapper.enumeration_type)
-            is_aggregation = isinstance(
-                attr_type, ifcopenshell.ifcopenshell_wrapper.aggregation_type)
+                # handle mixed cases
+                if isinstance(lst[0], ifcopenshell.ifcopenshell_wrapper.entity) \
+                        and isinstance(lst[1], ifcopenshell.ifcopenshell_wrapper.type_declaration):
+                    is_aggregation = True
 
             # catch some weird cases with IfcDimensionalExponents
             #  as this primary_node_type doesnt use types but atomic attr declarations
