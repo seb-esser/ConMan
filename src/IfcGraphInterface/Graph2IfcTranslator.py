@@ -65,8 +65,14 @@ class Graph2IfcTranslator:
                     attributes[key] = ast.literal_eval(val)
                     # https://stackoverflow.com/questions/24004241/convert-string-to-nested-tuple-python
 
-                elif key in [ 'ValueComponent']:
-                    attributes[key] = 0.017453292519943278
+                elif key in ['ValueComponent']:
+                    splitted = val.split('(')
+                    # extract the name
+                    nested_entity_name = splitted[0]
+                    # extract the value and cast to float datatype
+                    nested_val = float(splitted[1][:-1])
+
+                    attributes[key] = self.model.create_entity(nested_entity_name, nested_val)
                     # todo
                     # https://academy.ifcopenshell.org/posts/using-the-parsing-functionality-of-ifcopenshell-interactively/
 
