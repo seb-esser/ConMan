@@ -1,8 +1,13 @@
+from typing import List
+
 import jsonpickle
 
+from PatchManager.AttributeRule import AttributeRule
 from PatchManager.Patch import Patch
 from PatchManager.TransformationRule import TransformationRule
-from neo4jGraphDiff.Caption.StructureModification import StructuralModificationTypeEnum
+from neo4jGraphDiff.Caption.PropertyModification import PropertyModification
+from neo4jGraphDiff.Caption.StructureModification import StructuralModificationTypeEnum, StructureModification
+from neo4jGraphDiff.GraphDelta import GraphDelta
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
@@ -23,7 +28,7 @@ class PatchService:
         @return:
         """
         inst = cls()
-        inst.delta = delta
+        inst.delta: GraphDelta = delta
         return inst
 
     def load_delta(self, path: str):
@@ -37,7 +42,7 @@ class PatchService:
             content = f.read()
 
         print("[INFO] loading delta json....")
-        self.delta = jsonpickle.decode(content)
+        self.delta: GraphDelta = jsonpickle.decode(content)
         print("[INFO] loading delta json: DONE.")
 
     def generate_DPO_patch(self, connector) -> Patch:
@@ -60,8 +65,9 @@ class PatchService:
         patch.base_timestamp = ts_init
         patch.resulting_timestamp = ts_updated
 
-        # get all structural modifications
-        s_mods = self.delta.structure_updates
+        # get all modifications
+        s_mods: List[StructureModification] = self.delta.structure_updates
+        p_mods: List[PropertyModification] = self.delta.property_updates
 
         # loop over structural modifications
         for s_mod in s_mods:
@@ -153,6 +159,16 @@ class PatchService:
 
             # add dpo to patch object
             patch.operations.append(rule)
+
+        # loop over all p_mods
+        for p_mod in p_mods:
+            path = p_mod.pattern.paths[0]
+            attr_name = p_mod.attrName
+            init_val = p_mod.valueOld
+            updt_val = p_mod.valueNew
+            rule = AttributeRule(path=path, attribute_name=attr_name, init_value=init_val, updated_value=updt_val)
+            patch.attribute_changes.append(rule)
+
         print("[INFO] generate patch: DONE.")
         return patch
 

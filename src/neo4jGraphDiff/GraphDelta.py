@@ -30,7 +30,7 @@ class GraphDelta:
         @return:
         """
         try:
-            lst = sorted(self.property_updates, key=lambda pmod: pmod.pattern.get_entry_node().attrs['GlobalId'])
+            lst = sorted(self.property_updates, key=lambda pmod: pmod.pattern.get_start_node().attrs['GlobalId'])
             return lst
         except:
             print('Sorting failed. Perhaps there is an issue in a pattern for each pMod. ')
