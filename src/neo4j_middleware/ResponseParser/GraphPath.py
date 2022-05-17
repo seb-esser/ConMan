@@ -72,13 +72,13 @@ class GraphPath:
 
                     # append edge without specifying the start node again
                     skip_start = True
-                    cy = segment.to_cypher(skip_start_node=skip_start, skip_end_node_attrs=True)
+                    cy = segment.to_cypher(skip_start_node=skip_start)
                 else:
-                    cy = segment.to_cypher(skip_start_node=False, skip_start_node_attrs=False, skip_end_node_attrs=True)
+                    cy = segment.to_cypher(skip_start_node=False)
                     # cy += ', '
             except:
 
-                cy = segment.to_cypher(skip_start_node=False, skip_start_node_attrs=False, skip_end_node_attrs=True)
+                cy = segment.to_cypher(skip_start_node=False)
                 # cy += ', '
             cy_list.append(cy)
 

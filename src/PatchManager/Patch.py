@@ -115,6 +115,7 @@ class Patch(object):
         for r in self.attribute_changes:
             # swap updated and initial value
             r.updated_value, r.init_value = r.init_value, r.updated_value
+            r.path.segments[-1].end_node.attrs[r.attribute_name] = r.updated_value
 
         print("[INFO] applying transformation ...")
         self.apply(connector=connector)
