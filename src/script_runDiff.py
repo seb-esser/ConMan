@@ -21,7 +21,7 @@ def main():
                  "solibri": ("ts20121017T152740", "ts20121017T154702")
                  }
 
-    case_study = 'new_cuboid'
+    case_study = 'cuboid_changedElevation'
     ts_init, ts_updated = testcases[case_study]
 
     print('Running Diff on case study: >{}<'.format(case_study))
