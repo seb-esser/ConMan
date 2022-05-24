@@ -1,5 +1,5 @@
 <template>
-  <div class="border border-secondary">
+  <div>
   <h2>Event Stream</h2>
     <EventObject
         v-for="event in this.events"

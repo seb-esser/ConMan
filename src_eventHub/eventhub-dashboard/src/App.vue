@@ -1,20 +1,18 @@
 <template>
-  <div id="app" class="container my-5">
-    <!--  <img alt="Vue logo" src="./assets/logo.png">-->
-    <!--  <HelloWorld msg="Welcome to Your Vue.js App"/>-->
-    <EventStream></EventStream>
-  </div>
+  <nav>
+    <router-link to="/">Dashboard</router-link>
+    |
+    <router-link to="/about">About</router-link>
+  </nav>
+  <router-view/>
+
+
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld.vue'
-import EventStream from "@/components/EventStream";
 
 export default {
-  name: 'App',
-  components: {
-    EventStream
-  }
+  name: 'App'
 }
 </script>
 
@@ -27,4 +25,5 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+
 </style>
