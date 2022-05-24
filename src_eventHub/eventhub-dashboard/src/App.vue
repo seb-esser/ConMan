@@ -67,6 +67,7 @@ export default {
 
         {title: 'Home', icon: 'mdi-view-home', route: "/"},
         {title: 'Dashboard', icon: 'mdi-view-dashboard', route: "/dashboard"},
+        {title: 'Subscriptions', icon: 'mdi-view-dashboard', route: "/subscriptions"},
         {title: 'About', icon: 'mdi-help-box', route: "/about"},
       ],
       right: null,
