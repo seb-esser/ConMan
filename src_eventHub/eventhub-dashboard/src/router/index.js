@@ -2,6 +2,7 @@ import {createRouter, createWebHashHistory} from 'vue-router'
 import DashboardView from '../views/DashboardView.vue'
 import HomeView from "@/views/HomeView";
 import SubscriptionView from "@/views/SubscriptionView";
+import GraphVisualization from "@/components/GraphVisualization";
 
 const routes = [
     {
@@ -18,6 +19,11 @@ const routes = [
         path: '/subscriptions',
         name: 'SubscriptionView',
         component: SubscriptionView
+    },
+        {
+        path: '/graph',
+        name: 'GraphVisualizationView',
+        component: GraphVisualization
     },
     {
         path: '/about',

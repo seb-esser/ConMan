@@ -2,18 +2,62 @@
   <div>
     <h1>Subscriptions and Topic hierarchy</h1>
     <v-treeview
-        activatable
-        :items="topics"></v-treeview>
+        v-model="selection"
+        :items="topics"
+        selectable
+        open-all
+    >
+    </v-treeview>
   </div>
 </template>
 
 
 <script>
+
+
 export default {
   name: "SubscriptionView",
   data() {
     return {
-      "topics": [
+      selection: [],
+      treeDisplayData: [
+        {
+          text: "root 1",
+          state: {checked: false, selected: false, expanded: false},
+          id: 1,
+          checkable: false,
+          nodes: [
+            {
+              text: "Child 1",
+              state: {checked: true, selected: false, expanded: false},
+              id: 3,
+              nodes: [
+                {
+                  text: "Grandchild 1",
+                  state: {checked: false, selected: false, expanded: false},
+                  id: 5,
+                },
+                {
+                  text: "Grandchild 2",
+                  state: {checked: false, selected: false, expanded: false},
+                  id: 6,
+                },
+              ],
+            },
+            {
+              text: "Child 2",
+              state: {checked: false, selected: false, expanded: false},
+              id: 4,
+            },
+          ],
+        },
+        {
+          text: "Root 2",
+          state: {checked: false, selected: false, expanded: false},
+          id: 2,
+        },
+      ],
+      topics: [
         {
           id: 1,
           name: 'Applications :',

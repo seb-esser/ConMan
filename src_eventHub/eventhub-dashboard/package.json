@@ -12,8 +12,10 @@
     "core-js": "^3.8.3",
     "roboto-fontface": "*",
     "socket.io-client": "^4.5.1",
+    "v-network-graph": "^0.5.16",
     "vue": "^3.2.13",
     "vue-router": "^4.0.15",
+    "vuejs-tree": "^3.0.2",
     "vuetify": "^3.0.0-beta.0",
     "webfontloader": "^1.0.0"
   },
