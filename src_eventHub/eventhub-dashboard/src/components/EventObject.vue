@@ -1,7 +1,33 @@
 <template>
-  <div class="p-0">
+  <div id="line">
 
-    {{ eventId }} - {{ topic }} - {{ payload }} <v-btn variant="outlined">outlined</v-btn>
+    <v-container>
+      <v-form>
+        <v-row>
+          <v-col justify='left'>
+            {{ eventId }}
+          </v-col>
+          <v-col justify='left'>
+            {{ topic }}
+          </v-col>
+          <v-col justify='left'>
+            {{ payload }}
+          </v-col>
+          <v-col justify='right'>
+            <v-btn x-small
+                   color="normal"
+                   >view
+            </v-btn>
+            <v-btn x-small
+                   color="normal"
+                   >more
+            </v-btn>
+
+          </v-col>
+        </v-row>
+      </v-form>
+    </v-container>
+
 
   </div>
 
@@ -23,5 +49,10 @@ export default {
 </script>
 
 <style scoped>
+#line {
+  min-height: auto;
+  margin: 4px;
+  background-color: lightgrey
+}
 
 </style>

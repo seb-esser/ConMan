@@ -1,6 +1,6 @@
 <template>
   <div>
-  <h2>Event Stream</h2>
+  <h2>Events </h2>
     <EventObject
         v-for="event in this.events"
         v-bind:key="event.eventId"
