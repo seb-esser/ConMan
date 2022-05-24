@@ -30,7 +30,7 @@ export default {
     // var con = io("http://localhost:5000");
     // con.on("newTransaction", data => {
     //   console.log(data);
-    //   // this.msgBundles.push(data);
+    //   // this.events.push(data);
     //
     // });
   },

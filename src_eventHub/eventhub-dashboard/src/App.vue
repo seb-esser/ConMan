@@ -47,6 +47,7 @@
     </v-main>
 
     <v-footer app>
+      2022 - TUM CMS
       <!-- -->
     </v-footer>
 

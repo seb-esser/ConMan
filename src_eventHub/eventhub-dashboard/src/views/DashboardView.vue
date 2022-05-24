@@ -60,7 +60,6 @@ export default {
   flex: 0 0 50%;
   border-width: 2px;
   border-style: solid;
-  border-color: cadetblue;
   margin: 4px;
 
 }
@@ -69,7 +68,6 @@ export default {
   flex: 1;
   border-width: 2px;
   border-style: solid;
-  border-color: cadetblue;
   margin: 4px;
 }
 
