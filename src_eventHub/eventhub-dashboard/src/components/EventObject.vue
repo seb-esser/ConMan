@@ -1,18 +1,7 @@
 <template>
   <div class="p-0">
 
-    {{ eventId }} - {{ topic }} - {{ payload }}
-    <div>
-      <b-button-toolbar key-nav aria-label="Toolbar with button groups">
-
-        <b-button-group class="mx-1">
-          <b-button>Edit</b-button>
-          <b-button>Undo</b-button>
-          <b-button>Redo</b-button>
-        </b-button-group>
-
-      </b-button-toolbar>
-    </div>
+    {{ eventId }} - {{ topic }} - {{ payload }} <v-btn variant="outlined">outlined</v-btn>
 
   </div>
 

@@ -1,17 +1,13 @@
-import App from './App.vue'
 import { createApp } from 'vue'
+import App from './App.vue'
 import router from './router'
+import vuetify from './plugins/vuetify'
 
-// import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import { loadFonts } from './plugins/webfontloader'
 
-// Import Bootstrap and BootstrapVue CSS files (order is important)
-import 'bootstrap'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
-// import BootstrapVue from "bootstrap-vue";
+loadFonts()
 
-
-createApp(App).use(router).mount('#app')
-// App.use(BootstrapVue)
-
-
+createApp(App)
+  .use(router)
+  .use(vuetify)
+  .mount('#app')
