@@ -24,6 +24,9 @@
             :key="item.title"
             router :to="item.route"
         >
+           <v-list-item-avatar start>
+          <v-icon :icon="item.icon"></v-icon>
+        </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item-content>
@@ -66,10 +69,10 @@ export default {
         //  This list controls the entries given in the left navigation bar.
         //  If adding a new item, remember to add a new route to the router as well.
 
-        {title: 'Home', icon: 'mdi-view-home', route: "/"},
+        {title: 'Home', icon: 'mdi-home', route: "/"},
         {title: 'Dashboard', icon: 'mdi-view-dashboard', route: "/dashboard"},
-        {title: 'Subscriptions', icon: 'mdi-view-dashboard', route: "/subscriptions"},
-        {title: 'Graph Visualization', icon: 'mdi-view-dashboard', route: "/graph"},
+        {title: 'Subscriptions', icon: 'mdi-set-center', route: "/subscriptions"},
+        {title: 'Graph Visualization', icon: 'mdi-graphql', route: "/graph"},
         {title: 'About', icon: 'mdi-help-box', route: "/about"},
       ],
       right: null,
