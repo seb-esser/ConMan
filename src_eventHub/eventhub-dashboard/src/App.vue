@@ -1,32 +1,33 @@
 <template>
   <v-app>
-
-    <v-navigation-drawer>
+    <v-navigation-drawer
+        expand-on-hover>
       <!-- Header -->
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title class="text-h6">
-            BIM-Event-Hub
-          </v-list-item-title>
-          <v-list-item-subtitle>
-            version control for BIM models
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-
+      <vlist>
+        <v-list-item>
+          <v-list-item-content>
+            <v-list-item-title class="text-h6">
+              BIM-Event-Hub
+            </v-list-item-title>
+            <v-list-item-subtitle>
+              version control for BIM models
+            </v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+      </vlist>
 
       <!-- the actual menu -->
       <v-divider></v-divider>
 
-      <v-list>
+      <v-list density="compact">
         <v-list-item
             v-for="item in items"
             :key="item.title"
             router :to="item.route"
         >
-           <v-list-item-avatar start>
-          <v-icon :icon="item.icon"></v-icon>
-        </v-list-item-avatar>
+          <v-list-item-avatar start>
+            <v-icon :icon="item.icon"></v-icon>
+          </v-list-item-avatar>
           <v-list-item-content>
             <v-list-item-title>{{ item.title }}</v-list-item-title>
           </v-list-item-content>
