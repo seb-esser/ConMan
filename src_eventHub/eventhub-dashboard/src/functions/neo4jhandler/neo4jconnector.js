@@ -9,22 +9,17 @@ export async function useNeo4jQuery(cypherStatement) {
     const driver = neo4j.driver(uri, neo4j.auth.basic(user, password), {encrypted: "ENCRYPTION_OFF"})
     const session = driver.session()
 
-    var result = [];
+    var result = {};
     try {
-        const raw = await session.run(cypherStatement)
-
-        for (let i in raw.records) {
-            console.log("name" + raw.records[i]._fields[0] + " labels:" + raw.records[i]._fields[1])
-        }
-
-        result = raw.records
+        const raw = await session.run(cypherStatement);
+        result = raw;
 
     } finally {
-        await session.close()
+        await session.close();
     }
 
     // on application exit:
-    await driver.close()
+    await driver.close();
 
     return result
 }
