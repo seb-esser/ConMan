@@ -2,7 +2,7 @@
   <div id="line">
     <v-card
         elevation="2"
-        hover="true"
+        hover=true
         v-on:click="greet"
 
     >

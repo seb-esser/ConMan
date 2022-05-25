@@ -1,21 +1,25 @@
 <template>
   <div id="dashboard">
-    <div id="top">
-
-      <div id="left">
-        <EventStream></EventStream>
-      </div>
-
-      <div id="right">
-        <ConnectionOverview></ConnectionOverview>
-      </div>
-    </div>
+  <div id="left">
+    <v-card elevation="5" min-height="400"
+        >
+      <EventStream></EventStream>
+    </v-card>
   </div>
+  <div id="right">
+    <v-card elevation="5" min-height="400">
+      <ConnectionOverview></ConnectionOverview>
+    </v-card>
+  </div>
+</div>
 
   <div id="dashboard">
     <div id="bottom">
       <div id="left">
+            <v-card elevation="5" min-height="400"
+        >
         <TrackedModels></TrackedModels>
+              </v-card>
       </div>
     </div>
   </div>
@@ -58,16 +62,13 @@ export default {
 
 #left {
   flex: 0 0 50%;
-  border-width: 2px;
-  border-style: solid;
   margin: 4px;
+  min-height: 400px;
 
 }
 
 #right {
   flex: 1;
-  border-width: 2px;
-  border-style: solid;
   margin: 4px;
 }
 
