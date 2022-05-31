@@ -12,7 +12,6 @@ app.config['SECRET_KEY'] = 'secret!'
 app.config['CORS_HEADERS'] = 'Content-Type'
 CORS(app, resource={r"/*": {"origins": "*"}})
 socketio = SocketIO(app, cors_allowed_origins="*")
-app = Flask(__name__)
 
 
 @app.errorhandler(HTTPException)
@@ -50,6 +49,11 @@ def get_models():  # put application's code here
             response_json[model_name].append(timestamp)
 
     return jsonify(response_json)
+
+
+@app.route('/api/getSubscriptionHierarchy')
+def get_subscription_hierarchy():
+    return jsonify({"hierarchy": {"models": ["A", "B", "C"]}})
 
 
 @socketio.event
