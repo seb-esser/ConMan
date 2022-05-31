@@ -4,6 +4,9 @@ from flask_socketio import send, emit, SocketIO
 
 from werkzeug.exceptions import HTTPException
 
+from functions.neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from functions.neo4j_middleware.neo4jConnector import Neo4jConnector
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -27,9 +30,26 @@ def handle_exception(e):
     return response
 
 
-@app.route('/')
-def hello_world():  # put application's code here
-    return 'Hello World!'
+@app.route('/api/getModels')
+def get_models():  # put application's code here
+    cy = Neo4jQueryFactory.get_loaded_models()
+    connector = Neo4jConnector()
+    connector.connect_driver()
+    raw = connector.run_cypher_statement(cy)
+    connector.disconnect_driver()
+
+    response_json = {}
+
+    for record in raw:
+        model_name = record[0]
+        timestamp = [x for x in record[1] if x.startswith("ts")][0]
+
+        if model_name not in response_json:
+            response_json[model_name] = [timestamp]
+        else:
+            response_json[model_name].append(timestamp)
+
+    return jsonify(response_json)
 
 
 @socketio.event
