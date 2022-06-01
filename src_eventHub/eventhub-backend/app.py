@@ -71,10 +71,20 @@ def get_models():
     )
     return response
 
+
 @app.route('/api/getSubscriptionHierarchy')
 def get_subscription_hierarchy():
     return jsonify({"hierarchy": {"models": ["A", "B", "C"]}})
 
+
+@app.route('/api/testSocket')
+def test_socket():
+    socketio.emit("UserConnected", "User1")
+    response = app.response_class(
+        response="success",
+        status=200
+    )
+    return response
 
 @socketio.event
 def connect():
