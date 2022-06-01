@@ -17,5 +17,15 @@ export default createVuetify(
                 mdi,
             }
         },
+        theme: {
+            themes: {
+                light: {
+                    primary: '#0065bd',
+                    secondary: '#005293',
+                    accent: '#E37222',
+                    error: '#b71c1c',
+                },
+            },
+        },
     }
 )

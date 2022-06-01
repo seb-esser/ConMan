@@ -1,9 +1,11 @@
+import jsonpickle
 from flask import Flask, request, jsonify, render_template, json
 from flask_cors import CORS, cross_origin
 from flask_socketio import send, emit, SocketIO
 
 from werkzeug.exceptions import HTTPException
 
+from data_structures.ModelData import ModelData
 from functions.neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from functions.neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -37,19 +39,33 @@ def get_models():  # put application's code here
     raw = connector.run_cypher_statement(cy)
     connector.disconnect_driver()
 
-    response_json = {}
-
+    i = 0
+    all_models = []
     for record in raw:
+
         model_name = record[0]
         timestamp = [x for x in record[1] if x.startswith("ts")][0]
+        #
+        if model_name not in [x.Name for x in all_models]:
+            model = ModelData(model_name)
+            model.set_timestamps(timestamp)
+            all_models.append(model)
 
-        if model_name not in response_json:
-            response_json[model_name] = [timestamp]
         else:
-            response_json[model_name].append(timestamp)
+            m = [x for x in all_models if x.Name == model_name][0]
+            m.timestamps.append(timestamp)
 
-    return jsonify(response_json)
+        i += 1
 
+    # bundle data
+    s = jsonpickle.dumps({"models": all_models}, unpicklable=False)
+    # prepare response
+    response = app.response_class(
+        response=s,
+        status=200,
+        mimetype='application/json'
+    )
+    return response
 
 @app.route('/api/getSubscriptionHierarchy')
 def get_subscription_hierarchy():
