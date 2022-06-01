@@ -32,7 +32,7 @@ def handle_exception(e):
 
 
 @app.route('/api/getModels')
-def get_models():  # put application's code here
+def get_models():
     cy = Neo4jQueryFactory.get_loaded_models()
     connector = Neo4jConnector()
     connector.connect_driver()
@@ -45,15 +45,19 @@ def get_models():  # put application's code here
 
         model_name = record[0]
         timestamp = [x for x in record[1] if x.startswith("ts")][0]
-        #
+
+        #beautify timestamp
+        ts = "{}-{}-{}_{}-{}-{}".format(timestamp[2:6], timestamp[6:8], timestamp[8:10],
+                                        timestamp[11:13], timestamp[13:15], timestamp[15:17])
+
         if model_name not in [x.Name for x in all_models]:
             model = ModelData(model_name)
-            model.set_timestamps(timestamp)
+            model.set_timestamps(ts)
             all_models.append(model)
 
         else:
             m = [x for x in all_models if x.Name == model_name][0]
-            m.timestamps.append(timestamp)
+            m.timestamps.append(ts)
 
         i += 1
 

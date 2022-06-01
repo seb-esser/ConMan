@@ -2,18 +2,18 @@
   <div>
     <h2>Tracked Models</h2>
 
-<!--    <v-banner-->
-<!--        single-line-->
-<!--        :sticky="sticky"-->
-<!--        :rounded="true"-->
-<!--    >-->
+    <!--    <v-banner-->
+    <!--        single-line-->
+    <!--        :sticky="sticky"-->
+    <!--        :rounded="true"-->
+    <!--    >-->
 
-<!--      <template v-slot:actions>-->
-<!--        <v-btn block color="primary" @click="getModelsFromBackend">-->
-<!--          Reload-->
-<!--        </v-btn>-->
-<!--      </template>-->
-<!--    </v-banner>-->
+    <!--      <template v-slot:actions>-->
+    <!--        <v-btn block color="primary" @click="getModelsFromBackend">-->
+    <!--          Reload-->
+    <!--        </v-btn>-->
+    <!--      </template>-->
+    <!--    </v-banner>-->
     <div>
       <v-expansion-panels>
         <v-expansion-panel
@@ -26,18 +26,19 @@
           </v-expansion-panel-title>
           <v-expansion-panel-text>
 
-            <v-list density="compact">
+            <v-list>
               <v-list-subheader>Available timestamps</v-list-subheader>
               <v-list-item
                   v-for="(item, j) in i.timestamps"
                   :key="j"
                   :value="item"
-                  active-color="primary"
               >
                 <v-list-item-title v-text="item"></v-list-item-title>
-
-                <v-btn small icon="mdiCloudDownloadOutline">download file</v-btn>
+                <v-row class="justify-end">
+                  <v-btn small icon="mdi-download">download file</v-btn>
+                </v-row>
               </v-list-item>
+
             </v-list>
           </v-expansion-panel-text>
         </v-expansion-panel>
@@ -59,7 +60,7 @@ export default {
     }
   },
 
-  created (){
+  created() {
     this.getModelsFromBackend()
 
   },
