@@ -80,15 +80,27 @@ def get_subscription_hierarchy():
 @app.route('/api/testSocket')
 def test_socket():
     socketio.emit("UserConnected", "User1")
+    print("triggered socket event. Emitting (\"UserConnected, User1\") ")
     response = app.response_class(
         response="success",
         status=200
     )
     return response
 
-@socketio.event
+
+@socketio.event(namespace='/websocketTest')
 def connect():
-    print("[WS]: New client has connected via websocket. ")
+    print("[WS]: New client has connected via websocket on namespace websocketTest.")
+
+
+@socketio.event()
+def connect():
+    print("[WS]: New client has connected via websocket on default namespace.")
+
+
+@socketio.event(namespace="/websocketTest")
+def disconnect():
+    print("[WS]: Existing client has disconnected via websocket. ")
 
 
 @socketio.event

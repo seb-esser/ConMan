@@ -1,24 +1,52 @@
+import socketio
 from PyQt5.QtWidgets import (QAction, QApplication, QFormLayout, QGroupBox,
                              QLabel, QPushButton, QVBoxLayout, QWidget,
                              QMainWindow, QLineEdit, QTextEdit)
 from PyQt5.QtCore import Qt, QThread
 
-import websocket
 
+class ServerConnection(QThread):
 
-class ListenWebsocket(QThread):
-    def __init__(self, parent=None):
-        super(ListenWebsocket, self).__init__(parent)
+    def __init__(self):
+        QThread.__init__(self)
+        self.sio = socketio.AsyncClient(reconnection=True, reconnection_attempts=3,
+                   reconnection_delay=5, reconnection_delay_max=5, logger=True)
 
-        websocket.enableTrace(True)
+    'thread run function'
+    def run(self) -> None:
+        self.sio.connect(url="localhost:5000", socketio_path="/", transports="websocket")
+        self.sio.on('connect', self.connect, namespace=None)
+        self.sio.on('socket_connected', self.socket_connected, namespace=None)
+        self.sio.on('connect_error', self.connect_error, namespace=None)
+        self.sio.on('/client_Unlock', self.client_unlock_ack, namespace=None)
+        self.sio.on('UserConnected', self.userConnected, namespace=None)
 
-        self.WS = websocket.WebSocketApp("ws://localhost:5000/", on_message=self.on_message)
+    # @sio.on('/client_unlock')
+    'custom event from server, on receiving, this socketio thread needs to inform main GUI'
+    async def client_unlock_ack(self, data):
+            print(data)
+            'from here i want to call pyqt GUI main class function'
 
-    def run(self):
-        self.WS.run_forever()
+    async def userConnected(self, data):
+        print(data)
 
-    def on_message(self, message):
-        print(message)
+    # @sio.event
+    'connection established status'
+    def connect(self):
+        print('Server Connection established!')
+
+    # @sio.on("socket_connected")
+    'socket connection status check'
+    async def socket_connected(self, message):
+        print("Socket Connected!", message)
+
+    # @sio.event
+    def connect_error(self, data):
+        print('Connection error!', data)
+
+    # @sio.on('disconnect' or 'socket_disconnected')
+    def disconnect(self):
+        print('Disconnected!')
 
 
 class MainWindow(QMainWindow):
@@ -26,10 +54,6 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.create_ui()
         self.create_menu()
-
-        # add socket thread
-        self.thread = ListenWebsocket()
-        self.thread.start()
 
     def create_ui(self):
         # Create window
@@ -69,11 +93,13 @@ class MainWindow(QMainWindow):
         disconnect_menu = file_menu.addAction('Disconnect')
 
 
-
-
 if __name__ == '__main__':
     application = QApplication([])
     mainWindow = MainWindow()
 
+    con = ServerConnection()
+    con.start()
+
     mainWindow.show()
     application.exec()
+
