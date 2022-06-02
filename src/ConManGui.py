@@ -1,8 +1,24 @@
 from PyQt5.QtWidgets import (QAction, QApplication, QFormLayout, QGroupBox,
                              QLabel, QPushButton, QVBoxLayout, QWidget,
-                             QMainWindow, QLineEdit)
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap
+                             QMainWindow, QLineEdit, QTextEdit)
+from PyQt5.QtCore import Qt, QThread
+
+import websocket
+
+
+class ListenWebsocket(QThread):
+    def __init__(self, parent=None):
+        super(ListenWebsocket, self).__init__(parent)
+
+        websocket.enableTrace(True)
+
+        self.WS = websocket.WebSocketApp("ws://localhost:5000/", on_message=self.on_message)
+
+    def run(self):
+        self.WS.run_forever()
+
+    def on_message(self, message):
+        print(message)
 
 
 class MainWindow(QMainWindow):
@@ -10,6 +26,10 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         self.create_ui()
         self.create_menu()
+
+        # add socket thread
+        self.thread = ListenWebsocket()
+        self.thread.start()
 
     def create_ui(self):
         # Create window
@@ -27,6 +47,10 @@ class MainWindow(QMainWindow):
 
         # Vertically center widgets
         self._vertical_layout.addStretch(1)
+
+        text_area = QTextEdit()
+        self._vertical_layout.addWidget(text_area)
+
         # Add Copyright
         self.addCopyRight()
 
@@ -45,8 +69,11 @@ class MainWindow(QMainWindow):
         disconnect_menu = file_menu.addAction('Disconnect')
 
 
+
+
 if __name__ == '__main__':
     application = QApplication([])
     mainWindow = MainWindow()
+
     mainWindow.show()
     application.exec()
