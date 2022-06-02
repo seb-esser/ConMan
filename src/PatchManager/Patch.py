@@ -1,5 +1,6 @@
 from typing import List
 
+from PatchManager.AttributeRule import AttributeRule
 from PatchManager.TransformationRule import TransformationRule
 from neo4jGraphDiff.Caption.StructureModification import StructuralModificationTypeEnum
 from neo4j_middleware.neo4jConnector import Neo4jConnector
@@ -10,6 +11,8 @@ class Patch(object):
     def __init__(self):
         # an ordered list of operations that should mutate an existing graph into the updated version
         self.operations: List[TransformationRule] = []
+        # attribute changes
+        self.attribute_changes: List[AttributeRule] = []
         # the model, which the patch gets applied to
         self.base_timestamp: str = ""
         # the timestamp the resulting model should carry
@@ -25,6 +28,7 @@ class Patch(object):
         @return:
         """
 
+        # loop over all structural transformations
         for rule in self.operations:
             if rule.operation_type == StructuralModificationTypeEnum.ADDED:
 
@@ -57,6 +61,7 @@ class Patch(object):
                 # print(cy)
 
                 raw = connector.run_cypher_statement(cy)
+                # ToDo: implement validation that transformation has been applied successfully.
                 # print(raw)
 
             elif rule.operation_type == StructuralModificationTypeEnum.DELETED:
@@ -71,6 +76,23 @@ class Patch(object):
             connector.run_cypher_statement("MATCH (n) REMOVE n:{} SET n:{}".format(label_from, label_to))
             print("[INFO] Adjusting timestamps: DONE.")
 
+        # loop over attribute changes
+        for rule in self.attribute_changes:
+            # find node
+            cy = 'MATCH '
+
+            cy += rule.path.to_cypher(path_number=0)
+            # set new attribute value
+            cy += " SET {}.{} = {}".format(
+                rule.path.get_last_node().get_node_identifier(),
+                rule.attribute_name,
+                rule.updated_value)
+
+            # run statement
+            connector.run_cypher_statement(cy)
+            # ToDo: implement validation that transformation has been applied successfully.
+            #  Consider adding a RETURN to the cypher statement.
+
     def apply_inverse(self, connector: Neo4jConnector):
         """
         applies the given patch inversely
@@ -80,20 +102,24 @@ class Patch(object):
 
         # loop over all transformations
         for r in self.operations:
-            print("[INFO] inversing patterns ...")
+            print("[INFO] inverting patterns ...")
             # swap transformation type
             if r.operation_type == StructuralModificationTypeEnum.ADDED:
                 r.operation_type = StructuralModificationTypeEnum.DELETED
             elif r.operation_type == StructuralModificationTypeEnum.DELETED:
                 r.operation_type = StructuralModificationTypeEnum.ADDED
 
-            # swap timestamps
-            self.base_timestamp, self.resulting_timestamp = self.resulting_timestamp, self.base_timestamp
-            print("[INFO] applying transformation ...")
-            self.apply(connector=connector)
-            print("[INFO] applying transformation: DONE.")
+        # swap timestamps
+        self.base_timestamp, self.resulting_timestamp = self.resulting_timestamp, self.base_timestamp
 
+        for r in self.attribute_changes:
+            # swap updated and initial value
+            r.updated_value, r.init_value = r.init_value, r.updated_value
+            r.path.segments[-1].end_node.attrs[r.attribute_name] = r.updated_value
 
+        print("[INFO] applying transformation ...")
+        self.apply(connector=connector)
+        print("[INFO] applying transformation: DONE.")
 
 
 

@@ -59,7 +59,7 @@ class TransformationRule:
 
     def run_cleanup(self):
         """
-        run clean up and remove unnecessary attribues
+        run clean up and remove unnecessary attributes
         @return:
         """
         self.context_pattern.tidy_node_attributes()

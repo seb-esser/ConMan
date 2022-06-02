@@ -1,5 +1,6 @@
 from typing import List
 
+from neo4j_middleware.CypherUtilities import CypherUtilities
 from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.Neo4jFactory import Neo4jFactory
@@ -11,7 +12,18 @@ class GraphPath:
         self.segments = segments
 
     def get_start_node(self) -> NodeItem:
+        """
+        returns the first node of the path
+        @return:
+        """
         return self.segments[0].start_node
+
+    def get_last_node(self) -> NodeItem:
+        """
+        returns the last node of the path
+        @return:
+        """
+        return self.segments[-1].end_node
 
     @classmethod
     def from_neo4j_response(cls, raw: str):
@@ -73,7 +85,7 @@ class GraphPath:
             # update last_end_node attribute
             last_end_node = segment.end_node
 
-        return cy_list
+        return ' '.join(cy_list)
 
     def remove_segments_by_id(self, segment_ids):
         """
@@ -90,9 +102,4 @@ class GraphPath:
             else:
                 raise Exception('could not find edgeItem in segments of current path. ')
 
-    def get_entry_node(self) -> NodeItem:
-        """
-        returns the first node of the path
-        @return:
-        """
-        return self.segments[0].start_node
+
