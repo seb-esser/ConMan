@@ -1,96 +1,78 @@
+import asyncio
+import sys
+from functools import cached_property
+
+from PyQt5.QtCore import pyqtSignal, QObject, Qt
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
+from asyncqt import QEventLoop
+
 import socketio
 
-from PyQt5.QtWidgets import (QAction, QApplication, QFormLayout, QGroupBox,
-                             QLabel, QPushButton, QVBoxLayout, QWidget,
-                             QMainWindow, QLineEdit, QTextEdit)
-from PyQt5.QtCore import Qt, QThread
 
-sio = socketio.AsyncClient()
+class Client(QObject):
 
-
-class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.create_ui()
-        self.create_menu()
 
-    def create_ui(self):
-        # Create window
-        self.setWindowTitle('Event Hub Client')
-        self.resize(800, 500)
-        self.setMinimumSize(500, 450)
-        # Create central widget and layout
-        self._central_widget = QWidget()
-        self._vertical_layout = QVBoxLayout()
-        self._central_widget.setLayout(self._vertical_layout)
-        # Set central widget
-        self.setCentralWidget(self._central_widget)
-        # Vertically center widgets
-        self._vertical_layout.addStretch(1)
+        self.sio = socketio.AsyncClient()
 
-        # Vertically center widgets
-        self._vertical_layout.addStretch(1)
-        addBtn = QPushButton("Add", self)
-        commitBtn = QPushButton("Commit", self)
-        pushBtn = QPushButton("Push", self)
-        pullBtn = QPushButton("Pull", self)
+        self.connected = pyqtSignal()
+        self.disconnected = pyqtSignal()
+        self.error_occurred = pyqtSignal(object, name="errorOccurred")
+        self.data_changed = pyqtSignal(str, name="dataChanged")
 
-        self._vertical_layout.addWidget(addBtn)
-        self._vertical_layout.addWidget(commitBtn)
-        self._vertical_layout.addWidget(pushBtn)
-        self._vertical_layout.addWidget(pullBtn)
+        # register events and corresponding callback functions
+        self.sio.on("connect", self._handle_connect, namespace=None)
+        self.sio.on("connect_error", self._handle_connect_error, namespace=None)
+        self.sio.on("disconnect", self._handle_disconnect, namespace=None)
+        self.sio.on("UserConnected", self._user_connected, namespace=None)
 
-        # Add Copyright
-        self.addCopyRight()
+    # @cached_property
+    # def sio(self):
+    #     return socketio.AsyncClient()
 
-    def addCopyRight(self):
-        copyRight = QLabel(
-            'Copyright © <a href="https://cms.ed.tum.com/">TUM CMS</a> 2022')
-        copyRight.setOpenExternalLinks(True)
-        self._vertical_layout.addWidget(copyRight, alignment=Qt.AlignCenter)
+    async def start(self):
+        await self.sio.connect(url="http://localhost:5000", wait_timeout=5, namespaces=["/"])
 
-    def create_menu(self):
-        # Create menu bar
-        menu_bar = self.menuBar()
-        # Add menu items
-        file_menu = menu_bar.addMenu('File')
-        connect_menu = file_menu.addAction('Connect')
-        disconnect_menu = file_menu.addAction('Disconnect')
+    def _handle_connect(self):
+        self.connected.emit()
+
+    def _handle_disconnect(self):
+        self.disconnect.emit()
+
+    def _handle_connect_error(self, data):
+        self.error_occurred.emit(data)
+
+    def _user_connected(self, data):
+        print(data)
 
 
-# @sio.event
-# async def connect():
-#     print('connected to server')
-#
-#
-# @sio.event
-# async def disconnect():
-#     print('disconnected from server')
-#
-#
-# @sio.on("UserConnected")
-# async def new_user(data):
-#     sid_a = sio.get_sid()
-#     sid_b = sio.sid
-#     print(sid_a)
-#     print(sid_b)
-#     print("received message from SID: {} ".format(sid_b))
-#     print("message: {}".format(data))
-#
-#
-# async def start_server():
-#     await sio.connect('http://localhost:5000', wait_timeout=5, namespaces=["/"])
-#     print("my SID is: {}\n".format(sio.sid))
-#     await sio.wait()
+class View(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.label = QLabel(alignment=Qt.AlignCenter)
+        self.setCentralWidget(self.label)
+        self.resize(640, 480)
+
+    def update_data(self, message):
+        self.label.setText(message)
 
 
-if __name__ == '__main__':
-    application = QApplication([])
-    mainWindow = MainWindow()
-    mainWindow.show()
+def main():
+    app = QApplication(sys.argv)
+    loop = QEventLoop(app)
+    asyncio.set_event_loop(loop)
 
-    # asyncio.run(start_server())
+    view = View()
+    view.show()
 
-    application.exec()
+    client = Client()
+    # client.data_changed.connect(view.update_data)
+
+    with loop:
+        asyncio.ensure_future(client.start(), loop=loop)
+        loop.run_forever()
 
 
+if __name__ == "__main__":
+    main()
