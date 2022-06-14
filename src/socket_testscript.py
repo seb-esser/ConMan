@@ -1,7 +1,7 @@
 import asyncio
 import socketio
 
-sio = socketio.AsyncClient(logger=True, engineio_logger=True)
+sio = socketio.AsyncClient()
 
 
 @sio.event
@@ -15,19 +15,19 @@ async def disconnect():
 
 
 @sio.event
-def hello(a):
-    print(a)
+def hello(a, b, c):
+    print(a, b, c)
+
+
+@sio.on("UserConnected")
+async def new_user(data):
+    print(data)
 
 
 async def start_server():
-
-    print("[CLIENT] trying to connect...")
-    await sio.connect('http://localhost:5000')
-    print("[CLIENT] connected.")
+    await sio.connect('http://localhost:5000', wait_timeout=5, namespaces=["/"])
     await sio.wait()
 
 
 if __name__ == '__main__':
     asyncio.run(start_server())
-    #
-
