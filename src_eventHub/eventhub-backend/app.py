@@ -116,3 +116,5 @@ def disconnect():
 if __name__ == '__main__':
     print("Starting server ... ")
     socketio.run(app)
+
+# https://stackoverflow.com/questions/68383027/how-to-integrate-python-socket-io-with-qt
