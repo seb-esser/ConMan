@@ -91,21 +91,25 @@ def test_socket():
 @socketio.event(namespace='/websocketTest')
 def connect():
     print("[WS]: New client has connected via websocket on namespace websocketTest.")
+    print("[WS]\t SID: {} origin: {}".format(request.sid, request.headers.environ["HTTP_ORIGIN"]))
 
 
 @socketio.event()
 def connect():
     print("[WS]: New client has connected via websocket on default namespace.")
+    print("[WS]\t SID: {} origin: {}".format(request.sid, request.headers.environ["HTTP_ORIGIN"]))
 
 
 @socketio.event(namespace="/websocketTest")
 def disconnect():
     print("[WS]: Existing client has disconnected via websocket. ")
+    print("[WS]\t SID: {} origin: {}".format(request.sid, request.headers.environ["HTTP_ORIGIN"]))
 
 
 @socketio.event
 def disconnect():
     print("[WS]: Existing client has disconnected via websocket. ")
+    print("[WS]\t SID: {} origin: {}".format(request.sid, request.headers.environ["HTTP_ORIGIN"]))
 
 
 if __name__ == '__main__':
