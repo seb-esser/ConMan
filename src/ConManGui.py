@@ -1,52 +1,11 @@
 import socketio
+
 from PyQt5.QtWidgets import (QAction, QApplication, QFormLayout, QGroupBox,
                              QLabel, QPushButton, QVBoxLayout, QWidget,
                              QMainWindow, QLineEdit, QTextEdit)
 from PyQt5.QtCore import Qt, QThread
 
-
-class ServerConnection(QThread):
-
-    def __init__(self):
-        QThread.__init__(self)
-        self.sio = socketio.AsyncClient(reconnection=True, reconnection_attempts=3,
-                   reconnection_delay=5, reconnection_delay_max=5, logger=True)
-
-    'thread run function'
-    def run(self) -> None:
-        self.sio.connect(url="localhost:5000", socketio_path="/", transports="websocket")
-        self.sio.on('connect', self.connect, namespace=None)
-        self.sio.on('socket_connected', self.socket_connected, namespace=None)
-        self.sio.on('connect_error', self.connect_error, namespace=None)
-        self.sio.on('/client_Unlock', self.client_unlock_ack, namespace=None)
-        self.sio.on('UserConnected', self.userConnected, namespace=None)
-
-    # @sio.on('/client_unlock')
-    'custom event from server, on receiving, this socketio thread needs to inform main GUI'
-    async def client_unlock_ack(self, data):
-            print(data)
-            'from here i want to call pyqt GUI main class function'
-
-    async def userConnected(self, data):
-        print(data)
-
-    # @sio.event
-    'connection established status'
-    def connect(self):
-        print('Server Connection established!')
-
-    # @sio.on("socket_connected")
-    'socket connection status check'
-    async def socket_connected(self, message):
-        print("Socket Connected!", message)
-
-    # @sio.event
-    def connect_error(self, data):
-        print('Connection error!', data)
-
-    # @sio.on('disconnect' or 'socket_disconnected')
-    def disconnect(self):
-        print('Disconnected!')
+sio = socketio.AsyncClient()
 
 
 class MainWindow(QMainWindow):
@@ -71,9 +30,15 @@ class MainWindow(QMainWindow):
 
         # Vertically center widgets
         self._vertical_layout.addStretch(1)
+        addBtn = QPushButton("Add", self)
+        commitBtn = QPushButton("Commit", self)
+        pushBtn = QPushButton("Push", self)
+        pullBtn = QPushButton("Pull", self)
 
-        text_area = QTextEdit()
-        self._vertical_layout.addWidget(text_area)
+        self._vertical_layout.addWidget(addBtn)
+        self._vertical_layout.addWidget(commitBtn)
+        self._vertical_layout.addWidget(pushBtn)
+        self._vertical_layout.addWidget(pullBtn)
 
         # Add Copyright
         self.addCopyRight()
@@ -93,13 +58,39 @@ class MainWindow(QMainWindow):
         disconnect_menu = file_menu.addAction('Disconnect')
 
 
+# @sio.event
+# async def connect():
+#     print('connected to server')
+#
+#
+# @sio.event
+# async def disconnect():
+#     print('disconnected from server')
+#
+#
+# @sio.on("UserConnected")
+# async def new_user(data):
+#     sid_a = sio.get_sid()
+#     sid_b = sio.sid
+#     print(sid_a)
+#     print(sid_b)
+#     print("received message from SID: {} ".format(sid_b))
+#     print("message: {}".format(data))
+#
+#
+# async def start_server():
+#     await sio.connect('http://localhost:5000', wait_timeout=5, namespaces=["/"])
+#     print("my SID is: {}\n".format(sio.sid))
+#     await sio.wait()
+
+
 if __name__ == '__main__':
     application = QApplication([])
     mainWindow = MainWindow()
-
-    con = ServerConnection()
-    con.start()
-
     mainWindow.show()
+
+    # asyncio.run(start_server())
+
     application.exec()
+
 

@@ -79,6 +79,7 @@ def get_subscription_hierarchy():
 
 @app.route('/api/testSocket')
 def test_socket():
+
     socketio.emit("UserConnected", "User1")
     print("triggered socket event. Emitting (\"UserConnected, User1\") ")
     response = app.response_class(
@@ -91,7 +92,7 @@ def test_socket():
 @socketio.event(namespace='/websocketTest')
 def connect():
     print("[WS]: New client has connected via websocket on namespace websocketTest.")
-    print("[WS]\t SID: {} ".format(request.sid))
+    print("[WS]\t SID: {}".format(request.sid))
 
 
 @socketio.event()
