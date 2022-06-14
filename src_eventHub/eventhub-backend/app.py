@@ -109,7 +109,7 @@ def disconnect():
 @socketio.event
 def disconnect():
     print("[WS]: Existing client has disconnected via websocket. ")
-    print("[WS]\t SID: {} origin: {}".format(request.sid, request.headers.environ["HTTP_ORIGIN"]))
+    print("[WS]\t SID: {}".format(request.sid))
 
 
 if __name__ == '__main__':

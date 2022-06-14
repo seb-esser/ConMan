@@ -21,11 +21,13 @@ def hello(a, b, c):
 
 @sio.on("UserConnected")
 async def new_user(data):
-    print(data)
+    print("received message from SID: {} ".format(sio.sid))
+    print("message: {}".format(data))
 
 
 async def start_server():
     await sio.connect('http://localhost:5000', wait_timeout=5, namespaces=["/"])
+    print("my SID is: {}".format(sio.sid))
     await sio.wait()
 
 
