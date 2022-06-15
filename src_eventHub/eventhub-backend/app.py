@@ -7,7 +7,7 @@ from werkzeug.exceptions import HTTPException
 
 from data_structures.ModelData import ModelData
 from data_structures.Teams.DeliveryTeam import DeliveryTeam
-from data_structures.Teams.Member import TeamMember
+from data_structures.Teams.Member import Member
 from functions.neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from functions.neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -107,12 +107,16 @@ def get_models():
 @app.route('/api/getDeliveryTeams', methods=['GET'])
 def get_delivery_teams():
     teams = DeliveryTeam.from_db()
-    return jsonify(teams)
+    return app.response_class(
+        status=200,
+        response=jsonpickle.dumps(teams, unpicklable=False),
+        mimetype='application/json'
+    )
 
 
 @app.route('/api/getMembers', methods=['GET'])
 def get_members():
-    members = TeamMember.from_db()
+    members = Member.from_db()
     return app.response_class(
         status=200,
         response=jsonpickle.dumps(members, unpicklable=False),
@@ -122,7 +126,7 @@ def get_members():
 
 @app.route('/api/createMember', methods=['POST'])
 def create_member(data):
-    member = TeamMember(data["LastName"], data["FirstName"])
+    member = Member(data["LastName"], data["FirstName"])
     member.to_db()
     return app.response_class(
         status=200
