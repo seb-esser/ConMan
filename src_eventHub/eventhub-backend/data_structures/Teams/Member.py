@@ -24,12 +24,20 @@ class Member:
         else:
             return False
 
+    def delete_member(self, uuid_str):
+        sql = "DELETE FROM member WHERE member.UUID = '{}'".format(uuid_str)
+        connector = SQliteConnector()
+        connector.create_connection()
+        connector.run_sql_command(sql)
+        connector.close_connection()
+
     @classmethod
     def from_db(cls):
         sql = "SELECT * FROM member"
         connector = SQliteConnector()
         connector.create_connection()
         res = connector.run_sql_command(sql)
+        connector.close_connection()
 
         members = []
         for row in res:
@@ -37,11 +45,23 @@ class Member:
             members.append(member)
         return members
 
+    @classmethod
+    def from_db_by_uuid(cls, uuid_str):
+        sql = "SELECT * FROM member WHERE member.UUID == '{}'".format(uuid_str)
+        connector = SQliteConnector()
+        connector.create_connection()
+        res = connector.run_sql_command(sql)
+        connector.close_connection()
+
+        member = cls(res[0][0], res[0][1], res[0][2], res[0][3])
+        return member
+
     def to_db(self):
         sql = "INSERT INTO member (lastName, firstName, UUID, TeamID) VALUES ('{}', '{}', '{}', '{}')"\
             .format(self.last_name, self.first_name, self.user_id, self.team_id)
 
         connector = SQliteConnector()
         connector.create_connection()
-        res = connector.run_sql_command(sql)
+        connector.run_sql_command(sql)
+        connector.close_connection()
 

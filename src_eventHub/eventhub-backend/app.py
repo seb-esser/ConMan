@@ -142,6 +142,20 @@ def create_member():
     )
 
 
+@app.route('/api/deleteMember', methods=["DELETE"])
+def delete_member():
+    uuid = eval(request.data)['uuid']
+    member = Member.from_db_by_uuid(uuid)
+
+    # remove member from table
+    member.delete_member(uuid)
+
+    # make response
+    return app.response_class(
+        status=200
+    )
+
+
 @app.route('/api/getSubscriptionHierarchy')
 def get_subscription_hierarchy():
     return jsonify({"hierarchy": {"models": ["A", "B", "C"]}})
