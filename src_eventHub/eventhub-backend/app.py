@@ -114,6 +114,20 @@ def get_delivery_teams():
     )
 
 
+@app.route('/api/CreateDeliveryTeam', methods=['POST'])
+def create_delivery_teams():
+    name = eval(request.data)["teamName"]
+    team = DeliveryTeam(name=name)
+
+    team.to_db()
+
+    return app.response_class(
+        status=200,
+        response=jsonpickle.dumps(team, unpicklable=False),
+        mimetype='application/json'
+    )
+
+
 @app.route('/api/getMembers', methods=['GET'])
 def get_members():
     members = Member.from_db()

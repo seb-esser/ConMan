@@ -21,6 +21,7 @@ class DeliveryTeam:
         connector = SQliteConnector()
         connector.create_connection()
         res = connector.run_sql_command(sql)
+        connector.close_connection()
 
         teams = []
 
@@ -30,4 +31,11 @@ class DeliveryTeam:
             teams.append(team)
 
         return teams
+
+    def to_db(self):
+        sql = "INSERT INTO deliveryTeam (name) VALUES ('{}')".format(self.name)
+        connector = SQliteConnector()
+        connector.create_connection()
+        res = connector.run_sql_command(sql)
+        connector.close_connection()
 
