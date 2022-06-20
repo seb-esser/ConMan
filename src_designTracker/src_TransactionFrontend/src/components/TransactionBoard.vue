@@ -34,7 +34,7 @@ export default {
   created: function () {
     console.log("Hit onCreated method in App.vue. ");
     var con = io("http://localhost:5000");
-    con.on("newTransaction", data => {
+    con.on("UserConnected", data => {
       console.log(data);
       this.msgBundles.push(data);
 

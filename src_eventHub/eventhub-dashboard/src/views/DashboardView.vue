@@ -1,25 +1,25 @@
 <template>
   <div id="dashboard">
-  <div id="left">
-    <v-card elevation="5" min-height="400"
-        >
-      <EventStream></EventStream>
-    </v-card>
+    <div id="left">
+      <v-card elevation="5" min-height="400"
+      >
+        <EventStream></EventStream>
+      </v-card>
+    </div>
+    <div id="right">
+      <v-card elevation="5" min-height="400">
+        <ConnectionOverview></ConnectionOverview>
+      </v-card>
+    </div>
   </div>
-  <div id="right">
-    <v-card elevation="5" min-height="400">
-      <ConnectionOverview></ConnectionOverview>
-    </v-card>
-  </div>
-</div>
 
   <div id="dashboard">
     <div id="bottom">
       <div id="left">
-            <v-card elevation="5" min-height="400"
+        <v-card elevation="5" min-height="400"
         >
-        <TrackedModels></TrackedModels>
-              </v-card>
+          <TrackedModels></TrackedModels>
+        </v-card>
       </div>
     </div>
   </div>
