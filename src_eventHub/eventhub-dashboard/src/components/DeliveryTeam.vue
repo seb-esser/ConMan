@@ -19,6 +19,7 @@
           </th>
         </tr>
         </thead>
+
         <tbody>
         <tr
             v-for="item in members"
@@ -34,7 +35,7 @@
         </tr>
         </tbody>
       </v-table>
-      <v-row>
+
         <v-dialog
             v-model="dialog"
         >
@@ -57,6 +58,7 @@
                 <v-col>
                   <v-row>
                     <v-text-field
+                        v-model="firstName"
                         label="First name*"
                         required
                     ></v-text-field>
@@ -64,6 +66,7 @@
 
                   <v-row>
                     <v-text-field
+                        v-model="lastName"
                         label="Last name*"
                     ></v-text-field>
                   </v-row>
@@ -84,14 +87,14 @@
               <v-btn
                   color="blue-darken-1"
                   text
-                  @click="dialog = false"
+                  @click="submitNewMember"
               >
                 Save
               </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
-      </v-row>
+
     </v-card-text>
 
   </v-card>
@@ -99,6 +102,8 @@
 </template>
 
 <script>
+
+import axios from "axios";
 
 export default {
   name: "DeliveryTeam",
@@ -110,7 +115,25 @@ export default {
   },
   data: () => ({
     dialog: false,
+    lastName: null,
+    firstName: null
   }),
+
+  methods: {
+    async submitNewMember() {
+      var data = {"FirstName": this.firstName, "LastName": this.lastName, "TeamId": this.$props.TeamId }
+      var res = await axios.post("http://localhost:5000/api/createMember", data)
+      console.log(res)
+      var newMember = eval(res.data)
+      this.$props.members.push(newMember)
+      this.dialog = false
+    }
+
+    // async removeMember() {
+    //   var memberId = this.$props.members.
+    //   var res = await axios.delete("http://localhost:5000/api/deleteMember", memberId)
+    // }
+  }
 }
 </script>
 

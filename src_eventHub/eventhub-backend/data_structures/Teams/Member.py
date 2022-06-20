@@ -38,7 +38,9 @@ class Member:
         return members
 
     def to_db(self):
-        sql = "INSERT INTO member VALUES {} {} {}".format(self.last_name, self.first_name, self.user_id)
+        sql = "INSERT INTO member (lastName, firstName, UUID, TeamID) VALUES ('{}', '{}', '{}', '{}')"\
+            .format(self.last_name, self.first_name, self.user_id, self.team_id)
+
         connector = SQliteConnector()
         connector.create_connection()
         res = connector.run_sql_command(sql)

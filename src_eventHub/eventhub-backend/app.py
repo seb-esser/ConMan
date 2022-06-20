@@ -125,11 +125,20 @@ def get_members():
 
 
 @app.route('/api/createMember', methods=['POST'])
-def create_member(data):
-    member = Member(data["LastName"], data["FirstName"])
+def create_member():
+    # cast incoming byte array to dict
+    data = eval(request.data)
+
+    # instantiate member instance
+    member = Member(last_name=data["LastName"], first_name=data["FirstName"], team_id=data["TeamId"])
+    # send it to db
     member.to_db()
+
+    # make response
     return app.response_class(
-        status=200
+        status=200,
+        response=jsonpickle.dumps(member, unpicklable=False),
+        mimetype='application/json'
     )
 
 
