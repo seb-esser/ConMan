@@ -46,6 +46,7 @@
                       v-model="firstName"
                       label="First name*"
                       required
+                      autofocus="true"
                   ></v-text-field>
                 </v-row>
 
@@ -53,6 +54,7 @@
                   <v-text-field
                       v-model="lastName"
                       label="Last name*"
+                      @keydown.enter="submitNewMember"
                   ></v-text-field>
                 </v-row>
 
