@@ -67,8 +67,6 @@
     </div>
 
     <div id="right">
-      <h2>Subscriptions and Topic hierarchy</h2>
-
       <TopicHierarchy></TopicHierarchy>
     </div>
   </div>
