@@ -100,7 +100,6 @@ export default {
     async submitNewMember() {
       var data = {"FirstName": this.firstName, "LastName": this.lastName, "TeamId": this.$props.TeamId}
       var res = await axios.post("http://localhost:5000/api/createMember", data)
-      console.log(res)
       var newMember = eval(res.data)
       this.$props.members.push(newMember)
       this.dialog = false

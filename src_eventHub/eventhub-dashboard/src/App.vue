@@ -3,18 +3,13 @@
     <v-navigation-drawer
         expand-on-hover>
       <!-- Header -->
-      <vlist>
+      <v-list>
         <v-list-item>
-          <v-list-item-content>
-            <v-list-item-title class="text-h6">
-              BIM-Event-Hub
-            </v-list-item-title>
-            <v-list-item-subtitle>
-              version control for BIM models
-            </v-list-item-subtitle>
-          </v-list-item-content>
+          <v-list-item-title class="text-h6">
+            BIM Event-Hub
+          </v-list-item-title>
         </v-list-item>
-      </vlist>
+      </v-list>
 
       <!-- the actual menu -->
       <v-divider></v-divider>
@@ -28,9 +23,9 @@
           <v-list-item-avatar start>
             <v-icon :icon="item.icon"></v-icon>
           </v-list-item-avatar>
-          <v-list-item-content>
+
             <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
+
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -71,8 +66,8 @@ export default {
         //  If adding a new item, remember to add a new route to the router as well.
 
         {title: 'Home', icon: 'mdi-home', route: "/"},
-        {title: 'Dashboard', icon: 'mdi-view-dashboard', route: "/dashboard"},
         {title: 'Subscriptions', icon: 'mdi-set-center', route: "/subscriptions"},
+        {title: 'Dashboard', icon: 'mdi-view-dashboard', route: "/dashboard"},
         {title: 'Graph Visualization', icon: 'mdi-graphql', route: "/graph"},
         {title: 'About', icon: 'mdi-help-box', route: "/about"},
       ],

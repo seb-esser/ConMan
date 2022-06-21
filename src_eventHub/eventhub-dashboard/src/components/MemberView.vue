@@ -1,8 +1,9 @@
 <template>
-  <div id="line">
+  <div id="line"
+  >
     <v-card
         elevation="2"
-        hover=true>
+        hover="true">
       <v-container>
         <v-form>
           <v-row>
@@ -33,6 +34,7 @@
       </v-container>
 
     </v-card>
+
   </div>
 </template>
 
@@ -51,7 +53,6 @@ export default {
   methods: {
     async removeMember() {
       const memberId = this.$props.uuid;
-      console.log(memberId)
       await axios.delete("http://localhost:5000/api/deleteMember", {data: {"uuid": memberId}})
       // escalate the deletion to the parent component
       this.$emit('deleteThisMember')
