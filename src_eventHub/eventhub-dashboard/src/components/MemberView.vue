@@ -8,10 +8,10 @@
         <v-form>
           <v-row>
             <v-col justify='left'>
-              {{ lastName }}
-            </v-col>
-            <v-col justify='left'>
               {{ firstName }}
+            </v-col>
+             <v-col justify='left'>
+              {{ lastName }}
             </v-col>
             <v-col justify='left'>
               {{ uuid }}

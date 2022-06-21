@@ -115,16 +115,32 @@ def get_delivery_teams():
 
 
 @app.route('/api/CreateDeliveryTeam', methods=['POST'])
-def create_delivery_teams():
+def create_delivery_team():
     name = eval(request.data)["teamName"]
     team = DeliveryTeam(name=name)
 
+    # send to db and get back the primary key val
     team.to_db()
+    
+    team.id = team.get_team_by_id(team.uuid)
 
     return app.response_class(
         status=200,
         response=jsonpickle.dumps(team, unpicklable=False),
         mimetype='application/json'
+    )
+
+
+@app.route('/api/deleteDeliveryTeam', methods=["DELETE"])
+def delete_delivery_team():
+    uuid = eval(request.data)['uuid']
+    team = DeliveryTeam.from_db_by_uuid(uuid)
+
+    team.delete_team(uuid)
+
+    # make response
+    return app.response_class(
+        status=200
     )
 
 
