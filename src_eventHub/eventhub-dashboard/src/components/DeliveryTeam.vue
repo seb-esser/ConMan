@@ -1,6 +1,7 @@
 <template>
   <v-card variant="outlined">
     <v-card-title>{{ TeamName }}</v-card-title>
+    <v-card-subtitle> TeamID: {{TeamUUID}}</v-card-subtitle>
     <v-card-text>
 
       <MemberView
@@ -89,6 +90,7 @@ export default {
 
   props: {
     TeamId: {type: Number, default: 0},
+    TeamUUID: {type: String, default: ""},
     TeamName: {type: String, default: ""},
     members: {type: Object}
   },

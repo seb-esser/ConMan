@@ -6,6 +6,7 @@
         <DeliveryTeam v-for="team in this.deliveryTeams"
                       :key="team.id"
                       :TeamId=team.id
+                      :TeamUUID=team.uuid
                       :TeamName=team.name
                       :members=team.members
         />
