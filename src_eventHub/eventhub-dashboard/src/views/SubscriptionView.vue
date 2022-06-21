@@ -32,7 +32,7 @@
               <v-col>
                 <v-row>
                   <v-text-field
-                      v-model="NewTeamName"
+                      v-model="teamName"
                       label="Team Name*"
                       required
                   ></v-text-field>
@@ -91,7 +91,6 @@ export default {
   data() {
     return {
       deliveryTeams: [],
-      NewTeamName: {type: String, default: ""},
       treeItems: [
         {
           id: 1,
@@ -181,7 +180,7 @@ export default {
     },
 
     async submitNewTeam() {
-      var data = {"teamName": this.NewTeamName}
+      var data = {"teamName": this.teamName}
       var res = await axios.post("http://localhost:5000/api/CreateDeliveryTeam", data)
       var newTeam = eval(res.data)
       this.deliveryTeams.push(newTeam)
