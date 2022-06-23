@@ -1,9 +1,10 @@
 import uuid
 
+from data_structures.Teams.Subscriber import Subscriber
 from functions.sqlite_middleware.SQliteConnector import SQliteConnector
 
 
-class Member:
+class Member(Subscriber):
 
     def __init__(self, first_name: str, last_name: str, id=None, team_id=None):
         self.first_name = first_name

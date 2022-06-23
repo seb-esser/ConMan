@@ -1,10 +1,11 @@
 import uuid
 
 from data_structures.Teams.Member import Member
+from data_structures.Teams.Subscriber import Subscriber
 from functions.sqlite_middleware.SQliteConnector import SQliteConnector
 
 
-class DeliveryTeam:
+class DeliveryTeam(Subscriber):
     def __init__(self, name, id=None, uuid_str=None):
         if id is None:
             self.id = -1
