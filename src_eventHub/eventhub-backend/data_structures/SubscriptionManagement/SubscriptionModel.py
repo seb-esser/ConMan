@@ -3,6 +3,7 @@ from typing import List
 
 import jsonpickle
 
+from data_structures.SubscriptionManagement.Topic import Topic
 from data_structures.Teams.Subscriber import Subscriber
 
 
@@ -11,9 +12,10 @@ class SubscriptionModel:
 
     def __init__(self, name: str, uuid_str: str = None):
         self.name: str = name
-        self.topics: List[Subscriber] = []
+        self.topics: List[Topic] = []
+
         if uuid_str is None:
-            self.uuid = uuid.UUID.hex
+            self.uuid = uuid.uuid4().hex
         else:
             self.uuid = uuid_str
 
@@ -21,20 +23,17 @@ class SubscriptionModel:
         self.topics.append(topic)
 
     @classmethod
-    def from_json(cls, file_path: str):
+    def from_json(cls, name: str):
         """
         create object from json
-        :param file_path:
         :return:
         """
-        if file_path is not None:
-            #     save file to disk
-            json_file = open("SubscriptionModel_{}.json".format(self.name), "w")
-            content = json_file.read()
-            json_file.close()
-            js = jsonpickle.loads(content)
-        else:
-            raise FileExistsError()
+        # save file to disk
+        json_file = open("SubscriptionModel_{}.json".format(name), "w")
+        content = json_file.read()
+        json_file.close()
+        js = jsonpickle.loads(content)
+        return js
 
     def to_json(self, file_path: str = None):
         """
@@ -47,7 +46,7 @@ class SubscriptionModel:
 
         if file_path is not None:
             #     save file to disk
-            json_file = open("SubscriptionModel_{}.json".format(self.name), "w")
+            json_file = open("SubscriptionModel_{}.json".format(self.name).replace(' ', ''), "w")
             json_file.write(res)
             json_file.close()
 
