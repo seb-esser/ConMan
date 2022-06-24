@@ -59,7 +59,7 @@ class Member(Subscriber):
         return member
 
     def to_db(self):
-        sql = "INSERT INTO member (lastName, firstName, UUID, TeamID, isAdmin) VALUES ('{}', '{}', '{}', {}, {}})"\
+        sql = "INSERT INTO member (lastName, firstName, UUID, TeamID, isAdmin) VALUES ('{}', '{}', '{}', {}, {})"\
             .format(self.last_name, self.first_name, self.user_id, self.team_id, self.is_admin)
 
         connector = SQliteConnector()
