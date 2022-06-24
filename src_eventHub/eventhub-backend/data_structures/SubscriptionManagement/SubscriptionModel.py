@@ -23,13 +23,19 @@ class SubscriptionModel:
         self.topics.append(topic)
 
     @classmethod
-    def from_json(cls, name: str):
+    def from_json(cls, name: str = None, path: str = None):
         """
         create object from json
         :return:
         """
+
+        json_file = None
+
         # save file to disk
-        json_file = open("SubscriptionModel_{}.json".format(name), "w")
+        if name is not None:
+            json_file = open("SubscriptionModel_{}.json".format(name), "r")
+        elif path is not None:
+            json_file = open(path, "r")
         content = json_file.read()
         json_file.close()
         js = jsonpickle.loads(content)

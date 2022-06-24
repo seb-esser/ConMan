@@ -1,0 +1,152 @@
+{
+  "py/object": "data_structures.SubscriptionManagement.SubscriptionModel.SubscriptionModel",
+  "name": "IFC Breakdown version 2",
+  "topics": [
+    {
+      "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+      "uuid": "eaf13140a7664f1685c37eafc63dff5a",
+      "name": "Domain Model Architectural Domain",
+      "subscriptions": [],
+      "sub_topics": [
+        {
+          "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+          "uuid": "f86f25b988dc4c9a98540d7776e881d2",
+          "name": "Building A",
+          "subscriptions": [],
+          "sub_topics": [
+            {
+              "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+              "uuid": "b1673d05d01648b1a831081e113bc4a2",
+              "name": "Storey 1",
+              "subscriptions": [],
+              "sub_topics": [
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "5186ddb5ad4b4568b0fe6a3cb313d2a7",
+                  "name": "Wall",
+                  "subscriptions": [],
+                  "sub_topics": []
+                },
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "e54419f3245c409ba299648b1ffe7fb8",
+                  "name": "Window",
+                  "subscriptions": [],
+                  "sub_topics": []
+                },
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "371b8fd36a9046f594fa807c04245255",
+                  "name": "Door",
+                  "subscriptions": [],
+                  "sub_topics": []
+                },
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "86f04a04c6ca460cb1f76483d854c244",
+                  "name": "Slab",
+                  "subscriptions": [],
+                  "sub_topics": []
+                },
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "7f8e9e8cd2d7430c83d397c7a9fb2747",
+                  "name": "Column",
+                  "subscriptions": [],
+                  "sub_topics": []
+                }
+              ]
+            },
+            {
+              "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+              "uuid": "4391358672cd4fd9ad1b9f9a0791179e",
+              "name": "Storey 2",
+              "subscriptions": [],
+              "sub_topics": [
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "3897364a821f456f91dc9b3985de31fb",
+                  "name": "Wall",
+                  "subscriptions": [],
+                  "sub_topics": []
+                },
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "29ba9c6405724ea5a0be9e880f0d141f",
+                  "name": "Window",
+                  "subscriptions": [],
+                  "sub_topics": []
+                },
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "fd90bd50f81e4c05b7ae0af91b52d003",
+                  "name": "Door",
+                  "subscriptions": [],
+                  "sub_topics": []
+                },
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "ff11418464314e97ad3e543d76fa150a",
+                  "name": "Slab",
+                  "subscriptions": [],
+                  "sub_topics": []
+                },
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "14c5af2416e24574b8ac171412210a58",
+                  "name": "Column",
+                  "subscriptions": [],
+                  "sub_topics": []
+                }
+              ]
+            },
+            {
+              "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+              "uuid": "3a32cf6de8a649eb8433c74540a421a5",
+              "name": "Storey 3",
+              "subscriptions": [],
+              "sub_topics": [
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "aa1233f17cf54a77b6a4535c667b863c",
+                  "name": "Wall",
+                  "subscriptions": [],
+                  "sub_topics": []
+                },
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "6803e031c4534e309de3d6a7c5b5a10d",
+                  "name": "Window",
+                  "subscriptions": [],
+                  "sub_topics": []
+                },
+                {
+                  "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+                  "uuid": "aa7c19ee5ed740a28f74fe1e441e31a2",
+                  "name": "Roof",
+                  "subscriptions": [],
+                  "sub_topics": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+      "uuid": "ae5e586e5bee4e17b5a9972632a50cf1",
+      "name": "Domain Model MEP Domain",
+      "subscriptions": [],
+      "sub_topics": []
+    },
+    {
+      "py/object": "data_structures.SubscriptionManagement.Topic.Topic",
+      "uuid": "bc1adc0fc4b1411dbbe27b7522bef50b",
+      "name": "Domain Model HVAC",
+      "subscriptions": [],
+      "sub_topics": []
+    }
+  ],
+  "uuid": "4a9bf5dd640645ffb1fd9b7b42b096ad"
+}
