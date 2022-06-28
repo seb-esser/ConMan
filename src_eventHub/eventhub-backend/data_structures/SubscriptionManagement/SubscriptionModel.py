@@ -57,3 +57,8 @@ class SubscriptionModel:
             json_file.close()
 
         return res
+
+    def evaluate_dependency_subs(self, patch):
+        raise NotImplementedError("this method is not yet implemented. ")
+        pass
+

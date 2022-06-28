@@ -1,9 +1,12 @@
+import abc
+
 from data_structures.Teams.Subscriber import Subscriber
 
 
-class Subscription:
+class Subscription(abc.ABC):
 
-    def __init__(self, subscribing_party: Subscriber, level: str = "INFO", notification_interval: int = 3600, ):
+    @abc.abstractmethod
+    def __init__(self, subscribing_party: Subscriber, level: str = "INFO", notification_interval: int = 3600):
         """
         represents a subscription and knows about the notification level and interval
         :param level: specifies the desired escalation level (warning, info, silent)
