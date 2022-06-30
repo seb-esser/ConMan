@@ -19,6 +19,9 @@ class SubscriptionModel:
         else:
             self.uuid = uuid_str
 
+    def __repr__(self):
+        return "SubscriptionModel {}".format(self.name)
+
     def add_topic(self, topic):
         self.topics.append(topic)
 
