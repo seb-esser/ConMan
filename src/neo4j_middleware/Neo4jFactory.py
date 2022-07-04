@@ -44,7 +44,7 @@ class Neo4jFactory:
                 if isinstance(dictionary[key], (int, float)):
                     s += "{0}, ".format(dictionary[key])
                 else:
-                    s += "\'{0}\', ".format(dictionary[key])
+                    s += "\"{0}\", ".format(dictionary[key])
         # Quote all the values
         # s += "\'{0}\', ".format(self[key])
 

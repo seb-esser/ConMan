@@ -1,4 +1,5 @@
 import logging
+import re
 
 from neo4j import GraphDatabase
 from neo4jGraphDiff.Config.Configuration import Configuration
@@ -42,6 +43,11 @@ class Neo4jConnector:
         @return
         """
 
+        if self.checkForSpecialCharacters(statement) == False:
+            logger.warning(
+                "Potential errors in cypher command (single quotes within single quotes?)\n" +
+                "The following cypher command could fail when executing:\n{}".format(statement))
+
         try:
             with self.my_driver.session() as session:
                 with session.begin_transaction() as tx:
@@ -80,3 +86,25 @@ class Neo4jConnector:
         self.my_driver.close()
         logger.info('Driver disconnected.')
 
+    def checkForSpecialCharacters(self, statement: str) -> bool:
+        """
+        Checks for special characters which can cause problems for the cypher interpreter
+        @param statement: The cypher statement in question
+        @return: 'True' if all is good, 'False' if there could be problems, e.g. single quotes within single quotes
+        """
+        # Get all substrings within curly brackets
+        res_list = re.findall(r'\{}.*?\}', statement)
+
+        # iterate over all substrings
+        for res in res_list:
+            # split the substring by commas
+            res = res.split(',')
+
+            # iterate over those substrings
+            for item in res:
+                # if there are more than 2 single quotes in a substring, there will be a cypher error
+                if item.count("'") > 2:
+                    return False
+        
+        # otherwise, return true
+        return True
