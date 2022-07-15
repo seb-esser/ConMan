@@ -28,6 +28,31 @@ class Patch(object):
         @return:
         """
 
+        print("Applying attribute changes... ")
+        # loop over attribute changes
+        for rule in self.attribute_changes:
+            # find node
+            cy = 'MATCH '
+
+            cy += rule.path.to_cypher(path_number=0)
+            # set new attribute value
+            if isinstance(rule.updated_value, str) or rule.updated_value is None:
+                cy += " SET {}.{} = \"{}\"".format(
+                    rule.path.get_last_node().get_node_identifier(),
+                    rule.attribute_name,
+                    rule.updated_value)
+            else:
+                cy += " SET {}.{} = {}".format(
+                    rule.path.get_last_node().get_node_identifier(),
+                    rule.attribute_name,
+                    rule.updated_value)
+
+            # run statement
+            connector.run_cypher_statement(cy)
+            # ToDo: implement validation that transformation has been applied successfully.
+            #  Consider adding a RETURN to the cypher statement.
+
+        print("Applying structural changes... ")
         # loop over all structural transformations
         for rule in self.operations:
             if rule.operation_type == StructuralModificationTypeEnum.ADDED:
@@ -48,15 +73,24 @@ class Patch(object):
                 #  to keep the insertion identifiable.
                 #  Consider harmonizing labels after successfully gluing everything together
                 print("insert push out")
-                cy += rule.push_out_pattern.to_cypher_merge()
+
+                # prevent pattern statement to declare nodes and edges more than once
+                n = rule.context_pattern.get_unified_node_set()
+                e = rule.context_pattern.get_unified_edge_set()
+
+                cy += rule.push_out_pattern.to_cypher_merge(n, e)
                 # print(cy)
                 # raw = connector.run_cypher_statement(cy)
                 # print(raw)
 
                 # glue push out and context
                 rule.gluing_pattern.replace_timestamp(self.base_timestamp)
+
+                # prevent cypher query contain node and edge definitions more than once
                 nodes_push = rule.push_out_pattern.get_unified_node_set() + rule.context_pattern.get_unified_node_set()
-                cy += rule.gluing_pattern.to_cypher_merge(nodes_push)
+                edges_push = rule.push_out_pattern.get_unified_edge_set() + rule.context_pattern.get_unified_edge_set()
+
+                cy += rule.gluing_pattern.to_cypher_merge(nodes_push, edges_push)
                 # print("apply glue")
                 # print(cy)
 
@@ -76,22 +110,7 @@ class Patch(object):
             connector.run_cypher_statement("MATCH (n) REMOVE n:{} SET n:{}".format(label_from, label_to))
             print("[INFO] Adjusting timestamps: DONE.")
 
-        # loop over attribute changes
-        for rule in self.attribute_changes:
-            # find node
-            cy = 'MATCH '
 
-            cy += rule.path.to_cypher(path_number=0)
-            # set new attribute value
-            cy += " SET {}.{} = {}".format(
-                rule.path.get_last_node().get_node_identifier(),
-                rule.attribute_name,
-                rule.updated_value)
-
-            # run statement
-            connector.run_cypher_statement(cy)
-            # ToDo: implement validation that transformation has been applied successfully.
-            #  Consider adding a RETURN to the cypher statement.
 
     def apply_inverse(self, connector: Neo4jConnector):
         """

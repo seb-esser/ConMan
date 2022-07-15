@@ -8,6 +8,7 @@ from PatchManager.TransformationRule import TransformationRule
 from neo4jGraphDiff.Caption.PropertyModification import PropertyModification
 from neo4jGraphDiff.Caption.StructureModification import StructuralModificationTypeEnum, StructureModification
 from neo4jGraphDiff.GraphDelta import GraphDelta
+from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
@@ -71,21 +72,48 @@ class PatchService:
 
         # loop over structural modifications
         for s_mod in s_mods:
-            guid = s_mod.child.attrs["GlobalId"]
-
             if s_mod.modType == StructuralModificationTypeEnum.ADDED:
                 ts = ts_updated
             elif s_mod.modType == StructuralModificationTypeEnum.DELETED:
                 ts = ts_init
+                # ToDo: Delete events seem to have empty DPO statements.
             else:
                 raise Exception("Modification type has not been specified properly. ")
 
-            # generate pushOut Pattern
-            cy = """
-                   MATCH pa = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[:rel*..10]->(sec:SecondaryNode:{0})
-                   WHERE NOT (sec)-[:EQUIVALENT_TO]-() 
-                   RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
-                   """.format(ts, guid)
+            anchor_pattern: GraphPattern
+            guid = ""
+
+            # distinguish if a primary or secondary node has been inserted or removed
+            if s_mod.child.get_node_type() == "PrimaryNode":
+                # the anchor_pattern is the newly inserted primary node itself
+
+                guid = s_mod.child.attrs["GlobalId"]
+
+            elif s_mod.child.get_node_type() == "SecondaryNode":
+                primary_node = self.delta.node_matching_table.get_parent_primaryNode(s_mod.parent)
+                # query anchor path
+                cy = "MATCH {0}, {1}, p = SHORTESTPATH({2}-[:rel*]->{3}) RETURN p, NODES(p), RELATIONSHIPS(p)".format(
+                    primary_node.to_cypher(),
+                    s_mod.parent.to_cypher(),
+                    primary_node.to_cypher(skip_labels=True, skip_attributes=True),
+                    s_mod.parent.to_cypher(skip_labels=True, skip_attributes=True))
+                raw = connector.run_cypher_statement(cy)
+                anchor_pattern = GraphPattern.from_neo4j_response(raw)
+
+            if guid != "":
+
+                # generate pushOut Pattern
+                cy = """
+                       MATCH pa = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[:rel*..10]->(sec:SecondaryNode:{0})
+                       WHERE NOT (sec)-[:EQUIVALENT_TO]-() 
+                       RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
+                       """.format(ts, guid)
+            else:
+                cy = anchor_pattern.to_cypher_match() + """
+                       MATCH pa = {1}-[:rel*..10]->(sec:SecondaryNode:{0})
+                       WHERE NOT (sec)-[:EQUIVALENT_TO]-() 
+                       RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
+                       """.format(ts, anchor_pattern.get_last_node().to_cypher(skip_attributes=True, skip_labels=True))
             raws = connector.run_cypher_statement(cy)
             push_out_pattern = GraphPattern.from_neo4j_response(raws)
 
