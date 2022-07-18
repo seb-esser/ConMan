@@ -85,6 +85,11 @@ class NodeItem:
 
     @classmethod
     def from_neo4j_response_wou_rel(cls, raw: str) -> list:
+        """
+        expects a list of records
+        requires the following statements inside the RETURN:
+        ID(n), n.EntityType, PROPERTIES(n), LABELS(n)
+        """
         ret_val = []
         for inst in raw:
             node_labels = list(inst[3])
