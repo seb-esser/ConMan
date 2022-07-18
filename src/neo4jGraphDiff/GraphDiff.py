@@ -44,14 +44,6 @@ class GraphDiff(AbsGraphDiff):
         prim_nodes_updt = [x.updated_node for x in
                            self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
 
-        con_init = NodeItem.from_neo4j_response_wou_rel(self.connector.run_cypher_statement(
-            Neo4jQueryFactory.get_connection_nodes(self.label_init)
-        ))
-
-        con_updt = NodeItem.from_neo4j_response_wou_rel(self.connector.run_cypher_statement(
-            Neo4jQueryFactory.get_connection_nodes(self.label_updated)
-        ))
-
         for n in prim_nodes_init:
             if n.id == -1:
                 prim_nodes_init.remove(n)
@@ -61,8 +53,8 @@ class GraphDiff(AbsGraphDiff):
 
         set_calculator = SetCalculator()
         [unc, added, deleted] = set_calculator.calc_intersection(
-            set_A=prim_nodes_init + con_init,
-            set_B=prim_nodes_updt + con_updt,
+            set_A=prim_nodes_init,
+            set_B=prim_nodes_updt,
             intersection_method=MatchCriteriaEnum.OnGuid)
 
         # log unchanged nodes

@@ -360,6 +360,9 @@ class GraphPattern:
         """
         cy = self.to_cypher_match()
         num_paths = self.get_number_of_paths()
+        if num_paths == 0:
+            raise Exception("tried to delete a pattern but received zero path segments. ")
+
         cy += 'DETACH DELETE '
         for np in range(num_paths):
             cy += 'path{}, '.format(np)
