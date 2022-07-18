@@ -35,6 +35,9 @@ class GraphDiff(AbsGraphDiff):
         # recursion over hierarchical breakdown
         self.__move_level_down(entry_init, entry_updated)
 
+        # compare connection nodes
+        self.__compare_connection_nodes()
+
         #  --- post processing ---
         prim_nodes_init = [x.init_node for x in
                            self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
@@ -202,4 +205,21 @@ class GraphDiff(AbsGraphDiff):
                 MERGE (n)-[:EQUIVALENT_TO]->(m)
                 """.format(p.init_node.id, p.updated_node.id)
             self.connector.run_cypher_statement(cy)
+
+    def __compare_connection_nodes(self):
+        ts_init = self.label_init
+        ts_updated = self.label_updated
+
+        cy = """
+        match patternInit = (prim1init:PrimaryNode:{0})<-[:rel]-(cinit:ConnectionNode:{0})-[:rel]->(prim2init:PrimaryNode:{0})
+        match patternUpdt = (prim1updt:PrimaryNode:{1})<-[:rel]-(cupdt:ConnectionNode:{1})-[:rel]->(prim2updt:PrimaryNode:{1}) 
+        WHERE prim1init.GlobalId = prim1updt.GlobalId AND prim2init.GlobalId = prim2updt.GlobalId AND cinit.EntityType = cupdt.EntityType
+        RETURN DISTINCT [ID(cinit), cinit.EntityType, PROPERTIES(cinit), LABELS(cinit)] as n1, 
+        [ID(cupdt), cupdt.EntityType, PROPERTIES(cupdt), LABELS(cupdt)] as n2
+        """.format(ts_init, ts_updated)
+
+        pairs_raw = self.connector.run_cypher_statement(cy)
+        for p in pairs_raw:
+            node_init, node_updt = NodeItem.from_neo4j_response_wou_rel(p)
+            self.resource_diff.result.node_matching_table.add_matched_nodes(node_init, node_updt)
 
