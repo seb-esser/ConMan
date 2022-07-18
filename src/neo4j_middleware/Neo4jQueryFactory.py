@@ -84,7 +84,7 @@ class Neo4jQueryFactory(Neo4jFactory):
 
         # apply diffIgnore attributes if staged
         if attrIgnoreList == None:
-            calc_fingerprint = 'with apoc.hashing.fingerprint(n) as hash RETURN hash'
+            calc_fingerprint = "with apoc.hashing.fingerprint(n) as hash RETURN hash"
         else:
             # define function where quotationmarks "" or [] are added
             def surroundStrings(l):
@@ -240,36 +240,6 @@ class Neo4jQueryFactory(Neo4jFactory):
     def get_conNodes_patterns(cls, node_id: int) -> str:
         return 'MATCH paths = (c:ConnectionNode)-[r]->(n) WHERE ID(c) = {} ' \
                'RETURN paths, NODES(paths), RELATIONSHIPS(paths)'.format(node_id)
-
-    @classmethod
-    def get_adjacency_primary(cls, label: str) -> str:
-        """
-
-        @param label:
-        @return: cypher query string
-        """
-        match1 = 'MATCH (n:ts20210521T074802) WHERE Not n:SecondaryNode'
-        match2 = 'MATCH (m:ts20210521T074802) WHERE Not m:SecondaryNode'
-        ret = 'RETURN n.GlobalId as FromNodeGUID, m.GlobalId as ToNodeGUID, Exists((n)-->(m)) as connected'
-        return Neo4jFactory.BuildMultiStatement([match1, match2, ret])
-
-    @classmethod
-    def get_adjacency_byNodeIds(cls, nodeIds) -> str:
-        """
-
-        @param nodeIds:
-        @return: cypher query string
-        """
-
-        match1 = 'MATCH (n) WHERE ID(n) in {}'.format(nodeIds)
-        match2 = 'MATCH (m) WHERE ID(m) in {}'.format(nodeIds)
-
-        unwind1 = 'UNWIND n.GlobalId as fromGuid'
-        unwind2 = 'UNWIND m.GlobalId as toGuid'
-
-        ret = 'RETURN fromGuid as fromGuid, toGuid as toGuid, Exists((m) -->(n)) as connected'
-        sort = 'Order by fromGuid ASC, toGuid ASC'
-        return Neo4jFactory.BuildMultiStatement([match1, match2, unwind1, unwind2, ret, sort])
 
     @classmethod
     def get_node_exists(cls, p21_id: int, label: str) -> str:
