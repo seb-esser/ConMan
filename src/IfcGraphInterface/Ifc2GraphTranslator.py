@@ -71,7 +71,7 @@ class IFCGraphGenerator:
         for element in self.model:
             entity_list.append(element)
 
-        increment = 100 / (len(entity_list)*2)
+        increment = 100 / (len(entity_list) * 2)
         percent = 0
 
         for entity in entity_list:
@@ -114,10 +114,10 @@ class IFCGraphGenerator:
         # get number of nodes in the graph
         cy = Neo4jQueryFactory.count_nodes(self.timestamp)
         count_graph = self.connector.run_cypher_statement(cy, 'count')[0]
-        
+
         # get number of entities in the model
         count_model = len(list(self.model))
-        
+
         # compare and calculate diff
         if count_graph == count_model:
             print(
@@ -126,7 +126,7 @@ class IFCGraphGenerator:
         else:
             print('Validation unsuccessful. '
                   'Number of entities in the file do not equal the number of nodes in the graph.'
-                  '\nDifference: {}'.format(abs(count_graph-count_model)))
+                  '\nDifference: {}'.format(abs(count_graph - count_model)))
             return False
 
     def __map_entity(self, entity, label) -> None:
@@ -167,38 +167,54 @@ class IFCGraphGenerator:
         p21_id = info['id']
 
         # get attribute definitions
-        _, single_associations, aggregated_associations = self.separate_attributes(
-            entity)
+        _, single_associations, aggregated_associations = self.separate_attributes(entity)
 
-        for association in single_associations:
-            entity = info[association]
-            if entity is None:
+        for association_name in single_associations:
+
+            # get associated entity
+            associated_entity = info[association_name]
+
+            if associated_entity is None:
                 continue
 
-            p21_id_child = entity.get_info()['id']
+            # traverse to the associated entity and query p21 id
+            p21_id_child = associated_entity.get_info()['id']
 
-            edge_attrs = {'rel_type': association}
+            if not isinstance(p21_id_child, int):
+                raise Exception("help")
+
+            edge_attrs = {'rel_type': association_name}
 
             # merge with existing
             cy = Neo4jGraphFactory.merge_on_p21(
                 p21_id, p21_id_child, edge_attrs, self.timestamp)
             self.connector.run_cypher_statement(cy)
 
-        for association in aggregated_associations:
-            entities = info[association]
+        for association_name in aggregated_associations:
+            entities = info[association_name]
             i = 0
             if entities is None:
                 # detected an array of associations but nothing was referenced within the given instance model
                 continue
-            for entity in entities:
+
+            for associated_entity in entities:
                 try:
-                    p21_id_child = entity.get_info()['id']
+                    p21_id_child = associated_entity.get_info()['id']
 
                 except:
-                    raise Exception('Failed to query data from primary_node_type.')
+                    # in some weird cases, ifcopenshell fails to traverse objectified relationships
+                    child_guid = entities.GlobalId
+
+                    cy = 'MATCH (n{{GlobalId: \"{}\"}}) RETURN ID(n)'.format(child_guid)
+                    raw = self.connector.run_cypher_statement(cy)[0]
+
+                    p21_id_child = int(raw[0])
+                    # query element from model by its guid as travering fails
+
+                    # raise Exception('Failed to query data from primary_node_type.')
 
                 edge_attrs = {
-                    'rel_type': association,
+                    'rel_type': association_name,
                     'listItem': i
                 }
 
@@ -297,14 +313,14 @@ class IFCGraphGenerator:
                                'ThermodynamicTemperatureExponent',
                                'AmountOfSubstanceExponent',
                                'LuminousIntensityExponent',
-                               'Exponent',      # from IfcDerivedUnitElement
-                               'Precision',     # from IfcGeometricRepresentationContext
-                               'Scale',          # from IfcCartesianPointTransformationOperator3D in 2x3
-                               'Orientation',    # from IfcFaceOuterBound in 2x3
+                               'Exponent',  # from IfcDerivedUnitElement
+                               'Precision',  # from IfcGeometricRepresentationContext
+                               'Scale',  # from IfcCartesianPointTransformationOperator3D in 2x3
+                               'Orientation',  # from IfcFaceOuterBound in 2x3
                                'SelfIntersect',  # from IfcCompositeCurve in 2x3
-                               'SameSense',      # from IfcCompositeCurveSegment in IFC2x3
+                               'SameSense',  # from IfcCompositeCurveSegment in IFC2x3
                                'SenseAgreement',  # from IfcTrimmedCurve in IFC2x3
-                               'AgreementFlag',   # from IfcPolygonalBoundedHalfSpace
+                               'AgreementFlag',  # from IfcPolygonalBoundedHalfSpace
                                'ParameterTakesPrecedence',
                                'ClosedCurve',
                                'SelfIntersect',
@@ -347,7 +363,8 @@ class IFCGraphGenerator:
                                'SpecularColour',
                                'ColourList',
                                'ColourIndex',
-                               'NominalValue'
+                               'NominalValue',
+                               'AddressLines'
 
                                ]:
                 node_attributes.append(attr.name())
