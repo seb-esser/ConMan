@@ -3,7 +3,6 @@ from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 import ifcopenshell
 import progressbar
-import concurrent.futures
 
 """ file import """
 
@@ -192,39 +191,47 @@ class IFCGraphGenerator:
 
         for association_name in aggregated_associations:
             entities = info[association_name]
-            i = 0
+
             if entities is None:
                 # detected an array of associations but nothing was referenced within the given instance model
                 continue
+            self.build_aggregated_associations(association_name=association_name, parent_p21=p21_id,
+                                               child_entities=entities)
 
-            for associated_entity in entities:
-                try:
-                    p21_id_child = associated_entity.get_info()['id']
+    def build_aggregated_associations(self, association_name: str, parent_p21: int, child_entities):
 
-                except:
-                    # in some weird cases, ifcopenshell fails to traverse objectified relationships
-                    child_guid = entities.GlobalId
+        select_problem = False
 
-                    cy = 'MATCH (n{{GlobalId: \"{}\"}}) RETURN ID(n)'.format(child_guid)
-                    raw = self.connector.run_cypher_statement(cy)[0]
+        i = 0
+        for associated_entity in child_entities:
 
-                    p21_id_child = int(raw[0])
-                    # query element from model by its guid as travering fails
+            try:
+                p21_id_child = associated_entity.get_info()['id']
+            except:
+                if child_entities.is_a() == "IfcPropertySet":
+                    select_problem = True
+                # in some weird cases, ifcopenshell fails to traverse objectified relationships
+                child_guid = child_entities.GlobalId
 
-                    # raise Exception('Failed to query data from primary_node_type.')
+                cy = 'MATCH (n{{GlobalId: \"{}\"}}) RETURN n.p21_id'.format(child_guid)
+                raw = self.connector.run_cypher_statement(cy)[0]
+                p21_id_child = int(raw[0])
 
-                edge_attrs = {
-                    'rel_type': association_name,
-                    'listItem': i
-                }
+            edge_attrs = {
+                'rel_type': association_name,
+                'listItem': i
+            }
 
-                # merge with existing
-                cy = Neo4jGraphFactory.merge_on_p21(
-                    p21_id, p21_id_child, edge_attrs, self.timestamp)
-                self.connector.run_cypher_statement(cy)
+            # merge with existing
+            cy = Neo4jGraphFactory.merge_on_p21(
+                parent_p21, p21_id_child, edge_attrs, self.timestamp)
+            self.connector.run_cypher_statement(cy)
 
-                # increase counter
-                i += 1
+            # increase counter
+            i += 1
+
+            if select_problem:
+                break
 
     def separate_attributes(self, entity) -> tuple:
         """"
