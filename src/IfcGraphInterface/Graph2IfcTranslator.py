@@ -71,8 +71,18 @@ class Graph2IfcTranslator:
                     nested_entity_name = splitted[0]
                     # extract the value and cast to float datatype
                     nested_val = float(splitted[1][:-1])
+                    nested_entity = self.model.create_entity(nested_entity_name, nested_val)
+                    attributes[key] = nested_entity
 
-                    attributes[key] = self.model.create_entity(nested_entity_name, nested_val)
+                elif key in ['NominalValue']:
+                    splitted = val.split('(')
+                    # extract the name
+                    nested_entity_name = splitted[0]
+                    # extract the value and cast to float datatype
+                    nested_val = splitted[1][:-1]
+                    nested_entity = self.model.create_entity(nested_entity_name, nested_val)
+                    attributes[key] = nested_entity
+
                     # todo
                     # https://academy.ifcopenshell.org/posts/using-the-parsing-functionality-of-ifcopenshell-interactively/
 

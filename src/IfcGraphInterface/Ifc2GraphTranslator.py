@@ -207,6 +207,12 @@ class IFCGraphGenerator:
 
             try:
                 p21_id_child = associated_entity.get_info()['id']
+
+                edge_attrs = {
+                    'rel_type': association_name,
+                    'listItem': i
+                }
+
             except:
                 if child_entities.is_a() == "IfcPropertySet":
                     select_problem = True
@@ -217,10 +223,9 @@ class IFCGraphGenerator:
                 raw = self.connector.run_cypher_statement(cy)[0]
                 p21_id_child = int(raw[0])
 
-            edge_attrs = {
-                'rel_type': association_name,
-                'listItem': i
-            }
+                edge_attrs = {
+                    'rel_type': association_name
+                }
 
             # merge with existing
             cy = Neo4jGraphFactory.merge_on_p21(
