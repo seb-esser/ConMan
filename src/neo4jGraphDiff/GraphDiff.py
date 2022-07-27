@@ -105,8 +105,8 @@ class GraphDiff(AbsGraphDiff):
         raw_init = self.connector.run_cypher_statement(cy_next_nodes_init)
         raw_updated = self.connector.run_cypher_statement(cy_next_nodes_upd)
 
-        next_nodes_init = NodeItem.from_neo4j_response_wou_rel(raw_init)
-        next_nodes_upd = NodeItem.from_neo4j_response_wou_rel(raw_updated)
+        next_nodes_init = NodeItem.from_neo4j_response(raw_init, False)
+        next_nodes_upd = NodeItem.from_neo4j_response(raw_updated, False)
 
         # check if no new children got found:
         if len(next_nodes_init) == 0 and len(next_nodes_upd) == 0:
@@ -212,6 +212,6 @@ class GraphDiff(AbsGraphDiff):
 
         pairs_raw = self.connector.run_cypher_statement(cy)
         for p in pairs_raw:
-            node_init, node_updt = NodeItem.from_neo4j_response_wou_rel(p)
+            node_init, node_updt = NodeItem.from_neo4j_response(p, False)
             self.resource_diff.result.node_matching_table.add_matched_nodes(node_init, node_updt)
 

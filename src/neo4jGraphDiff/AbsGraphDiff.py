@@ -49,7 +49,7 @@ class AbsGraphDiff(abc.ABC):
         raw = self.connector.run_cypher_statement(cypher)
 
         # unpack neo4j response into a list if NodeItem instances
-        res = NodeItem.from_neo4j_response_with_rel(raw)
+        res = NodeItem.from_neo4j_response(raw, True)
 
         # check if leave node got touched
         if len(res) == 0:
