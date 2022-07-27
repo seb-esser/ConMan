@@ -146,7 +146,8 @@ class Graph2IfcTranslator:
         raw_res = self.connector.run_cypher_statement(cy)
 
         # cast cypher response in a list of node items
-        child_nodes = NodeItem.from_neo4j_response_with_rel(raw_res)
+        # child_nodes = NodeItem.from_neo4j_response_with_rel(raw_res)
+        child_nodes = NodeItem.from_neo4j_response(raw_res, True)
 
         # check if leaf node was found
         if len(child_nodes) == 0:
@@ -208,7 +209,7 @@ class Graph2IfcTranslator:
         raw_res = self.connector.run_cypher_statement(cy)
 
         # cast cypher response in a list of node items
-        nodes = NodeItem.from_neo4j_response_wou_rel(raw_res)
+        nodes = NodeItem.from_neo4j_response(raw_res, False)
 
         for n in nodes:
             n.tidy_attrs()
@@ -221,7 +222,7 @@ class Graph2IfcTranslator:
         cn = Neo4jQueryFactory.get_connection_nodes(self.ts)
         raw_res = self.connector.run_cypher_statement(cn)
 
-        connection_nodes = NodeItem.from_neo4j_response_wou_rel(raw_res)
+        connection_nodes = NodeItem.from_neo4j_response(raw_res, False)
 
         for cnode in connection_nodes:
             cy = Neo4jQueryFactory.get_node_properties_by_id(cnode.id)
