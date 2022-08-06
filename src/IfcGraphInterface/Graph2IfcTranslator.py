@@ -146,7 +146,6 @@ class Graph2IfcTranslator:
         raw_res = self.connector.run_cypher_statement(cy)
 
         # cast cypher response in a list of node items
-        # child_nodes = NodeItem.from_neo4j_response_with_rel(raw_res)
         child_nodes = NodeItem.from_neo4j_response(raw_res, True)
 
         # check if leaf node was found
