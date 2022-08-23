@@ -27,7 +27,6 @@ class ConnectionNodeDiff:
 
         cy = Neo4jQueryFactory.get_connection_nodes(self.ts_init)
         raw_res = self.connector.run_cypher_statement(cy)
-        # con_nodes_init = NodeItem.from_neo4j_response_wou_rel(raw_res)
         con_nodes_init = NodeItem.from_neo4j_response(raw_res, False)
 
         cy = Neo4jQueryFactory.get_connection_nodes(self.ts_updated)

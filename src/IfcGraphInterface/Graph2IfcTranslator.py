@@ -4,6 +4,7 @@ import uuid
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 import ifcopenshell
+import progressbar
 
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -146,7 +147,6 @@ class Graph2IfcTranslator:
         raw_res = self.connector.run_cypher_statement(cy)
 
         # cast cypher response in a list of node items
-        # child_nodes = NodeItem.from_neo4j_response_with_rel(raw_res)
         child_nodes = NodeItem.from_neo4j_response(raw_res, True)
 
         # check if leaf node was found
@@ -206,25 +206,36 @@ class Graph2IfcTranslator:
 
         # get all primary nodes
         cy = Neo4jQueryFactory.get_primary_nodes(self.ts)
-        raw_res = self.connector.run_cypher_statement(cy)
+        raw_res_pr = self.connector.run_cypher_statement(cy)
 
-        # cast cypher response in a list of node items
-        nodes = NodeItem.from_neo4j_response(raw_res, False)
+        # get all connection nodes
+        cn = Neo4jQueryFactory.get_connection_nodes(self.ts)
+        raw_res_cn = self.connector.run_cypher_statement(cn)
 
-        for n in nodes:
+        # cast cypher response in a list of primary/connection node items
+        nodes_pr = NodeItem.from_neo4j_response(raw_res_pr, False)
+        nodes_cn = NodeItem.from_neo4j_response(raw_res_cn, False)
+
+        increment = 100 / (len(nodes_pr) + len(nodes_cn))
+        percent = 0
+
+        for n in nodes_pr:
+            # print progressbar
+            progressbar.printbar(percent)
+            
             n.tidy_attrs()
 
             # build IFC primary_node_type
             self.build_entity(n.id, n.get_entity_type(), n.attrs)
             self.build_childs(n, rec=True)
 
-        # get all connection nodes
-        cn = Neo4jQueryFactory.get_connection_nodes(self.ts)
-        raw_res = self.connector.run_cypher_statement(cn)
+            percent += increment
 
-        connection_nodes = NodeItem.from_neo4j_response(raw_res, False)
+        
+        for cnode in nodes_cn:
+            # print progressbar
+            progressbar.printbar(percent)
 
-        for cnode in connection_nodes:
             cy = Neo4jQueryFactory.get_node_properties_by_id(cnode.id)
             raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
             # assign properties to node object
@@ -237,3 +248,9 @@ class Graph2IfcTranslator:
 
             # build the childs (non-recursive)
             self.build_childs(cnode, False)
+
+            percent += increment
+
+        progressbar.printbar(percent)
+        print('[Graph:{} >> IFC_P21]: Generating file - DONE.\n'.format(self.ts))
+
