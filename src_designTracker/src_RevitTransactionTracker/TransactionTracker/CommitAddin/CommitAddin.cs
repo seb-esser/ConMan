@@ -7,6 +7,8 @@ using System.Runtime.CompilerServices;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Newtonsoft.Json;
+using Formatting = System.Xml.Formatting;
 
 namespace CommitAddin
 {
@@ -36,38 +38,40 @@ namespace CommitAddin
 
                 Debug.WriteLine("count coll: " + coll.Count());
 
-                var tracking = new List<string>(); 
+                var trackingBucket = new List<ObjectBucket>(); 
 
                 foreach (var element in familyInstances)
                 {
+                   
                     // get element id
-                    var elementId = element.Id;
+                    var elementId = element.Id.IntegerValue;
 
                     // get element UniqueId
                     var objectGuid = element.UniqueId;
 
                     // get version id
-                    var versionGuid = element.VersionGuid;
+                    var versionGuid = element.VersionGuid.ToString();
 
                     // get element name
                     var name = element.Name;
 
-                    tracking.Add($"{objectGuid} \t {versionGuid} \t {name} \t {elementId}");
+                    var bucket = new ObjectBucket(elementId, name, objectGuid, versionGuid);
+
+                    trackingBucket.Add(bucket);
 
                     
                 }
 
+                var snapshot = new Snapshot(trackingBucket); 
+
                 DateTime utcDate = DateTime.UtcNow;
-                string fileName = @"C:\Users\ga38hep\dev\" + utcDate.ToShortDateString().Replace(".", "-") + "_" + utcDate.ToShortTimeString().Replace(":", "-") + ".txt";
+                string fileName = @"C:\Users\ga38hep\dev\" + utcDate.ToShortDateString().Replace(".", "-") + "_" + utcDate.ToShortTimeString().Replace(":", "-") + ".json";
                 Debug.WriteLine(fileName);
 
                 using (StreamWriter writeText = new StreamWriter(@fileName))
                 {
-                    foreach (var t in tracking)
-                    {
-                        writeText.WriteLine(t);
-                    }
-
+                    string json = JsonConvert.SerializeObject(snapshot);
+                    writeText.Write(json);
                 }
 
 
