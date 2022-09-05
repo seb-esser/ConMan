@@ -18,10 +18,11 @@ def main():
                  "4x3_bridges": ("ts20210118T211240", "ts20210227T133609"),
                  "Storey": ("ts20210521T074802", "ts20210521T074934"),
                  "new_cuboid": ("ts20210623T091748", "ts20210623T091749"),
-                 "solibri": ("ts20121017T152740", "ts20121017T154702")
+                 "solibri": ("ts20121017T152740", "ts20121017T154702"),
+                 "CAM": ("ts20220715T135504", "ts20220715T135358")
                  }
 
-    case_study = 'cuboid_changedElevation'
+    case_study = 'CAM'
     ts_init, ts_updated = testcases[case_study]
 
     print('Running Diff on case study: >{}<'.format(case_study))
@@ -45,8 +46,8 @@ def main():
         RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)
         """.format(ts_updated))
 
-    entry_init: NodeItem = NodeItem.from_neo4j_response_wou_rel(raw_init)[0]
-    entry_updated: NodeItem = NodeItem.from_neo4j_response_wou_rel(raw_updated)[0]
+    entry_init: NodeItem = NodeItem.from_neo4j_response(raw_init, False)[0]
+    entry_updated: NodeItem = NodeItem.from_neo4j_response(raw_updated, False)[0]
 
     pDiff = GraphDiff(connector=connector, ts_init=ts_init, ts_updated=ts_updated)
     delta = pDiff.diff_subgraphs(entry_init, entry_updated)

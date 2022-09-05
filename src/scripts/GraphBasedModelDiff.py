@@ -36,9 +36,9 @@ def diff():
         RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)
         """.format(label_updated))
     
-    entry_init: NodeItem = NodeItem.from_neo4j_response_wou_rel(raw_init)[0]
-    entry_updated: NodeItem = NodeItem.from_neo4j_response_wou_rel(raw_updated)[0]
-    
+    entry_init: NodeItem = NodeItem.from_neo4j_response(raw_init, False)[0]
+    entry_updated: NodeItem = NodeItem.from_neo4j_response(raw_updated, False)[0]
+
     diff = GraphDiff(connector, label_init, label_updated)
     delta = diff.diff_subgraphs(entry_init, entry_updated)
     

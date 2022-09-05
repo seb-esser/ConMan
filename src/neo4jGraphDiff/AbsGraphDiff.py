@@ -49,7 +49,7 @@ class AbsGraphDiff(abc.ABC):
         raw = self.connector.run_cypher_statement(cypher)
 
         # unpack neo4j response into a list if NodeItem instances
-        res = NodeItem.from_neo4j_response_with_rel(raw)
+        res = NodeItem.from_neo4j_response(raw, True)
 
         # check if leave node got touched
         if len(res) == 0:
@@ -97,15 +97,15 @@ class AbsGraphDiff(abc.ABC):
 
         return diff
 
-    def __get_node_data_by_id(self, nodeId: int):
-        """
-        executes a cypher query to get some node data
-        @param nodeId:
-        @return:
-        """
-        cypher = Neo4jQueryFactory.get_node_data_by_id(nodeId)
-        raw = self.connector.run_cypher_statement(cypher)
+    # def __get_node_data_by_id(self, nodeId: int):
+    #     """
+    #     executes a cypher query to get some node data
+    #     @param nodeId:
+    #     @return:
+    #     """
+    #     cypher = Neo4jQueryFactory.get_node_data_by_id(nodeId)
+    #     raw = self.connector.run_cypher_statement(cypher)
 
-        # unpack neo4j response into a list if NodeItem instances
-        res = NodeItem.from_neo4j_response_wou_rel(raw)
-        return res
+    #     # unpack neo4j response into a list if NodeItem instances
+    #     res = NodeItem.from_neo4j_response_wou_rel(raw)
+    #     return res

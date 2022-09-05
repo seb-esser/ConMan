@@ -95,6 +95,13 @@ class GraphPattern:
         """
         return self.paths[0].get_start_node()
 
+    def get_last_node(self) -> NodeItem:
+        """
+        returns last node if pattern is a path
+        """
+        return self.paths[-1].get_last_node()
+
+
     def load_rel_attrs(self, connector: neo4jConnector):
         """
         loads all attributes attached to each segment in the graph pattern
@@ -148,7 +155,7 @@ class GraphPattern:
 
         return cy_statement
 
-    def to_cypher_merge(self, nodes_specified=[]) -> str:
+    def to_cypher_merge(self, nodes_specified=[], edges_specified=[]) -> str:
         """
         creates a cypher query string to create a given graph pattern in a target graph
          without recognizing existing items
@@ -162,9 +169,12 @@ class GraphPattern:
 
         # list of nodes that observe which node was already defined in the query
         nodes_already_specified = []
+        edges_already_specified = []
 
         if nodes_specified!=[]:
             nodes_already_specified.extend(nodes_specified)
+        if edges_specified!=[]:
+            edges_already_specified.extend(edges_specified)
 
         # loop over all paths. Each path contains a list of segments
         for unified_path in self.paths:
@@ -186,6 +196,8 @@ class GraphPattern:
                 else:
                     skip_end_attrs = True
                     skip_end_labels = True
+                if edge in edges_already_specified:
+                    continue
 
                 cy_frag = "MERGE " + edge.to_cypher(skip_start_node_attrs=skip_start_attrs,
                                                     skip_start_node_labels=skip_start_labels,
@@ -194,6 +206,7 @@ class GraphPattern:
 
                 nodes_already_specified.append(edge.start_node)
                 nodes_already_specified.append(edge.end_node)
+                edges_already_specified.append(edge)
 
                 cy_list.append(cy_frag)
                 edge_iterator += 1
@@ -243,16 +256,15 @@ class GraphPattern:
             initial_segments = list(path.segments)  # make deep copy
             for segment in initial_segments:
 
-                if segment.edge_id in unified_segments:
+                if segment.edge_id in [e.edge_id for e in unified_segments]:
                     # segment has been already tackled
                     # remove current segment from Path
                     path.remove_segments_by_id([segment.edge_id])
                 else:
                     # segment appears the first time, therefore keep it and add it to the list
-                    unified_segments.append(segment.edge_id)
+                    unified_segments.append(segment)
 
-        # print after state to console
-        # self.print_to_console()
+        return unified_segments
 
     def unify_edge_set(self) -> None:
         """
@@ -348,6 +360,9 @@ class GraphPattern:
         """
         cy = self.to_cypher_match()
         num_paths = self.get_number_of_paths()
+        if num_paths == 0:
+            raise Exception("tried to delete a pattern but received zero path segments. ")
+
         cy += 'DETACH DELETE '
         for np in range(num_paths):
             cy += 'path{}, '.format(np)

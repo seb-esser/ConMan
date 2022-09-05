@@ -15,10 +15,11 @@ def main():
         "4x3_bridges": ("ts20210118T211240", "ts20210227T133609"),
         "Storey": ("ts20210521T074802", "ts20210521T074934"),
         "new_cuboid": ("ts20210623T091748", "ts20210623T091749"),
-        "solibri": ("ts20121017T152740", "ts20121017T154702")
+        "solibri": ("ts20121017T152740", "ts20121017T154702"),
+        "CAM": ("ts20220715T135504", "ts20220715T135358")
     }
 
-    case_study = 'cuboid_changedElevation'
+    case_study = 'CAM'
     ts_init, ts_updated = testcases[case_study]
 
     connector = Neo4jConnector()

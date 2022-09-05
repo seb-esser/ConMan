@@ -1,3 +1,5 @@
+import os
+
 import jsonpickle
 from flask import Flask, request, jsonify, render_template, json
 from flask_cors import CORS, cross_origin
@@ -6,6 +8,7 @@ from flask_socketio import send, emit, SocketIO
 from werkzeug.exceptions import HTTPException
 
 from data_structures.ModelData import ModelData
+from data_structures.SubscriptionManagement.SubscriptionModel import SubscriptionModel
 from data_structures.Teams.DeliveryTeam import DeliveryTeam
 from data_structures.Teams.Member import Member
 from functions.neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
@@ -115,16 +118,32 @@ def get_delivery_teams():
 
 
 @app.route('/api/CreateDeliveryTeam', methods=['POST'])
-def create_delivery_teams():
+def create_delivery_team():
     name = eval(request.data)["teamName"]
     team = DeliveryTeam(name=name)
 
+    # send to db and get back the primary key val
     team.to_db()
+    
+    team.id = team.get_team_by_id(team.uuid)
 
     return app.response_class(
         status=200,
         response=jsonpickle.dumps(team, unpicklable=False),
         mimetype='application/json'
+    )
+
+
+@app.route('/api/deleteDeliveryTeam', methods=["DELETE"])
+def delete_delivery_team():
+    uuid = eval(request.data)['uuid']
+    team = DeliveryTeam.from_db_by_uuid(uuid)
+
+    team.delete_team(uuid)
+
+    # make response
+    return app.response_class(
+        status=200
     )
 
 
@@ -170,9 +189,47 @@ def delete_member():
     )
 
 
-@app.route('/api/getSubscriptionHierarchy')
-def get_subscription_hierarchy():
-    return jsonify({"hierarchy": {"models": ["A", "B", "C"]}})
+@app.route('/api/getSubscriptionModelIds')
+def get_subscription_model_ids():
+
+    response = {"SubscriptionModels": []}
+
+    # specify the path where the JSONs are stored inside the server
+    model_path = "data_structures/SubscriptionManagement/models"
+    for file in os.listdir(model_path):
+        if file.startswith("SubscriptionModel_"):
+            model: SubscriptionModel = SubscriptionModel.from_json(path=model_path + "/" + file)
+            response["SubscriptionModels"].append({"modelUUID": model.uuid, "modelName": model.name})
+    # make response
+    return app.response_class(
+        status=200,
+        response=jsonpickle.dumps(response, unpicklable=False),
+        mimetype='application/json'
+    )
+
+
+@app.route('/api/getSubscriptionModel', methods=["GET"])
+def get_subscription_model():
+    model_id = eval(request.data)['modelUUID']
+
+    # specify the path where the JSONs are stored inside the server
+    model_path = "data_structures/SubscriptionManagement/models"
+    for file in os.listdir(model_path):
+        if file.startswith("SubscriptionModel_"):
+            model: SubscriptionModel = SubscriptionModel.from_json(path=model_path + "/" + file)
+            if model.uuid == model_id:
+
+                # make response
+                return app.response_class(
+                    status=200,
+                    response=jsonpickle.dumps(model, unpicklable=False),
+                    mimetype='application/json'
+                )
+
+    # if no model was found under the requested id, make 404 response
+    return app.response_class(
+        status=404
+    )
 
 
 @app.route('/api/testSocket')
