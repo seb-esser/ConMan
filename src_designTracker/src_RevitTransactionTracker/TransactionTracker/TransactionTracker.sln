@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31912.275
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31911.196
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionTracker", "TransactionTracker\TransactionTracker.csproj", "{748E6267-75C4-4C86-AADB-A55D83EFFA18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommitAddin", "CommitAddin\CommitAddin.csproj", "{B1053F63-5FC9-4A57-A811-9855A08AACF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamoVersionTrackingUtilities", "DynamoVersionTrackingUtilities\DynamoVersionTrackingUtilities.csproj", "{BE371725-7230-4251-B6D7-1C60D6D14005}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{748E6267-75C4-4C86-AADB-A55D83EFFA18}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{748E6267-75C4-4C86-AADB-A55D83EFFA18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{748E6267-75C4-4C86-AADB-A55D83EFFA18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1053F63-5FC9-4A57-A811-9855A08AACF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1053F63-5FC9-4A57-A811-9855A08AACF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1053F63-5FC9-4A57-A811-9855A08AACF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1053F63-5FC9-4A57-A811-9855A08AACF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE371725-7230-4251-B6D7-1C60D6D14005}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE371725-7230-4251-B6D7-1C60D6D14005}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE371725-7230-4251-B6D7-1C60D6D14005}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE371725-7230-4251-B6D7-1C60D6D14005}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
