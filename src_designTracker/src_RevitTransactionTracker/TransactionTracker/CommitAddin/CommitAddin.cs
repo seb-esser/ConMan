@@ -16,21 +16,23 @@ namespace CommitAddin
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
     public class CommitAddin : IExternalCommand
     {
+        /// <summary>
+        /// creates a snapshot of all family instances currently used in the Revit model
+        /// </summary>
+        /// <param name="commandData"></param>
+        /// <param name="message"></param>
+        /// <param name="elements"></param>
+        /// <returns></returns>
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
 
             UIApplication uiapp = commandData.Application;
             UIDocument uidoc = uiapp.ActiveUIDocument;
-            Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
             try
             {
-                //FilteredElementCollector coll = new FilteredElementCollector(doc).WherePasses(
-                //    new LogicalOrFilter(
-                //        new ElementIsElementTypeFilter(false),
-                //        new ElementIsElementTypeFilter(true))
-                //);
+
                 FilteredElementCollector coll
                     = new FilteredElementCollector(doc)
                         .WhereElementIsNotElementType();
@@ -65,7 +67,7 @@ namespace CommitAddin
                 var snapshot = new Snapshot(trackingBucket); 
 
                 DateTime utcDate = DateTime.UtcNow;
-                string fileName = @"C:\Users\ga38hep\dev\" + utcDate.ToShortDateString().Replace(".", "-") + "_" + utcDate.ToShortTimeString().Replace(":", "-") + ".json";
+                string fileName = @"C:\Users\ga38hep\dev\" + utcDate.ToShortDateString().Replace(".", "-") + "_" + utcDate.ToLongTimeString().Replace(":", "-") + ".json";
                 Debug.WriteLine(fileName);
 
                 using (StreamWriter writeText = new StreamWriter(@fileName))
@@ -73,8 +75,6 @@ namespace CommitAddin
                     string json = JsonConvert.SerializeObject(snapshot);
                     writeText.Write(json);
                 }
-
-
 
             }
             catch (Exception e)

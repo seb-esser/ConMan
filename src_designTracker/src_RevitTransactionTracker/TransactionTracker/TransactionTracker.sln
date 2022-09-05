@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommitAddin", "CommitAddin\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamoVersionTrackingUtilities", "DynamoVersionTrackingUtilities\DynamoVersionTrackingUtilities.csproj", "{BE371725-7230-4251-B6D7-1C60D6D14005}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RevitVersionControlRibbon", "RevitVersionControllRibbon\RevitVersionControlRibbon.csproj", "{A4F73EAC-B5A8-41C6-943A-18773E77A903}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{BE371725-7230-4251-B6D7-1C60D6D14005}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE371725-7230-4251-B6D7-1C60D6D14005}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE371725-7230-4251-B6D7-1C60D6D14005}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4F73EAC-B5A8-41C6-943A-18773E77A903}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4F73EAC-B5A8-41C6-943A-18773E77A903}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4F73EAC-B5A8-41C6-943A-18773E77A903}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4F73EAC-B5A8-41C6-943A-18773E77A903}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
