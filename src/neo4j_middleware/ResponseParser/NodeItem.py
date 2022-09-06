@@ -124,9 +124,8 @@ class NodeItem:
         else:
             for inst in raw:
                 node_labels = list(inst[3])
-                node_type = [x for x in node_labels if not x.startswith('ts')][0]
                 child = cls(node_id=int(inst[0]), rel_type=None)
-                child.labels.append(node_type)
+                child.labels.extend(node_labels)
                 attrs = inst[2]
                 child.attrs = attrs
                 ret_val.append(child)
