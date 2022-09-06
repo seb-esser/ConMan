@@ -23,13 +23,15 @@ def get_status():
 
     zipped = zip(project_nodes, history_nodes)
 
+    print("Tracked model versions:")
+
     for z in zipped:
         project_guid = z[0].attrs["GlobalId"]
         project_name = z[0].attrs["Name"]
         created = int(z[1].attrs["CreationDate"])
         creation_date = datetime.utcfromtimestamp(created).strftime('%Y-%m-%d %H:%M:%S')
         timestamp = z[0].get_timestamps()[0]
-        print("{0} \t {1} \t {2} \t {3}".format(timestamp, creation_date, project_guid, project_name))
+        print("\t{0}\t{1}\t{2}\t{3}".format(timestamp, creation_date, project_guid, project_name))
 
 
 if __name__ == "__main__":

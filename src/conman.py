@@ -88,8 +88,6 @@ parser.add_argument("-pull", "--pull",
 # get the user arguments
 args = parser.parse_args()
 
-print(args)
-
 # check input
 
 if args.status is True:
@@ -130,8 +128,9 @@ elif args.add is not None:
 elif args.get is not None:
     # parse graph to file
     label = args.label
+    folder = args.path
     if args.get == "ifc":
-        graph2ifc.parse(label)
+        graph2ifc.parse(ts=label, directory=folder)
 
     elif args.get == "citygml":
         raise Exception("Not implemented yet.")

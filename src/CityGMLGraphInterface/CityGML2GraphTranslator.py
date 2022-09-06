@@ -87,7 +87,7 @@ class CityGMLGraphGenerator:
         Maps an primary_node_type to the database with a given label and attribute dict
         """
         # print the progressbar
-        progressbar.printbar(self.percent)
+        progressbar.print_bar(self.percent)
 
         # get the attribute dictionary of the primary_node_type
         attrs = entity.attrib

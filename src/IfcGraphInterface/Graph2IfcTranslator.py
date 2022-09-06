@@ -89,13 +89,12 @@ class Graph2IfcTranslator:
 
             del attributes['EntityType']
             e = self.model.create_entity(class_name, **attributes)
-            print(e)
+
             # save node id 2 spf id in dict
             self.node_id_2_spf_id[graph_node_id] = e.id()
 
             return e.id()
         except:
-
             raise Exception("Error in creating instance of {} with attributes {} ".format(class_name, attributes))
 
     def build_association(self, parent_node_id: int, child_node_id: int, association_name: str):
@@ -193,12 +192,12 @@ class Graph2IfcTranslator:
         @return:
         """
         try:
-            self.model.write(path + ".ifc")
+            self.model.write(path)
             return True
         except:
             return False
 
-    def generateSPF(self):
+    def generate_SPF(self):
         """
         translates a graph from neo4j into an IFC SPF file
         @return:
@@ -221,7 +220,7 @@ class Graph2IfcTranslator:
 
         for n in nodes_pr:
             # print progressbar
-            progressbar.printbar(percent)
+            progressbar.print_bar(percent)
             
             n.tidy_attrs()
 
@@ -234,7 +233,7 @@ class Graph2IfcTranslator:
         
         for cnode in nodes_cn:
             # print progressbar
-            progressbar.printbar(percent)
+            progressbar.print_bar(percent)
 
             cy = Neo4jQueryFactory.get_node_properties_by_id(cnode.id)
             raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
@@ -251,6 +250,6 @@ class Graph2IfcTranslator:
 
             percent += increment
 
-        progressbar.printbar(percent)
+        progressbar.print_bar(percent)
         print('[Graph:{} >> IFC_P21]: Generating file - DONE.\n'.format(self.ts))
 

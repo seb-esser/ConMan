@@ -12,7 +12,7 @@ def main():
     generator = Graph2IfcTranslator(connector=connector, ts=ts)
 
     # load data into IFC
-    generator.generateSPF()
+    generator.generate_SPF()
 
     # save model as IFC SPF file
     path = "C:\dev\out\{}".format(ts)

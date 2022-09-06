@@ -102,7 +102,7 @@ class IFCGraphGenerator:
         # loop over all rooted entities
         for entity in rootedEntities:
             # print progressbar
-            progressbar.printbar(percent)
+            progressbar.print_bar(percent)
 
             # get some basic data
             info = entity.get_info()
@@ -120,7 +120,7 @@ class IFCGraphGenerator:
             percent += increment
 
         # show last progressbar update
-        progressbar.printbar(percent)
+        progressbar.print_bar(percent)
 
     # private recursive function
     def build_node_content(self, entity, indent: int, node_id: int):
