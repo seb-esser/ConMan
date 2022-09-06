@@ -108,7 +108,6 @@ elif args.add is not None:
             directory = args.path + "/**/*.ifc"
             for filepath in glob.glob(directory, recursive=True):
                 paths.append(filepath)
-                print(paths)
 
             ifc2graph.parse(paths)
 
