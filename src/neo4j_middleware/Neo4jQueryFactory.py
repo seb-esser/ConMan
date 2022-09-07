@@ -252,15 +252,6 @@ class Neo4jQueryFactory(Neo4jFactory):
         return cy
 
     @classmethod
-    def get_node(cls, node_id: int) -> str:
-        """
-
-        @param node_id:
-        @return:
-        """
-        return 'MATCH (n) WHERE ID(n) = {} RETURN n'.format(node_id)
-
-    @classmethod
     def get_parent_connection_node(cls, node_id: int):
         return 'MATCH path = (c:ConnectionNode)-[r]->(n) WHERE ID(n)={} ' \
                'RETURN path, NODES(path), RELATIONSHIPS(path)'.format(node_id)
