@@ -1,9 +1,7 @@
 from typing import List
 
-from neo4j_middleware.CypherUtilities import CypherUtilities
 from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
-from neo4j_middleware.Neo4jFactory import Neo4jFactory
 
 
 class GraphPath:

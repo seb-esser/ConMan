@@ -105,8 +105,8 @@ class GraphDiff(AbsGraphDiff):
         raw_init = self.connector.run_cypher_statement(cy_next_nodes_init)
         raw_updated = self.connector.run_cypher_statement(cy_next_nodes_upd)
 
-        next_nodes_init = NodeItem.from_neo4j_response(raw_init, False)
-        next_nodes_upd = NodeItem.from_neo4j_response(raw_updated, False)
+        next_nodes_init = NodeItem.from_neo4j_response(raw_init)
+        next_nodes_upd = NodeItem.from_neo4j_response(raw_updated)
 
         # check if no new children got found:
         if len(next_nodes_init) == 0 and len(next_nodes_upd) == 0:
@@ -206,12 +206,11 @@ class GraphDiff(AbsGraphDiff):
         match patternInit = (prim1init:PrimaryNode:{0})<-[:rel]-(cinit:ConnectionNode:{0})-[:rel]->(prim2init:PrimaryNode:{0})
         match patternUpdt = (prim1updt:PrimaryNode:{1})<-[:rel]-(cupdt:ConnectionNode:{1})-[:rel]->(prim2updt:PrimaryNode:{1}) 
         WHERE prim1init.GlobalId = prim1updt.GlobalId AND prim2init.GlobalId = prim2updt.GlobalId AND cinit.EntityType = cupdt.EntityType
-        RETURN DISTINCT [ID(cinit), cinit.EntityType, PROPERTIES(cinit), LABELS(cinit)] as n1, 
-        [ID(cupdt), cupdt.EntityType, PROPERTIES(cupdt), LABELS(cupdt)] as n2
+        RETURN DISTINCT cinit as n1, cupdt as n2
         """.format(ts_init, ts_updated)
 
         pairs_raw = self.connector.run_cypher_statement(cy)
         for p in pairs_raw:
-            node_init, node_updt = NodeItem.from_neo4j_response(p, False)
+            node_init, node_updt = NodeItem.from_neo4j_response(p)
             self.resource_diff.result.node_matching_table.add_matched_nodes(node_init, node_updt)
 

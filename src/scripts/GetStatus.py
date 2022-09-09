@@ -10,16 +10,16 @@ def get_status():
     connector.connect_driver()
 
     cy = "MATCH (n:PrimaryNode {EntityType: \"IfcProject\"})-->(h:SecondaryNode{EntityType: \"IfcOwnerHistory\"}) " \
-         "RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)"
+         "RETURN n"
     raw = connector.run_cypher_statement(cy)
 
-    project_nodes = NodeItem.from_neo4j_response(raw, with_rel=False)
+    project_nodes = NodeItem.from_neo4j_response(raw)
 
     cy = "MATCH (n:PrimaryNode {EntityType: \"IfcProject\"})-->(h:SecondaryNode{EntityType: \"IfcOwnerHistory\"}) " \
-         "RETURN ID(h), h.EntityType, PROPERTIES(h), LABELS(h)"
+         "RETURN h"
     raw = connector.run_cypher_statement(cy)
 
-    history_nodes = NodeItem.from_neo4j_response(raw, with_rel=False)
+    history_nodes = NodeItem.from_neo4j_response(raw)
 
     zipped = zip(project_nodes, history_nodes)
 
