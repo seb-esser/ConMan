@@ -38,16 +38,16 @@ def main():
     raw_init = connector.run_cypher_statement(
         """
         MATCH (n:PrimaryNode:{} {{EntityType: "IfcProject"}})
-        RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)
+        RETURN n
         """.format(ts_init))
     raw_updated = connector.run_cypher_statement(
         """
         MATCH (n:PrimaryNode:{} {{EntityType: "IfcProject"}})
-        RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)
+        RETURN n
         """.format(ts_updated))
 
-    entry_init: NodeItem = NodeItem.from_neo4j_response(raw_init, False)[0]
-    entry_updated: NodeItem = NodeItem.from_neo4j_response(raw_updated, False)[0]
+    entry_init: NodeItem = NodeItem.from_neo4j_response(raw_init)[0]
+    entry_updated: NodeItem = NodeItem.from_neo4j_response(raw_updated)[0]
 
     pDiff = GraphDiff(connector=connector, ts_init=ts_init, ts_updated=ts_updated)
     delta = pDiff.diff_subgraphs(entry_init, entry_updated)

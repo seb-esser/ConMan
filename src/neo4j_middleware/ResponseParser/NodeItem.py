@@ -1,3 +1,7 @@
+from typing import List
+
+import neo4j.data
+
 from neo4j_middleware.CypherUtilities import CypherUtilities
 from neo4j_middleware.Neo4jFactory import Neo4jFactory
 import re
@@ -102,33 +106,55 @@ class NodeItem:
         return ret_val
 
     @classmethod
-    def from_neo4j_response(cls, raw, with_rel: bool) -> list:
+    def from_neo4j_response(cls, raw) -> list:
         """
         creates a List of NodeItem instances from a given neo4j response
         @param raw: neo4j response string
         @return:
         """
+
+        # allocate return value
         ret_val = []
-        if with_rel:
-            for inst in raw:
-                node_type = inst[4][0]
-                # child = cls(node_id=int(inst[0]), rel_type=inst[1]['rel_type'], entity_type=inst[2])
-                child = cls(node_id=int(inst[0]), rel_type=inst[1]['rel_type'])
-                child.labels.append(node_type)
-                if 'listItem' in inst[1]:
-                    child.rel_type = inst[1]['rel_type'] + '__listItem{}'.format(inst[1]['listItem'])
-                    # ToDo: consider to re-model the recursive Diff approach by incorporating edgeItems
-                attrs = inst[3]
-                child.attrs = attrs
-                ret_val.append(child)
-        else:
-            for inst in raw:
-                node_labels = list(inst[3])
-                child = cls(node_id=int(inst[0]), rel_type=None)
-                child.labels.extend(node_labels)
-                attrs = inst[2]
-                child.attrs = attrs
-                ret_val.append(child)
+
+        # prevent case of empty raw input
+        if raw == []:
+            return []
+
+        if type(raw) == list:
+
+            # cast
+            for raw_node in raw:
+
+                # unpack if record
+                if type(raw_node) == neo4j.data.Record:
+                    raw_node = raw_node[0]
+
+                node_labels = list(raw_node.labels)
+                node = cls(node_id=int(raw_node.id), rel_type=None)
+                node.set_node_attributes(dict(raw_node._properties))
+                node.labels = node_labels
+                ret_val.append(node)
+
+            return ret_val
+
+        if type(raw) == neo4j.data.Record:
+            # passed a single node into the method, therefore we can skip the unpacking
+
+            # cast
+            for raw_node in raw:
+                node_labels = list(raw_node.labels)
+                node = cls(node_id=int(raw_node.id), rel_type=None)
+                node.set_node_attributes(dict(raw_node._properties))
+                node.labels = node_labels
+                ret_val.append(node)
+
+        elif type(raw) == neo4j.data.Node:
+            raw_node = raw
+            node_labels = list(raw_node.labels)
+            node = cls(node_id=int(raw_node.id), rel_type=None)
+            node.set_node_attributes(dict(raw_node._properties))
+            node.labels = node_labels
+            ret_val.append(node)
 
         return ret_val
 

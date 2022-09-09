@@ -146,7 +146,12 @@ class Graph2IfcTranslator:
         raw_res = self.connector.run_cypher_statement(cy)
 
         # cast cypher response in a list of node items
-        child_nodes = NodeItem.from_neo4j_response(raw_res, True)
+        child_nodes_raw = raw_res[0]
+        edges_raw = raw_res[1]
+        child_nodes = NodeItem.from_neo4j_response(child_nodes_raw)
+        for pair in zip(child_nodes, edges_raw):
+            # add relationship data to node
+            pair[0].rel_type = pair[1]
 
         # check if leaf node was found
         if len(child_nodes) == 0:

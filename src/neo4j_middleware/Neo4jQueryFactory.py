@@ -50,7 +50,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH (n:PrimaryNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)'
+        ret_statement = 'RETURN n'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
@@ -61,7 +61,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH (n:ConnectionNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)'
+        ret_statement = 'RETURN n'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
@@ -118,13 +118,13 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match = 'MATCH (n:{})-[r:rel]->(c)'.format(label)
         where = 'WHERE ID(n) = {}'.format(parent_node_id)
-        ret = 'RETURN ID(c), PROPERTIES(r), c.EntityType, PROPERTIES(c), LABELS(c)'
+        ret = 'RETURN c, PROPERTIES(r)'
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     
     @classmethod
     def get_node_by_id(cls, nodeId: int) -> str:
-        return 'MATCH (n) WHERE ID(n)={} RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)'.format(nodeId)
+        return 'MATCH (n) WHERE ID(n)={} RETURN n'.format(nodeId)
 
     @classmethod
     def get_hierarchical_prim_nodes(cls, node_id: int, exclude_nodes: List[NodePair] = []) -> str:
@@ -135,7 +135,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         return """
             MATCH (n)<-[r1]-(c:ConnectionNode)-[r2]->(m:PrimaryNode) 
             WHERE ID(n) = {} AND NOT r1 = r2 AND NOT(ID(m) IN [{}])
-            RETURN DISTINCT ID(m), m.EntityType, PROPERTIES(m), LABELS(m)
+            RETURN DISTINCT m
             """.format(node_id, va[:-2])
 
     @classmethod
@@ -267,7 +267,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         Match (n)-[r:SIMILAR_TO]-(m) 
         WITH collect(ID(n)) as nodeIds
         MATCH (a:{0}) WHERE NOT ID(a) IN nodeIds
-        RETURN ID(a), a.EntityType, PROPERTIES(a), LABELS(a)
+        RETURN a
         """.format(timestamp)
         return cy
 
