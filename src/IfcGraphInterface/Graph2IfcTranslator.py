@@ -217,8 +217,8 @@ class Graph2IfcTranslator:
         raw_res_cn = self.connector.run_cypher_statement(cn)
 
         # cast cypher response in a list of primary/connection node items
-        nodes_pr = NodeItem.from_neo4j_response(raw_res_pr, False)
-        nodes_cn = NodeItem.from_neo4j_response(raw_res_cn, False)
+        nodes_pr = NodeItem.from_neo4j_response(raw_res_pr)
+        nodes_cn = NodeItem.from_neo4j_response(raw_res_cn)
 
         increment = 100 / (len(nodes_pr) + len(nodes_cn))
         percent = 0
