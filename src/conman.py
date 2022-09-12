@@ -2,6 +2,9 @@
 import argparse
 import os
 import glob
+from pprint import pprint
+
+from scripts import GetStatus
 
 """ file import """
 import scripts.Ifc2Graph as ifc2graph
@@ -13,6 +16,8 @@ from scripts.GetStatus import get_status
 # --- Methods ---
 
 def commit():
+    ts_guid_dict = get_status()
+    pprint(ts_guid_dict)
     all_pairs = []
     for pair in all_pairs:
         graphbaseddiff.diff(pair[0], pair[1])
