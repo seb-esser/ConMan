@@ -1,8 +1,10 @@
 from typing import List
+import re
 
 from PatchManager.AttributeRule import AttributeRule
 from PatchManager.TransformationRule import TransformationRule
 from neo4jGraphDiff.Caption.StructureModification import StructuralModificationTypeEnum
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
@@ -79,6 +81,7 @@ class Patch(object):
                 e = rule.context_pattern.get_unified_edge_set()
 
                 cy += rule.push_out_pattern.to_cypher_merge(n, e)
+                self.hightlight_patch(rule, connector)
                 # print(cy)
                 # raw = connector.run_cypher_statement(cy)
                 # print(raw)
@@ -139,6 +142,36 @@ class Patch(object):
         print("[INFO] applying transformation ...")
         self.apply(connector=connector)
         print("[INFO] applying transformation: DONE.")
+
+
+    def hightlight_patch(self, rule: TransformationRule, connector: Neo4jConnector):
+        """
+        applies a new label to the push_out_pattern of a given rule
+        @param rule: The TransformationRule in question
+        @param connector: Neo4jConnector instance
+        @return: None
+        """
+        # gett all nodes of the pattern
+        push_out_nodes: List[NodeItem] = rule.push_out_pattern.get_unified_node_set()
+
+        cy = ""
+        # for all NodeItems except the last
+        for node in push_out_nodes:
+            # replace the "nXXX" with just "n"
+            new_match = re.sub('n[0-9]+:', 'n:', node.to_cypher())
+            # if the NodeItem isn't the last, add a UNION to execute everything in one db call
+            if node != push_out_nodes[-1]:
+                union = "UNION "
+            else:
+                union = ""
+            # Set the label according to the ModificytionType 
+            if rule.operation_type == StructuralModificationTypeEnum.ADDED:
+                cy += "MATCH" + new_match + " SET n:Added " + union
+            elif rule.operation_type == StructuralModificationTypeEnum.DELETED:
+                cy += "MATCH" + new_match + " SET n:Deleted " + union
+        
+        # run the cypher statement
+        connector.run_cypher_statement(cy)
 
 
 
