@@ -1,3 +1,4 @@
+import re
 from typing import List
 
 from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
@@ -7,7 +8,7 @@ from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 class GraphPath:
 
     def __init__(self, segments: List[EdgeItem]):
-        self.segments = segments
+        self.segments: List[EdgeItem] = segments
 
     def get_start_node(self) -> NodeItem:
         """
@@ -43,10 +44,11 @@ class GraphPath:
     def __repr__(self):
         return 'GraphPath instance'
 
-    def to_cypher(self, path_number: int = None):
+    def to_cypher(self, path_number: int = None, skip_timestamp=False):
         """
         serializes the GraphPath object into a string representation
         @param path_number: specify an integer indicating the path number inside a pattern, otherwise None
+        @param skip_timestamp: remove timestamps from nodes
         @return: cypher string fragment
         """
 
@@ -83,7 +85,12 @@ class GraphPath:
             # update last_end_node attribute
             last_end_node = segment.end_node
 
-        return ' '.join(cy_list)
+        cy = ' '.join(cy_list)
+
+        if skip_timestamp:
+            cy = re.sub(r".ts[a-zA-Z0-9]{15}", r"", cy)
+
+        return cy
 
     def remove_segments_by_id(self, segment_ids):
         """
@@ -100,4 +107,8 @@ class GraphPath:
             else:
                 raise Exception('could not find edgeItem in segments of current path. ')
 
+    def tidy_node_attributes(self):
+        for segment in self.segments:
+            segment.start_node.tidy_attrs()
+            segment.end_node.tidy_attrs()
 

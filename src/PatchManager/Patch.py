@@ -81,7 +81,7 @@ class Patch(object):
                 e = rule.context_pattern.get_unified_edge_set()
 
                 cy += rule.push_out_pattern.to_cypher_merge(n, e)
-                self.hightlight_patch(rule, connector)
+                self.highlight_patch(connector)
                 # print(cy)
                 # raw = connector.run_cypher_statement(cy)
                 # print(raw)
@@ -113,8 +113,6 @@ class Patch(object):
             connector.run_cypher_statement("MATCH (n) REMOVE n:{} SET n:{}".format(label_from, label_to))
             print("[INFO] Adjusting timestamps: DONE.")
 
-
-
     def apply_inverse(self, connector: Neo4jConnector):
         """
         applies the given patch inversely
@@ -143,35 +141,51 @@ class Patch(object):
         self.apply(connector=connector)
         print("[INFO] applying transformation: DONE.")
 
-
-    def hightlight_patch(self, rule: TransformationRule, connector: Neo4jConnector):
+    def highlight_patch(self, connector: Neo4jConnector):
         """
-        applies a new label to the push_out_pattern of a given rule
-        @param rule: The TransformationRule in question
+        applies a new label to the push_out_pattern of
         @param connector: Neo4jConnector instance
         @return: None
         """
-        # gett all nodes of the pattern
-        push_out_nodes: List[NodeItem] = rule.push_out_pattern.get_unified_node_set()
 
-        cy = ""
-        # for all NodeItems except the last
-        for node in push_out_nodes:
-            # replace the "nXXX" with just "n"
-            new_match = re.sub('n[0-9]+:', 'n:', node.to_cypher())
-            # if the NodeItem isn't the last, add a UNION to execute everything in one db call
-            if node != push_out_nodes[-1]:
-                union = "UNION "
-            else:
-                union = ""
-            # Set the label according to the ModificytionType 
-            if rule.operation_type == StructuralModificationTypeEnum.ADDED:
-                cy += "MATCH" + new_match + " SET n:Added " + union
-            elif rule.operation_type == StructuralModificationTypeEnum.DELETED:
-                cy += "MATCH" + new_match + " SET n:Deleted " + union
-        
-        # run the cypher statement
+        # highlight removed and inserted nodes
+        for rule in self.operations:
+            # get all nodes of the pattern
+            push_out_nodes: List[NodeItem] = rule.push_out_pattern.get_unified_node_set()
+
+            cy = ""
+            # for all NodeItems except the last
+            for node in push_out_nodes:
+                # replace the "nXXX" with just "n"
+                new_match = re.sub('n[0-9]+:', 'n:', node.to_cypher())
+                # if the NodeItem isn't the last, add a UNION to execute everything in one db call
+                if node != push_out_nodes[-1]:
+                    union = "UNION "
+                else:
+                    union = ""
+                # Set the label according to the ModificationType
+                if rule.operation_type == StructuralModificationTypeEnum.ADDED:
+                    cy += "MATCH" + new_match + " SET n:ADDED " + union
+                elif rule.operation_type == StructuralModificationTypeEnum.DELETED:
+                    cy += "MATCH" + new_match + " SET n:DELETED " + union
+
+            # run the cypher statement
+            connector.run_cypher_statement(cy)
+
+        # highlight modified nodes
+        for pMod in self.attribute_changes:
+            # remove p21_id etc from nodes
+            pMod.path.tidy_node_attributes()
+            pMod.path.segments[-1].end_node.attrs = {}
+
+            cy = "MATCH "
+            cy += pMod.path.to_cypher(skip_timestamp=True)
+
+            cy += "SET {}:MODIFIED".format(pMod.path.get_last_node().get_node_identifier())
+            connector.run_cypher_statement(cy)
+
+    def remove_highlight_labels(self, connector: Neo4jConnector):
+
+        cy = "MATCH (n:ADDED), (m:DELETED), (o:MODIFIED) " \
+             "REMOVE n:ADDED, m:DELETED, o:MODIFIED"
         connector.run_cypher_statement(cy)
-
-
-

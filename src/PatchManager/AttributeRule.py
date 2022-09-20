@@ -19,4 +19,6 @@ class AttributeRule:
         self.init_value = init_value
         self.updated_value = updated_value
 
+    def remove_modified_attr_in_last_node(self):
+        del self.path.get_last_node().attrs[self.attribute_name]
 
