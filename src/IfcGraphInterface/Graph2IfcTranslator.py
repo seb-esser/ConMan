@@ -112,8 +112,8 @@ class Graph2IfcTranslator:
         child = self.model.by_id(spf_id_child)
 
         # test if the desired association is modeled as a pointer or an array of pointers
-        if not association_name.find("listItem") == -1:
-            name = association_name.split('__')[0]
+        if 'listItem' in association_name:
+            name = association_name['rel_type']
             # list of pointers
             try:
                 lst = getattr(parent, name)
@@ -129,7 +129,7 @@ class Graph2IfcTranslator:
                 print('Skip building {} between #{} and #{}'.format(association_name, spf_id_parent, spf_id_child))
         else:
             try:
-                setattr(parent, association_name, child)
+                setattr(parent, association_name['rel_type'], child)
             except:
                 print('Skip building {} between #{} and #{}'.format(association_name, spf_id_parent, spf_id_child))
 
@@ -237,11 +237,6 @@ class Graph2IfcTranslator:
         for cnode in nodes_cn:
             # print progressbar
             progressbar.print_bar(percent)
-
-            cy = Neo4jQueryFactory.get_node_properties_by_id(cnode.id)
-            raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
-            # assign properties to node object
-            cnode.set_node_attributes(raw_res)
 
             cnode.tidy_attrs()
 
