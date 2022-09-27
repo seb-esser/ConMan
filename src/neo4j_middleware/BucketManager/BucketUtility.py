@@ -13,6 +13,10 @@ class BucketUtility:
         pass
 
     def get_buckets(self):
+        """
+        returns all buckets currently stored in the connected database. the return value is sorted according to
+        the creation date
+        """
         connector = Neo4jConnector()
         connector.connect_driver()
 
@@ -37,7 +41,7 @@ class BucketUtility:
 
             project_name = z[0].attrs["Name"]
             created = int(z[1].attrs["CreationDate"])
-            creation_date = datetime.utcfromtimestamp(created).strftime('%Y-%m-%d %H:%M:%S')
+            creation_date = datetime.utcfromtimestamp(created)
             timestamp = z[0].get_timestamps()[0]
 
             bucket_object = BucketObject(ts=timestamp, creation_date=creation_date)
@@ -51,6 +55,11 @@ class BucketUtility:
                 existing_bucket[0].Content.append(bucket_object)
 
         connector.disconnect_driver()
+
+        # sort w.r.t. time
+        for b in buckets:
+            b.Content = sorted(b.Content)
+
         return buckets
 
     def pprint_buckets(self, buckets: List[Bucket]):
@@ -60,4 +69,5 @@ class BucketUtility:
             print("Bucket ID {}".format(bucket.GlobalId))
 
             for version in bucket.Content:
-                print("\t timestamp: {} created: {}".format(version.timestamp, version.creation_date))
+                print("\t timestamp: {} created: {}".format(version.timestamp,
+                                                            version.creation_date.strftime('%Y-%m-%d %H:%M:%S')))

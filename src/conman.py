@@ -133,4 +133,4 @@ elif args.remove is not None:
 
 elif args.commit is not None:
     # calculate diff and prepare patch
-    commit()
+    commit(args.commit)

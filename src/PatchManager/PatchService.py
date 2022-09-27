@@ -53,7 +53,6 @@ class PatchService:
         @return: the patch object
         """
 
-        print("[INFO] generate patch ....")
         patch = Patch()
 
         try:
@@ -197,7 +196,6 @@ class PatchService:
             rule = AttributeRule(path=path, attribute_name=attr_name, init_value=init_val, updated_value=updt_val)
             patch.attribute_changes.append(rule)
 
-        print("[INFO] generate patch: DONE.")
         return patch
 
     def apply_patch(self, patch: Patch, connector: Neo4jConnector):
@@ -206,7 +204,7 @@ class PatchService:
     def apply_patch_inverse(self, patch: Patch, connector: Neo4jConnector):
         patch.apply_inverse(connector=connector)
 
-    def save_patch_to_json(self, patch: Patch):
+    def save_patch_to_json(self, patch: Patch, directory=''):
         """
         saves a given patch into json
         @param patch:
@@ -216,11 +214,11 @@ class PatchService:
         ts_init = patch.base_timestamp
         ts_updated = patch.resulting_timestamp
 
-        print('[INFO] saving patch ... ')
-        f = open('Patch_init{}-updt{}.json'.format(ts_init, ts_updated), 'w')
+        print('[INFO] Saving patch ... ')
+        f = open(directory + 'Patch_init{}-updt{}.json'.format(ts_init, ts_updated), 'w')
         f.write(jsonpickle.dumps(patch))
         f.close()
-        print('[INFO] saving patch: DONE. ')
+
         # return jsonpickle.encode(self)
 
     def load_patch_from_json(self, path: str) -> Patch:

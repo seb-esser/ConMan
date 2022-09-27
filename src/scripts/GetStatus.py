@@ -1,9 +1,11 @@
-from neo4j_middleware.BucketManager.BucketFactory import BucketUtility
+from neo4j_middleware.BucketManager.BucketUtility import BucketUtility
 
 
 def get_status():
     factory = BucketUtility()
     buckets = factory.get_buckets()
+
+
 
     factory.pprint_buckets(buckets)
 

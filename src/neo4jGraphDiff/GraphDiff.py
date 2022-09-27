@@ -89,7 +89,7 @@ class GraphDiff(AbsGraphDiff):
         """
         self.resource_diff.result.node_matching_table.add_matched_nodes(entry_init, entry_updated)
 
-        print('[DIFF] Running subgraph Diff under PrimaryNodes {} and {}'.format(entry_init.id, entry_updated.id))
+        # print('[DIFF] Running subgraph Diff under PrimaryNodes {} and {}'.format(entry_init.id, entry_updated.id))
         # run diff and get node matching
         self.resource_diff.diff_subgraphs(entry_init, entry_updated)
 
