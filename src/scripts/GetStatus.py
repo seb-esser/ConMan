@@ -34,7 +34,10 @@ def get_status():
         timestamp = z[0].get_timestamps()[0]
         print("\t{0}\t{1}\t{2}\t{3}".format(timestamp, creation_date, project_guid, project_name))
         return_dict[timestamp] = project_guid
-    return  return_dict
+
+    connector.disconnect_driver()
+
+    return return_dict
 
 
 if __name__ == "__main__":

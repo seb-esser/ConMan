@@ -5,6 +5,8 @@ import glob
 from pprint import pprint
 
 from scripts import GetStatus
+from scripts.Commit import commit
+from scripts.Remove import remove
 
 """ file import """
 import scripts.Ifc2Graph as ifc2graph
@@ -13,29 +15,7 @@ import scripts.Graph2Ifc as graph2ifc
 import scripts.GraphBasedModelDiff as graphbaseddiff
 from scripts.GetStatus import get_status
 
-# --- Methods ---
-
-def commit():
-    ts_guid_dict = get_status()
-    pprint(ts_guid_dict)
-    all_pairs = []
-    for pair in all_pairs:
-        graphbaseddiff.diff(pair[0], pair[1])
-
-
-# --- Script ---
-
 parser = argparse.ArgumentParser('ConMan')
-
-# define arguments
-# parser.add_argument("-i", "--input",
-#                     type=str,
-#                     help="Specifies the input type. If 'diff' is selected, all other args will be ignored. "
-#                          "Edit diff in scripts/GraphBasedModelDiff.py",
-#                     choices=["ifc", "citygml", "graph", "diff"])
-# parser.add_argument("-o", "--output", type=str,
-#                     help="Specifies the output type.",
-#                     choices=["ifc", "graph"])
 
 # status
 parser.add_argument("-s", "--status",
@@ -65,6 +45,11 @@ parser.add_argument("-g", "--get",
 parser.add_argument("-l", "--label",
                     type=str,
                     help="The label of the neo4j graph")
+
+#remove
+parser.add_argument("-rm", "--remove",
+                    type=str,
+                    help="removes a graph from the database by its timestamp label")
 
 # commit
 parser.add_argument("-c", "--commit",
@@ -142,6 +127,9 @@ elif args.get is not None:
 
     else:
         raise Exception("Types do not match.")
+
+elif args.remove is not None:
+    remove(args.remove)
 
 elif args.commit is not None:
     # calculate diff and prepare patch

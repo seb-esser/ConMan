@@ -20,7 +20,7 @@ Usage:
 Example: 
 ``python conman.py -a "ifc" -p "C:\dev\myModel.ifc"``
 
-# Get model from repository
+## Get model from repository
 
 Usage:
 ``python conman.py -g "<model-type>" -l "<timestamp-label>" -p "path/to/store/result"`` 
@@ -28,7 +28,7 @@ Usage:
 Example:
 ``python conman.py -g "ifc" -l "ts20220726T075533010"``
 
-# Commit 
+## Commit 
 
 Usage: 
 ``python conman.py -c "<commit-message>" ``
