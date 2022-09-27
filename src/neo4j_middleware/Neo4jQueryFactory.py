@@ -139,18 +139,6 @@ class Neo4jQueryFactory(Neo4jFactory):
             """.format(node_id, va[:-2])
 
     @classmethod
-    def get_node_properties_by_id(cls, nodeId: int) -> str:
-        """
-        Query all params of a node specified by its node id
-        @param nodeId: the node id in the neo4j database
-        @return: cypher query string
-        """
-        match = 'MATCH (n)'
-        where = 'WHERE ID(n) = {}'.format(nodeId)
-        ret = 'RETURN properties(n)'
-        return Neo4jFactory.BuildMultiStatement([match, where, ret])
-
-    @classmethod
     def nodes_are_connected(cls, node_id_a: int, node_id_b: int) -> str:
         """
         checks if two given nodes have a directed edge from a to b

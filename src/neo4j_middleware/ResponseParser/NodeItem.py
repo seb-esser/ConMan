@@ -1,6 +1,7 @@
 from typing import List
 
 import neo4j.data
+import neo4j.graph
 
 from neo4j_middleware.CypherUtilities import CypherUtilities
 from neo4j_middleware.Neo4jFactory import Neo4jFactory
@@ -148,7 +149,7 @@ class NodeItem:
                 node.labels = node_labels
                 ret_val.append(node)
 
-        elif type(raw) == neo4j.data.Node:
+        elif type(raw) == neo4j.graph.Node:
             raw_node = raw
             node_labels = list(raw_node.labels)
             node = cls(node_id=int(raw_node.id), rel_type=None)
