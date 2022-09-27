@@ -1,3 +1,4 @@
+from PatchManager.PatchBundle import PatchBundle
 from PatchManager.PatchService import PatchService
 from neo4jGraphDiff.GraphDiff import GraphDiff
 from neo4j_middleware.BucketManager.BucketUtility import BucketUtility
@@ -16,6 +17,9 @@ def commit(commit_message: str):
     # connect to db
     connector = Neo4jConnector()
     connector.connect_driver()
+
+    # init patch bundle
+    bundle = PatchBundle(message=commit_message)
 
     buckets = BucketUtility().get_buckets()
 
@@ -50,8 +54,12 @@ def commit(commit_message: str):
         print("[INFO] Generate Patch for bucket {}".format(bucket.GlobalId))
         patch = service.generate_DPO_patch(connector=connector)
 
-        service.save_patch_to_json(patch, directory='')
+        bundle.patches.append(patch)
 
+    # save bundle
+    service = PatchService().save_patch_bundle_to_json(bundle)
+
+    # disconnect
     connector.disconnect_driver()
 
 

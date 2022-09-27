@@ -1,9 +1,11 @@
+import hashlib
 from typing import List
 
 import jsonpickle
 
 from PatchManager.AttributeRule import AttributeRule
 from PatchManager.Patch import Patch
+from PatchManager.PatchBundle import PatchBundle
 from PatchManager.TransformationRule import TransformationRule
 from neo4jGraphDiff.Caption.PropertyModification import PropertyModification
 from neo4jGraphDiff.Caption.StructureModification import StructuralModificationTypeEnum, StructureModification
@@ -238,4 +240,32 @@ class PatchService:
 
         return result
 
+    def save_patch_bundle_to_json(self, patch_bundle: PatchBundle):
+        """
+                saves a given patch bundle into json
+                @param patch_bundle:
+                """
 
+        commit_hash = hashlib.md5(patch_bundle)
+
+        print('[INFO] Saving patch bundle {} '.format(commit_hash))
+        f = open('PatchBundle_{}.json'.format(commit_hash), 'w')
+        f.write(jsonpickle.dumps(patch_bundle))
+        f.close()
+
+    def load_patch_bundle_from_json(self, path: str) -> PatchBundle:
+        """
+        loads a patch bundle from json
+        @param path:
+        @return:
+        """
+
+        # load graph delta
+        with open(path) as f:
+            content = f.read()
+
+        print("[INFO] loading delta json....")
+        result: PatchBundle = jsonpickle.decode(content)
+        print("[INFO] loading delta json: DONE.")
+
+        return result
