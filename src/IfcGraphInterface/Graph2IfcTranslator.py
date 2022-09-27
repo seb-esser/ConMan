@@ -146,25 +146,23 @@ class Graph2IfcTranslator:
         raw_res = self.connector.run_cypher_statement(cy)
 
         # cast cypher response in a list of node items
-        child_nodes_raw = raw_res[0]
-        edges_raw = raw_res[1]
-        child_nodes = NodeItem.from_neo4j_response(child_nodes_raw)
-        for pair in zip(child_nodes, edges_raw):
-            # add relationship data to node
-            pair[0].rel_type = pair[1]
+        child_nodes = []
 
+        for pair in raw_res:
+            child_node_raw = pair[0]
+            edge_raw = pair[1]
+            child_node = NodeItem.from_neo4j_response(child_node_raw)[0]
+
+            # add relationship data to node
+            child_node.rel_type = edge_raw
+            # ToDo: Hier überprüfen, ob die Daten entsprechend der Erwartungen auf das rel_type Attribut geschrieben werden
+
+            child_nodes.append(child_node)
         # check if leaf node was found
         if len(child_nodes) == 0:
             return
 
         for c in child_nodes:
-            # query all node properties of n
-            cy = query_factory.get_node_properties_by_id(c.id)
-            raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
-
-            # assign properties to node object
-            c.set_node_attributes(raw_res)
-
             c.tidy_attrs()
 
             # check if IFC counterpart to current node was already initialized

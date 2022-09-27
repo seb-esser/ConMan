@@ -49,7 +49,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @param label:
         @return: cypher query string
         """
-        match = 'MATCH (n:PrimaryNode:{}) '.format(label)
+        match = 'MATCH p = (n:PrimaryNode:{}) '.format(label)
         ret_statement = 'RETURN n'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 

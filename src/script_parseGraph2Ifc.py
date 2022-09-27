@@ -6,7 +6,7 @@ def main():
     connector = Neo4jConnector()
     connector.connect_driver()
 
-    ts = "ts20220726T0755330100"
+    ts = "ts20220210T102821"
 
     # init generator instance
     generator = Graph2IfcTranslator(connector=connector, ts=ts)
