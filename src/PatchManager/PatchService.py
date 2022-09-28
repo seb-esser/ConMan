@@ -246,7 +246,7 @@ class PatchService:
                 @param patch_bundle:
                 """
 
-        commit_hash = hashlib.md5(patch_bundle)
+        commit_hash = hash(patch_bundle)
 
         print('[INFO] Saving patch bundle {} '.format(commit_hash))
         f = open('PatchBundle_{}.json'.format(commit_hash), 'w')
