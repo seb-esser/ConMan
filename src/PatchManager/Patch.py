@@ -33,26 +33,7 @@ class Patch(object):
         print("Applying attribute changes... ")
         # loop over attribute changes
         for rule in self.attribute_changes:
-            # find node
-            cy = 'MATCH '
-
-            cy += rule.path.to_cypher(path_number=0)
-            # set new attribute value
-            if isinstance(rule.updated_value, str) or rule.updated_value is None:
-                cy += " SET {}.{} = \"{}\"".format(
-                    rule.path.get_last_node().get_node_identifier(),
-                    rule.attribute_name,
-                    rule.updated_value)
-            else:
-                cy += " SET {}.{} = {}".format(
-                    rule.path.get_last_node().get_node_identifier(),
-                    rule.attribute_name,
-                    rule.updated_value)
-
-            # run statement
-            connector.run_cypher_statement(cy)
-            # ToDo: implement validation that transformation has been applied successfully.
-            #  Consider adding a RETURN to the cypher statement.
+            self.__apply_attribute_rule(rule, connector)
 
         print("Applying structural changes... ")
         # loop over all structural transformations
@@ -61,7 +42,7 @@ class Patch(object):
 
                 # find context and
                 # -> use the base timestamp here
-                if len(rule.context_pattern.paths) < 0: # catch situation in which no context exists in the rule
+                if len(rule.context_pattern.paths) < 0:  # catch situation in which no context exists in the rule
                     rule.context_pattern.replace_timestamp(self.base_timestamp)
 
                 cy = rule.context_pattern.to_cypher_match()
@@ -114,6 +95,42 @@ class Patch(object):
 
             connector.run_cypher_statement("MATCH (n:{0}) REMOVE n:{0} SET n:{1}".format(label_from, label_to))
             # print("[INFO] Adjusting timestamps: DONE.")
+
+    def apply_version2(self, connector: Neo4jConnector):
+        # attribute changes
+        for rule in self.attribute_changes:
+            self.__apply_attribute_rule(rule, connector=connector)
+
+        # structural changes
+
+        inserting_rules = [x for x in self.operations if x.operation_type == StructuralModificationTypeEnum.ADDED]
+        removing_rules = [x for x in self.operations if x.operation_type == StructuralModificationTypeEnum.DELETED]
+
+        all_new_nodes_inserted = []
+        all_new_edges_inserted = []
+        for rule in inserting_rules:
+            all_new_nodes_inserted += rule.push_out_pattern.get_unified_node_set()
+            all_new_edges_inserted += rule.push_out_pattern.get_unified_edge_set()
+
+        # ToDo: unify all_new_nodes_inserted
+        cy = ''
+        for node in all_new_nodes_inserted:
+            cy = "MERGE " + node.to_cypher()
+            connector.run_cypher_statement(cy)
+
+        for edge in all_new_edges_inserted:
+            cy = "MATCH {} " \
+                 "MATCH {} " \
+                 "MERGE {} ".format(
+
+                edge.start_node.to_cypher(),
+                edge.end_node.to_cypher(),
+                edge.to_cypher(
+                    skip_start_node_attrs=True,
+                    skip_end_node_attrs=True,
+                    skip_start_node_labels=True,
+                    skip_end_node_labels=True))
+            connector.run_cypher_statement(cy)
 
     def apply_inverse(self, connector: Neo4jConnector):
         """
@@ -190,4 +207,26 @@ class Patch(object):
 
         cy = "MATCH (n:ADDED), (m:DELETED), (o:MODIFIED) " \
              "REMOVE n:ADDED, m:DELETED, o:MODIFIED"
+        connector.run_cypher_statement(cy)
+
+    def __apply_attribute_rule(self, rule, connector: Neo4jConnector):
+        """
+
+        """
+        # find node
+        cy = 'MATCH '
+
+        cy += rule.path.to_cypher(path_number=0)
+        # set new attribute value
+        if isinstance(rule.updated_value, str) or rule.updated_value is None:
+            cy += " SET {}.{} = \"{}\"".format(
+                rule.path.get_last_node().get_node_identifier(),
+                rule.attribute_name,
+                rule.updated_value)
+        else:
+            cy += " SET {}.{} = {}".format(
+                rule.path.get_last_node().get_node_identifier(),
+                rule.attribute_name,
+                rule.updated_value)
+        # run statement
         connector.run_cypher_statement(cy)

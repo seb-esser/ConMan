@@ -117,7 +117,6 @@ class GraphPattern:
     def to_cypher_match(self) -> str:
         """
         improved version to search for a specified graph pattern using a distinct node set definition
-        @type timestamp: optional timestamp string to identify the target graph the pattern should be searched for
         @return:
         """
 

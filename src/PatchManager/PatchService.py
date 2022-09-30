@@ -273,7 +273,7 @@ class PatchService:
             rule = TransformationRule(gluing_pattern=gluing_pattern, push_out_pattern=push_out_pattern,
                                       context_pattern=context_pattern, operation_type=s_mod.modType)
 
-            rule.run_cleanup()
+            # rule.run_cleanup()
 
             # add dpo to patch object
             patch.operations.append(rule)
@@ -290,7 +290,7 @@ class PatchService:
         return patch
 
     def apply_patch(self, patch: Patch, connector: Neo4jConnector):
-        patch.apply(connector=connector)
+        patch.apply_version2(connector=connector)
 
     def apply_patch_inverse(self, patch: Patch, connector: Neo4jConnector):
         patch.apply_inverse(connector=connector)
