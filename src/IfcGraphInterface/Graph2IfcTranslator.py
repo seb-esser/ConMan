@@ -163,10 +163,10 @@ class Graph2IfcTranslator:
             return
 
         # for some geometries, the order of instantiation is important. Therefore, we sort the nodes here w.r.t listItem
-        # sorted_child_nodes = sorted(child_nodes, key=lambda cnode: cnode.get_listitem())
-        sorted_child_nodes = child_nodes
+        sorted_child_nodes = sorted(child_nodes, key=lambda cnode: cnode.get_listitem())
+        # sorted_child_nodes = child_nodes
 
-        print([x.get_listitem() for x in sorted_child_nodes])
+        # print([x.get_listitem() for x in sorted_child_nodes])
 
         for c in sorted_child_nodes:
             c.tidy_attrs()
