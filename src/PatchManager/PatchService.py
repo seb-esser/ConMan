@@ -74,6 +74,9 @@ class PatchService:
 
         # loop over structural modifications
         for s_mod in s_mods:
+            # clear cypher
+            cy = ''
+
             if s_mod.modType == StructuralModificationTypeEnum.ADDED:
                 ts = ts_updated
             elif s_mod.modType == StructuralModificationTypeEnum.DELETED:
@@ -82,70 +85,140 @@ class PatchService:
             else:
                 raise Exception("Modification type has not been specified properly. ")
 
-            anchor_pattern: GraphPattern
-            guid = ""
+            # init patterns
 
-            # distinguish if a primary or secondary node has been inserted or removed
-            if s_mod.child.get_node_type() == "PrimaryNode":
-                # the anchor_pattern is the newly inserted primary node itself
-
-                guid = s_mod.child.attrs["GlobalId"]
-
-            elif s_mod.child.get_node_type() == "SecondaryNode":
-                primary_node = self.delta.node_matching_table.get_parent_primaryNode(s_mod.parent)
-                # query anchor path
-                cy = "MATCH {0}, {1}, p = SHORTESTPATH({2}-[:rel*]->{3}) RETURN p, NODES(p), RELATIONSHIPS(p)".format(
-                    primary_node.to_cypher(),
-                    s_mod.parent.to_cypher(),
-                    primary_node.to_cypher(skip_labels=True, skip_attributes=True),
-                    s_mod.parent.to_cypher(skip_labels=True, skip_attributes=True))
-                raw = connector.run_cypher_statement(cy)
-                anchor_pattern = GraphPattern.from_neo4j_response(raw)
-
-            if guid != "":
-
-                # generate pushOut Pattern
-                cy = """
-                       MATCH pa = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[:rel*..10]->(sec:SecondaryNode:{0})
-                       WHERE NOT (sec)-[:EQUIVALENT_TO]-() 
-                       RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
-                       """.format(ts, guid)
-            else:
-                cy = anchor_pattern.to_cypher_match() + """
-                       MATCH pa = {1}-[:rel*..10]->(sec:SecondaryNode:{0})
-                       WHERE NOT (sec)-[:EQUIVALENT_TO]-() 
-                       RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
-                       """.format(ts, anchor_pattern.get_last_node().to_cypher(skip_attributes=True, skip_labels=True))
-            raws = connector.run_cypher_statement(cy)
-            push_out_pattern = GraphPattern.from_neo4j_response(raws)
-
-            # generate context pattern
+            # context pattern: It contains a set of paths to nodes which we'd like to build edges to
             context_pattern = GraphPattern()
 
             # generate gluing pattern
             gluing_pattern = GraphPattern()
 
-            # get the embed for primary embedding
-            cy = "MATCH {}<-[:rel]-(c:ConnectionNode) " \
-                 "MATCH p = (c)-[:rel]->(prmN) WHERE NOT prmN = {} RETURN p, NODES(p), RELATIONSHIPS(p)".format(
-                s_mod.child.to_cypher(skip_labels=True), s_mod.child.to_cypher(skip_labels=True, skip_attributes=True))
+            push_out_pattern = GraphPattern()
 
-            raw = connector.run_cypher_statement(cy)
-            prim_context: GraphPattern = GraphPattern.from_neo4j_response(raw)
-            context_pattern.paths.extend(prim_context.paths)
+            # distinguish if a primary or secondary node has been inserted or removed
+            if s_mod.child.get_node_type() == "PrimaryNode":
 
-            # get the gluing between primary push out and primary embed
-            cy = "MATCH p= {}<-[:rel]-(c:ConnectionNode) " \
-                 "RETURN p, NODES(p), RELATIONSHIPS(p)".format(
-                s_mod.child.to_cypher(skip_labels=True), s_mod.child.to_cypher(skip_labels=True, skip_attributes=True))
+                # get the pushOut Pattern
+                guid = s_mod.child.attrs["GlobalId"]
+                cy = """
+                     MATCH pa = (n:PrimaryNode:{0} {{GlobalId: \"{1}\"}})-[:rel*..10]->(sec:SecondaryNode:{0})
+                     WHERE NOT (sec)-[:EQUIVALENT_TO]-() 
+                     RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
+                     """.format(ts, guid)
 
-            raw = connector.run_cypher_statement(cy)
-            prim_gluing: GraphPattern = GraphPattern.from_neo4j_response(raw)
-            gluing_pattern.paths.extend(prim_gluing.paths)
+                # query pushout
+                raw = connector.run_cypher_statement(cy)
+                # save pushout
+                push_out_pattern.paths.extend(GraphPattern.from_neo4j_response(raw).paths)
 
-            # get all embed paths for secondary nodes
+                # get the embed for primary embedding.
+                # be aware that GUIDs of connection nodes might be unstable
+                # ToDo: this query returns nothing in case of secondaryNode insertion! It may only work for primCases
+                cy = "MATCH {0}<-[:rel]-(c:ConnectionNode) " \
+                     "MATCH p = (c)-[:rel]->(prmN) WHERE NOT prmN = {1} RETURN p, NODES(p), RELATIONSHIPS(p)".format(
+                    s_mod.child.to_cypher(skip_labels=True),
+                    s_mod.child.to_cypher(skip_labels=True, skip_attributes=True))
+
+                raw = connector.run_cypher_statement(cy)
+                anchor_pattern: GraphPattern = GraphPattern.from_neo4j_response(raw)
+                # add anchor to context and connecting edge to glue
+                context_pattern.paths.extend(anchor_pattern.paths)
+
+            # changes in the secondary structure of a rooted entity
+            elif s_mod.child.get_node_type() == "SecondaryNode":
+
+                # construct a path from a primaryNode (having a GUID) to the parent
+                reference_primary_node = self.delta.node_matching_table.get_parent_primaryNode(s_mod.parent)
+
+                # query anchor path for newly inserted node.
+                # Returns a path that uniquely accesses the last secondary node already existing (i.e. equivalent_to)
+
+                cy = "MATCH {0}, {1}, p = SHORTESTPATH({2}-[:rel*]->{3}) RETURN p, NODES(p), RELATIONSHIPS(p)".format(
+                    reference_primary_node.to_cypher(),
+                    s_mod.parent.to_cypher(),
+                    reference_primary_node.to_cypher(skip_labels=True, skip_attributes=True),
+                    # must be given twice as shortest path doenst allow declaration
+                    s_mod.parent.to_cypher(skip_labels=True, skip_attributes=True))
+                raw = connector.run_cypher_statement(cy)
+
+                anchor_pattern: GraphPattern = GraphPattern.from_neo4j_response(raw)
+                # the anchor is already a first part of the context necessary to ensure correct insertion
+                context_pattern.paths.extend(anchor_pattern.paths)
+
+                # get the pushOut pattern. Here: get_last_node is the parent_node that is has equiv_to edge
+
+                # path_to_parent + glue + pushOut
+                cy = \
+                    anchor_pattern.to_cypher_match() + \
+                    "MATCH {0}-[:rel]->{1} " \
+                    "MATCH pa = {1}-[:rel*..10]->(sec:SecondaryNode:{2})  " \
+                    "WHERE NOT (sec)-[:EQUIVALENT_TO]-() " \
+                    "RETURN pa, NODES(pa), RELATIONSHIPS(pa)".format(
+                        anchor_pattern.get_last_node().to_cypher(skip_attributes=True, skip_labels=True),
+                        s_mod.child.to_cypher(skip_labels=True),
+                        ts)
+
+                # query pushout
+                raw = connector.run_cypher_statement(cy)
+                push_put = GraphPattern.from_neo4j_response(raw)
+
+                # a special case is the moment, where only one leaf node has been added.
+                # Then, the pattern query returns no paths. To solve this situation, the parent node is queried as well
+                # such that we can construct a pattern
+
+                if len(push_put.paths) == 0:
+                    # path_to_parent + pushOut
+                    cy = \
+                        anchor_pattern.to_cypher_match() + \
+                        "MATCH pa = {0}-[:rel]->(sec:SecondaryNode:{1}) " \
+                        "WHERE NOT (sec)-[:EQUIVALENT_TO]-() " \
+                        "RETURN pa, NODES(pa), RELATIONSHIPS(pa)".format(
+                            anchor_pattern.get_last_node().to_cypher(skip_attributes=True, skip_labels=True),
+                            ts)
+                    # query pushout
+                    raw = connector.run_cypher_statement(cy)
+                    push_put = GraphPattern.from_neo4j_response(raw)
+
+                # save pushout
+                push_out_pattern.paths.extend(push_put.paths)
+
+            else:
+                print("the transfer of connection nodes might fail. ")
+                continue
+
+            # get the glue between parent and child. Because of the unstable GUIDS,
+            # we need to differenciate the prim and sec case again...
+
+            if s_mod.child.get_node_type() == "PrimaryNode":
+                # get the gluing edge between primary push out and connectionNode embed
+                cy = "MATCH p= {}<-[:rel]-(c:ConnectionNode) " \
+                     "RETURN p, NODES(p), RELATIONSHIPS(p)".format(
+                    s_mod.child.to_cypher(skip_labels=True),
+                    s_mod.child.to_cypher(skip_labels=True, skip_attributes=True))
+                raw = connector.run_cypher_statement(cy)
+                glue: GraphPattern = GraphPattern.from_neo4j_response(raw)
+
+            elif s_mod.child.get_node_type() == "SecondaryNode":
+                # first get the unique path to reach the parent (secondary) node
+                cy_anchor_path = context_pattern.to_cypher_match()
+                # secondly, get the edge connecting both and just store the edge in the gluing pattern
+                # (the anchor is context!)
+                cy = cy_anchor_path + " MATCH p = {}-[:rel]->{} RETURN p, NODES(p), RELATIONSHIPS(p)".format(
+                    context_pattern.get_last_node().to_cypher(skip_labels=True, skip_attributes=True),
+                    s_mod.child.to_cypher())
+                raw = connector.run_cypher_statement(cy)
+                glue: GraphPattern = GraphPattern.from_neo4j_response(raw)
+
+            else:
+                print("ConNode case to be implemented")
+                glue = GraphPattern()
+
+            gluing_pattern.paths.extend(glue.paths)
+
+            # finally, calculate all gluing edges between pushout nodes and context
             nodes_pushed_out = push_out_pattern.get_unified_node_set()
 
+            # calculate all embedding edges for the pushout pattern
             for n in nodes_pushed_out:
                 cy_equ_neighbor = "match p = (n)-[r:rel]->(e)-[:EQUIVALENT_TO]-() WHERE ID(n) = {} return e".format(
                     n.id)
@@ -155,10 +228,10 @@ class PatchService:
                 # that is already present in the target graph
                 if raw_neighbor != []:
                     context_node = NodeItem.from_neo4j_response(raw_neighbor[0])[0]
-                    # get "first visited from"
+                    # get "first visited from" for the context_node
                     parent_node = self.delta.node_matching_table.get_parent_primaryNode(context_node)
 
-                    # calculate the shortest path
+                    # calculate the unique path describing the context node
                     cy = "MATCH {0}, {1}, p = SHORTESTPATH({2}-[:rel*]->{3}) RETURN p, NODES(p), RELATIONSHIPS(p)".format(
                         parent_node.to_cypher(),
                         context_node.to_cypher(),
