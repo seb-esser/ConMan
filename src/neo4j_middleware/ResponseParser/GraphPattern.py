@@ -273,6 +273,12 @@ class GraphPattern:
         """
         self.get_unified_edge_set()
 
+        # in some situations, edges get removed such that a GraphPath with zero segments (i.e., edges) remains
+        # remove those GraphPath instances from segments which have no egde anymore
+        cleaned_paths = [p for p in self.paths if len(p.segments) != 0]
+
+        self.paths = cleaned_paths
+
     def print_to_console(self):
         """
         visualizes the graph pattern structure to the console
@@ -344,6 +350,8 @@ class GraphPattern:
         @return:
         """
 
+        if len(self.paths) == 0:
+            raise Exception("found path with zero segments. ")
         old_timestamp = self.paths[0].get_start_node().get_timestamps()[0]
 
         for p in self.paths:

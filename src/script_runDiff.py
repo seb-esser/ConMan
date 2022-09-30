@@ -19,10 +19,11 @@ def main():
                  "Storey": ("ts20210521T074802", "ts20210521T074934"),
                  "new_cuboid": ("ts20210623T091748", "ts20210623T091749"),
                  "solibri": ("ts20121017T152740", "ts20121017T154702"),
-                 "CAM": ("ts20220715T135504", "ts20220715T135358")
+                 "CAM": ("ts20220715T135504", "ts20220715T135358"),
+                 "FirstStorey": ("ts20220930T111448", "ts20220930T111542")
                  }
 
-    case_study = 'CAM'
+    case_study = 'FirstStorey'
     ts_init, ts_updated = testcases[case_study]
 
     print('Running Diff on case study: >{}<'.format(case_study))
@@ -57,7 +58,7 @@ def main():
     pDiff.build_equivalent_to_edges()
     print('[INFO] building EQUIVALENT_TO edges: DONE. ')
 
-    u_input = 'y'
+    u_input = 'n'
     # u_input = input('Store delta object to json? [y, n]')
 
     if u_input == 'y':

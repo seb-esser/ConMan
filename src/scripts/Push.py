@@ -12,7 +12,7 @@ def push():
     api_location = base_url + endpoint
 
     # get patch bundle
-    path = 'PatchBundle_{}.json'.format(137594156267)
+    path = 'PatchBundle_{}.json'.format(121891797032)
     patch_bundle = PatchService().load_patch_from_json(path=path)
 
     # post bundle on server

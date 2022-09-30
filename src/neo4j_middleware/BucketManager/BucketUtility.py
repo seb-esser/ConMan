@@ -71,3 +71,15 @@ class BucketUtility:
             for version in bucket.Content:
                 print("\t timestamp: {} created: {}".format(version.timestamp,
                                                             version.creation_date.strftime('%Y-%m-%d %H:%M:%S')))
+
+    def bool_timestamp_exists(self, ts):
+        """
+        returns true if one existing bucket contains the timestamp, false if no model has the timestamp in question
+        """
+
+        for bucket in self.get_buckets():
+            for version in bucket.Content:
+                if version.timestamp == ts:
+                    return True
+
+        return False

@@ -16,13 +16,15 @@ def main():
         "Storey": ("ts20210521T074802", "ts20210521T074934"),
         "new_cuboid": ("ts20210623T091748", "ts20210623T091749"),
         "solibri": ("ts20121017T152740", "ts20121017T154702"),
-        "CAM": ("ts20220715T135504", "ts20220715T135358")
+        "CAM": ("ts20220715T135504", "ts20220715T135358"),
+        "FirstStorey": ("ts20220930T111448", "ts20220930T111542")
     }
 
-    case_study = 'CAM'
+    case_study = 'FirstStorey'
     ts_init, ts_updated = testcases[case_study]
 
     connector = Neo4jConnector()
+
     connector.connect_driver()
 
     service = PatchService()

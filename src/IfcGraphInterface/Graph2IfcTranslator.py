@@ -162,7 +162,13 @@ class Graph2IfcTranslator:
         if len(child_nodes) == 0:
             return
 
-        for c in child_nodes:
+        # for some geometries, the order of instantiation is important. Therefore, we sort the nodes here w.r.t listItem
+        # sorted_child_nodes = sorted(child_nodes, key=lambda cnode: cnode.get_listitem())
+        sorted_child_nodes = child_nodes
+
+        print([x.get_listitem() for x in sorted_child_nodes])
+
+        for c in sorted_child_nodes:
             c.tidy_attrs()
 
             # check if IFC counterpart to current node was already initialized

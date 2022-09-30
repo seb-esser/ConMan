@@ -61,7 +61,8 @@ class Patch(object):
 
                 # find context and
                 # -> use the base timestamp here
-                rule.context_pattern.replace_timestamp(self.base_timestamp)
+                if len(rule.context_pattern.paths) < 0: # catch situation in which no context exists in the rule
+                    rule.context_pattern.replace_timestamp(self.base_timestamp)
 
                 cy = rule.context_pattern.to_cypher_match()
                 print("[INFO] finding context...")
@@ -81,13 +82,14 @@ class Patch(object):
                 e = rule.context_pattern.get_unified_edge_set()
 
                 cy += rule.push_out_pattern.to_cypher_merge(n, e)
-                self.highlight_patch(connector)
+                # self.highlight_patch(connector)
                 # print(cy)
                 # raw = connector.run_cypher_statement(cy)
                 # print(raw)
 
                 # glue push out and context
-                rule.gluing_pattern.replace_timestamp(self.base_timestamp)
+                if len(rule.gluing_pattern.paths) < 0:
+                    rule.gluing_pattern.replace_timestamp(self.base_timestamp)
 
                 # prevent cypher query contain node and edge definitions more than once
                 nodes_push = rule.push_out_pattern.get_unified_node_set() + rule.context_pattern.get_unified_node_set()
@@ -106,12 +108,12 @@ class Patch(object):
                 cy = rule.push_out_pattern.to_cypher_pattern_delete()
                 connector.run_cypher_statement(cy)
 
-            print("[INFO] Adjusting timestamps... ")
+            # print("[INFO] Adjusting timestamps... ")
             label_from = self.base_timestamp
             label_to = self.resulting_timestamp
 
-            connector.run_cypher_statement("MATCH (n) REMOVE n:{} SET n:{}".format(label_from, label_to))
-            print("[INFO] Adjusting timestamps: DONE.")
+            connector.run_cypher_statement("MATCH (n:{0}) REMOVE n:{0} SET n:{1}".format(label_from, label_to))
+            # print("[INFO] Adjusting timestamps: DONE.")
 
     def apply_inverse(self, connector: Neo4jConnector):
         """

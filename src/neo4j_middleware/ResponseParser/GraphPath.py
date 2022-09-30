@@ -39,10 +39,13 @@ class GraphPath:
         nodes = NodeItem.from_neo4j_response(raw_nodes)
         segments = EdgeItem.from_neo4j_response(raw_edges, nodes)
 
+        if len(segments) == 0:
+            raise Exception("Graph Path got instantiated but no segments have been unpacked. ")
+
         return cls(segments)
 
     def __repr__(self):
-        return 'GraphPath instance'
+        return 'GraphPath instance. No segments: {}'.format(len(self.segments))
 
     def to_cypher(self, path_number: int = None, skip_timestamp=False):
         """

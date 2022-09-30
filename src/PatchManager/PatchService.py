@@ -20,6 +20,7 @@ class PatchService:
     """
     manages loading and saving of patches and can apply a patch
     """
+
     def __init__(self):
         self.delta = None
 
@@ -146,7 +147,8 @@ class PatchService:
             nodes_pushed_out = push_out_pattern.get_unified_node_set()
 
             for n in nodes_pushed_out:
-                cy_equ_neighbor = "match p = (n)-[r:rel]->(e)-[:EQUIVALENT_TO]-() WHERE ID(n) = {} return e".format(n.id)
+                cy_equ_neighbor = "match p = (n)-[r:rel]->(e)-[:EQUIVALENT_TO]-() WHERE ID(n) = {} return e".format(
+                    n.id)
                 raw_neighbor = connector.run_cypher_statement(cy_equ_neighbor)
 
                 # check if the newly created node has a relationship to another node
@@ -176,10 +178,24 @@ class PatchService:
                     # add gluing edge
                     gluing_pattern.paths.append(glue.paths[0])
 
+            if not len(gluing_pattern.paths) > 0:
+                Warning("graph pattern must not have zero paths")
+
+            if not len(push_out_pattern.paths) > 0:
+                Warning("graph pattern must not have zero paths")
+
+            if not len(context_pattern.paths) != 0:
+                Warning("graph pattern must not have zero paths")
+
             # init transformation
             gluing_pattern.unify_edge_set()
             push_out_pattern.unify_edge_set()
             context_pattern.unify_edge_set()
+
+            # verify that patterns are not empty
+            for path in push_out_pattern.paths:
+                if len(path.segments) == 0:
+                    raise Exception("something seems wrong with the patterns at question. ")
 
             rule = TransformationRule(gluing_pattern=gluing_pattern, push_out_pattern=push_out_pattern,
                                       context_pattern=context_pattern, operation_type=s_mod.modType)

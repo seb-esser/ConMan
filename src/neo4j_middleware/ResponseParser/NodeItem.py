@@ -37,6 +37,12 @@ class NodeItem:
         ts = [x for x in self.labels if x.startswith('ts')]
         return ts
 
+    def get_listitem(self) -> int:
+        if 'listItem' in self.rel_type:
+            return int(self.rel_type["listItem"])
+        else:
+            return -1
+
     def get_node_type(self) -> str:
         """
         returns the node type label (either primary, secondary, or connectionNode).
