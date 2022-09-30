@@ -4,6 +4,8 @@ import glob
 import os
 
 from scripts.Commit import commit
+from scripts.Fetch import fetch
+from scripts.Pull import pull
 from scripts.Push import push
 from scripts.Remove import remove
 
@@ -137,7 +139,7 @@ elif args.push is True:
     push()
 
 elif args.pull is True:
-    print("pulling")
+    pull()
 
 elif args.fetch is True:
-    print("fetching")
+    fetch()

@@ -234,9 +234,7 @@ class PatchService:
         with open(path) as f:
             content = f.read()
 
-        print("[INFO] loading delta json....")
         result: Patch = jsonpickle.decode(content)
-        print("[INFO] loading delta json: DONE.")
 
         return result
 
@@ -264,8 +262,6 @@ class PatchService:
         with open(path) as f:
             content = f.read()
 
-        print("[INFO] loading delta json....")
         result: PatchBundle = jsonpickle.decode(content)
-        print("[INFO] loading delta json: DONE.")
 
         return result

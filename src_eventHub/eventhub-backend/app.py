@@ -251,9 +251,13 @@ def handout_patch():
 
 @app.route('/conman/fetch', methods=["GET"])
 def fetch_patch():
+
+    di = json.loads(patch_bundles[-1])
+
     return app.response_class(
         status=200,
-        response=patch_bundles[-1]["message"]
+        content_type="text/plain; charset=utf-8",
+        response=di["message"]
     )
 
 

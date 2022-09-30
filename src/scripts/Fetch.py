@@ -9,7 +9,7 @@ def fetch():
     api_location = base_url + endpoint
 
     res = requests.get(api_location)
-    print("Found most recent PatchBundle entitled > {} <".format(res.content))
+    print("Found most recent PatchBundle entitled > {} <".format(res.content.decode("utf-8") ))
 
 
 if __name__ == "__main__":
