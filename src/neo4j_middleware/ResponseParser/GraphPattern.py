@@ -114,7 +114,7 @@ class GraphPattern:
                 attr_dict = connector.run_cypher_statement(cy, 'PROPERTIES(r)')[0]
                 segment.attributes = attr_dict
 
-    def to_cypher_match(self) -> str:
+    def to_cypher_match(self, define_return: bool = False) -> str:
         """
         improved version to search for a specified graph pattern using a distinct node set definition
         @return:
@@ -137,17 +137,16 @@ class GraphPattern:
             path_iterator += 1
             cy_list.append(' ')
 
-        # define_return = False
-        # if define_return:
-        #     num_paths = self.get_number_of_paths()
-        #
-        #     return_cy = 'RETURN '
-        #     for np in range(num_paths):
-        #         return_cy += 'path{}, '.format(np)
-        #
-        #     return_cy = return_cy[:-2] # remove last ', '
-        #
-        #     cy_list.append(return_cy)
+        if define_return:
+            num_paths = self.get_number_of_paths()
+
+            return_cy = 'RETURN '
+            for np in range(num_paths):
+                return_cy += 'path{}, '.format(np)
+
+            return_cy = return_cy[:-2] # remove last ', '
+
+            cy_list.append(return_cy)
 
         # build the final cypher statement
         cy_statement = ''.join(cy_list)
@@ -232,11 +231,15 @@ class GraphPattern:
         unified_pattern_node_list = []
         for path in self.paths:
             for segment in path.segments:
-                start_node = segment.start_node
-                end_node = segment.end_node
-                if start_node not in unified_pattern_node_list:
+                start_node: NodeItem = segment.start_node
+                end_node: NodeItem = segment.end_node
+
+                if start_node.id == -1:
+                    print("!")
+
+                if start_node not in unified_pattern_node_list and start_node.id != -1:
                     unified_pattern_node_list.append(start_node)
-                if end_node not in unified_pattern_node_list:
+                if end_node not in unified_pattern_node_list and end_node.id != -1:
                     unified_pattern_node_list.append(end_node)
         return unified_pattern_node_list
 
@@ -255,7 +258,11 @@ class GraphPattern:
             initial_segments = list(path.segments)  # make deep copy
             for segment in initial_segments:
 
-                if segment.edge_id in [e.edge_id for e in unified_segments]:
+                if segment.edge_id != -1:
+                    # this edge is a virtual one - skip
+                    continue
+
+                if segment.edge_id in [e.edge_id for e in unified_segments] :
                     # segment has been already tackled
                     # remove current segment from Path
                     path.remove_segments_by_id([segment.edge_id])
@@ -376,4 +383,8 @@ class GraphPattern:
         cy = cy[:-2]  # remove last ', '
         return cy
 
-
+    def is_empty(self):
+        if self.get_number_of_paths() == 0:
+            return True
+        else:
+            return False

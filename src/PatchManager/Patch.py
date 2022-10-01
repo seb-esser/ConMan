@@ -97,9 +97,9 @@ class Patch(object):
             # print("[INFO] Adjusting timestamps: DONE.")
 
     def apply_version2(self, connector: Neo4jConnector):
-        # attribute changes
-        for rule in self.attribute_changes:
-            self.__apply_attribute_rule(rule, connector=connector)
+        # # attribute changes
+        # for rule in self.attribute_changes:
+        #     self.__apply_attribute_rule(rule, connector=connector)
 
         # structural changes
 
@@ -114,23 +114,54 @@ class Patch(object):
 
         # ToDo: unify all_new_nodes_inserted
         cy = ''
+        # create all new nodes to be inserted
         for node in all_new_nodes_inserted:
             cy = "MERGE " + node.to_cypher()
             connector.run_cypher_statement(cy)
 
+        # create all edges between newly inserted nodes
         for edge in all_new_edges_inserted:
             cy = "MATCH {} " \
                  "MATCH {} " \
-                 "MERGE {} ".format(
-
+                 "MERGE {} RETURN {}".format(
                 edge.start_node.to_cypher(),
                 edge.end_node.to_cypher(),
                 edge.to_cypher(
                     skip_start_node_attrs=True,
                     skip_end_node_attrs=True,
                     skip_start_node_labels=True,
-                    skip_end_node_labels=True))
-            connector.run_cypher_statement(cy)
+                    skip_end_node_labels=True),
+                edge.edge_identifier)
+            res = connector.run_cypher_statement(cy)
+            print(res)
+
+        # sometimes, inserted pushouts reference parts of the graph that have not been created yet.
+        # Hence, try to create the context structures (with the updt. timestamp)
+        for rule in inserting_rules:
+
+            # ensure that the context is built before trying to glue
+            for edge in rule.context_pattern.get_unified_edge_set():
+                cy = "MATCH {} " \
+                     "MATCH {} " \
+                     "MERGE {}".format(
+
+                    edge.start_node.to_cypher(),
+                    edge.end_node.to_cypher(),
+                    edge.to_cypher(
+                        skip_start_node_attrs=True,
+                        skip_end_node_attrs=True,
+                        skip_start_node_labels=True,
+                        skip_end_node_labels=True))
+                connector.run_cypher_statement(cy)
+
+                # ToDo change timestamp depending on the direction of the edge!
+
+        for rule in inserting_rules:
+            nodes = rule.context_pattern.get_unified_node_set()
+            cy = ''
+            for node in nodes:
+                cy += "MATCH {}".format(node.to_cypher())
+            print(cy)
 
     def apply_inverse(self, connector: Neo4jConnector):
         """

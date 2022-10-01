@@ -18,7 +18,7 @@ class NodeItem:
         @param node_id: node id in the graph database
         @param rel_type: rel_type of edge pointing to this node
         """
-        self.id = node_id
+        self.id: int = node_id
         self.rel_type = rel_type
         self.attrs = None
         self.labels = []
@@ -248,6 +248,11 @@ class NodeItem:
         returns a cypher query fragment to search for or to create this node with semantics
         @return:
         """
+
+        if self.id == -1:
+            # virtual node
+            return '()'
+
         cy_node_identifier = self.get_node_identifier()
         cy_node_attrs = ""
         cy_node_labels = ""

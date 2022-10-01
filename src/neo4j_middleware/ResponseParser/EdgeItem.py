@@ -8,6 +8,9 @@ from neo4j_middleware.Neo4jFactory import Neo4jFactory
 
 class EdgeItem:
     def __init__(self, start_node: NodeItem, end_node: NodeItem, rel_id: int):
+        """
+
+        """
         self.start_node: NodeItem = start_node
         self.end_node: NodeItem = end_node
         self.edge_id: int = rel_id
@@ -188,3 +191,10 @@ class EdgeItem:
                 )
 
         return cy
+
+    def is_virtual_edge(self):
+        if self.edge_id == -1:
+            return True
+        else:
+            return False
+
