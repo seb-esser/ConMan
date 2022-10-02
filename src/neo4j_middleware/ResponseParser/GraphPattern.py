@@ -119,6 +119,10 @@ class GraphPattern:
         @return:
         """
 
+        if len(self.paths) == 0:
+            # empty pattern
+            return ''
+
         self.get_unified_edge_set()
 
         # init cypher query
@@ -371,6 +375,7 @@ class GraphPattern:
                 n2.labels.remove("ADDED")
                 n2.labels.remove("DELETED")
                 n2.labels.remove("MODIFIED")
+                # ToDo Move this method into NodeItem
 
     def replace_timestamp(self, new_timestamp):
         """
@@ -379,8 +384,6 @@ class GraphPattern:
         @return:
         """
 
-        if len(self.paths) == 0:
-            raise Exception("found path with zero segments. ")
         old_timestamp = self.paths[0].get_start_node().get_timestamps()[0]
 
         for p in self.paths:

@@ -97,11 +97,13 @@ class Patch(object):
             # print("[INFO] Adjusting timestamps: DONE.")
 
     def apply_version2(self, connector: Neo4jConnector):
-        # # attribute changes
-        # for rule in self.attribute_changes:
-        #     self.__apply_attribute_rule(rule, connector=connector)
 
-        # structural changes
+        print("Applying attribute changes... ")
+        # loop over attribute changes
+        for rule in self.attribute_changes:
+            self.__apply_attribute_rule(rule, connector)
+
+        print("Applying structural changes... ")
 
         inserting_rules = [x for x in self.operations if x.operation_type == StructuralModificationTypeEnum.ADDED]
         removing_rules = [x for x in self.operations if x.operation_type == StructuralModificationTypeEnum.DELETED]
@@ -145,6 +147,10 @@ class Patch(object):
         connector.run_cypher_statement(cy)
 
         for rule in inserting_rules:
+
+            if rule.context_pattern.is_empty() or rule.gluing_pattern.is_empty():
+                continue
+
             context = rule.context_pattern
             glue = rule.gluing_pattern
 
@@ -153,9 +159,25 @@ class Patch(object):
             context.tidy_node_attributes()
             context.remove_OwnerHistory_links()
 
-            print(context.to_cypher_match(define_return=True, entType_guid_only=True))
-            # Problem hier ist derzeit, dass in den patterns timestamps von beiden Modellversionen verwendet werden.
-            a = 1
+            cy = context.to_cypher_match(entType_guid_only=True)
+
+            # prevent pattern statement to declare nodes and edges more than once
+            n = rule.context_pattern.get_unified_node_set()
+            e = rule.context_pattern.get_unified_edge_set()
+
+            cy += glue.to_cypher_merge(n, e)
+            connector.run_cypher_statement(cy)
+
+        # removing stuff
+        for rule in removing_rules:
+            cy = rule.push_out_pattern.to_cypher_pattern_delete()
+            # connector.run_cypher_statement(cy)
+
+        # harmonize labels
+        label_from = self.base_timestamp
+        label_to = self.resulting_timestamp
+
+        connector.run_cypher_statement("MATCH (n:{0}) REMOVE n:{0} SET n:{1}".format(label_from, label_to))
 
     def apply_inverse(self, connector: Neo4jConnector):
         """
