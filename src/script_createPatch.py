@@ -18,10 +18,11 @@ def main():
         "solibri": ("ts20121017T152740", "ts20121017T154702"),
         "CAM": ("ts20220715T135504", "ts20220715T135358"),
         "FirstStorey": ("ts20220930T111448", "ts20220930T111542"),
-        "WandTuer": ("ts20221001T100832", "ts20221001T100900")
+        "WandTuer": ("ts20221001T100832", "ts20221001T100900"),
+        "WandTuermodGuids": ("ts20221002T111302", "ts20221001T111540")
     }
 
-    case_study = 'WandTuer'
+    case_study = 'WandTuermodGuids'
     ts_init, ts_updated = testcases[case_study]
 
     connector = Neo4jConnector()
@@ -34,9 +35,6 @@ def main():
     patch = service.generate_DPO_patch(connector=connector)
 
     service.save_patch_to_json(patch)
-
-    # visualize results
-    # update_patch.operations[0].plot_patterns()
 
     # finally disconnect
     connector.disconnect_driver()

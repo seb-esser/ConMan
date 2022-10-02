@@ -63,7 +63,7 @@ class NodeItem:
     # ToDo: consider implementing python properties for managed access
 
     def __repr__(self):
-        return 'NodeItem: id: {} var: {} attrs: {} labels: {}'\
+        return 'NodeItem: id: {} var: {} attrs: {} labels: {}' \
             .format(self.id, self.node_identifier, self.attrs, self.labels)
 
     def __eq__(self, other):
@@ -243,9 +243,12 @@ class NodeItem:
                     cleared_dict[key] = eval(val)
             self.attrs = cleared_dict
 
-    def to_cypher(self, skip_attributes=False, skip_labels=False):
+    def to_cypher(self, skip_attributes: bool = False, skip_labels: bool = False, entType_guid_only: bool = False):
         """
         returns a cypher query fragment to search for or to create this node with semantics
+        @param skip_labels:
+        @param skip_attributes:
+        @type entType_guid_only: returns a reduced attr definition for patternmatching
         @return:
         """
 
@@ -259,7 +262,17 @@ class NodeItem:
 
         if skip_attributes is False:
             if self.attrs != {}:
-                cy_node_attrs = Neo4jFactory.formatDict(self.attrs)
+                if entType_guid_only:
+                    # remove all attributes except GUID and EntityType
+                    reduced_attrs = {"EntityType": self.attrs["EntityType"]}
+                    if "GlobalId" in self.attrs:
+                        reduced_attrs["GlobalId"] = self.attrs["GlobalId"]
+
+                    # send reduced dict to factory
+                    cy_node_attrs = Neo4jFactory.formatDict(reduced_attrs)
+
+                else:
+                    cy_node_attrs = Neo4jFactory.formatDict(self.attrs)
 
         if skip_labels is False:
             if len(self.labels) > 0:
@@ -271,4 +284,3 @@ class NodeItem:
         # cleaned_node_attrs.pop('p21_id', None)
 
         return '({0}{1}{2})'.format(cy_node_identifier, cy_node_labels, cy_node_attrs)
-

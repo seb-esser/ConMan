@@ -137,7 +137,8 @@ class EdgeItem:
                   skip_end_node_attrs=False,
                   skip_start_node_labels=False,
                   skip_end_node_labels=False,
-                  skip_edge_attrs=False) -> str:
+                  skip_edge_attrs=False,
+                  entType_guid_only: bool = False) -> str:
         """
         returns a cypher statement to search for this edge item.
         @return: cypher statement as str
@@ -155,13 +156,15 @@ class EdgeItem:
         # parse nodes
         if skip_start_node is False:
             cy_start_node = self.start_node.to_cypher(skip_attributes=skip_start_node_attrs,
-                                                      skip_labels=skip_start_node_labels)
+                                                      skip_labels=skip_start_node_labels,
+                                                      entType_guid_only=entType_guid_only)
         else:
             cy_start_node = ''
 
         if skip_end_node is False:
             cy_end_node = self.end_node.to_cypher(skip_attributes=skip_end_node_attrs,
-                                                  skip_labels=skip_end_node_labels)
+                                                  skip_labels=skip_end_node_labels,
+                                                  entType_guid_only=entType_guid_only)
         else:
             cy_end_node = ''
 
@@ -198,3 +201,5 @@ class EdgeItem:
         else:
             return False
 
+    def get_rel_type(self):
+        return self.attributes["rel_type"]

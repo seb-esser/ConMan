@@ -101,7 +101,6 @@ class GraphPattern:
         """
         return self.paths[-1].get_last_node()
 
-
     def load_rel_attrs(self, connector: neo4jConnector):
         """
         loads all attributes attached to each segment in the graph pattern
@@ -114,7 +113,7 @@ class GraphPattern:
                 attr_dict = connector.run_cypher_statement(cy, 'PROPERTIES(r)')[0]
                 segment.attributes = attr_dict
 
-    def to_cypher_match(self, define_return: bool = False) -> str:
+    def to_cypher_match(self, define_return: bool = False, entType_guid_only: bool = False) -> str:
         """
         improved version to search for a specified graph pattern using a distinct node set definition
         @return:
@@ -128,9 +127,8 @@ class GraphPattern:
         path_iterator = 0
         # loop over all paths. Each path contains a list of segments
         for path in self.paths:
-
             cy_list.append("MATCH ")
-            cy_l = path.to_cypher(path_number=path_iterator)
+            cy_l = path.to_cypher(path_number=path_iterator, skip_timestamp=True, entType_guid_only=entType_guid_only)
             cy_list.extend(cy_l)
 
             # increase path iterator by one
@@ -144,7 +142,7 @@ class GraphPattern:
             for np in range(num_paths):
                 return_cy += 'path{}, '.format(np)
 
-            return_cy = return_cy[:-2] # remove last ', '
+            return_cy = return_cy[:-2]  # remove last ', '
 
             cy_list.append(return_cy)
 
@@ -169,9 +167,9 @@ class GraphPattern:
         nodes_already_specified = []
         edges_already_specified = []
 
-        if nodes_specified!=[]:
+        if nodes_specified != []:
             nodes_already_specified.extend(nodes_specified)
-        if edges_specified!=[]:
+        if edges_specified != []:
             edges_already_specified.extend(edges_specified)
 
         # loop over all paths. Each path contains a list of segments
@@ -252,23 +250,36 @@ class GraphPattern:
         # self.print_to_console()
 
         unified_segments = []
+
+        empty_paths = []
         # loop over all paths
         for path in self.paths:
             # a path consists of several segments (i.e., edges)
             initial_segments = list(path.segments)  # make deep copy
             for segment in initial_segments:
 
-                if segment.edge_id != -1:
-                    # this edge is a virtual one - skip
-                    continue
+                # if segment.edge_id != -1:
+                #     # this edge is a virtual one - skip
+                #     continue
 
-                if segment.edge_id in [e.edge_id for e in unified_segments] :
+                if segment.edge_id in [e.edge_id for e in unified_segments]:
                     # segment has been already tackled
                     # remove current segment from Path
                     path.remove_segments_by_id([segment.edge_id])
                 else:
                     # segment appears the first time, therefore keep it and add it to the list
                     unified_segments.append(segment)
+
+            if len(path.segments) == 0:
+                empty_paths.append(path)
+
+        # remove empty paths
+        if len(empty_paths) > 0:
+            new_list = []
+            for v in self.paths:
+                if v not in empty_paths:
+                    new_list.append(v)
+            self.paths = new_list
 
         return unified_segments
 
@@ -349,6 +360,18 @@ class GraphPattern:
                 n1.tidy_attrs(remove_None_values=False)
                 n2.tidy_attrs(remove_None_values=False)
 
+    def remove_highlight_labels(self):
+        for p in self.paths:
+            for e in p.segments:
+                n1: NodeItem = e.start_node
+                n2: NodeItem = e.end_node
+                n1.labels.remove("ADDED")
+                n1.labels.remove("DELETED")
+                n1.labels.remove("MODIFIED")
+                n2.labels.remove("ADDED")
+                n2.labels.remove("DELETED")
+                n2.labels.remove("MODIFIED")
+
     def replace_timestamp(self, new_timestamp):
         """
         replaces the timestamp label in all nodes of the this graph pattern
@@ -388,3 +411,9 @@ class GraphPattern:
             return True
         else:
             return False
+
+    def remove_OwnerHistory_links(self):
+        for p in self.paths:
+            for seg in p.segments:
+                if seg.get_rel_type() == "OwnerHistory":
+                    self.paths.remove(p)

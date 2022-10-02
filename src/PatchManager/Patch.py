@@ -106,62 +106,56 @@ class Patch(object):
         inserting_rules = [x for x in self.operations if x.operation_type == StructuralModificationTypeEnum.ADDED]
         removing_rules = [x for x in self.operations if x.operation_type == StructuralModificationTypeEnum.DELETED]
 
-        all_new_nodes_inserted = []
-        all_new_edges_inserted = []
         for rule in inserting_rules:
-            all_new_nodes_inserted += rule.push_out_pattern.get_unified_node_set()
-            all_new_edges_inserted += rule.push_out_pattern.get_unified_edge_set()
+            new_nodes_inserted = rule.push_out_pattern.get_unified_node_set()
+            new_edges_inserted = rule.push_out_pattern.get_unified_edge_set()
 
-        # ToDo: unify all_new_nodes_inserted
-        cy = ''
-        # create all new nodes to be inserted
-        for node in all_new_nodes_inserted:
-            cy = "MERGE " + node.to_cypher()
-            connector.run_cypher_statement(cy)
+            # ToDo: unify all_new_nodes_inserted
+            cy = ''
+            # create all new nodes to be inserted
+            for node in new_nodes_inserted:
+                cy = "MERGE " + node.to_cypher()
+                connector.run_cypher_statement(cy)
 
-        # create all edges between newly inserted nodes
-        for edge in all_new_edges_inserted:
-            cy = "MATCH {} " \
-                 "MATCH {} " \
-                 "MERGE {} RETURN {}".format(
-                edge.start_node.to_cypher(),
-                edge.end_node.to_cypher(),
-                edge.to_cypher(
-                    skip_start_node_attrs=True,
-                    skip_end_node_attrs=True,
-                    skip_start_node_labels=True,
-                    skip_end_node_labels=True),
-                edge.edge_identifier)
-            res = connector.run_cypher_statement(cy)
-            print(res)
+            # create all edges between newly inserted nodes
+            for edge in new_edges_inserted:
 
-        # sometimes, inserted pushouts reference parts of the graph that have not been created yet.
-        # Hence, try to create the context structures (with the updt. timestamp)
-        for rule in inserting_rules:
+                if edge.is_virtual_edge():
+                    continue
 
-            # ensure that the context is built before trying to glue
-            for edge in rule.context_pattern.get_unified_edge_set():
                 cy = "MATCH {} " \
                      "MATCH {} " \
-                     "MERGE {}".format(
-
+                     "MERGE {} RETURN {}".format(
                     edge.start_node.to_cypher(),
                     edge.end_node.to_cypher(),
                     edge.to_cypher(
                         skip_start_node_attrs=True,
                         skip_end_node_attrs=True,
                         skip_start_node_labels=True,
-                        skip_end_node_labels=True))
-                connector.run_cypher_statement(cy)
+                        skip_end_node_labels=True),
+                    edge.edge_identifier)
 
-                # ToDo change timestamp depending on the direction of the edge!
+                res = connector.run_cypher_statement(cy)
+
+            # so far, all pushout patterns have been inserted
+            # next, build glue and embedding
+
+        # solve ownerhistory for the moment
+        cy = "MATCH (n:ts20221001T111540{EntityType: \"IfcOwnerHistory\"}) DETACH DELETE n"
+        connector.run_cypher_statement(cy)
 
         for rule in inserting_rules:
-            nodes = rule.context_pattern.get_unified_node_set()
-            cy = ''
-            for node in nodes:
-                cy += "MATCH {}".format(node.to_cypher())
-            print(cy)
+            context = rule.context_pattern
+            glue = rule.gluing_pattern
+
+            # context should be found in the initial (i.e. host) graph
+            context.replace_timestamp(self.base_timestamp)
+            context.tidy_node_attributes()
+            context.remove_OwnerHistory_links()
+
+            print(context.to_cypher_match(define_return=True, entType_guid_only=True))
+            # Problem hier ist derzeit, dass in den patterns timestamps von beiden Modellversionen verwendet werden.
+            a = 1
 
     def apply_inverse(self, connector: Neo4jConnector):
         """

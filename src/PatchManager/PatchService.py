@@ -196,12 +196,28 @@ class PatchService:
                     push_out_pattern.paths.extend(pushout.paths)
 
                     # gluing edges between cnode and other nodes
-                    cy = "MATCH p= {}-[:rel]->(node) RETURN p, NODES(p), RELATIONSHIPS(p)".format(
-                        s_mod.child.to_cypher())
+
+                    # paths between new cNode and initial Graph -> edge connects pushout and embed
+                    cy = "MATCH p= {0}-[:rel]->(node:{1}) RETURN p, NODES(p), RELATIONSHIPS(p)".format(
+                        s_mod.child.to_cypher(),
+                        self.delta.ts_init)
                     raw = connector.run_cypher_statement(cy)
-                    glue_pattern = GraphPattern.from_neo4j_response(raw)
-                    gluing_paths = glue_pattern.paths
-                    gluing_pattern.paths.extend(gluing_paths)
+                    glue_to_initial_nodes = GraphPattern.from_neo4j_response(raw)
+
+                    gluing_pattern.paths.extend(glue_to_initial_nodes.paths)
+
+                    # paths between new cNode and updated Graph -> edge can be added to pushout
+                    cy = "MATCH p= {0}-[:rel]->(node:{1}) RETURN p, NODES(p), RELATIONSHIPS(p)".format(
+                        s_mod.child.to_cypher(),
+                        self.delta.ts_updated)
+                    raw = connector.run_cypher_statement(cy)
+                    glue_to_updated_nodes = GraphPattern.from_neo4j_response(raw)
+
+                    push_out_pattern.paths.extend(glue_to_updated_nodes.paths)
+
+
+                    # gluing_paths = glue_pattern.paths
+                    # gluing_pattern.paths.extend(gluing_paths)
 
             # get the glue between parent and child. Because of the unstable GUIDS,
             # we need to differentiate the prim and sec case again...

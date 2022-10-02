@@ -47,9 +47,10 @@ class GraphPath:
     def __repr__(self):
         return 'GraphPath instance. No segments: {}'.format(len(self.segments))
 
-    def to_cypher(self, path_number: int = None, skip_timestamp=False):
+    def to_cypher(self, path_number: int = None, skip_timestamp=False, entType_guid_only: bool=False):
         """
         serializes the GraphPath object into a string representation
+        @param entType_guid_only: use reduced node attribute representation. should be False for most cases
         @param path_number: specify an integer indicating the path number inside a pattern, otherwise None
         @param skip_timestamp: remove timestamps from nodes
         @return: cypher string fragment
@@ -60,7 +61,7 @@ class GraphPath:
         cy_list = []
 
         # init match-statement
-        cy = 'path{} ='.format(path_number, self.segments[0].start_node.to_cypher())
+        cy = 'path{} ='.format(path_number, self.segments[0].start_node.to_cypher(entType_guid_only=entType_guid_only))
         cy_list.append(cy)
 
         last_end_node: NodeItem
@@ -75,13 +76,13 @@ class GraphPath:
 
                     # append edge without specifying the start node again
                     skip_start = True
-                    cy = segment.to_cypher(skip_start_node=skip_start)
+                    cy = segment.to_cypher(skip_start_node=skip_start, entType_guid_only=True)
                 else:
-                    cy = segment.to_cypher(skip_start_node=False)
+                    cy = segment.to_cypher(skip_start_node=False, entType_guid_only=True)
                     # cy += ', '
             except:
 
-                cy = segment.to_cypher(skip_start_node=False)
+                cy = segment.to_cypher(skip_start_node=False, entType_guid_only=True)
                 # cy += ', '
             cy_list.append(cy)
 

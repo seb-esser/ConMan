@@ -30,8 +30,8 @@ def main():
 
     # load patch
     patch = service.load_patch_from_json('Patch_init{}-updt{}.json'.format(ts_init, ts_updated))
-    # patch.remove_highlight_labels(connector=connector)
-    patch.highlight_patch(connector=connector)
+    patch.remove_highlight_labels(connector=connector)
+    # patch.highlight_patch(connector=connector)
 
     connector.disconnect_driver()
 
