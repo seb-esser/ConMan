@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List
 import re
 
@@ -114,7 +115,7 @@ class GraphPattern:
                 attr_dict = connector.run_cypher_statement(cy, 'PROPERTIES(r)')[0]
                 segment.attributes = attr_dict
 
-    def to_cypher_match(self, define_return: bool = False, entType_guid_only: bool = False) -> str:
+    def to_cypher_match(self, define_return: bool = False, entType_guid_only: bool = False, skip_timestamps: bool = False) -> str:
         """
         improved version to search for a specified graph pattern using a distinct node set definition
         @return:
@@ -133,7 +134,7 @@ class GraphPattern:
         # loop over all paths. Each path contains a list of segments
         for path in self.paths:
             cy_list.append("MATCH ")
-            cy_l = path.to_cypher(path_number=path_iterator, skip_timestamp=False
+            cy_l = path.to_cypher(path_number=path_iterator, skip_timestamp=skip_timestamps
                                   , entType_guid_only=entType_guid_only)
             cy_list.extend(cy_l)
 
@@ -395,7 +396,7 @@ class GraphPattern:
                 n2: NodeItem = s.end_node
                 n2.labels = [new_timestamp if item == old_timestamp else item for item in n2.labels]
 
-    def to_cypher_pattern_delete(self) -> str:
+    def to_cypher_pattern_delete(self, nodes_specified, edges_specified) -> str:
         """
         removes a pattern. Prerequisite is that the pattern is entirely decoupled.
         @return: cypher statement
@@ -410,6 +411,77 @@ class GraphPattern:
             cy += 'path{}, '.format(np)
         cy = cy[:-2]  # remove last ', '
         return cy
+        #
+        # # init cypher query
+        # cy_list = []
+        #
+        # path_iterator = 0
+        #
+        # # list of nodes that observe which node was already defined in the query
+        # nodes_already_specified = []
+        # edges_already_specified = []
+        #
+        # if nodes_specified != []:
+        #     nodes_already_specified.extend(nodes_specified)
+        # if edges_specified != []:
+        #     edges_already_specified.extend(edges_specified)
+        #
+        # # loop over all paths. Each path contains a list of segments
+        # for unified_path in self.paths:
+        #
+        #     # define path section
+        #     edge_iterator = 0
+        #
+        #     for edge in unified_path.segments:
+        #
+        #         if edge.start_node not in nodes_already_specified:
+        #             skip_start_attrs = False
+        #             skip_start_labels = False
+        #         else:
+        #             skip_start_attrs = True
+        #             skip_start_labels = True
+        #         if edge.end_node not in nodes_already_specified:
+        #             skip_end_attrs = False
+        #             skip_end_labels = False
+        #         else:
+        #             skip_end_attrs = True
+        #             skip_end_labels = True
+        #         if edge in edges_already_specified:
+        #             continue
+        #
+        #         cy_frag = "DETACH DELETE " + edge.to_cypher(skip_start_node_attrs=skip_start_attrs,
+        #                                             skip_start_node_labels=skip_start_labels,
+        #                                             skip_end_node_attrs=skip_end_attrs,
+        #                                             skip_end_node_labels=skip_end_labels) + " "
+        #
+        #         nodes_already_specified.append(edge.start_node)
+        #         nodes_already_specified.append(edge.end_node)
+        #         edges_already_specified.append(edge)
+        #
+        #         cy_list.append(cy_frag)
+        #         edge_iterator += 1
+        #
+        #     # increase path iterator
+        #     path_iterator += 1
+        #
+        # cy_statement = ''.join(cy_list)
+        #
+        # return cy_statement
+
+    def to_cypher_node_delete(self):
+        """
+        method assumes that all nodes have been already specified by a match function
+
+        @return:
+        """
+
+        nodes_to_be_detached = self.get_unified_node_set()
+        cy = ""
+
+        for node in nodes_to_be_detached:
+            cy += "DETACH DELETE {} ".format(node.to_cypher(skip_labels=True, skip_attributes=True))
+
+        return cy
 
     def is_empty(self):
         if self.get_number_of_paths() == 0:
@@ -418,7 +490,11 @@ class GraphPattern:
             return False
 
     def remove_OwnerHistory_links(self):
+        # ToDo: remove?
         for p in self.paths:
             for seg in p.segments:
                 if seg.get_rel_type() == "OwnerHistory":
                     self.paths.remove(p)
+
+
+

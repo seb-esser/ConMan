@@ -211,4 +211,6 @@ class EdgeItem:
             return False
 
     def get_rel_type(self):
+        if self.is_virtual_edge():
+            return None
         return self.attributes["rel_type"]

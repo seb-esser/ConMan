@@ -35,9 +35,6 @@ class GraphDiff(AbsGraphDiff):
         # recursion over hierarchical breakdown
         self.__move_level_down(entry_init, entry_updated)
 
-        # compare connection nodes
-        # self.__compare_connection_nodes()
-
         #  --- post processing ---
         prim_nodes_init = [x.init_node for x in
                            self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
@@ -68,32 +65,6 @@ class GraphDiff(AbsGraphDiff):
         for de in deleted:
             self.resource_diff.result.node_matching_table.add_matched_nodes(de, NodeItem(node_id=-1))
             self.resource_diff.result.capture_structure_mod(entry_init, de, 'deleted')
-
-        # # log connectionNode changes
-        # cy_init = "MATCH (c:ConnectionNode:{0}) RETURN c".format(entry_init.get_timestamps()[0])
-        # cy_updt = "MATCH (c:ConnectionNode:{0}) RETURN c".format(entry_updated.get_timestamps()[0])
-        # raw_init = self.connector.run_cypher_statement(cy_init)
-        # raw_updt = self.connector.run_cypher_statement(cy_updt)
-        #
-        # con_nodes_init = NodeItem.from_neo4j_response(raw_init)
-        # con_nodes_updt = NodeItem.from_neo4j_response(raw_updt)
-        # [unc, added, deleted] = set_calculator.calc_intersection(
-        #     set_A=con_nodes_init,
-        #     set_B=con_nodes_updt,
-        #     intersection_method=MatchCriteriaEnum.OnGuid)
-        #
-        # # log connection nodes
-        # # unchanged nodes
-        # for n1, n2 in unc:
-        #     self.resource_diff.result.node_matching_table.add_matched_nodes(n1, n2)
-        #
-        # # added and deleted nodes on primary structure
-        # for ad in added:
-        #     self.resource_diff.result.node_matching_table.add_matched_nodes(NodeItem(node_id=-1), ad)
-        #     self.resource_diff.result.capture_structure_mod(NodeItem(node_id=-1), ad, 'added')
-        # for de in deleted:
-        #     self.resource_diff.result.node_matching_table.add_matched_nodes(de, NodeItem(node_id=-1))
-        #     self.resource_diff.result.capture_structure_mod(NodeItem(node_id=-1), de, 'deleted')
 
         # returns the delta calculated during the diff process
         return self.resource_diff.get_delta()
@@ -191,22 +162,4 @@ class GraphDiff(AbsGraphDiff):
                 MERGE (n)-[:EQUIVALENT_TO]->(m)
                 """.format(p.init_node.id, p.updated_node.id)
             self.connector.run_cypher_statement(cy)
-
-    def __compare_connection_nodes(self):
-        ts_init = self.label_init
-        ts_updated = self.label_updated
-
-        cy = """
-        MATCH (prim1init:PrimaryNode:{0})<-[:rel]-(cinit:ConnectionNode:{0})-[:rel]->(prim2init:PrimaryNode:{0})
-        MATCH (prim1updt:PrimaryNode:{1})<-[:rel]-(cupdt:ConnectionNode:{1})-[:rel]->(prim2updt:PrimaryNode:{1}) 
-        WHERE prim1init.GlobalId = prim1updt.GlobalId 
-         AND prim2init.GlobalId = prim2updt.GlobalId 
-         AND cinit.EntityType = cupdt.EntityType
-        RETURN DISTINCT cinit as n1, cupdt as n2
-        """.format(ts_init, ts_updated)
-
-        pairs_raw = self.connector.run_cypher_statement(cy)
-        for p in pairs_raw:
-            node_init, node_updt = NodeItem.from_neo4j_response(p)
-            self.resource_diff.result.node_matching_table.add_matched_nodes(node_init, node_updt)
 
