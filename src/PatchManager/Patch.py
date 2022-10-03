@@ -172,25 +172,31 @@ class Patch(object):
 
         for rule in inserting_rules:
 
+            if rule is inserting_rules[-1]:
+                print("asdf")
+
             if rule.context_pattern.is_empty() or rule.gluing_pattern.is_empty():
                 continue
 
             rule.context_pattern.tidy_node_attributes()
-
+            rule.context_pattern.replace_timestamp(self.base_timestamp)
             # find context pattern
-            cy = rule.context_pattern.to_cypher_match()
+            cy = rule.context_pattern.to_cypher_match(optional_match=False)
 
             # this node is part of the pushout but can be addressed by it p21 id and the timestamp for the moment
             start_nodes = []
             for p in rule.gluing_pattern.paths:
                 node = p.segments[0].start_node
-                start_nodes.append(node)
-                cy += "MATCH " + node.to_cypher()
+
+                if node not in start_nodes:
+                    start_nodes.append(node)
+                    cy += "MATCH " + node.to_cypher(entType_guid_only=True)
 
             nodes_context = rule.context_pattern.get_unified_node_set()
             cy += rule.gluing_pattern.to_cypher_merge(nodes_specified=[*start_nodes, *nodes_context], edges_specified=[])
             print(cy)
             connector.run_cypher_statement(cy)
+
 
         # harmonize labels
         label_from = self.base_timestamp

@@ -115,7 +115,9 @@ class GraphPattern:
                 attr_dict = connector.run_cypher_statement(cy, 'PROPERTIES(r)')[0]
                 segment.attributes = attr_dict
 
-    def to_cypher_match(self, define_return: bool = False, entType_guid_only: bool = False, skip_timestamps: bool = False) -> str:
+    def to_cypher_match(self, define_return: bool = False,
+                        entType_guid_only: bool = False, skip_timestamps: bool = False,
+                        optional_match:bool = False) -> str:
         """
         improved version to search for a specified graph pattern using a distinct node set definition
         @return:
@@ -133,6 +135,9 @@ class GraphPattern:
         path_iterator = 0
         # loop over all paths. Each path contains a list of segments
         for path in self.paths:
+
+            if optional_match:
+                cy_list.append("OPTIONAL ")
             cy_list.append("MATCH ")
             cy_l = path.to_cypher(path_number=path_iterator, skip_timestamp=skip_timestamps
                                   , entType_guid_only=entType_guid_only)
