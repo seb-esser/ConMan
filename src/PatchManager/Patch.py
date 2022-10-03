@@ -173,12 +173,11 @@ class Patch(object):
         for rule in inserting_rules:
 
             if rule is inserting_rules[-1]:
-                print("asdf")
+                print("applying conNode edges...")
 
             if rule.context_pattern.is_empty() or rule.gluing_pattern.is_empty():
                 continue
 
-            rule.context_pattern.tidy_node_attributes()
             rule.context_pattern.replace_timestamp(self.base_timestamp)
             # find context pattern
             cy = rule.context_pattern.to_cypher_match(optional_match=False)
@@ -190,7 +189,7 @@ class Patch(object):
 
                 if node not in start_nodes:
                     start_nodes.append(node)
-                    cy += "MATCH " + node.to_cypher(entType_guid_only=True)
+                    cy += "MATCH " + node.to_cypher()
 
             nodes_context = rule.context_pattern.get_unified_node_set()
             cy += rule.gluing_pattern.to_cypher_merge(nodes_specified=[*start_nodes, *nodes_context], edges_specified=[])
