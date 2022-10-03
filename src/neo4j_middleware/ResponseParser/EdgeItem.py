@@ -49,6 +49,11 @@ class EdgeItem:
 
         edges = []
 
+        if len(raw) == 0:
+            # create virtual edge
+            edge = EdgeItem(start_node=nodes[0], end_node=NodeItem.NodeItem(-1), rel_id=-1)
+            return [edge]
+
         for edge in raw:
             raw_startnode_id = edge.start_node.id
             raw_endnode_id = edge.end_node.id
@@ -182,6 +187,10 @@ class EdgeItem:
         # parse direction
         if self.is_undirected is False:
             cy_directed = ">"
+
+        if self.is_virtual_edge():
+            cy = '{}'.format(cy_start_node)
+            return cy
 
         # construct statement
         cy = '{}-[{}{}{}]-{}{}'.format(

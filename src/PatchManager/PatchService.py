@@ -215,7 +215,6 @@ class PatchService:
 
                     push_out_pattern.paths.extend(glue_to_updated_nodes.paths)
 
-
                     # gluing_paths = glue_pattern.paths
                     # gluing_pattern.paths.extend(gluing_paths)
 
@@ -342,6 +341,24 @@ class PatchService:
             rule = AttributeRule(path=path, attribute_name=attr_name, init_value=init_val, updated_value=updt_val)
             patch.attribute_changes.append(rule)
 
+        # store connectionNode structures
+
+        pushout_init, context_init, glue_init = self.__extract_conNode_patterns(connector, ts=ts_init)
+        pushout_updt, context_updt, glue_updt = self.__extract_conNode_patterns(connector, ts=ts_updated)
+
+        remove_rule = TransformationRule(gluing_pattern=glue_init,
+                                         push_out_pattern=pushout_init,
+                                         context_pattern=context_init,
+                                         operation_type=StructuralModificationTypeEnum.DELETED)
+
+        insert_rule = TransformationRule(gluing_pattern=glue_updt,
+                                         push_out_pattern=pushout_updt,
+                                         context_pattern=context_updt,
+                                         operation_type=StructuralModificationTypeEnum.ADDED)
+
+        patch.operations.append(remove_rule)
+        patch.operations.append(insert_rule)
+
         return patch
 
     def apply_patch(self, patch: Patch, connector: Neo4jConnector):
@@ -409,3 +426,63 @@ class PatchService:
         result: PatchBundle = jsonpickle.decode(content)
 
         return result
+
+    def __extract_conNode_patterns(self, connector: Neo4jConnector,  ts: str):
+        """
+
+        @param connector:
+        @param con_node_pattern:
+        @param ts:
+        @return:
+        """
+        all_glue = GraphPattern()
+        all_context = GraphPattern()
+
+        # pushout
+        cy = "MATCH p = (c:ConnectionNode:{0}) RETURN p, NODES(p), RELATIONSHIPS(p)".format(ts)
+        push_out: GraphPattern = GraphPattern.from_neo4j_response(connector.run_cypher_statement(cy))
+
+        # calculate glue and context
+        for path in push_out.paths:
+            cy = "MATCH p = {0}-[:rel]->(n:{1})  " \
+                 "RETURN p, NODES(p), RELATIONSHIPS(p)".format(path.get_start_node().to_cypher(), ts)
+            raw = connector.run_cypher_statement(cy)
+            glue = GraphPattern.from_neo4j_response(raw)
+            # remove glues to materials for the moment -> to be issued
+            paths_to_prim_or_ownerHist = [x for x in glue.paths
+                                          if x.segments[0].end_node.get_entity_type() == "IfcOwnerHistory"
+                                          or x.segments[0].end_node.get_node_type() == "PrimaryNode"]
+            all_glue.paths.extend(paths_to_prim_or_ownerHist)
+
+            # get context
+            targets = glue.get_unified_node_set()
+            for glue_target in targets:
+
+                if glue_target.get_node_type() == "SecondaryNode":
+
+                    if glue_target.get_entity_type() == "IfcOwnerHistory":
+                        # query context
+                        cy = "MATCH p = SHORTESTPATH({0}<-[:rel*]-(n:PrimaryNode:{1}{{EntityType: \"IfcProject\"}}))  " \
+                             "RETURN p, NODES(p), RELATIONSHIPS(p)".format(glue_target.to_cypher(), ts)
+                        raw = connector.run_cypher_statement(cy)
+                        context_current_node = GraphPattern.from_neo4j_response(raw)
+
+                        # if context_current_node.paths[0] not in context_init.paths:
+
+                        all_context.paths.append(context_current_node.paths[0])
+
+                    else:
+                        print(Warning("These gluing cases are not yet supported"))
+                        continue
+
+                elif glue_target.get_node_type() == "PrimaryNode":
+                    # glue target has guid
+                    path_to_current_node = GraphPath(segments=[
+                        EdgeItem(start_node=glue_target, end_node=NodeItem(-1), rel_id=-1)
+                    ]
+                    )
+                    # if path_to_current_node not in context_init.paths:
+                    all_context.paths.append(path_to_current_node)
+
+        return push_out, all_context, all_glue
+

@@ -57,7 +57,7 @@ class GraphPath:
         """
 
         # init local vars of this method
-        cy = ''
+
         cy_list = []
 
         # init match-statement
@@ -68,6 +68,11 @@ class GraphPath:
 
         # loop over all segments of the current path and append them to the call
         for segment in self.segments:
+            if segment.is_virtual_edge():
+                cy = segment.to_cypher()
+                cy_list.append(cy)
+                continue
+
             try:
                 if segment.start_node == last_end_node:
                     # # remove last comma

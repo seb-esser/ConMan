@@ -15,8 +15,9 @@ class GraphPattern:
         @param paths:
         """
         if paths is None:
-            paths = []
-        self.paths: List[GraphPath] = paths
+            self.paths: List[GraphPath] = []
+        else:
+            self.paths: List[GraphPath] = paths
 
     def __repr__(self):
         return 'GraphPattern instance composed by several GraphPath instances'
@@ -132,7 +133,8 @@ class GraphPattern:
         # loop over all paths. Each path contains a list of segments
         for path in self.paths:
             cy_list.append("MATCH ")
-            cy_l = path.to_cypher(path_number=path_iterator, skip_timestamp=True, entType_guid_only=entType_guid_only)
+            cy_l = path.to_cypher(path_number=path_iterator, skip_timestamp=False
+                                  , entType_guid_only=entType_guid_only)
             cy_list.extend(cy_l)
 
             # increase path iterator by one
@@ -266,7 +268,7 @@ class GraphPattern:
                 #     # this edge is a virtual one - skip
                 #     continue
 
-                if segment.edge_id in [e.edge_id for e in unified_segments]:
+                if segment.edge_id in [e.edge_id for e in unified_segments] and segment.is_virtual_edge() is False:
                     # segment has been already tackled
                     # remove current segment from Path
                     path.remove_segments_by_id([segment.edge_id])
