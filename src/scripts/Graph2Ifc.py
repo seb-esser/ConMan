@@ -13,6 +13,9 @@ def parse(ts: str, directory=None):
     connector = Neo4jConnector()
     connector.connect_driver()
 
+    if directory is None:
+        directory = "C:\dev\out"
+
     # ensure path is valid
     if not os.path.exists(directory):
         raise NotADirectoryError("The directory you have specified is not reachable. Stopping export. ")

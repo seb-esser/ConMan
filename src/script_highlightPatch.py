@@ -18,9 +18,11 @@ def main():
         "Storey": ("ts20210521T074802", "ts20210521T074934"),
         "new_cuboid": ("ts20210623T091748", "ts20210623T091749"),
         "solibri": ("ts20121017T152740", "ts20121017T154702"),
-        "CAM": ("ts20220715T135504", "ts20220715T135358")
+        "CAM": ("ts20220715T135504", "ts20220715T135358"),
+        "WandTuer": ("ts20221001T100832", "ts20221001T100900"),
+        "WandTuermodGuids": ("ts20221002T111302", "ts20221001T111540")
     }
-    case_study = 'CAM'
+    case_study = 'WandTuermodGuids'
     ts_init, ts_updated = testcases[case_study]
 
     # init service
@@ -29,7 +31,7 @@ def main():
     # load patch
     patch = service.load_patch_from_json('Patch_init{}-updt{}.json'.format(ts_init, ts_updated))
     patch.remove_highlight_labels(connector=connector)
-    patch.highlight_patch(connector=connector)
+    # patch.highlight_patch(connector=connector)
 
     connector.disconnect_driver()
 

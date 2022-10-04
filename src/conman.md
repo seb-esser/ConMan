@@ -1,10 +1,10 @@
 # ConMan CLI
 
-Command line interface to interact with the graph
+Command line interface to perform version control of BIM models. 
 
 ## getting started
 
-use ``python conman.py --h`` to display the help menu
+use ``python conman.py -h`` to display the help menu
 
 ## Get status
 

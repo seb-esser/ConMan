@@ -8,6 +8,9 @@ from neo4j_middleware.Neo4jFactory import Neo4jFactory
 
 class EdgeItem:
     def __init__(self, start_node: NodeItem, end_node: NodeItem, rel_id: int):
+        """
+
+        """
         self.start_node: NodeItem = start_node
         self.end_node: NodeItem = end_node
         self.edge_id: int = rel_id
@@ -45,6 +48,11 @@ class EdgeItem:
         """
 
         edges = []
+
+        if len(raw) == 0:
+            # create virtual edge
+            edge = EdgeItem(start_node=nodes[0], end_node=NodeItem.NodeItem(-1), rel_id=-1)
+            return [edge]
 
         for edge in raw:
             raw_startnode_id = edge.start_node.id
@@ -134,7 +142,8 @@ class EdgeItem:
                   skip_end_node_attrs=False,
                   skip_start_node_labels=False,
                   skip_end_node_labels=False,
-                  skip_edge_attrs=False) -> str:
+                  skip_edge_attrs=False,
+                  entType_guid_only: bool = False) -> str:
         """
         returns a cypher statement to search for this edge item.
         @return: cypher statement as str
@@ -152,13 +161,15 @@ class EdgeItem:
         # parse nodes
         if skip_start_node is False:
             cy_start_node = self.start_node.to_cypher(skip_attributes=skip_start_node_attrs,
-                                                      skip_labels=skip_start_node_labels)
+                                                      skip_labels=skip_start_node_labels,
+                                                      entType_guid_only=entType_guid_only)
         else:
             cy_start_node = ''
 
         if skip_end_node is False:
             cy_end_node = self.end_node.to_cypher(skip_attributes=skip_end_node_attrs,
-                                                  skip_labels=skip_end_node_labels)
+                                                  skip_labels=skip_end_node_labels,
+                                                  entType_guid_only=entType_guid_only)
         else:
             cy_end_node = ''
 
@@ -177,6 +188,10 @@ class EdgeItem:
         if self.is_undirected is False:
             cy_directed = ">"
 
+        if self.is_virtual_edge():
+            cy = '{}'.format(cy_start_node)
+            return cy
+
         # construct statement
         cy = '{}-[{}{}{}]-{}{}'.format(
             cy_start_node,
@@ -188,3 +203,14 @@ class EdgeItem:
                 )
 
         return cy
+
+    def is_virtual_edge(self):
+        if self.edge_id == -1:
+            return True
+        else:
+            return False
+
+    def get_rel_type(self):
+        if self.is_virtual_edge():
+            return None
+        return self.attributes["rel_type"]

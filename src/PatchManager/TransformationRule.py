@@ -10,6 +10,7 @@ class TransformationRule:
 
     def __init__(self, gluing_pattern: GraphPattern, push_out_pattern: GraphPattern, context_pattern: GraphPattern,
                  operation_type):
+
         self.push_out_pattern = push_out_pattern
         self.gluing_pattern = gluing_pattern
         self.context_pattern = context_pattern

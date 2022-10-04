@@ -50,6 +50,8 @@ topic_hierarchy = {
         }
 }
 
+patch_bundles = []
+
 
 @app.errorhandler(HTTPException)
 def handle_exception(e):
@@ -124,7 +126,7 @@ def create_delivery_team():
 
     # send to db and get back the primary key val
     team.to_db()
-    
+
     team.id = team.get_team_by_id(team.uuid)
 
     return app.response_class(
@@ -191,7 +193,6 @@ def delete_member():
 
 @app.route('/api/getSubscriptionModelIds')
 def get_subscription_model_ids():
-
     response = {"SubscriptionModels": []}
 
     # specify the path where the JSONs are stored inside the server
@@ -218,7 +219,6 @@ def get_subscription_model():
         if file.startswith("SubscriptionModel_"):
             model: SubscriptionModel = SubscriptionModel.from_json(path=model_path + "/" + file)
             if model.uuid == model_id:
-
                 # make response
                 return app.response_class(
                     status=200,
@@ -229,6 +229,35 @@ def get_subscription_model():
     # if no model was found under the requested id, make 404 response
     return app.response_class(
         status=404
+    )
+
+
+@app.route('/conman/push', methods=["POST"])
+def receive_patch():
+    data = eval(request.data)
+    patch_bundles.append(data)
+    print("Received new patchbundle")
+    return app.response_class(status=200)
+
+
+@app.route('/conman/pull', methods=["GET"])
+def handout_patch():
+    return app.response_class(
+        status=200,
+        response=patch_bundles[-1],
+        mimetype='application/json'
+    )
+
+
+@app.route('/conman/fetch', methods=["GET"])
+def fetch_patch():
+
+    di = json.loads(patch_bundles[-1])
+
+    return app.response_class(
+        status=200,
+        content_type="text/plain; charset=utf-8",
+        response=di["message"]
     )
 
 

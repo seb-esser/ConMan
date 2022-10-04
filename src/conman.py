@@ -1,18 +1,18 @@
 """ package import """
 import argparse
-import os
 import glob
-from pprint import pprint
+import os
 
-from scripts import GetStatus
 from scripts.Commit import commit
+from scripts.Fetch import fetch
+from scripts.Pull import pull
+from scripts.Push import push
 from scripts.Remove import remove
 
 """ file import """
 import scripts.Ifc2Graph as ifc2graph
 import scripts.CityGML2Graph as citygml2graph
 import scripts.Graph2Ifc as graph2ifc
-import scripts.GraphBasedModelDiff as graphbaseddiff
 from scripts.GetStatus import get_status
 
 parser = argparse.ArgumentParser('ConMan')
@@ -59,19 +59,19 @@ parser.add_argument("-c", "--commit",
 
 # push
 parser.add_argument("-push", "--push",
-                    type=str,
+                    action="store_true",
                     help="push transformation rules to server. "
                          "Remote settings to be defined in remoteConfig.txt \n")
 
 # fetch
 parser.add_argument("-f", "--fetch",
-                    type=str,
+                    action="store_true",
                     help="fetch transformation rules from server. "
                          "Remote settings to be defined in remoteConfig.txt \n")
 
 # fetch
 parser.add_argument("-pull", "--pull",
-                    type=str,
+                    action="store_true",
                     help="apply transformation rules to local repository. "
                          "Remote settings to be defined in remoteConfig.txt \n")
 
@@ -134,3 +134,12 @@ elif args.remove is not None:
 elif args.commit is not None:
     # calculate diff and prepare patch
     commit(args.commit)
+
+elif args.push is True:
+    push()
+
+elif args.pull is True:
+    pull()
+
+elif args.fetch is True:
+    fetch()
