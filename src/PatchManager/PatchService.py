@@ -148,22 +148,15 @@ class PatchService:
                 # Then, the pattern query returns no paths. To solve this situation, the parent node is queried as well
                 # such that we can construct a pattern
 
-                # ToDo: hier virtual nodes nutzen und passenden Glue definieren!
-                if len(push_put.paths) == 0:
-                    # path_to_parent + pushOut
-                    cy = \
-                        anchor_pattern.to_cypher_match() + \
-                        "MATCH pa = {0}-[:rel]->(sec:SecondaryNode:{1}) " \
-                        "WHERE NOT (sec)-[:EQUIVALENT_TO]-() " \
-                        "RETURN pa, NODES(pa), RELATIONSHIPS(pa)".format(
-                            anchor_pattern.get_last_node().to_cypher(skip_attributes=True, skip_labels=True),
-                            ts)
-                    # query pushout
-                    raw = connector.run_cypher_statement(cy)
-                    push_put = GraphPattern.from_neo4j_response(raw)
+                if push_put is not None:
+                    # save pushout
+                    push_out_pattern.paths.extend(push_put.paths)
+                else:
+                    # child node is leaf node. Create virtual node to have a pattern
+                    virtual_path = GraphPath(
+                        [EdgeItem(start_node=s_mod.child, end_node=NodeItem(node_id=-1), rel_id=-1)])
 
-                # save pushout
-                push_out_pattern.paths.extend(push_put.paths)
+                    push_out_pattern.paths.append(virtual_path)
 
             # get the glue between parent and child. Because of the unstable GUIDS,
             # we need to differentiate the prim and sec case again...
@@ -181,6 +174,9 @@ class PatchService:
                     s_mod.child.to_cypher())
                 raw = connector.run_cypher_statement(cy)
                 glue: GraphPattern = GraphPattern.from_neo4j_response(raw)
+
+                if glue is None:
+                    print("got none pattern")
                 gluing_pattern.paths.extend(glue.paths)
 
             # calculate the gluing for prim and secondary

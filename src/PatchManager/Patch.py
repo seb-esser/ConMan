@@ -178,7 +178,7 @@ class Patch(object):
             if rule.context_pattern.is_empty() or rule.gluing_pattern.is_empty():
                 continue
 
-            rule.context_pattern.replace_timestamp(self.base_timestamp)
+            # rule.context_pattern.replace_timestamp(self.base_timestamp)
             # find context pattern
             cy = rule.context_pattern.to_cypher_match(optional_match=False)
 
@@ -188,8 +188,13 @@ class Patch(object):
                 node = p.segments[0].start_node
 
                 if node not in start_nodes:
-                    start_nodes.append(node)
-                    cy += "MATCH " + node.to_cypher()
+
+                    if node in rule.context_pattern.get_unified_node_set():
+                        # node has been already declared, use reduced cy representation
+                        cy += "MATCH " + node.to_cypher(skip_attributes=True, skip_labels=True)
+                    else:
+                        start_nodes.append(node)
+                        cy += "MATCH " + node.to_cypher()
 
             nodes_context = rule.context_pattern.get_unified_node_set()
             cy += rule.gluing_pattern.to_cypher_merge(nodes_specified=[*start_nodes, *nodes_context], edges_specified=[])

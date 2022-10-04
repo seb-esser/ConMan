@@ -28,6 +28,9 @@ class GraphPattern:
         # decode cypher response
         raw_paths = raw
 
+        if len(raw_paths) == 0:
+            return None
+
         paths = []
 
         for path in raw_paths:
