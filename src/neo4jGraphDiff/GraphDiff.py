@@ -10,6 +10,7 @@ from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
+import progressbar
 
 
 class GraphDiff(AbsGraphDiff):
@@ -41,10 +42,17 @@ class GraphDiff(AbsGraphDiff):
         prim_nodes_updt = [x.updated_node for x in
                            self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs()]
 
+        increment = 100 / (len(prim_nodes_init) + len(prim_nodes_updt))
+        percent = 0
+
         for n in prim_nodes_init:
+            progressbar.print_bar(percent)
+            percent += increment
             if n.id == -1:
                 prim_nodes_init.remove(n)
         for n in prim_nodes_updt:
+            progressbar.print_bar(percent)
+            percent += increment
             if n.id == -1:
                 prim_nodes_updt.remove(n)
 

@@ -7,6 +7,7 @@ from neo4jGraphDiff.Caption.StructureModification import StructuralModificationT
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
+import progressbar
 
 
 class Patch(object):
@@ -103,7 +104,13 @@ class Patch(object):
         removing_rules = [x for x in self.operations if x.operation_type == StructuralModificationTypeEnum.DELETED]
         print("Applying removal rules... ")
         # removing stuff
+
+        increment = 100 / (len(inserting_rules) + len(removing_rules) + len(self.attribute_changes))
+        percent = 0
         for rule in removing_rules:
+            # print progressbar
+            progressbar.print_bar(percent)
+            percent += increment
             context = rule.context_pattern
             glue = rule.gluing_pattern
 
@@ -125,10 +132,16 @@ class Patch(object):
         print("Applying attribute changes... ")
         # loop over attribute changes
         for rule in self.attribute_changes:
+            progressbar.print_bar(percent)
+            percent += increment
+            
             self.__apply_attribute_rule(rule, connector)
 
         print("Applying insertion rules... ")
         for rule in inserting_rules:
+            progressbar.print_bar(percent)
+            percent += increment
+
             new_nodes_inserted = rule.push_out_pattern.get_unified_node_set()
             new_edges_inserted = rule.push_out_pattern.get_unified_edge_set()
 

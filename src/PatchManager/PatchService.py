@@ -15,6 +15,7 @@ from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
+import progressbar
 
 
 class PatchService:
@@ -73,8 +74,14 @@ class PatchService:
         s_mods: List[StructureModification] = self.delta.structure_updates
         p_mods: List[PropertyModification] = self.delta.property_updates
 
+        increment = 100 / (len(s_mods) + 2)
+        percent = 0
         # loop over structural modifications
         for s_mod in s_mods:
+
+            # print progressbar
+            progressbar.print_bar(percent)
+            percent += increment
             # clear cypher
             cy = ''
 
@@ -267,7 +274,12 @@ class PatchService:
                                          context_pattern=context_updt,
                                          operation_type=StructuralModificationTypeEnum.ADDED)
 
+        progressbar.print_bar(percent)
+        percent += increment
         patch.operations.append(remove_rule)
+
+        progressbar.print_bar(percent)
+        percent += increment
         patch.operations.append(insert_rule)
 
         return patch
