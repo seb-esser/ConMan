@@ -229,6 +229,7 @@ class Graph2IfcTranslator:
 
         for n in nodes_pr:
             # print progressbar
+            percent += increment
             progressbar.print_bar(percent)
             
             n.tidy_attrs()
@@ -237,11 +238,11 @@ class Graph2IfcTranslator:
             self.build_entity(n.id, n.get_entity_type(), n.attrs)
             self.build_childs(n, rec=True)
 
-            percent += increment
 
         
         for cnode in nodes_cn:
             # print progressbar
+            percent += increment
             progressbar.print_bar(percent)
 
             cnode.tidy_attrs()
@@ -252,8 +253,6 @@ class Graph2IfcTranslator:
             # build the childs (non-recursive)
             self.build_childs(cnode, False)
 
-            percent += increment
-
-        progressbar.print_bar(percent)
+        
         print('[Graph:{} >> IFC_P21]: Generating file - DONE.\n'.format(self.ts))
 

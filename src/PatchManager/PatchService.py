@@ -80,8 +80,8 @@ class PatchService:
         for s_mod in s_mods:
 
             # print progressbar
-            progressbar.print_bar(percent)
             percent += increment
+            progressbar.print_bar(percent)
             # clear cypher
             cy = ''
 
@@ -274,12 +274,12 @@ class PatchService:
                                          context_pattern=context_updt,
                                          operation_type=StructuralModificationTypeEnum.ADDED)
 
-        progressbar.print_bar(percent)
         percent += increment
+        progressbar.print_bar(percent)
         patch.operations.append(remove_rule)
 
-        progressbar.print_bar(percent)
         percent += increment
+        progressbar.print_bar(percent)
         patch.operations.append(insert_rule)
 
         return patch

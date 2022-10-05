@@ -109,8 +109,8 @@ class Patch(object):
         percent = 0
         for rule in removing_rules:
             # print progressbar
-            progressbar.print_bar(percent)
             percent += increment
+            progressbar.print_bar(percent)
             context = rule.context_pattern
             glue = rule.gluing_pattern
 
@@ -132,15 +132,15 @@ class Patch(object):
         print("Applying attribute changes... ")
         # loop over attribute changes
         for rule in self.attribute_changes:
-            progressbar.print_bar(percent)
             percent += increment
+            progressbar.print_bar(percent)
             
             self.__apply_attribute_rule(rule, connector)
 
         print("Applying insertion rules... ")
         for rule in inserting_rules:
-            progressbar.print_bar(percent)
             percent += increment
+            progressbar.print_bar(percent)
 
             new_nodes_inserted = rule.push_out_pattern.get_unified_node_set()
             new_edges_inserted = rule.push_out_pattern.get_unified_edge_set()

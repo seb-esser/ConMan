@@ -46,13 +46,13 @@ class GraphDiff(AbsGraphDiff):
         percent = 0
 
         for n in prim_nodes_init:
-            progressbar.print_bar(percent)
             percent += increment
+            progressbar.print_bar(percent)
             if n.id == -1:
                 prim_nodes_init.remove(n)
         for n in prim_nodes_updt:
-            progressbar.print_bar(percent)
             percent += increment
+            progressbar.print_bar(percent)
             if n.id == -1:
                 prim_nodes_updt.remove(n)
 

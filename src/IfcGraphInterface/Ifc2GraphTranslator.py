@@ -78,6 +78,7 @@ class IFCGraphGenerator:
         for entity in entity_list:
 
             # print progressbar
+            percent += increment
             progressbar.print_bar(percent)
 
             # check if the primary_node_type is either an ObjectDef or Relationship or neither
@@ -87,20 +88,16 @@ class IFCGraphGenerator:
                 self.__map_entity(entity, "ConnectionNode")
             else:
                 self.__map_entity(entity, "SecondaryNode")
-
-            # add increment to percentage
-            percent += increment
+            
 
         for entity in entity_list:
             # print progressbar
+            percent += increment
             progressbar.print_bar(percent)
 
             self.build_node_rels(entity)
 
-            # add increment to percentage
-            percent += increment
 
-        progressbar.print_bar(percent)
         print('[IFC_P21 > {} < ]: Generating graph - DONE. \n '.format(self.timestamp))
 
         if validate_result:
