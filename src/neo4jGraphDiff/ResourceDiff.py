@@ -43,11 +43,12 @@ class ResourceDiff(AbsGraphDiff):
         self.current_prim_updated = node_updated
 
         # start recursion on resource structure
-        self.__compare_and_continue(node_init, node_updated, indent=0)
+        # ToDo: Ticket "Improve Diff by Isomorphism appraoches": implement startpoint of isomorphism check here
+        self.__compare_secondary_and_continue(node_init, node_updated, indent=0)
 
         return self.result
 
-    def __compare_and_continue(self, node_init, node_updated, indent=0):
+    def __compare_secondary_and_continue(self, node_init, node_updated, indent=0):
         """
         compares two nodes n_init and n_updated semantically.
         Afterwards, the method searches for the next direct child nodes and detects structural changes.
@@ -118,7 +119,7 @@ class ResourceDiff(AbsGraphDiff):
                     self.result.node_matching_table.add_matched_nodes(n1, n2)
 
             # run recursion for children if "NoChange" or "Modified" happened
-            self.__compare_and_continue(matchingChildPair[0], matchingChildPair[1], indent=indent + 1)
+            self.__compare_secondary_and_continue(matchingChildPair[0], matchingChildPair[1], indent=indent + 1)
 
         return
 
