@@ -1,3 +1,5 @@
+import networkx
+
 from PatchManager.DoublePushOut import DoublePushOut
 from neo4jGraphDiff.Caption.StructureModification import StructuralModificationTypeEnum
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
@@ -66,3 +68,16 @@ class TransformationRule:
         self.context_pattern.tidy_node_attributes()
         self.gluing_pattern.tidy_node_attributes()
         self.push_out_pattern.tidy_node_attributes()
+
+    def get_nx_graph(self):
+        """
+
+        @return:
+        """
+        push = self.push_out_pattern.to_nx_graph(cluster_type="pushout", node_highlighter="ADDED")
+        context = self.context_pattern.to_nx_graph(cluster_type="context")
+        glue = self.gluing_pattern.to_nx_graph(cluster_type="glue")
+
+        graph = networkx.compose_all([context, glue, push])
+
+        return graph

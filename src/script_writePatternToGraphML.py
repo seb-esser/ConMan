@@ -1,3 +1,5 @@
+import networkx
+
 from PatchManager.PatchService import PatchService
 
 
@@ -24,9 +26,9 @@ def write_graph():
     # init service
     service = PatchService()
     patch = service.load_patch_from_json('Patch_init{}-updt{}.json'.format(ts_init, ts_updated))
-    pattern = patch.operations[0].push_out_pattern
+    graph = patch.operations[0].get_nx_graph()
 
-    pattern.to_nx_graph()
+    networkx.write_graphml(G=graph, path="test.graphml")
 
 
 if __name__ == "__main__":

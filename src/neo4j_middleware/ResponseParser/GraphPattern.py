@@ -123,7 +123,7 @@ class GraphPattern:
 
     def to_cypher_match(self, define_return: bool = False,
                         entType_guid_only: bool = False, skip_timestamps: bool = False,
-                        optional_match:bool = False) -> str:
+                        optional_match: bool = False) -> str:
         """
         improved version to search for a specified graph pattern using a distinct node set definition
         @return:
@@ -501,23 +501,42 @@ class GraphPattern:
             return False
 
     def remove_OwnerHistory_links(self):
+        """
+
+        @return:
+        """
         # ToDo: remove?
         for p in self.paths:
             for seg in p.segments:
                 if seg.get_rel_type() == "OwnerHistory":
                     self.paths.remove(p)
 
+    def to_nx_graph(self, cluster_type=None, node_highlighter: str = "") -> networkx.DiGraph:
+        """
 
-    def to_nx_graph(self):
-        nx_graph = networkx.DiGraph()
+        @param node_highlighter:
+        @param cluster_type:
+        @return:
+        """
+        graph = networkx.DiGraph()
 
         nodes = self.get_unified_node_set()
-        nx_graph.add_nodes_from(nodes)
+
+        for node in nodes:
+            graph.add_node(node.get_node_identifier())
+            networkx.set_node_attributes(graph, {node.get_node_identifier(): node.attrs})
+            networkx.set_node_attributes(graph, {node.get_node_identifier(): {"NodeType": node.get_node_type(),
+                                                                              "Highlighter": node_highlighter}})
 
         for edge in self.get_unified_edge_set():
-            nx_graph.add_edge(u_of_edge=edge.start_node, v_of_edge=edge.end_node, label=str(edge.attributes))
-
-        networkx.write_graphml(nx_graph, "test.graphml")
-
-
-
+            graph.add_edge(u_of_edge=edge.start_node.get_node_identifier(),
+                           v_of_edge=edge.end_node.get_node_identifier())
+            networkx.set_edge_attributes(graph,
+                                         {
+                                             (edge.start_node.get_node_identifier(),
+                                              edge.end_node.get_node_identifier()): {
+                                                 "relType": edge.attributes["rel_type"],
+                                                 "clusterType": cluster_type
+                                             }
+                                         })
+        return graph
