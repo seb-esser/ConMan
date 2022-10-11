@@ -1,6 +1,9 @@
 from copy import deepcopy
+from pprint import pprint
 from typing import List
 import re
+
+import networkx
 
 from neo4j_middleware import neo4jConnector
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
@@ -503,6 +506,18 @@ class GraphPattern:
             for seg in p.segments:
                 if seg.get_rel_type() == "OwnerHistory":
                     self.paths.remove(p)
+
+
+    def to_nx_graph(self):
+        nx_graph = networkx.DiGraph()
+
+        nodes = self.get_unified_node_set()
+        nx_graph.add_nodes_from(nodes)
+
+        for edge in self.get_unified_edge_set():
+            nx_graph.add_edge(u_of_edge=edge.start_node, v_of_edge=edge.end_node, label=str(edge.attributes))
+
+        networkx.write_graphml(nx_graph, "test.graphml")
 
 
 

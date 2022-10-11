@@ -24,6 +24,9 @@ class NodeItem:
         self.labels = []
         self.node_identifier = ""
 
+    def __hash__(self):
+        return hash((self.id, self.rel_type, *self.attrs, *self.labels, self.node_identifier))
+
     def get_entity_type(self) -> str:
         """
         returns the entityType label of the node
