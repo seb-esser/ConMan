@@ -44,8 +44,9 @@ class ResourceDiff(AbsGraphDiff):
 
         # start recursion on resource structure
         # ToDo: Ticket "Improve Diff by Isomorphism appraoches": implement startpoint of isomorphism check here
-        self.__compare_secondary_and_continue(node_init, node_updated, indent=0)
-
+        if self.check_isomorphism() == False:
+            self.__compare_secondary_and_continue(node_init, node_updated, indent=0)
+        
         return self.result
 
     def __compare_secondary_and_continue(self, node_init, node_updated, indent=0):
@@ -229,6 +230,7 @@ class ResourceDiff(AbsGraphDiff):
         """
         # check ismorphism init --> updt
         # query the pattern beneath a primary node
+        print("Checking for isomorphism...\n")
         cy = Neo4jQueryFactory.get_pattern_by_id_no_limits(self.current_prim_init.id)
         res = self.connector.run_cypher_statement(cy)
         try:
@@ -247,7 +249,8 @@ class ResourceDiff(AbsGraphDiff):
         cy = cy.replace(ts_init, ts_updt)
 
         res = self.connector.run_cypher_statement(cy)
- 
+
+        # if the response is empty, no match could be found and isomorphism is impossible
         if len(res) == 0:
             return False
         
@@ -270,6 +273,12 @@ class ResourceDiff(AbsGraphDiff):
         cy = cy.replace(ts_updt, ts_init)
 
         res = self.connector.run_cypher_statement(cy)
- 
+
+        print("Isomorphism check DONE.")
+
+        # if the reposonse is empty, no match could be found and isomorphism is impossible
+        # if both isomophism checks are true (no reponses are empty) then return True
         if len(res) == 0:
             return False
+        else:
+            return True
