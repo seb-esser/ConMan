@@ -178,6 +178,18 @@ class Neo4jQueryFactory(Neo4jFactory):
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     @classmethod
+    def get_pattern_by_id_no_limits(cls, node_id: int) -> str:
+        """
+        return the pattern of a subgraph beneath a node without path length limits
+        @param node_id: ifc guid of the node
+        @return: cypher query string
+        """
+        match = 'MATCH pattern = (n)-[*]->(m)'
+        where = 'WHERE ID(n) = {}'.format(node_id)
+        ret = 'RETURN pattern, NODES(pattern), RELATIONSHIPS(pattern)'
+        return Neo4jFactory.BuildMultiStatement([match, where, ret])
+
+    @classmethod
     def get_outgoing_rel_types(cls, node_id: int):
         """
         Queries

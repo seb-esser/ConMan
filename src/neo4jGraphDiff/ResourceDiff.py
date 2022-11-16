@@ -44,8 +44,9 @@ class ResourceDiff(AbsGraphDiff):
 
         # start recursion on resource structure
         # ToDo: Ticket "Improve Diff by Isomorphism appraoches": implement startpoint of isomorphism check here
-        self.__compare_secondary_and_continue(node_init, node_updated, indent=0)
-
+        if self.check_isomorphism() == False:
+            self.__compare_secondary_and_continue(node_init, node_updated, indent=0)
+        
         return self.result
 
     def __compare_secondary_and_continue(self, node_init, node_updated, indent=0):
@@ -223,3 +224,61 @@ class ResourceDiff(AbsGraphDiff):
             print('Tried to query a graph pattern. DB response was empty. NodeInit_ID: {} NodeUpdt_ID: {}'
                   .format(root_node_id, current_node_id))
             return GraphPattern([])
+
+    def check_isomorphism(self) -> bool:
+        """
+        """
+        # check ismorphism init --> updt
+        # query the pattern beneath a primary node
+        print("Checking for isomorphism...\n")
+        cy = Neo4jQueryFactory.get_pattern_by_id_no_limits(self.current_prim_init.id)
+        res = self.connector.run_cypher_statement(cy)
+        try:
+            path = GraphPath.from_neo4j_response(res)
+            pattern = GraphPattern(paths=[path])
+        except:
+            print('Tried to query a graph pattern. DB response was empty. Node_ID: {}'
+                  .format(self.current_prim_init.id))
+
+        # create cypher query out of pattern (don't skip timestamps)
+        cy = pattern.to_cypher_match(define_return = True, entType_guid_only=True)
+        
+        # replace init ts with updt ts in the cypher query
+        ts_init = self.current_prim_init.get_timestamps()[0]
+        ts_updt = self.current_prim_updated.get_timestamps()[0]
+        cy = cy.replace(ts_init, ts_updt)
+
+        res = self.connector.run_cypher_statement(cy)
+
+        # if the response is empty, no match could be found and isomorphism is impossible
+        if len(res) == 0:
+            return False
+        
+        # check ismorphism updt --> init
+        cy = Neo4jQueryFactory.get_pattern_by_id_no_limits(self.current_prim_updated.id)
+        res = self.connector.run_cypher_statement(cy)
+        try:
+            path = GraphPath.from_neo4j_response(res)
+            pattern = GraphPattern(paths=[path])
+        except:
+            print('Tried to query a graph pattern. DB response was empty. Node_ID: {}'
+                  .format(self.current_prim_updated.id))
+
+        # create cypher query out of pattern (don't skip timestamps)
+        cy = pattern.to_cypher_match(define_return = True, entType_guid_only=True)
+        
+        # replace init ts with updt ts in the cypher query
+        ts_init = self.current_prim_init.get_timestamps()[0]
+        ts_updt = self.current_prim_updated.get_timestamps()[0]
+        cy = cy.replace(ts_updt, ts_init)
+
+        res = self.connector.run_cypher_statement(cy)
+
+        print("Isomorphism check DONE.")
+
+        # if the reposonse is empty, no match could be found and isomorphism is impossible
+        # if both isomophism checks are true (no reponses are empty) then return True
+        if len(res) == 0:
+            return False
+        else:
+            return True
