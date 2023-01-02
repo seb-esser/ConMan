@@ -529,6 +529,10 @@ class GraphPattern:
                                                                               "Highlighter": node_highlighter}})
 
         for edge in self.get_unified_edge_set():
+
+            if edge.is_virtual_edge():
+                continue
+
             graph.add_edge(u_of_edge=edge.start_node.get_node_identifier(),
                            v_of_edge=edge.end_node.get_node_identifier())
             networkx.set_edge_attributes(graph,

@@ -74,7 +74,14 @@ class TransformationRule:
 
         @return:
         """
-        push = self.push_out_pattern.to_nx_graph(cluster_type="pushout", node_highlighter="ADDED")
+
+        node_highlighter = ""
+        if self.operation_type == StructuralModificationTypeEnum.DELETED:
+            node_highlighter = "REMOVED"
+        elif self.operation_type == StructuralModificationTypeEnum.ADDED:
+            node_highlighter = "INSERTED"
+
+        push = self.push_out_pattern.to_nx_graph(cluster_type="pushout", node_highlighter=node_highlighter)
         context = self.context_pattern.to_nx_graph(cluster_type="context")
         glue = self.gluing_pattern.to_nx_graph(cluster_type="glue")
 

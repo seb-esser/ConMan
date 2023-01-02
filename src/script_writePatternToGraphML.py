@@ -26,9 +26,14 @@ def write_graph():
     # init service
     service = PatchService()
     patch = service.load_patch_from_json('Patch_init{}-updt{}.json'.format(ts_init, ts_updated))
-    graph = patch.operations[0].get_nx_graph()
 
-    networkx.write_graphml(G=graph, path="test.graphml")
+    all_operations = networkx.Graph()
+    for operation in patch.operations:
+
+        graph = operation.get_nx_graph()
+        all_operations = networkx.compose_all([all_operations, graph])
+
+    networkx.write_graphml(G=all_operations, path="test2.graphml")
 
 
 if __name__ == "__main__":
