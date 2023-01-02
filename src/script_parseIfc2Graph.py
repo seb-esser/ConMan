@@ -57,7 +57,7 @@ def main():
     # paths = ['./00_sampleData/IFC_stepP21/WallSpace/SpaceWallExample.ifc',
     #          './00_sampleData/IFC_stepP21/WallSpace/SpaceWallExample_wallMoved.ifc'
     #          ]
-    paths = ['./00_sampleData/IFC_stepP21/CAM/CadCam_Module_init.ifc',
+    paths = ['./00_sampleData/IFC_stepP21/SpaceWallWithPset.ifc',
              #'./00_sampleData/IFC_stepP21/CAM/CadCam_Module_updt.ifc'
              ]
 

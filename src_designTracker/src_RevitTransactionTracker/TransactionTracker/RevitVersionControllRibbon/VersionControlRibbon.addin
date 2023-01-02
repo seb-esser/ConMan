@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>VersionControlRibbon</Name>
+
+    <Assembly>RevitVersionControllRibbon.dll</Assembly>
+
+    <AddInId>E312627D-657A-4980-A926-BBD3A61469B0</AddInId>
+    <ClientId>a68828d7-d4c3-4dca-a7ea-e38638b5b5dd</ClientId>
+    <FullClassName>RevitVersionControllRibbon.VersionControlRibbon</FullClassName>
+    <VendorId>SebastianEsser</VendorId>
+    <VendorDescription>Sebastian Esser</VendorDescription>
+
+  </AddIn>
+</RevitAddIns>
+
+<!--This file works if Revit is set as an external app inside the debug menu of this sln -->
+<!--Place it here: C:\Users\ga38hep\AppData\Roaming\Autodesk\Revit\Addins\2022 -->

@@ -87,7 +87,8 @@ class CityGMLGraphGenerator:
         Maps an primary_node_type to the database with a given label and attribute dict
         """
         # print the progressbar
-        progressbar.printbar(self.percent)
+        self.percent += self.increment
+        progressbar.print_bar(self.percent)
 
         # get the attribute dictionary of the primary_node_type
         attrs = entity.attrib
@@ -120,9 +121,7 @@ class CityGMLGraphGenerator:
         cypher_statement = Neo4jGraphFactory.merge_node_with_attr(label, attrs, self.label)
         node_id = self.connector.run_cypher_statement(
             cypher_statement, 'ID(n)')[0]
-
-        # increment the percentage and return the id
-        self.percent += self.increment
+        
         return node_id
 
     def filterEntitiesToAttributes(self, entity):

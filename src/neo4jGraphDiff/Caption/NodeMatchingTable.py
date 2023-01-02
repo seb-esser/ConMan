@@ -85,8 +85,13 @@ class NodeMatchingTable:
             lst_position = self.get_all_updated_nodes().index(subgraphNode)
             node_list = self.get_all_updated_nodes()[:lst_position]
 
-        # find next primaryNode in the list by reversing and find first index
-        parent_primary_node = [prim_node for prim_node in node_list[::-1] if prim_node.get_node_type() == "PrimaryNode"][0]
+        try:
+            # find next primaryNode in the list by reversing and find first index
+            parent_primary_node = [prim_node for prim_node in node_list[::-1]
+                                   if prim_node.get_node_type() == "PrimaryNode"][0]
+        except:
+            # some situations are not yet implemented
+            return None
 
         # return node_list[::-1].index(parent_primary_node)
         return parent_primary_node

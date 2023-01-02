@@ -4,6 +4,7 @@ import uuid
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 import ifcopenshell
+import progressbar
 
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -88,13 +89,12 @@ class Graph2IfcTranslator:
 
             del attributes['EntityType']
             e = self.model.create_entity(class_name, **attributes)
-            print(e)
+
             # save node id 2 spf id in dict
             self.node_id_2_spf_id[graph_node_id] = e.id()
 
             return e.id()
         except:
-
             raise Exception("Error in creating instance of {} with attributes {} ".format(class_name, attributes))
 
     def build_association(self, parent_node_id: int, child_node_id: int, association_name: str):
@@ -112,8 +112,8 @@ class Graph2IfcTranslator:
         child = self.model.by_id(spf_id_child)
 
         # test if the desired association is modeled as a pointer or an array of pointers
-        if not association_name.find("listItem") == -1:
-            name = association_name.split('__')[0]
+        if 'listItem' in association_name:
+            name = association_name['rel_type']
             # list of pointers
             try:
                 lst = getattr(parent, name)
@@ -129,7 +129,7 @@ class Graph2IfcTranslator:
                 print('Skip building {} between #{} and #{}'.format(association_name, spf_id_parent, spf_id_child))
         else:
             try:
-                setattr(parent, association_name, child)
+                setattr(parent, association_name['rel_type'], child)
             except:
                 print('Skip building {} between #{} and #{}'.format(association_name, spf_id_parent, spf_id_child))
 
@@ -146,20 +146,29 @@ class Graph2IfcTranslator:
         raw_res = self.connector.run_cypher_statement(cy)
 
         # cast cypher response in a list of node items
-        child_nodes = NodeItem.from_neo4j_response_with_rel(raw_res)
+        child_nodes = []
 
+        for pair in raw_res:
+            child_node_raw = pair[0]
+            edge_raw = pair[1]
+            child_node = NodeItem.from_neo4j_response(child_node_raw)[0]
+
+            # add relationship data to node
+            child_node.rel_type = edge_raw
+            # ToDo: Hier überprüfen, ob die Daten entsprechend der Erwartungen auf das rel_type Attribut geschrieben werden
+
+            child_nodes.append(child_node)
         # check if leaf node was found
         if len(child_nodes) == 0:
             return
 
-        for c in child_nodes:
-            # query all node properties of n
-            cy = query_factory.get_node_properties_by_id(c.id)
-            raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
+        # for some geometries, the order of instantiation is important. Therefore, we sort the nodes here w.r.t listItem
+        sorted_child_nodes = sorted(child_nodes, key=lambda cnode: cnode.get_listitem())
+        # sorted_child_nodes = child_nodes
 
-            # assign properties to node object
-            c.set_node_attributes(raw_res)
+        # print([x.get_listitem() for x in sorted_child_nodes])
 
+        for c in sorted_child_nodes:
             c.tidy_attrs()
 
             # check if IFC counterpart to current node was already initialized
@@ -192,12 +201,12 @@ class Graph2IfcTranslator:
         @return:
         """
         try:
-            self.model.write(path + ".ifc")
+            self.model.write(path)
             return True
         except:
             return False
 
-    def generateSPF(self):
+    def generate_SPF(self):
         """
         translates a graph from neo4j into an IFC SPF file
         @return:
@@ -205,29 +214,36 @@ class Graph2IfcTranslator:
 
         # get all primary nodes
         cy = Neo4jQueryFactory.get_primary_nodes(self.ts)
-        raw_res = self.connector.run_cypher_statement(cy)
+        raw_res_pr = self.connector.run_cypher_statement(cy)
 
-        # cast cypher response in a list of node items
-        nodes = NodeItem.from_neo4j_response_wou_rel(raw_res)
+        # get all connection nodes
+        cn = Neo4jQueryFactory.get_connection_nodes(self.ts)
+        raw_res_cn = self.connector.run_cypher_statement(cn)
 
-        for n in nodes:
+        # cast cypher response in a list of primary/connection node items
+        nodes_pr = NodeItem.from_neo4j_response(raw_res_pr)
+        nodes_cn = NodeItem.from_neo4j_response(raw_res_cn)
+
+        increment = 100 / (len(nodes_pr) + len(nodes_cn))
+        percent = 0
+
+        for n in nodes_pr:
+            # print progressbar
+            percent += increment
+            progressbar.print_bar(percent)
+            
             n.tidy_attrs()
 
             # build IFC primary_node_type
             self.build_entity(n.id, n.get_entity_type(), n.attrs)
             self.build_childs(n, rec=True)
 
-        # get all connection nodes
-        cn = Neo4jQueryFactory.get_connection_nodes(self.ts)
-        raw_res = self.connector.run_cypher_statement(cn)
 
-        connection_nodes = NodeItem.from_neo4j_response_wou_rel(raw_res)
-
-        for cnode in connection_nodes:
-            cy = Neo4jQueryFactory.get_node_properties_by_id(cnode.id)
-            raw_res = self.connector.run_cypher_statement(cy, "properties(n)")
-            # assign properties to node object
-            cnode.set_node_attributes(raw_res)
+        
+        for cnode in nodes_cn:
+            # print progressbar
+            percent += increment
+            progressbar.print_bar(percent)
 
             cnode.tidy_attrs()
 
@@ -236,3 +252,7 @@ class Graph2IfcTranslator:
 
             # build the childs (non-recursive)
             self.build_childs(cnode, False)
+
+        
+        print('[Graph:{} >> IFC_P21]: Generating file - DONE.\n'.format(self.ts))
+

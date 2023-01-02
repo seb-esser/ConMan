@@ -49,8 +49,8 @@ class Neo4jQueryFactory(Neo4jFactory):
         @param label:
         @return: cypher query string
         """
-        match = 'MATCH (n:PrimaryNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)'
+        match = 'MATCH p = (n:PrimaryNode:{}) '.format(label)
+        ret_statement = 'RETURN n'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
@@ -61,7 +61,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH (n:ConnectionNode:{}) '.format(label)
-        ret_statement = 'RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)'
+        ret_statement = 'RETURN n'
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
@@ -118,13 +118,13 @@ class Neo4jQueryFactory(Neo4jFactory):
         """
         match = 'MATCH (n:{})-[r:rel]->(c)'.format(label)
         where = 'WHERE ID(n) = {}'.format(parent_node_id)
-        ret = 'RETURN ID(c), PROPERTIES(r), c.EntityType, PROPERTIES(c), LABELS(c)'
+        ret = 'RETURN c, PROPERTIES(r)'
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     
     @classmethod
     def get_node_by_id(cls, nodeId: int) -> str:
-        return 'MATCH (n) WHERE ID(n)={} RETURN ID(n), n.EntityType, PROPERTIES(n), LABELS(n)'.format(nodeId)
+        return 'MATCH (n) WHERE ID(n)={} RETURN n'.format(nodeId)
 
     @classmethod
     def get_hierarchical_prim_nodes(cls, node_id: int, exclude_nodes: List[NodePair] = []) -> str:
@@ -135,20 +135,8 @@ class Neo4jQueryFactory(Neo4jFactory):
         return """
             MATCH (n)<-[r1]-(c:ConnectionNode)-[r2]->(m:PrimaryNode) 
             WHERE ID(n) = {} AND NOT r1 = r2 AND NOT(ID(m) IN [{}])
-            RETURN DISTINCT ID(m), m.EntityType, PROPERTIES(m), LABELS(m)
+            RETURN DISTINCT m
             """.format(node_id, va[:-2])
-
-    @classmethod
-    def get_node_properties_by_id(cls, nodeId: int) -> str:
-        """
-        Query all params of a node specified by its node id
-        @param nodeId: the node id in the neo4j database
-        @return: cypher query string
-        """
-        match = 'MATCH (n)'
-        where = 'WHERE ID(n) = {}'.format(nodeId)
-        ret = 'RETURN properties(n)'
-        return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     @classmethod
     def nodes_are_connected(cls, node_id_a: int, node_id_b: int) -> str:
@@ -185,6 +173,18 @@ class Neo4jQueryFactory(Neo4jFactory):
         @return: cypher query string
         """
         match = 'MATCH pattern = (n)-[*..10]->(m)'
+        where = 'WHERE ID(n) = {}'.format(node_id)
+        ret = 'RETURN pattern, NODES(pattern), RELATIONSHIPS(pattern)'
+        return Neo4jFactory.BuildMultiStatement([match, where, ret])
+
+    @classmethod
+    def get_pattern_by_id_no_limits(cls, node_id: int) -> str:
+        """
+        return the pattern of a subgraph beneath a node without path length limits
+        @param node_id: ifc guid of the node
+        @return: cypher query string
+        """
+        match = 'MATCH pattern = (n)-[*]->(m)'
         where = 'WHERE ID(n) = {}'.format(node_id)
         ret = 'RETURN pattern, NODES(pattern), RELATIONSHIPS(pattern)'
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
@@ -252,15 +252,6 @@ class Neo4jQueryFactory(Neo4jFactory):
         return cy
 
     @classmethod
-    def get_node(cls, node_id: int) -> str:
-        """
-
-        @param node_id:
-        @return:
-        """
-        return 'MATCH (n) WHERE ID(n) = {} RETURN n'.format(node_id)
-
-    @classmethod
     def get_parent_connection_node(cls, node_id: int):
         return 'MATCH path = (c:ConnectionNode)-[r]->(n) WHERE ID(n)={} ' \
                'RETURN path, NODES(path), RELATIONSHIPS(path)'.format(node_id)
@@ -276,7 +267,7 @@ class Neo4jQueryFactory(Neo4jFactory):
         Match (n)-[r:SIMILAR_TO]-(m) 
         WITH collect(ID(n)) as nodeIds
         MATCH (a:{0}) WHERE NOT ID(a) IN nodeIds
-        RETURN ID(a), a.EntityType, PROPERTIES(a), LABELS(a)
+        RETURN a
         """.format(timestamp)
         return cy
 

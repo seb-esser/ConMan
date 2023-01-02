@@ -1,0 +1,208 @@
+{
+  "Uuid": "3e1bbecf-e83c-4cd8-81f5-4f0c6da84a9a",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "visualizeDiff",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "CoreNodeModels.Input.Filename, CoreNodeModels",
+      "HintPath": "C:\\Users\\ga38hep\\dev\\05-09-2022_12-49.json",
+      "InputValue": "..\\..\\..\\..\\05-09-2022_12-49.json",
+      "NodeType": "ExtensionNode",
+      "Id": "6510409bde864330a28d133a1c6cb5a8",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "017d42aa4cb04b1b87d16e3345aa7b8a",
+          "Name": "",
+          "Description": "Dateipfad",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Ermöglicht die Auswahl einer Datei auf dem System, um ihren Dateinamen abzurufen."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "NodeType": "FunctionNode",
+      "FunctionSignature": "DynamoVersionTrackingUtilities.BucketLoader.LoadSnapshots@string,string",
+      "Id": "8e09cf4feda741318d2b5c90510da652",
+      "Inputs": [
+        {
+          "Id": "c095201748194e0bb8f013fb5b38248f",
+          "Name": "snapshotPathInit",
+          "Description": "string",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "d59d2d08f8f74aeaa8e805f2a5c48e4b",
+          "Name": "snapshotPathUpdated",
+          "Description": "string",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "8d605da1c7f549a6abd9c068f2457911",
+          "Name": "insertedElementIds",
+          "Description": "var",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "ad13a77bf54b4e61836e5bf987aace7c",
+          "Name": "removedElementIds",
+          "Description": "var",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "ba5037bbc8054ff5afe15bda24232336",
+          "Name": "modifiedElementIds",
+          "Description": "var",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Auto",
+      "Description": "BucketLoader.LoadSnapshots (snapshotPathInit: string, snapshotPathUpdated: string): var[]..[]"
+    },
+    {
+      "ConcreteType": "CoreNodeModels.Input.Filename, CoreNodeModels",
+      "HintPath": "C:\\Users\\ga38hep\\dev\\05-09-2022_12-50.json",
+      "InputValue": "..\\..\\..\\..\\05-09-2022_12-50.json",
+      "NodeType": "ExtensionNode",
+      "Id": "3f0604e62b834649ad24123685635c59",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "8d5d6b9f2fd541d3a07415eba7c88bae",
+          "Name": "",
+          "Description": "Dateipfad",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Ermöglicht die Auswahl einer Datei auf dem System, um ihren Dateinamen abzurufen."
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "017d42aa4cb04b1b87d16e3345aa7b8a",
+      "End": "c095201748194e0bb8f013fb5b38248f",
+      "Id": "e74edf0709df403bb15867d4cd47cbdf"
+    },
+    {
+      "Start": "8d5d6b9f2fd541d3a07415eba7c88bae",
+      "End": "d59d2d08f8f74aeaa8e805f2a5c48e4b",
+      "Id": "9986465bab5d41f585e0f35891d8b498"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "2.12",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "1.10",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "Keine",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.12.1.8246",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "Hintergrundvorschau",
+      "EyeX": 12.082806587219238,
+      "EyeY": 8.0727920532226563,
+      "EyeZ": -3.1967720985412598,
+      "LookX": -6.4190773963928223,
+      "LookY": -8.22279167175293,
+      "LookZ": -5.4224810600280762,
+      "UpX": -0.40481343865394592,
+      "UpY": 0.84804826974868774,
+      "UpZ": -0.34196555614471436
+    },
+    "NodeViews": [
+      {
+        "ShowGeometry": true,
+        "Name": "File Path",
+        "Id": "6510409bde864330a28d133a1c6cb5a8",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 160.5,
+        "Y": -262.0
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "BucketLoader.LoadSnapshots",
+        "Id": "8e09cf4feda741318d2b5c90510da652",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 534.0,
+        "Y": -197.5
+      },
+      {
+        "ShowGeometry": true,
+        "Name": "File Path",
+        "Id": "3f0604e62b834649ad24123685635c59",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 209.5,
+        "Y": -45.0
+      }
+    ],
+    "Annotations": [],
+    "X": -9.5,
+    "Y": 356.0,
+    "Zoom": 1.0
+  }
+}

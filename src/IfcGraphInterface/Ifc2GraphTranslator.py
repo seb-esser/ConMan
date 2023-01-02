@@ -23,6 +23,7 @@ class IFCGraphGenerator:
 
         # try to open the ifc model and load the content into the model variable
         try:
+            self.model_path = model_path
             self.model = ifcopenshell.open(model_path)
             ifc_version = self.model.schema
             self.schema = ifcopenshell.ifcopenshell_wrapper.schema_by_name(
@@ -47,19 +48,20 @@ class IFCGraphGenerator:
 
         super().__init__()
 
-    # public entry method to generate the graph out of a given IFC model
-
-    def generateGraph(self):
+    def generateGraph(self, validate_result=False):
         """
         parses the IFC model into the graph database
         @return: the label, by which you can identify the model in the database
         """
 
-        # delete entire graph if label already exists
-        # print('DEBUG INFO: entire graph labeled with >> {} << gets deleted \n'.format(
-        #     self.timestamp))
-        # self.connector.run_cypher_statement(
-        #     'MATCH(n:{}) DETACH DELETE n'.format(self.timestamp))
+        # check if model has been already processed
+        n = self.connector.run_cypher_statement('MATCH(n:{}) RETURN COUNT(n)'.format(self.timestamp))[0][0]
+
+        if int(n) > 0:
+            print('WARNING: entire graph labeled with >> {} << gets overwritten by staged file {}.'.format(
+                self.timestamp, self.model_path))
+
+            self.connector.run_cypher_statement('MATCH(n:{}) DETACH DELETE n'.format(self.timestamp))
 
         print('[IFC_P21 > {} < ]: Generating graph... '.format(self.timestamp))
 
@@ -76,7 +78,8 @@ class IFCGraphGenerator:
         for entity in entity_list:
 
             # print progressbar
-            progressbar.printbar(percent)
+            percent += increment
+            progressbar.print_bar(percent)
 
             # check if the primary_node_type is either an ObjectDef or Relationship or neither
             if entity.is_a('IfcObjectDefinition'):
@@ -85,23 +88,21 @@ class IFCGraphGenerator:
                 self.__map_entity(entity, "ConnectionNode")
             else:
                 self.__map_entity(entity, "SecondaryNode")
-
-            # add increment to percentage
-            percent += increment
+            
 
         for entity in entity_list:
             # print progressbar
-            progressbar.printbar(percent)
+            percent += increment
+            progressbar.print_bar(percent)
 
             self.build_node_rels(entity)
 
-            # add increment to percentage
-            percent += increment
 
-        progressbar.printbar(percent)
         print('[IFC_P21 > {} < ]: Generating graph - DONE. \n '.format(self.timestamp))
 
-        self.validateParsingResult()
+        if validate_result:
+            self.validateParsingResult()
+
         return self.timestamp
 
     def validateParsingResult(self):

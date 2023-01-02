@@ -1,9 +1,13 @@
 from typing import List
+import re
 
 from PatchManager.AttributeRule import AttributeRule
 from PatchManager.TransformationRule import TransformationRule
 from neo4jGraphDiff.Caption.StructureModification import StructuralModificationTypeEnum
+from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
+import progressbar
 
 
 class Patch(object):
@@ -31,26 +35,7 @@ class Patch(object):
         print("Applying attribute changes... ")
         # loop over attribute changes
         for rule in self.attribute_changes:
-            # find node
-            cy = 'MATCH '
-
-            cy += rule.path.to_cypher(path_number=0)
-            # set new attribute value
-            if isinstance(rule.updated_value, str) or rule.updated_value is None:
-                cy += " SET {}.{} = \"{}\"".format(
-                    rule.path.get_last_node().get_node_identifier(),
-                    rule.attribute_name,
-                    rule.updated_value)
-            else:
-                cy += " SET {}.{} = {}".format(
-                    rule.path.get_last_node().get_node_identifier(),
-                    rule.attribute_name,
-                    rule.updated_value)
-
-            # run statement
-            connector.run_cypher_statement(cy)
-            # ToDo: implement validation that transformation has been applied successfully.
-            #  Consider adding a RETURN to the cypher statement.
+            self.__apply_attribute_rule(rule, connector)
 
         print("Applying structural changes... ")
         # loop over all structural transformations
@@ -59,7 +44,8 @@ class Patch(object):
 
                 # find context and
                 # -> use the base timestamp here
-                rule.context_pattern.replace_timestamp(self.base_timestamp)
+                if len(rule.context_pattern.paths) < 0:  # catch situation in which no context exists in the rule
+                    rule.context_pattern.replace_timestamp(self.base_timestamp)
 
                 cy = rule.context_pattern.to_cypher_match()
                 print("[INFO] finding context...")
@@ -79,12 +65,14 @@ class Patch(object):
                 e = rule.context_pattern.get_unified_edge_set()
 
                 cy += rule.push_out_pattern.to_cypher_merge(n, e)
+                # self.highlight_patch(connector)
                 # print(cy)
                 # raw = connector.run_cypher_statement(cy)
                 # print(raw)
 
                 # glue push out and context
-                rule.gluing_pattern.replace_timestamp(self.base_timestamp)
+                if len(rule.gluing_pattern.paths) < 0:
+                    rule.gluing_pattern.replace_timestamp(self.base_timestamp)
 
                 # prevent cypher query contain node and edge definitions more than once
                 nodes_push = rule.push_out_pattern.get_unified_node_set() + rule.context_pattern.get_unified_node_set()
@@ -103,14 +91,135 @@ class Patch(object):
                 cy = rule.push_out_pattern.to_cypher_pattern_delete()
                 connector.run_cypher_statement(cy)
 
-            print("[INFO] Adjusting timestamps... ")
+            # print("[INFO] Adjusting timestamps... ")
             label_from = self.base_timestamp
             label_to = self.resulting_timestamp
 
-            connector.run_cypher_statement("MATCH (n) REMOVE n:{} SET n:{}".format(label_from, label_to))
-            print("[INFO] Adjusting timestamps: DONE.")
+            connector.run_cypher_statement("MATCH (n:{0}) REMOVE n:{0} SET n:{1}".format(label_from, label_to))
+            # print("[INFO] Adjusting timestamps: DONE.")
+
+    def apply_version2(self, connector: Neo4jConnector):
+
+        inserting_rules = [x for x in self.operations if x.operation_type == StructuralModificationTypeEnum.ADDED]
+        removing_rules = [x for x in self.operations if x.operation_type == StructuralModificationTypeEnum.DELETED]
+        print("Applying removal rules... ")
+        # removing stuff
+
+        increment = 100 / (len(inserting_rules) + len(removing_rules) + len(self.attribute_changes))
+        percent = 0
+        for rule in removing_rules:
+            # print progressbar
+            percent += increment
+            progressbar.print_bar(percent)
+            context = rule.context_pattern
+            glue = rule.gluing_pattern
+
+            # context should be found in the initial (i.e. host) graph
+            context.replace_timestamp(self.base_timestamp)
+            context.tidy_node_attributes()
+            context.remove_OwnerHistory_links()
+
+            search = GraphPattern()
+            search.paths.extend(rule.push_out_pattern.paths)
+            search.paths.extend(rule.context_pattern.paths)
+            search.paths.extend(rule.gluing_pattern.paths)
+            cy = search.to_cypher_match(define_return=False)
+
+            # run the delete operation
+            cy += rule.push_out_pattern.to_cypher_node_delete()
+            connector.run_cypher_statement(cy)
+
+        print("Applying attribute changes... ")
+        # loop over attribute changes
+        for rule in self.attribute_changes:
+            percent += increment
+            progressbar.print_bar(percent)
+            
+            self.__apply_attribute_rule(rule, connector)
+
+        print("Applying insertion rules... ")
+        for rule in inserting_rules:
+            percent += increment
+            progressbar.print_bar(percent)
+
+            new_nodes_inserted = rule.push_out_pattern.get_unified_node_set()
+            new_edges_inserted = rule.push_out_pattern.get_unified_edge_set()
+
+            # ToDo: unify all_new_nodes_inserted
+            cy = ''
+            # create all new nodes to be inserted
+            for node in new_nodes_inserted:
+                cy += "MERGE {}".format(node.to_cypher())
+            res = connector.run_cypher_statement(cy)
+
+            # create all edges between newly inserted nodes
+            for edge in new_edges_inserted:
+
+                if edge.is_virtual_edge():
+                    continue
+                # achtung: hier wird als eindeutiges Merkmal
+                # für secondary Nodes die kombination timestamp und p21 genutzt!
+                cy = "MATCH {} " \
+                     "MATCH {} " \
+                     "MERGE {} RETURN {}".format(
+                    edge.start_node.to_cypher(),
+                    edge.end_node.to_cypher(),
+                    edge.to_cypher(
+                        skip_start_node_attrs=True,
+                        skip_end_node_attrs=True,
+                        skip_start_node_labels=True,
+                        skip_end_node_labels=True),
+                    edge.edge_identifier)
+
+                # this cy creates all edges between push out nodes and thus works without any changes in the timestamp
+                res = connector.run_cypher_statement(cy)
+
+        # so far, all pushout patterns have been inserted
+        # next, build glue and embedding
+
+        print("updating timestamps 1/2")
+        label_from = self.base_timestamp
+        label_to = self.resulting_timestamp
+
+        connector.run_cypher_statement("MATCH (n:{0}) SET n:{1}".format(label_from, label_to))
+
+        for rule in inserting_rules:
+
+            if rule is inserting_rules[-1]:
+                print("applying conNode edges...")
+
+            if rule.context_pattern.is_empty() or rule.gluing_pattern.is_empty():
+                continue
+
+            # rule.context_pattern.replace_timestamp(self.base_timestamp)
+            # find context pattern
+            cy = rule.context_pattern.to_cypher_match(optional_match=False)
+
+            # this node is part of the pushout but can be addressed by it p21 id and the timestamp for the moment
+            start_nodes = []
+            for p in rule.gluing_pattern.paths:
+                node = p.segments[0].start_node
+
+                if node not in start_nodes:
+
+                    if node in rule.context_pattern.get_unified_node_set():
+                        # node has been already declared, use reduced cy representation
+                        cy += "MATCH " + node.to_cypher(skip_attributes=True, skip_labels=True)
+                    else:
+                        start_nodes.append(node)
+                        cy += "MATCH " + node.to_cypher()
+
+            nodes_context = rule.context_pattern.get_unified_node_set()
+            cy += rule.gluing_pattern.to_cypher_merge(nodes_specified=[*start_nodes, *nodes_context], edges_specified=[])
+            print(cy)
+            connector.run_cypher_statement(cy)
 
 
+        # harmonize labels
+        label_from = self.base_timestamp
+        label_to = self.resulting_timestamp
+        print("updating timestamps 2/2")
+        connector.run_cypher_statement("MATCH (n:{0}) REMOVE n:{0} SET n:{1}".format(label_from, label_to))
 
     def apply_inverse(self, connector: Neo4jConnector):
         """
@@ -140,5 +249,73 @@ class Patch(object):
         self.apply(connector=connector)
         print("[INFO] applying transformation: DONE.")
 
+    def highlight_patch(self, connector: Neo4jConnector):
+        """
+        applies a new label to the push_out_pattern of
+        @param connector: Neo4jConnector instance
+        @return: None
+        """
 
+        # highlight removed and inserted nodes
+        for rule in self.operations:
+            # get all nodes of the pattern
+            push_out_nodes: List[NodeItem] = rule.push_out_pattern.get_unified_node_set()
 
+            cy = ""
+            # for all NodeItems except the last
+            for node in push_out_nodes:
+                # replace the "nXXX" with just "n"
+                new_match = re.sub('n[0-9]+:', 'n:', node.to_cypher())
+                # if the NodeItem isn't the last, add a UNION to execute everything in one db call
+                if node != push_out_nodes[-1]:
+                    union = "UNION "
+                else:
+                    union = ""
+                # Set the label according to the ModificationType
+                if rule.operation_type == StructuralModificationTypeEnum.ADDED:
+                    cy += "MATCH" + new_match + " SET n:ADDED " + union
+                elif rule.operation_type == StructuralModificationTypeEnum.DELETED:
+                    cy += "MATCH" + new_match + " SET n:DELETED " + union
+
+            # run the cypher statement
+            connector.run_cypher_statement(cy)
+
+        # highlight modified nodes
+        for pMod in self.attribute_changes:
+            # remove p21_id etc from nodes
+            pMod.path.tidy_node_attributes()
+            pMod.path.segments[-1].end_node.attrs = {}
+
+            cy = "MATCH "
+            cy += pMod.path.to_cypher(skip_timestamp=True)
+
+            cy += "SET {}:MODIFIED".format(pMod.path.get_last_node().get_node_identifier())
+            connector.run_cypher_statement(cy)
+
+    def remove_highlight_labels(self, connector: Neo4jConnector):
+
+        cy = "MATCH (n:ADDED), (m:DELETED), (o:MODIFIED) " \
+             "REMOVE n:ADDED, m:DELETED, o:MODIFIED"
+        connector.run_cypher_statement(cy)
+
+    def __apply_attribute_rule(self, rule, connector: Neo4jConnector):
+        """
+
+        """
+        # find node
+        cy = 'MATCH '
+
+        cy += rule.path.to_cypher(path_number=0)
+        # set new attribute value
+        if isinstance(rule.updated_value, str) or rule.updated_value is None:
+            cy += " SET {}.{} = \"{}\"".format(
+                rule.path.get_last_node().get_node_identifier(),
+                rule.attribute_name,
+                rule.updated_value)
+        else:
+            cy += " SET {}.{} = {}".format(
+                rule.path.get_last_node().get_node_identifier(),
+                rule.attribute_name,
+                rule.updated_value)
+        # run statement
+        connector.run_cypher_statement(cy)

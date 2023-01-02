@@ -1,3 +1,8 @@
+from typing import List
+
+import neo4j.data
+import neo4j.graph
+
 from neo4j_middleware.CypherUtilities import CypherUtilities
 from neo4j_middleware.Neo4jFactory import Neo4jFactory
 import re
@@ -13,11 +18,14 @@ class NodeItem:
         @param node_id: node id in the graph database
         @param rel_type: rel_type of edge pointing to this node
         """
-        self.id = node_id
+        self.id: int = node_id
         self.rel_type = rel_type
         self.attrs = None
         self.labels = []
         self.node_identifier = ""
+
+    def __hash__(self):
+        return hash((self.id, self.rel_type, *self.attrs, *self.labels, self.node_identifier))
 
     def get_entity_type(self) -> str:
         """
@@ -31,6 +39,12 @@ class NodeItem:
         """
         ts = [x for x in self.labels if x.startswith('ts')]
         return ts
+
+    def get_listitem(self) -> int:
+        if 'listItem' in self.rel_type:
+            return int(self.rel_type["listItem"])
+        else:
+            return -1
 
     def get_node_type(self) -> str:
         """
@@ -52,7 +66,7 @@ class NodeItem:
     # ToDo: consider implementing python properties for managed access
 
     def __repr__(self):
-        return 'NodeItem: id: {} var: {} attrs: {} labels: {}'\
+        return 'NodeItem: id: {} var: {} attrs: {} labels: {}' \
             .format(self.id, self.node_identifier, self.attrs, self.labels)
 
     def __eq__(self, other):
@@ -108,11 +122,47 @@ class NodeItem:
         @param raw: neo4j response string
         @return:
         """
+
+        # allocate return value
         ret_val = []
-        for node_raw in raw:
-            node_labels = list(node_raw.labels)
-            node = cls(node_id=int(node_raw.id), rel_type=None)
-            node.set_node_attributes(dict(node_raw._properties))
+
+        # prevent case of empty raw input
+        if raw == []:
+            return []
+
+        if type(raw) == list:
+
+            # cast
+            for raw_node in raw:
+
+                # unpack if record
+                if type(raw_node) == neo4j.data.Record:
+                    raw_node = raw_node[0]
+
+                node_labels = list(raw_node.labels)
+                node = cls(node_id=int(raw_node.id), rel_type=None)
+                node.set_node_attributes(dict(raw_node._properties))
+                node.labels = node_labels
+                ret_val.append(node)
+
+            return ret_val
+
+        if type(raw) == neo4j.data.Record:
+            # passed a single node into the method, therefore we can skip the unpacking
+
+            # cast
+            for raw_node in raw:
+                node_labels = list(raw_node.labels)
+                node = cls(node_id=int(raw_node.id), rel_type=None)
+                node.set_node_attributes(dict(raw_node._properties))
+                node.labels = node_labels
+                ret_val.append(node)
+
+        elif type(raw) == neo4j.graph.Node:
+            raw_node = raw
+            node_labels = list(raw_node.labels)
+            node = cls(node_id=int(raw_node.id), rel_type=None)
+            node.set_node_attributes(dict(raw_node._properties))
             node.labels = node_labels
             ret_val.append(node)
 
@@ -182,6 +232,11 @@ class NodeItem:
         removes entity_type and p21_id from attr dict
         @return:
         """
+
+        if self.id == -1:
+            # virtual node, nothing to clean
+            return
+
         # self.attrs.pop("EntityType", None)
         self.attrs.pop("p21_id", None)
         self.attrs.pop('rel_type', None)
@@ -196,18 +251,36 @@ class NodeItem:
                     cleared_dict[key] = eval(val)
             self.attrs = cleared_dict
 
-    def to_cypher(self, skip_attributes=False, skip_labels=False):
+    def to_cypher(self, skip_attributes: bool = False, skip_labels: bool = False, entType_guid_only: bool = False):
         """
         returns a cypher query fragment to search for or to create this node with semantics
+        @param skip_labels:
+        @param skip_attributes:
+        @type entType_guid_only: returns a reduced attr definition for patternmatching
         @return:
         """
+
+        if self.id == -1:
+            # virtual node
+            return '()'
+
         cy_node_identifier = self.get_node_identifier()
         cy_node_attrs = ""
         cy_node_labels = ""
 
         if skip_attributes is False:
             if self.attrs != {}:
-                cy_node_attrs = Neo4jFactory.formatDict(self.attrs)
+                if entType_guid_only:
+                    # remove all attributes except GUID and EntityType
+                    reduced_attrs = {"EntityType": self.attrs["EntityType"]}
+                    if "GlobalId" in self.attrs:
+                        reduced_attrs["GlobalId"] = self.attrs["GlobalId"]
+
+                    # send reduced dict to factory
+                    cy_node_attrs = Neo4jFactory.formatDict(reduced_attrs)
+
+                else:
+                    cy_node_attrs = Neo4jFactory.formatDict(self.attrs)
 
         if skip_labels is False:
             if len(self.labels) > 0:
@@ -219,4 +292,3 @@ class NodeItem:
         # cleaned_node_attrs.pop('p21_id', None)
 
         return '({0}{1}{2})'.format(cy_node_identifier, cy_node_labels, cy_node_attrs)
-

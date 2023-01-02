@@ -40,7 +40,6 @@ class AbsGraphDiff(abc.ABC):
         Query a list of all direct child nodes to the given parent node
         @param label: the model label
         @param parent_node_id:
-        @param indent:
         @return:
         """
 
@@ -49,7 +48,16 @@ class AbsGraphDiff(abc.ABC):
         raw = self.connector.run_cypher_statement(cypher)
 
         # unpack neo4j response into a list if NodeItem instances
-        res = NodeItem.from_neo4j_response_with_rel(raw)
+        res = []
+        for raw_node, edge_data in raw:
+            node: NodeItem = NodeItem.from_neo4j_response(raw_node)[0]
+
+            if 'listItem' in edge_data:
+                node.rel_type = edge_data['rel_type'] + '__listItem{}'.format(edge_data['listItem'])
+            else:
+                node.rel_type = edge_data['rel_type']
+
+            res.append(node)
 
         # check if leave node got touched
         if len(res) == 0:

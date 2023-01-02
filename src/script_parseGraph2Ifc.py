@@ -6,13 +6,13 @@ def main():
     connector = Neo4jConnector()
     connector.connect_driver()
 
-    ts = "ts20220510T140041"
+    ts = "ts20221001T111540"
 
     # init generator instance
     generator = Graph2IfcTranslator(connector=connector, ts=ts)
 
     # load data into IFC
-    generator.generateSPF()
+    generator.generate_SPF()
 
     # save model as IFC SPF file
     path = "C:\dev\out\{}".format(ts)
