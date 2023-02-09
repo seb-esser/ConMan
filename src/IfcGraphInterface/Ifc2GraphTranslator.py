@@ -101,11 +101,11 @@ class IFCGraphGenerator:
         print('[IFC_P21 > {} < ]: Generating graph - DONE. \n '.format(self.timestamp))
 
         if validate_result:
-            self.validateParsingResult()
+            self.validate_parsing_result()
 
         return self.timestamp
 
-    def validateParsingResult(self):
+    def validate_parsing_result(self):
         """
         Compares the number of entities in the model with the number of nodes in the graph
         @return: boolean
@@ -156,8 +156,13 @@ class IFCGraphGenerator:
         node_properties_dict['p21_id'] = node_properties_dict.pop('id')
         node_properties_dict['EntityType'] = node_properties_dict.pop('type')
 
+        entity_type = node_properties_dict['EntityType']
+
         # run cypher command
-        cypher_statement = Neo4jGraphFactory.merge_node_with_attr(label, node_properties_dict, self.timestamp)
+        cypher_statement = Neo4jGraphFactory.merge_node_with_attr(label=label,
+                                                                  attrs=node_properties_dict,
+                                                                  timestamp=self.timestamp,
+                                                                  entity_type=entity_type)
 
         self.connector.run_cypher_statement(cypher_statement)
 
