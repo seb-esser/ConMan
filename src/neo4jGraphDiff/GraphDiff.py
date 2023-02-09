@@ -72,7 +72,7 @@ class GraphDiff(AbsGraphDiff):
             self.resource_diff.result.capture_structure_mod(entry_init, ad, 'added')
         for de in deleted:
             self.resource_diff.result.node_matching_table.add_matched_nodes(de, NodeItem(node_id=-1))
-            self.resource_diff.result.capture_structure_mod(entry_init, de, 'deleted')
+            self.resource_diff.result.capture_structure_mod(entry_updated, de, 'deleted')
 
         # returns the delta calculated during the diff process
         return self.resource_diff.get_delta()
