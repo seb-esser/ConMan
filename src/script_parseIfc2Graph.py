@@ -27,7 +27,7 @@ def main():
     # print(paths)
 
     paths = ['./00_sampleData/IFC_stepP21/wand_tuer/01_Wand_single-guidsMod.ifc',
-             './00_sampleData/IFC_stepP21/wand_tuer/02_Wand_mitTuer-guidsMod.ifc'
+             # './00_sampleData/IFC_stepP21/wand_tuer/02_Wand_mitTuer-guidsMod.ifc'
              ]
 
     for p in paths:

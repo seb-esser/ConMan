@@ -44,8 +44,8 @@ class ResourceDiff(AbsGraphDiff):
 
         # start recursion on resource structure
         # ToDo: Ticket "Improve Diff by Isomorphism appraoches": implement startpoint of isomorphism check here
-        if not self.check_isomorphism():
-            print("Expecting changes. ")
+        # if not self.check_isomorphism():
+        #     print("Expecting changes. ")
 
         self.__compare_secondary_and_continue(node_init, node_updated, indent=0)
         

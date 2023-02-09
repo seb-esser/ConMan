@@ -76,8 +76,13 @@ class PatchService:
 
         increment = 100 / (len(s_mods) + 2)
         percent = 0
+
+        # sort s_mods
+        removing_mods = [x for x in s_mods if x.modType == StructuralModificationTypeEnum.DELETED]
+        inserting_mods = [x for x in s_mods if x.modType == StructuralModificationTypeEnum.ADDED]
+
         # loop over structural modifications
-        for s_mod in s_mods:
+        for s_mod in removing_mods + inserting_mods:
 
             # print progressbar
             percent += increment
@@ -395,7 +400,8 @@ class PatchService:
                         all_context.paths.append(context_current_node.paths[0])
 
                     else:
-                        print(Warning("These gluing cases are not yet supported"))
+                        print(Warning("These gluing cases are not yet supported. Target: {}"
+                                      "".format(glue_target.get_entity_type())))
                         continue
 
                 elif glue_target.get_node_type() == "PrimaryNode":

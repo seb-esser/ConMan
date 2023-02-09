@@ -120,13 +120,18 @@ class Patch(object):
             context.remove_OwnerHistory_links()
 
             search = GraphPattern()
-            search.paths.extend(rule.push_out_pattern.paths)
             search.paths.extend(rule.context_pattern.paths)
             search.paths.extend(rule.gluing_pattern.paths)
+            search.paths.extend(rule.push_out_pattern.paths)
             cy = search.to_cypher_match(define_return=False)
+
+            # delete the gluing edge
+            cy += "DELETE e{} ".format(glue.paths[0].segments[0].edge_id)
 
             # run the delete operation
             cy += rule.push_out_pattern.to_cypher_node_delete()
+
+            print(cy)
             connector.run_cypher_statement(cy)
 
         print("Applying attribute changes... ")
