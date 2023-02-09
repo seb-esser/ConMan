@@ -119,19 +119,20 @@ class Patch(object):
             context.tidy_node_attributes()
             context.remove_OwnerHistory_links()
 
+            # match context, glue and pushout first
             search = GraphPattern()
             search.paths.extend(rule.context_pattern.paths)
             search.paths.extend(rule.gluing_pattern.paths)
             search.paths.extend(rule.push_out_pattern.paths)
             cy = search.to_cypher_match(define_return=False)
 
-            # delete the gluing edge
-            cy += "DELETE e{} ".format(glue.paths[0].segments[0].edge_id)
+            # delete the gluing edges
+            for edge in glue.paths:
+                cy += "DELETE e{} ".format(edge.segments[0].edge_id)
 
-            # run the delete operation
-            cy += rule.push_out_pattern.to_cypher_node_delete()
+            # run the node delete operation. Include detach is required to catch all edges
+            cy += rule.push_out_pattern.to_cypher_node_delete(include_detach=True)
 
-            print(cy)
             connector.run_cypher_statement(cy)
 
         print("Applying attribute changes... ")
