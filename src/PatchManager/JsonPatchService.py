@@ -36,12 +36,14 @@ class JsonPatchService(PatchService):
         @return: the patch representing the operations
         """
 
+        print("[INFO] generating JsonBasedPatch...\n")
         with open(self.init_path) as init_file:
             init_data = json.load(init_file)
 
         with open(self.updt_path) as updt_file:
             updt_data = json.load(updt_file)
 
+        print("[INFO] Generating done.")
         return JsonBasedPatch(patch=jsonpatch.make_patch(init_data, updt_data))
 
     def apply_patch(self, patch: JsonBasedPatch, filepath: str):
@@ -50,14 +52,15 @@ class JsonPatchService(PatchService):
         @param filepath: path to the json file that should be patched
         @return: 
         """
-
+        
+        print("[INFO] Applying json patch...\n")
         with open(filepath) as f:
             data_to_patch = json.load(f)
         
-        data_to_patch = patch.apply(data_to_patch)
+        patched_data = patch.apply(data_to_patch)
 
-        with open(filepath, 'w') as f:
-            json.dump(data_to_patch, f)
+        print("[INFO] Applying done.")
+        return patched_data
 
     def save_patch_to_json(self, patch: JsonBasedPatch, directory=''):
         """
