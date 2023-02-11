@@ -34,16 +34,18 @@ class Neo4jGraphFactory(Neo4jFactory):
         return Neo4jFactory.BuildMultiStatement([create, setGuid, setEntityType, return_id])
 
     @classmethod
-    def merge_node_with_attr(cls, label: str, attrs: dict, timestamp: str):
+    def merge_node_with_attr(cls, label: str, attrs: dict, timestamp: str, entity_type: str = ""):
         """
         Provides the cypher command to create a node with attributes in the neo4j database.
+        @param entity_type:
+        @param attrs:
         @param label: label for the node (e.g. PrimaryNode)
         @param attr: dictionary of the corresponding attributes
         @param timestamp: identifier for a model
         @return: cypher command as str
         """
         node_attrs = Neo4jFactory.formatDict(attrs)
-        create = 'MERGE(n:{}:{} {})'.format(timestamp, label, node_attrs)
+        create = 'MERGE(n:{}:{}:{} {})'.format(timestamp, label, entity_type, node_attrs)
         return_id = 'RETURN ID(n)'
         return Neo4jFactory.BuildMultiStatement([create, return_id])
         

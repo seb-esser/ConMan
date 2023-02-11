@@ -178,18 +178,6 @@ class Neo4jQueryFactory(Neo4jFactory):
         return Neo4jFactory.BuildMultiStatement([match, where, ret])
 
     @classmethod
-    def get_pattern_by_id_no_limits(cls, node_id: int) -> str:
-        """
-        return the pattern of a subgraph beneath a node without path length limits
-        @param node_id: ifc guid of the node
-        @return: cypher query string
-        """
-        match = 'MATCH pattern = (n)-[*]->(m)'
-        where = 'WHERE ID(n) = {}'.format(node_id)
-        ret = 'RETURN pattern, NODES(pattern), RELATIONSHIPS(pattern)'
-        return Neo4jFactory.BuildMultiStatement([match, where, ret])
-
-    @classmethod
     def get_outgoing_rel_types(cls, node_id: int):
         """
         Queries
@@ -257,14 +245,14 @@ class Neo4jQueryFactory(Neo4jFactory):
                'RETURN path, NODES(path), RELATIONSHIPS(path)'.format(node_id)
 
     @classmethod
-    def get_all_nodes_wou_SIMILARTO_rel(cls, timestamp: str) -> str:
+    def get_all_nodes_wou_EQUIVALENTTO_rel(cls, timestamp: str) -> str:
         """
         queries all nodes that do not have an incoming or outgoing SIMILAR_TO relationship
         @param timestamp: the model's identifier
         @return: cypher query string
         """
         cy = """
-        Match (n)-[r:SIMILAR_TO]-(m) 
+        Match (n)-[r:EQUIVALENT_TO]-(m) 
         WITH collect(ID(n)) as nodeIds
         MATCH (a:{0}) WHERE NOT ID(a) IN nodeIds
         RETURN a

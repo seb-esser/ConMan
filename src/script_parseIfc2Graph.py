@@ -26,39 +26,8 @@ def main():
     #    paths.append(filepath)
     # print(paths)
 
-    # paths = [  # './00_sampleData/IFC_stepP21/GeomRepresentation_01/Initial_GeomRepresentation_01.ifc',
-    # same representation
-    # './00_sampleData/IFC_stepP21/GeomRepresentation_01/Update_GeomRepresentation_01.ifc',  # two representations
-    # './00_sampleData/IFC_stepP21/GeomRepresentation_02/Initial_GeomRepresentation_02.ifc',  # two representations
-    # './00_sampleData/IFC_stepP21/GeomRepresentation_02/Update_GeomRepresentation_02.ifc',
-    # elevated cuboid height -> PMod
-    #          './00_sampleData/IFC_stepP21/GeomRepresentation_03/Initial_GeomRepresentation_03.ifc',  # 1 proxy as cuboid
-    #          './00_sampleData/IFC_stepP21/GeomRepresentation_03/Update_GeomRepresentation_03.ifc',# 1 proxy as cylinder -> mainly PMod,
-    #          './00_sampleData/IFC_stepP21/GeomRepresentation_04/Initial_GeomRepresentation_04.ifc',  # extrudedArea
-    #          './00_sampleData/IFC_stepP21/GeomRepresentation_04/Update_GeomRepresentation_04.ifc',  # BRep -> structural Mod
-    # './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_single.ifc',
-    # './00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_double.ifc',
-    #          './00_sampleData/IFC_stepP21/GeomRepresentation_06/cube_double.ifc',
-    #          './00_sampleData/IFC_stepP21/GeomRepresentation_06/cube_double_wModifiedParentPlacement.ifc',
-    #          './00_sampleData/IFC_stepP21/wall-column/Wall-Column.ifc',
-    #          './00_sampleData/IFC_stepP21/wall-column/Column-Wall.ifc',
-    #          './00_sampleData/IFC_stepP21/SleeperSample/sleeper_init.ifc',
-    #          './00_sampleData/IFC_stepP21/SleeperSample/sleeper_updated.ifc',
-    #          './00_sampleData/IFC_stepP21/SpatialStructure_01/spatial_initial.ifc',
-    #          './00_sampleData/IFC_stepP21/SpatialStructure_01/spatial_updated.ifc',
-    #          './00_sampleData/IFC_stepP21/LocalPlacement_01/Initial_LocalPlacement_01.ifc',
-    #          './00_sampleData/IFC_stepP21/LocalPlacement_01/Update_LocalPlacement_01.ifc',
-    # './00_sampleData/IFC_stepP21/Storey_01/SingleStorey_init.ifc',
-    # './00_sampleData/IFC_stepP21/Storey_01/SingleStorey_updated.ifc'
-    #          # # moved wall, new window and subsequent change in parent wall
-    # './00_sampleData/IFC_stepP21/Fahrzeughalle/Fahrzeughalle.ifc',
-    # './00_sampleData/IFC_stepP21/Fahrzeughalle/Fahrzeughalle_updt.ifc'
-    # ]
-    # paths = ['./00_sampleData/IFC_stepP21/WallSpace/SpaceWallExample.ifc',
-    #          './00_sampleData/IFC_stepP21/WallSpace/SpaceWallExample_wallMoved.ifc'
-    #          ]
-    paths = ['./00_sampleData/IFC_stepP21/SpaceWallWithPset.ifc',
-             #'./00_sampleData/IFC_stepP21/CAM/CadCam_Module_updt.ifc'
+    paths = ['./00_sampleData/IFC_stepP21/wand_tuer/01_Wand_single-guidsMod.ifc',
+             # './00_sampleData/IFC_stepP21/wand_tuer/02_Wand_mitTuer-guidsMod.ifc'
              ]
 
     for p in paths:
@@ -69,9 +38,9 @@ def main():
     start = time.perf_counter()
     for idx, path in enumerate(paths):
         # parse model
-        graphGenerator = IFCGraphGenerator(connector, path, None)
+        graph_generator = IFCGraphGenerator(connector, path, None)
         print('Generating Graph %d/%d' % (idx + 1, amount))
-        graphGenerator.generateGraph()
+        graph_generator.generateGraph()
     finish = time.perf_counter()
     print('\n 100% done. Graphs generated. Finished in {} seconds.'.format(round(finish - start, 2)))
     # disconnect from database
