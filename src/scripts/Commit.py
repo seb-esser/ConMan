@@ -1,5 +1,5 @@
 from PatchManager.PatchBundle import PatchBundle
-from PatchManager.PatchService import PatchService
+from PatchManager.GraphPatchService import GraphPatchService
 from neo4jGraphDiff.GraphDiff import GraphDiff
 from neo4j_middleware.BucketManager.BucketUtility import BucketUtility
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
@@ -50,14 +50,14 @@ def commit(commit_message: str):
         pDiff.build_equivalent_to_edges()
 
         # create and store patch
-        service = PatchService.from_existing_delta(delta=delta)
+        service = GraphPatchService.from_existing_delta(delta=delta)
         print("[INFO] Generate Patch for bucket {}".format(bucket.GlobalId))
-        patch = service.generate_DPO_patch(connector=connector)
+        patch = service.generate_patch(connector=connector)
 
         bundle.patches.append(patch)
 
     # save bundle
-    service = PatchService().save_patch_bundle_to_json(bundle)
+    service = GraphPatchService().save_patch_bundle_to_json(bundle)
 
     # disconnect
     connector.disconnect_driver()
