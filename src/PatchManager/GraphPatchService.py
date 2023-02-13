@@ -1,12 +1,13 @@
+from pprint import pprint
 from typing import List
 
 import jsonpickle
 
+import progressbar
 from PatchManager.AttributeRule import AttributeRule
 from PatchManager.GraphBasedPatch import GraphBasedPatch
-from PatchManager.GraphBasedPatch import GraphBasedPatch
-from PatchManager.PatchService import PatchService
 from PatchManager.PatchBundle import PatchBundle
+from PatchManager.PatchService import PatchService
 from PatchManager.TransformationRule import TransformationRule
 from neo4jGraphDiff.Caption.PropertyModification import PropertyModification
 from neo4jGraphDiff.Caption.StructureModification import StructuralModificationTypeEnum, StructureModification
@@ -16,7 +17,6 @@ from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
-import progressbar
 
 
 class GraphPatchService(PatchService):
@@ -207,11 +207,12 @@ class GraphPatchService(PatchService):
                     parent_node = self.delta.node_matching_table.get_parent_primaryNode(context_node)
 
                     # calculate the unique path describing the context node
-                    cy = "MATCH {0}, {1}, p = SHORTESTPATH({2}-[:rel*]->{3}) RETURN p, NODES(p), RELATIONSHIPS(p)".format(
-                        parent_node.to_cypher(),
-                        context_node.to_cypher(),
-                        parent_node.to_cypher(skip_labels=True, skip_attributes=True),
-                        context_node.to_cypher(skip_labels=True, skip_attributes=True))
+                    cy = "MATCH {0}, {1}, p = SHORTESTPATH({2}-[:rel*]->{3}) " \
+                         "RETURN p, NODES(p), RELATIONSHIPS(p)".format(
+                            parent_node.to_cypher(),
+                            context_node.to_cypher(),
+                            parent_node.to_cypher(skip_labels=True, skip_attributes=True),
+                            context_node.to_cypher(skip_labels=True, skip_attributes=True))
                     raw = connector.run_cypher_statement(cy)
                     embed: GraphPattern = GraphPattern.from_neo4j_response(raw)
                     context_pattern.paths.append(embed.paths[0])
@@ -262,7 +263,7 @@ class GraphPatchService(PatchService):
             rule = AttributeRule(path=path, attribute_name=attr_name, init_value=init_val, updated_value=updt_val)
             patch.attribute_changes.append(rule)
 
-        # store connectionNode structures
+            # store connectionNode structures
 
         pushout_init, context_init, glue_init = self.__extract_conNode_patterns(connector, ts=ts_init)
         pushout_updt, context_updt, glue_updt = self.__extract_conNode_patterns(connector, ts=ts_updated)
@@ -353,7 +354,7 @@ class GraphPatchService(PatchService):
 
         return result
 
-    def __extract_conNode_patterns(self, connector: Neo4jConnector,  ts: str):
+    def __extract_conNode_patterns(self, connector: Neo4jConnector, ts: str):
         """
 
         @param connector:
@@ -380,15 +381,14 @@ class GraphPatchService(PatchService):
                                           or x.segments[0].end_node.get_node_type() == "PrimaryNode"]
             all_glue.paths.extend(paths_to_prim_or_ownerHist)
 
-            # get context
-            targets = glue.get_unified_node_set()
-            for glue_target in targets:
+            # get context for those gluing edges that have not been sorted out
+            for glue_target in [x.segments[0].end_node for x in paths_to_prim_or_ownerHist]:
 
                 if glue_target.get_node_type() == "SecondaryNode":
 
                     if glue_target.get_entity_type() == "IfcOwnerHistory":
                         # query context
-                        cy = "MATCH p = SHORTESTPATH({0}<-[:rel*]-(n:PrimaryNode:{1}{{EntityType: \"IfcProject\"}}))  " \
+                        cy = "MATCH p = SHORTESTPATH({0}<-[:rel*]-(n:PrimaryNode:{1}{{EntityType: \"IfcProject\"}})) " \
                              "RETURN p, NODES(p), RELATIONSHIPS(p)".format(glue_target.to_cypher(), ts)
                         raw = connector.run_cypher_statement(cy)
                         context_current_node = GraphPattern.from_neo4j_response(raw)
@@ -412,4 +412,3 @@ class GraphPatchService(PatchService):
                     all_context.paths.append(path_to_current_node)
 
         return push_out, all_context, all_glue
-
