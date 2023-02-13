@@ -1,3 +1,4 @@
+from PatchManager.GraphPatchService import GraphPatchService
 from PatchManager.PatchService import PatchService
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
@@ -28,7 +29,7 @@ def main():
     ts_init, ts_updated = testcases[case_study]
 
     # init new PatchService object handling all load and save operations
-    service = PatchService()
+    service = GraphPatchService()
 
     # load patch
     patch = service.load_patch_from_json('Patch_init{}-updt{}.json'.format(ts_init, ts_updated))

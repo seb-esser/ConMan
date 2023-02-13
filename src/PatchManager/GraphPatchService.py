@@ -1,4 +1,3 @@
-from pprint import pprint
 from typing import List
 
 import jsonpickle
@@ -24,14 +23,19 @@ class GraphPatchService(PatchService):
     manages loading, applying and saving of graph based patches
     """
 
+    def __init__(self, connector: Neo4jConnector):
+        super().__init__()
+        self.connector = connector
+
     @classmethod
-    def from_existing_delta(cls, delta):
+    def from_existing_delta(cls, delta, connector: Neo4jConnector):
         """
         creates GraphBasedPatchService object from existing delta object without loading any jsons
+        @param connector:
         @param delta:
         @return:
         """
-        inst = cls()
+        inst = cls(connector=connector)
         inst.delta: GraphDelta = delta
         return inst
 
@@ -49,14 +53,14 @@ class GraphPatchService(PatchService):
         self.delta: GraphDelta = jsonpickle.decode(content)
         print("[INFO] loading delta json: DONE.")
 
-    def generate_patch(self, connector) -> GraphBasedPatch:
+    def generate_patch(self) -> GraphBasedPatch:
         """
         produces a patch from a given delta
         @param connector: the neo4j connector instance
         @return: the patch object
         """
 
-        patch = GraphBasedPatch(connector)
+        patch = GraphBasedPatch(self.connector)
 
         try:
             ts_init = self.delta.ts_init
@@ -112,7 +116,7 @@ class GraphPatchService(PatchService):
                      """.format(ts, guid)
 
                 # query pushout
-                raw = connector.run_cypher_statement(cy)
+                raw = self.connector.run_cypher_statement(cy)
                 # save pushout
                 push_out_pattern.paths.extend(GraphPattern.from_neo4j_response(raw).paths)
 
@@ -131,7 +135,7 @@ class GraphPatchService(PatchService):
                     reference_primary_node.to_cypher(skip_labels=True, skip_attributes=True),
                     # must be given twice as shortest path doenst allow declaration
                     s_mod.parent.to_cypher(skip_labels=True, skip_attributes=True))
-                raw = connector.run_cypher_statement(cy)
+                raw = self.connector.run_cypher_statement(cy)
 
                 anchor_pattern: GraphPattern = GraphPattern.from_neo4j_response(raw)
                 # the anchor is already a first part of the context necessary to ensure correct insertion
@@ -151,7 +155,7 @@ class GraphPatchService(PatchService):
                         ts)
 
                 # query pushout
-                raw = connector.run_cypher_statement(cy)
+                raw = self.connector.run_cypher_statement(cy)
                 push_put = GraphPattern.from_neo4j_response(raw)
 
                 # a special case is the moment, where only one leaf node has been added.
@@ -182,7 +186,7 @@ class GraphPatchService(PatchService):
                 cy = cy_anchor_path + " MATCH p = {}-[:rel]->{} RETURN p, NODES(p), RELATIONSHIPS(p)".format(
                     context_pattern.get_last_node().to_cypher(skip_labels=True, skip_attributes=True),
                     s_mod.child.to_cypher())
-                raw = connector.run_cypher_statement(cy)
+                raw = self.connector.run_cypher_statement(cy)
                 glue: GraphPattern = GraphPattern.from_neo4j_response(raw)
 
                 if glue is None:
@@ -197,7 +201,7 @@ class GraphPatchService(PatchService):
             for n in nodes_pushed_out:
                 cy_equ_neighbor = "match p = (n)-[r:rel]->(e)-[:EQUIVALENT_TO]-() WHERE ID(n) = {} return e".format(
                     n.id)
-                raw_neighbor = connector.run_cypher_statement(cy_equ_neighbor)
+                raw_neighbor = self.connector.run_cypher_statement(cy_equ_neighbor)
 
                 # check if the newly created node has a relationship to another node
                 # that is already present in the target graph
@@ -213,7 +217,7 @@ class GraphPatchService(PatchService):
                             context_node.to_cypher(),
                             parent_node.to_cypher(skip_labels=True, skip_attributes=True),
                             context_node.to_cypher(skip_labels=True, skip_attributes=True))
-                    raw = connector.run_cypher_statement(cy)
+                    raw = self.connector.run_cypher_statement(cy)
                     embed: GraphPattern = GraphPattern.from_neo4j_response(raw)
                     context_pattern.paths.append(embed.paths[0])
 
@@ -221,7 +225,7 @@ class GraphPatchService(PatchService):
                     cy = "MATCH p = {}-[r:rel]->{} RETURN p, NODES(p), RELATIONSHIPS(p)".format(
                         n.to_cypher(skip_attributes=False, skip_labels=False),
                         context_node.to_cypher(skip_attributes=False, skip_labels=False))
-                    raw = connector.run_cypher_statement(cy)
+                    raw = self.connector.run_cypher_statement(cy)
                     glue: GraphPattern = GraphPattern.from_neo4j_response(raw)
 
                     # add gluing edge
@@ -265,8 +269,8 @@ class GraphPatchService(PatchService):
 
             # store connectionNode structures
 
-        pushout_init, context_init, glue_init = self.__extract_conNode_patterns(connector, ts=ts_init)
-        pushout_updt, context_updt, glue_updt = self.__extract_conNode_patterns(connector, ts=ts_updated)
+        pushout_init, context_init, glue_init = self.__extract_conNode_patterns(self.connector, ts=ts_init)
+        pushout_updt, context_updt, glue_updt = self.__extract_conNode_patterns(self.connector, ts=ts_updated)
 
         remove_rule = TransformationRule(gluing_pattern=glue_init,
                                          push_out_pattern=pushout_init,

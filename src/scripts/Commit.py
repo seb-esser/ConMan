@@ -50,14 +50,14 @@ def commit(commit_message: str):
         pDiff.build_equivalent_to_edges()
 
         # create and store patch
-        service = GraphPatchService.from_existing_delta(delta=delta)
+        service = GraphPatchService.from_existing_delta(delta=delta, connector=connector)
         print("[INFO] Generate Patch for bucket {}".format(bucket.GlobalId))
-        patch = service.generate_patch(connector=connector)
+        patch = service.generate_patch()
 
         bundle.patches.append(patch)
 
     # save bundle
-    service = GraphPatchService().save_patch_bundle_to_json(bundle)
+    service = GraphPatchService(connector=connector).save_patch_bundle_to_json(bundle)
 
     # disconnect
     connector.disconnect_driver()
