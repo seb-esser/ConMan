@@ -32,7 +32,7 @@ def main():
     service = GraphPatchService()
     service.load_delta('GraphDelta_init{}-updt{}.json'.format(ts_init, ts_updated))
 
-    patch = service.generate_patch(connector=connector)
+    patch = service.generate_patch()
 
     service.save_patch_to_json(patch)
 

@@ -79,10 +79,24 @@ class ResourceDiff(AbsGraphDiff):
         [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(children_init, children_updated,
                                                                                      matching_method)
 
+        # consider the exceptional case that the EntityType has changed. Then, the relTypes are still the same but
+        # chances are high that a structural change makes life a lot easier on the long run
+        to_remove = []
+        for n1, n2 in nodes_unchanged:
+            if n1.get_entity_type() != n2.get_entity_type():
+                # remove pair from unchanged list
+                to_remove.append((n1, n2))
+                # add n1 to nodes_removed
+                nodes_deleted.append(n1)
+                # add n2 to nodes_inserted
+                nodes_added.append(n2)
+
+        nodes_unchanged = [pair for pair in nodes_unchanged if pair not in to_remove]
+
         # check if nodes in nodes_unchanged got already matched but a previous subtree analysis
         import copy
-        intmed_unc = copy.deepcopy(nodes_unchanged)
-        for pair in intmed_unc:
+        unchanged_pairs = copy.deepcopy(nodes_unchanged)
+        for pair in unchanged_pairs:
             if NodePair(pair[0], pair[1]) in self.result.node_matching_table.matched_nodes:
                 # stop recursion because this node pair was already visited in a previous step
                 nodes_unchanged.remove(pair)
@@ -211,7 +225,7 @@ class ResourceDiff(AbsGraphDiff):
 
     def __get_pattern(self, root_node_id: int, current_node_id: int) -> GraphPattern:
         """
-
+        Returns a graph pattern between two nodes specified by their ids
         @param root_node_id:
         @param current_node_id:
         @return:

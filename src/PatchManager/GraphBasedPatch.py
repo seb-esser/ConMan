@@ -132,10 +132,15 @@ class GraphBasedPatch(Patch):
             for edge in glue.paths:
                 cy += "DELETE e{} ".format(edge.segments[0].edge_id)
 
-            # run the node delete operation. Include detach is required to catch all edges
-            cy += rule.push_out_pattern.to_cypher_node_delete(include_detach=True)
+            # ToDo
+            # run the node delete operation of the pushout part.
+            cy += rule.push_out_pattern.to_cypher_node_delete(include_detach=False)
+            print(cy)
 
             self.connector.run_cypher_statement(cy)
+
+        print("Performing cleanup ...")
+        cy = "MATCH (n) WHERE NOT (n)--() DELETE n"
 
         print("Applying attribute changes... ")
         # loop over attribute changes
@@ -195,6 +200,7 @@ class GraphBasedPatch(Patch):
 
             if rule is inserting_rules[-1]:
                 print("applying conNode edges...")
+                # ToDo: Run with relaxed semantic conditions in the match statements - seems like there is an issue
 
             if rule.context_pattern.is_empty() or rule.gluing_pattern.is_empty():
                 continue

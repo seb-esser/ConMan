@@ -23,9 +23,8 @@ class GraphPatchService(PatchService):
     manages loading, applying and saving of graph based patches
     """
 
-    def __init__(self, connector: Neo4jConnector):
+    def __init__(self):
         super().__init__()
-        self.connector = connector
 
     @classmethod
     def from_existing_delta(cls, delta, connector: Neo4jConnector):
@@ -35,7 +34,7 @@ class GraphPatchService(PatchService):
         @param delta:
         @return:
         """
-        inst = cls(connector=connector)
+        inst = cls()
         inst.delta: GraphDelta = delta
         return inst
 
@@ -56,7 +55,6 @@ class GraphPatchService(PatchService):
     def generate_patch(self) -> GraphBasedPatch:
         """
         produces a patch from a given delta
-        @param connector: the neo4j connector instance
         @return: the patch object
         """
 
@@ -126,7 +124,7 @@ class GraphPatchService(PatchService):
                 # construct a path from a primaryNode (having a GUID) to the parent
                 reference_primary_node = self.delta.node_matching_table.get_parent_primaryNode(s_mod.parent)
 
-                # query anchor path for newly inserted node.
+                # query anchor path for removed or inserted node.
                 # Returns a path that uniquely accesses the last secondary node already existing (i.e. equivalent_to)
 
                 cy = "MATCH {0}, {1}, p = SHORTESTPATH({2}-[:rel*]->{3}) RETURN p, NODES(p), RELATIONSHIPS(p)".format(
@@ -158,15 +156,25 @@ class GraphPatchService(PatchService):
                 raw = self.connector.run_cypher_statement(cy)
                 push_put = GraphPattern.from_neo4j_response(raw)
 
-                # a special case is the moment, where only one leaf node has been added.
+                # a special case is the moment, where only one leaf node has been added or deleted.
                 # Then, the pattern query returns no paths. To solve this situation, the parent node is queried as well
                 # such that we can construct a pattern
+
+                # Special attention must be spent in situations where the child node is still used by other resources
+                # such that only the edge must be deleted or inserted
 
                 if push_put is not None:
                     # save pushout
                     push_out_pattern.paths.extend(push_put.paths)
                 else:
+
                     # child node is leaf node. Create virtual node to have a pattern
+                    cy = anchor_pattern.to_cypher_match()
+                    print(cy)
+
+                    # check if s_mod.child is referenced by other structures.
+                    # In this case, only the edge has to be removed.
+
                     virtual_path = GraphPath(
                         [EdgeItem(start_node=s_mod.child, end_node=NodeItem(node_id=-1), rel_id=-1)])
 
