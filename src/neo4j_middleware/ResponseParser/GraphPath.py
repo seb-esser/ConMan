@@ -69,7 +69,7 @@ class GraphPath:
         # loop over all segments of the current path and append them to the call
         for segment in self.segments:
             if segment.is_virtual_edge():
-                cy = segment.to_cypher()
+                cy = segment.to_cypher(entType_guid_only=entType_guid_only)
                 cy_list.append(cy)
                 continue
 

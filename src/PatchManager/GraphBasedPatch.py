@@ -152,44 +152,6 @@ class GraphBasedPatch(Patch):
             self.__apply_attribute_rule(rule)
 
         print("Applying insertion rules... ")
-        for rule in inserting_rules:
-            percent += increment
-            progressbar.print_bar(percent)
-
-            new_nodes_inserted = rule.push_out_pattern.get_unified_node_set()
-            new_edges_inserted = rule.push_out_pattern.get_unified_edge_set()
-
-            # ToDo: unify all_new_nodes_inserted
-            cy = ''
-            # create all new nodes to be inserted
-            for node in new_nodes_inserted:
-                cy += "MERGE {}".format(node.to_cypher())
-            res = self.connector.run_cypher_statement(cy)
-
-            # create all edges between newly inserted nodes
-            for edge in new_edges_inserted:
-
-                if edge.is_virtual_edge():
-                    continue
-                # achtung: hier wird als eindeutiges Merkmal
-                # für secondary Nodes die kombination timestamp und p21 genutzt!
-                cy = "MATCH {} " \
-                     "MATCH {} " \
-                     "MERGE {} RETURN {}".format(
-                    edge.start_node.to_cypher(),
-                    edge.end_node.to_cypher(),
-                    edge.to_cypher(
-                        skip_start_node_attrs=True,
-                        skip_end_node_attrs=True,
-                        skip_start_node_labels=True,
-                        skip_end_node_labels=True),
-                    edge.edge_identifier)
-
-                # this cy creates all edges between push out nodes and thus works without any changes in the timestamp
-                res = self.connector.run_cypher_statement(cy)
-
-        # so far, all pushout patterns have been inserted
-        # next, build glue and embedding
 
         print("updating timestamps 1/2")
         label_from = self.base_timestamp
@@ -208,21 +170,28 @@ class GraphBasedPatch(Patch):
 
             # rule.context_pattern.replace_timestamp(self.base_timestamp)
             # find context pattern
-            cy = rule.context_pattern.to_cypher_match(optional_match=False)
+            cy = rule.context_pattern.to_cypher_match(optional_match=False, entType_guid_only=True)
+
+            # create push-out
+            cy += rule.push_out_pattern.to_cypher_merge()
 
             # this node is part of the pushout but can be addressed by it p21 id and the timestamp for the moment
-            start_nodes = []
+            start_nodes = rule.push_out_pattern.get_unified_node_set() + rule.context_pattern.get_unified_node_set()
             for p in rule.gluing_pattern.paths:
-                node = p.segments[0].start_node
+                glue_start = p.segments[0].start_node
 
-                if node not in start_nodes:
+                if glue_start in rule.push_out_pattern.get_unified_node_set():
+                    # node already specified, no need to re-specify
+                    continue
 
-                    if node in rule.context_pattern.get_unified_node_set():
+                if glue_start not in start_nodes:
+
+                    if glue_start in rule.context_pattern.get_unified_node_set():
                         # node has been already declared, use reduced cy representation
-                        cy += "MATCH " + node.to_cypher(skip_attributes=True, skip_labels=True)
+                        cy += "MATCH " + glue_start.to_cypher(skip_attributes=True, skip_labels=True)
                     else:
-                        start_nodes.append(node)
-                        cy += "MATCH " + node.to_cypher()
+                        start_nodes.append(glue_start)
+                        cy += "MATCH " + glue_start.to_cypher()
 
             nodes_context = rule.context_pattern.get_unified_node_set()
             cy += rule.gluing_pattern.to_cypher_merge(nodes_specified=[*start_nodes, *nodes_context], edges_specified=[])

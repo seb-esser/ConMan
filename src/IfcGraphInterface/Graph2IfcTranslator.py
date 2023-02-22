@@ -162,8 +162,11 @@ class Graph2IfcTranslator:
         if len(child_nodes) == 0:
             return
 
+        # in some cases, nodes may exist that do not represent entities. Filter them out
+        filtered_child_nodes = [n for n in child_nodes if n.get_entity_type() is not None]
+
         # for some geometries, the order of instantiation is important. Therefore, we sort the nodes here w.r.t listItem
-        sorted_child_nodes = sorted(child_nodes, key=lambda cnode: cnode.get_listitem())
+        sorted_child_nodes = sorted(filtered_child_nodes, key=lambda cnode: cnode.get_listitem())
         # sorted_child_nodes = child_nodes
 
         # print([x.get_listitem() for x in sorted_child_nodes])

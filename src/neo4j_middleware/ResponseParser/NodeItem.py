@@ -31,7 +31,7 @@ class NodeItem:
         """
         returns the entityType label of the node
         """
-        return self.attrs["EntityType"]
+        return self.attrs.get("EntityType", None)
 
     def get_timestamps(self) -> list:
         """

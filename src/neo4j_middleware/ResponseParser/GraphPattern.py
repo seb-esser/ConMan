@@ -210,7 +210,7 @@ class GraphPattern:
                 else:
                     skip_end_attrs = True
                     skip_end_labels = True
-                if edge in edges_already_specified:
+                if edge in edges_already_specified and not edge.is_virtual_edge():
                     continue
 
                 cy_frag = "MERGE " + edge.to_cypher(skip_start_node_attrs=skip_start_attrs,
