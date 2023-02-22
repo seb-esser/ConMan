@@ -42,7 +42,18 @@ def main():
         print('Generating Graph %d/%d' % (idx + 1, amount))
         graph_generator.generateGraph()
     finish = time.perf_counter()
-    print('\n 100% done. Graphs generated. Finished in {} seconds.'.format(round(finish - start, 2)))
+    print('100% done. Graphs generated. Finished in {} seconds.'.format(round(finish - start, 2)))
+
+    print("Performing post-processing: Remove layer assignments and styled items ")
+
+    cy = 'MATCH p = (n{EntityType:"IfcStyledItem"})-[r:rel]->(s:SecondaryNode) DELETE r'
+    connector.run_cypher_statement(cy)
+
+    cy = 'MATCH p = (n{EntityType:"IfcPresentationLayerAssignment"})-[r:rel]->(s:SecondaryNode) DELETE r'
+    connector.run_cypher_statement(cy)
+
+    print("Post-processing done. ")
+
     # disconnect from database
     connector.disconnect_driver()
 

@@ -128,19 +128,20 @@ class GraphBasedPatch(Patch):
             search.paths.extend(rule.push_out_pattern.paths)
             cy = search.to_cypher_match(define_return=False)
 
-            # delete the gluing edges
-            for edge in glue.paths:
+            # delete the gluing and pushout edges
+            for edge in glue.paths + rule.push_out_pattern.paths:
+                if edge.segments[0].is_virtual_edge():
+                    continue
                 cy += "DELETE e{} ".format(edge.segments[0].edge_id)
 
             # ToDo
             # run the node delete operation of the pushout part.
-            cy += rule.push_out_pattern.to_cypher_node_delete(include_detach=False)
+            # ignore nodes that are part of the context pattern
+            context_nodes = rule.context_pattern.get_unified_node_set()
+            cy += rule.push_out_pattern.to_cypher_node_delete(include_detach=True, ignore_nodes=context_nodes)
             print(cy)
 
             self.connector.run_cypher_statement(cy)
-
-        print("Performing cleanup ...")
-        cy = "MATCH (n) WHERE NOT (n)--() DELETE n"
 
         print("Applying attribute changes... ")
         # loop over attribute changes

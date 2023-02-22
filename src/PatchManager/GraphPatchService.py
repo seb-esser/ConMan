@@ -25,9 +25,11 @@ class GraphPatchService(PatchService):
 
     def __init__(self):
         super().__init__()
+        self.connector = Neo4jConnector()
+        self.connector.connect_driver()
 
     @classmethod
-    def from_existing_delta(cls, delta, connector: Neo4jConnector):
+    def from_existing_delta(cls, delta):
         """
         creates GraphBasedPatchService object from existing delta object without loading any jsons
         @param connector:
