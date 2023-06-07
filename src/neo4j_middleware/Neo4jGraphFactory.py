@@ -34,9 +34,12 @@ class Neo4jGraphFactory(Neo4jFactory):
         return Neo4jFactory.BuildMultiStatement([create, setGuid, setEntityType, return_id])
 
     @classmethod
-    def merge_node_with_attr(cls, label: str, attrs: dict, timestamp: str, entity_type: str = ""):
+    def merge_node_with_attr(cls, label: str, attrs: dict, timestamp: str, entity_type: str = "",
+                             node_identifier: str = "", skip_return: bool = False):
         """
         Provides the cypher command to create a node with attributes in the neo4j database.
+        @param skip_return:
+        @param node_identifier:
         @param entity_type:
         @param attrs:
         @param label: label for the node (e.g. PrimaryNode)
@@ -45,10 +48,13 @@ class Neo4jGraphFactory(Neo4jFactory):
         @return: cypher command as str
         """
         node_attrs = Neo4jFactory.formatDict(attrs)
-        create = 'MERGE(n:{}:{}:{} {})'.format(timestamp, label, entity_type, node_attrs)
-        return_id = 'RETURN ID(n)'
+        create = 'MERGE(n{}:{}:{}:{} {})'.format(node_identifier, timestamp, label, entity_type, node_attrs)
+        if not skip_return:
+            return_id = 'RETURN ID(n)'
+        else:
+            return_id = ''
         return Neo4jFactory.BuildMultiStatement([create, return_id])
-        
+
     @classmethod
     def add_attributes_by_node_id(cls, node_id: int, attributes: dict, timestamp: str) -> str:
         """
@@ -130,7 +136,7 @@ class Neo4jGraphFactory(Neo4jFactory):
         returnID = 'RETURN ID(n)'
 
         return Neo4jFactory.BuildMultiStatement([match, create, merge] + attrs + [returnID])
-    
+
     @classmethod
     def create_list_node(cls, parent_id: int, rel_type: str, timestamp: str) -> str:
         """
@@ -263,5 +269,3 @@ class Neo4jGraphFactory(Neo4jFactory):
         detach = 'DETACH'
         delete = 'DELETE n'
         return Neo4jFactory.BuildMultiStatement([match, detach, delete])
-    
-    

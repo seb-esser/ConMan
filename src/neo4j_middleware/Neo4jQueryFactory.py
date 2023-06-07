@@ -65,6 +65,22 @@ class Neo4jQueryFactory(Neo4jFactory):
         return Neo4jFactory.BuildMultiStatement([match, ret_statement])
 
     @classmethod
+    def get_all_nodes(cls, label:str) -> str:
+        """
+        queries all nodes with a specific label
+        @param label:
+        @return: cypher query string
+        """
+        cy = "MATCH (n:{}) RETURN n".format(label)
+        return cy
+
+    @classmethod
+    def get_all_edge_patterns(cls, label: str) -> str:
+        cy = "MATCH pattern = (n:{0})-[r:rel]->(m:{0}) " \
+             "RETURN pattern, NODES(pattern), RELATIONSHIPS(pattern)".format(label)
+        return cy
+
+    @classmethod
     def get_hash_by_nodeId(cls, label: str, nodeId: int, attrIgnoreList=None) -> str:
         """
         Calculates the hash_value sum over a given node.
