@@ -197,7 +197,7 @@ class IFCGraphGenerator:
 
             # merge with existing
             cy = Neo4jGraphFactory.merge_on_p21(
-                p21_id, p21_id_child, edge_attrs, self.timestamp)
+                p21_id, p21_id_child, edge_attrs, self.timestamp, without_match=True)
 
             if self.write_to_file:
                 print(cy)
@@ -248,9 +248,8 @@ class IFCGraphGenerator:
 
             # merge with existing
             cy = Neo4jGraphFactory.merge_on_p21(
-                parent_p21, p21_id_child, edge_attrs, self.timestamp)
+                parent_p21, p21_id_child, edge_attrs, self.timestamp, without_match=True)
 
-            cy = "MERGE (n{})-[r:{}]->(n{})".format(parent_p21, association_name, associated_entity.get_info()['id'])
 
             if self.write_to_file:
                 print(cy)

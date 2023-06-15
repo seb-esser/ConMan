@@ -221,28 +221,37 @@ class Neo4jGraphFactory(Neo4jFactory):
         return Neo4jFactory.BuildMultiStatement([matchObjRel, matchRootedObj, merge1, merge2, returnID])
 
     @classmethod
-    def merge_on_p21(cls, from_p21, to_p21, rel_attrs, timestamp):
+    def merge_on_p21(cls, from_p21: int, to_p21: int, rel_attrs, timestamp, without_match: bool = False):
         """
         Provides the cypher command to merge two nodes based on their P21 vals
-        @param from_p21:
-        @param to_p21:
+        @param without_match:
+        @param from_p21: p21 id origin
+        @param to_p21: p21 id destination
         @param rel_attrs:
         @param timestamp:
         @return: cypher command as str
         """
-        from_node = 'MATCH (source:{}) WHERE source.p21_id = {}'.format(timestamp, from_p21)
-        to_node = 'MATCH (target:{}) WHERE target.p21_id = {}'.format(timestamp, to_p21)
-        merge = 'MERGE (source)-[r:rel ]->(target)'
-        attrs = []
-        for attr, val in rel_attrs.items():
-            if isinstance(val, str):
-                add_param = 'SET r.{} = "{}"'.format(attr, val)
-                attrs.append(add_param)
-            elif isinstance(val, (int, float, complex)):
-                add_param = 'SET r.{} = {}'.format(attr, val)
-                attrs.append(add_param)
-        returnID = 'RETURN ID(source), ID(target)'
-        return Neo4jFactory.BuildMultiStatement([from_node, to_node, merge] + attrs + [returnID])
+
+        if without_match is False:
+            from_node = 'MATCH (source:{}) WHERE source.p21_id = {}'.format(timestamp, from_p21)
+            to_node = 'MATCH (target:{}) WHERE target.p21_id = {}'.format(timestamp, to_p21)
+            merge = 'MERGE (source)-[r:rel ]->(target)'
+            attrs = []
+            for attr, val in rel_attrs.items():
+                if isinstance(val, str):
+                    add_param = 'SET r.{} = "{}"'.format(attr, val)
+                    attrs.append(add_param)
+                elif isinstance(val, (int, float, complex)):
+                    add_param = 'SET r.{} = {}'.format(attr, val)
+                    attrs.append(add_param)
+            return_id = 'RETURN ID(source), ID(target)'
+            cy: str = Neo4jFactory.BuildMultiStatement([from_node, to_node, merge] + attrs + [return_id])
+
+        else:
+            attrs_str: str = Neo4jFactory.formatDict(rel_attrs)
+            cy: str = "MERGE (n{})-[:{} {}]->(n{})".format(from_p21, rel_attrs["rel_type"], attrs_str, to_p21)
+
+        return cy
 
     @classmethod
     def merge_on_node_ids(cls, node_id_from: int, node_id_to: int, rel_type: str = 'DEFAULT_CONNECTION') -> str:
