@@ -37,6 +37,7 @@ class IFCGraphGenerator:
         my_label = my_label.replace('-', '')
         my_label = my_label.replace(':', '')
         self.timestamp = my_label
+        self.cypher_statements = []
 
         # set the connector
         self.connector = connector
@@ -104,7 +105,7 @@ class IFCGraphGenerator:
         if validate_result:
             self.validate_parsing_result()
 
-        return self.timestamp
+        return self.cypher_statements
 
     def validate_parsing_result(self):
         """
@@ -130,7 +131,7 @@ class IFCGraphGenerator:
                   '\nDifference: {}'.format(abs(count_graph - count_model)))
             return False
 
-    def __map_entity(self, entity, label) -> None:
+    def __map_entity(self, entity, label) -> str:
         """
         translates an IFC instance into a neo4j node
         """
@@ -170,6 +171,7 @@ class IFCGraphGenerator:
             print(cypher_statement)
         else:
             self.connector.run_cypher_statement(cypher_statement)
+        self.cypher_statements.append(cypher_statement)
 
     def build_node_rels(self, entity):
         # get info
@@ -203,6 +205,7 @@ class IFCGraphGenerator:
                 print(cy)
             else:
                 self.connector.run_cypher_statement(cy)
+            self.cypher_statements.append(cy)
 
         for association_name in aggregated_associations:
             entities = info[association_name]
@@ -250,11 +253,11 @@ class IFCGraphGenerator:
             cy = Neo4jGraphFactory.merge_on_p21(
                 parent_p21, p21_id_child, edge_attrs, self.timestamp, without_match=True)
 
-
             if self.write_to_file:
                 print(cy)
             else:
                 self.connector.run_cypher_statement(cy)
+            self.cypher_statements.append(cy)
 
             # increase counter
             i += 1
