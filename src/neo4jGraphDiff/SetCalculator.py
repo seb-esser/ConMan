@@ -52,7 +52,7 @@ class SetCalculator(object):
                 nodes_deleted.remove(pair[0])
                 nodes_unchanged.append((pair[0], pair[1]))
         except:
-            print('A problem occured during set calculations. Tried to continue')
+            print('A problem occurred during set calculations. Tried to continue')
             # raise Exception('Unable to sort nodes in SetCalculator. ')
 
         return nodes_unchanged, nodes_added, nodes_deleted

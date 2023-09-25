@@ -22,7 +22,7 @@ def parse(paths):
     
     for idx, path in enumerate(paths):
         # parse model
-        graphGenerator = IFCGraphGenerator(connector, path, None)
+        graphGenerator = IFCGraphGenerator(connector, path)
         print('[IFC_P21] Generating Graph %d/%d' % (idx + 1, amount))
         graphGenerator.generateGraph()
     

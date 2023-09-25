@@ -21,7 +21,15 @@ class IFCGraphGenerator:
     trigger console output while parsing using the ToConsole boolean
     """
 
-    def __init__(self, connector, model_path, ParserConfig):
+    def __init__(self, connector, model_path, write_to_file=False):
+        """
+
+        @param connector: can be null if write_to_file is set to True
+        @param model_path:
+        @param write_to_file: if False, all commands are directly executed on the connected neo4j db.
+                                if set to True, cypher is written to console or *.cypher file
+        """
+
 
         # try to open the ifc model and load the content into the model variable
         try:
@@ -39,14 +47,12 @@ class IFCGraphGenerator:
         my_label = my_label.replace('-', '')
         my_label = my_label.replace(':', '')
         self.timestamp = my_label
+        self.cypher_statements = []
 
         # set the connector
         self.connector = connector
 
-        # set output
-        self.parserConfig = ParserConfig
-        self.printToConsole = False
-        self.printToLog = True
+        self.write_to_file = write_to_file
 
         super().__init__()
 
@@ -56,14 +62,15 @@ class IFCGraphGenerator:
         @return: the label, by which you can identify the model in the database
         """
 
-        # check if model has been already processed
-        n = self.connector.run_cypher_statement('MATCH(n:{}) RETURN COUNT(n)'.format(self.timestamp))[0][0]
+        if not self.write_to_file:
+            # check if model has been already processed
+            n = self.connector.run_cypher_statement('MATCH(n:{}) RETURN COUNT(n)'.format(self.timestamp))[0][0]
 
-        if int(n) > 0:
-            print('WARNING: entire graph labeled with >> {} << gets overwritten by staged file {}.'.format(
-                self.timestamp, self.model_path))
+            if int(n) > 0:
+                print('WARNING: entire graph labeled with >> {} << gets overwritten by staged file {}.'.format(
+                    self.timestamp, self.model_path))
 
-            self.connector.run_cypher_statement('MATCH(n:{}) DETACH DELETE n'.format(self.timestamp))
+                self.connector.run_cypher_statement('MATCH(n:{}) DETACH DELETE n'.format(self.timestamp))
 
         print('[IFC_P21 > {} < ]: Generating graph... '.format(self.timestamp))
 
@@ -101,9 +108,9 @@ class IFCGraphGenerator:
         print('[IFC_P21 > {} < ]: Generating graph - DONE. \n '.format(self.timestamp))
 
         if validate_result:
-            self.validateParsingResult()
+            self.validate_parsing_result()
 
-        return self.timestamp
+        return self.cypher_statements
 
     def generate_arrows_visualization(self):
         """
@@ -142,7 +149,7 @@ class IFCGraphGenerator:
                   '\nDifference: {}'.format(abs(count_graph - count_model)))
             return False
 
-    def __map_entity(self, entity, label) -> None:
+    def __map_entity(self, entity, label) -> str:
         """
         translates an IFC instance into a neo4j node
         """
@@ -169,10 +176,20 @@ class IFCGraphGenerator:
         node_properties_dict['p21_id'] = node_properties_dict.pop('id')
         node_properties_dict['EntityType'] = node_properties_dict.pop('type')
 
-        # run cypher command
-        cypher_statement = Neo4jGraphFactory.merge_node_with_attr(label, node_properties_dict, self.timestamp)
+        entity_type = node_properties_dict['EntityType']
 
-        self.connector.run_cypher_statement(cypher_statement)
+        # run cypher command
+        cypher_statement = Neo4jGraphFactory.merge_node_with_attr(label=label,
+                                                                  attrs=node_properties_dict,
+                                                                  timestamp=self.timestamp,
+                                                                  entity_type=entity_type,
+                                                                  node_identifier=node_properties_dict['p21_id'],
+                                                                  skip_return=True)
+        if self.write_to_file:
+            print(cypher_statement)
+        else:
+            self.connector.run_cypher_statement(cypher_statement)
+        self.cypher_statements.append(cypher_statement)
 
     def build_node_rels(self, entity):
         # get info
@@ -200,8 +217,13 @@ class IFCGraphGenerator:
 
             # merge with existing
             cy = Neo4jGraphFactory.merge_on_p21(
-                p21_id, p21_id_child, edge_attrs, self.timestamp)
-            self.connector.run_cypher_statement(cy)
+                p21_id, p21_id_child, edge_attrs, self.timestamp, without_match=True)
+
+            if self.write_to_file:
+                print(cy)
+            else:
+                self.connector.run_cypher_statement(cy)
+            self.cypher_statements.append(cy)
 
         for association_name in aggregated_associations:
             entities = info[association_name]
@@ -234,8 +256,12 @@ class IFCGraphGenerator:
                 child_guid = child_entities.GlobalId
 
                 cy = 'MATCH (n{{GlobalId: \"{}\"}}) RETURN n.p21_id'.format(child_guid)
-                raw = self.connector.run_cypher_statement(cy)[0]
-                p21_id_child = int(raw[0])
+
+                if self.write_to_file:
+                    print(cy)
+                else:
+                    raw = self.connector.run_cypher_statement(cy)[0]
+                    p21_id_child = int(raw[0])
 
                 edge_attrs = {
                     'rel_type': association_name
@@ -243,8 +269,13 @@ class IFCGraphGenerator:
 
             # merge with existing
             cy = Neo4jGraphFactory.merge_on_p21(
-                parent_p21, p21_id_child, edge_attrs, self.timestamp)
-            self.connector.run_cypher_statement(cy)
+                parent_p21, p21_id_child, edge_attrs, self.timestamp, without_match=True)
+
+            if self.write_to_file:
+                print(cy)
+            else:
+                self.connector.run_cypher_statement(cy)
+            self.cypher_statements.append(cy)
 
             # increase counter
             i += 1

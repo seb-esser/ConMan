@@ -210,7 +210,7 @@ class GraphPattern:
                 else:
                     skip_end_attrs = True
                     skip_end_labels = True
-                if edge in edges_already_specified:
+                if edge in edges_already_specified and not edge.is_virtual_edge():
                     continue
 
                 cy_frag = "MERGE " + edge.to_cypher(skip_start_node_attrs=skip_start_attrs,
@@ -479,18 +479,23 @@ class GraphPattern:
         #
         # return cy_statement
 
-    def to_cypher_node_delete(self):
+    def to_cypher_node_delete(self, include_detach=False, ignore_nodes=[]):
         """
         method assumes that all nodes have been already specified by a match function
 
         @return:
         """
 
-        nodes_to_be_detached = self.get_unified_node_set()
+        pattern_nodes = self.get_unified_node_set()
+
+        nodes_to_be_removed = [x for x in pattern_nodes if x not in ignore_nodes]
+
         cy = ""
 
-        for node in nodes_to_be_detached:
-            cy += "DETACH DELETE {} ".format(node.to_cypher(skip_labels=True, skip_attributes=True))
+        for node in nodes_to_be_removed:
+            if include_detach:
+                cy += "DETACH "
+            cy += "DELETE {} ".format(node.to_cypher(skip_labels=True, skip_attributes=True))
 
         return cy
 

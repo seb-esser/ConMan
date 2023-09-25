@@ -31,7 +31,7 @@ class NodeItem:
         """
         returns the entityType label of the node
         """
-        return self.attrs["EntityType"]
+        return self.attrs.get("EntityType", None)
 
     def get_timestamps(self) -> list:
         """
@@ -52,7 +52,7 @@ class NodeItem:
         returns "VirtualNode" in case of a non-existent (i.e., -1) node
         """
         try:
-            node_type = [x for x in self.labels if not x.startswith('ts')][0]
+            node_type = [x for x in self.labels if not x.startswith('ts') and not x.startswith('Ifc')][0]
         except:
             node_type = "VirtualNode"
         return node_type

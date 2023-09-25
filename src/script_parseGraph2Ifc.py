@@ -15,7 +15,7 @@ def main():
     generator.generate_SPF()
 
     # save model as IFC SPF file
-    path = "C:\dev\out\{}".format(ts)
+    path = "C:\dev\out\{}.ifc".format(ts)
     generator.save_model(path=path)
 
     # disconnect driver

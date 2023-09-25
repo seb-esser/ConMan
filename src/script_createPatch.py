@@ -1,4 +1,4 @@
-from PatchManager.PatchService import PatchService
+from PatchManager.GraphPatchService import GraphPatchService
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
@@ -29,10 +29,10 @@ def main():
 
     connector.connect_driver()
 
-    service = PatchService()
+    service = GraphPatchService()
     service.load_delta('GraphDelta_init{}-updt{}.json'.format(ts_init, ts_updated))
 
-    patch = service.generate_DPO_patch(connector=connector)
+    patch = service.generate_patch()
 
     service.save_patch_to_json(patch)
 

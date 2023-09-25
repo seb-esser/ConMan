@@ -1,10 +1,9 @@
+from PatchManager.GraphPatchService import GraphPatchService
 from PatchManager.PatchService import PatchService
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
 def main():
-    connector = Neo4jConnector()
-    connector.connect_driver()
 
     testcases = {
         "sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
@@ -28,15 +27,17 @@ def main():
     ts_init, ts_updated = testcases[case_study]
 
     # init new PatchService object handling all load and save operations
-    service = PatchService()
+    service = GraphPatchService()
 
     # load patch
     patch = service.load_patch_from_json('Patch_init{}-updt{}.json'.format(ts_init, ts_updated))
 
-    # apply the patch
-    service.apply_patch(patch, connector=connector)
+    # activate driver
+    patch.connector.connect_driver()
+    # ToDo: this is not intended to ship the connector within the patch
 
-    connector.disconnect_driver()
+    # apply the patch
+    service.apply_patch(patch)
 
 
 if __name__ == "__main__":
