@@ -1,4 +1,6 @@
 """ package import """
+import jsonpickle
+
 from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
 import ifcopenshell
@@ -88,7 +90,6 @@ class IFCGraphGenerator:
                 self.__map_entity(entity, "ConnectionNode")
             else:
                 self.__map_entity(entity, "SecondaryNode")
-            
 
         for entity in entity_list:
             # print progressbar
@@ -97,13 +98,25 @@ class IFCGraphGenerator:
 
             self.build_node_rels(entity)
 
-
         print('[IFC_P21 > {} < ]: Generating graph - DONE. \n '.format(self.timestamp))
 
         if validate_result:
             self.validateParsingResult()
 
         return self.timestamp
+
+    def generate_arrows_visualization(self):
+        """
+        creates a json that can be used for arrows.app visualization
+        """
+
+        # load base
+        with open("neo4j_middleware/base_arrows_format.json") as f:
+            content = f.read()
+        arrows = jsonpickle.decode(content)
+
+        print(arrows)
+
 
     def validateParsingResult(self):
         """
