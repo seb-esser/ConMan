@@ -7,7 +7,7 @@ def main():
     path = '00_sampleData/IFC_stepP21/GeomRepresentation_05/cube_single.ifc'
 
     generator = IFCGraphGenerator(connector, path, None)
-    generator.generate_arrows_visualization()
+    generator.generate_arrows_visualization(ignore_null_values=True)
 
 
 if __name__ == "__main__":

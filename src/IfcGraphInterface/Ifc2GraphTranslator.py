@@ -113,7 +113,7 @@ class IFCGraphGenerator:
 
         return self.cypher_statements
 
-    def generate_arrows_visualization(self):
+    def generate_arrows_visualization(self, ignore_null_values: bool = False):
         """
         creates a json that can be used for arrows.app visualization
         """
@@ -126,6 +126,7 @@ class IFCGraphGenerator:
         x_pos = 0
         y_pos = 0
 
+        rel_counter = 0
         for entity in self.model:
 
             # get node data
@@ -136,6 +137,10 @@ class IFCGraphGenerator:
                 if type(val) in [list, tuple, dict]:
                     attr_dict[key] = str(val)
 
+            if ignore_null_values:
+                new_dict = {k: v for k, v in attr_dict.items() if v is not None}
+                attr_dict = new_dict
+
             # check if the primary_node_type is either an ObjectDef or Relationship or neither
             if entity.is_a('IfcObjectDefinition'):
                 node_type = "PrimaryNode"
@@ -145,11 +150,13 @@ class IFCGraphGenerator:
                 node_type = "SecondaryNode"
 
             node_identifier = attr_dict['p21_id']
+            attr_dict.pop("p21_id")
 
             node_border_colors = {"PrimaryNode": "#0062b1",
                                   "SecondaryNode": "#fcc400",
                                   "ConnectionNode": "#68bc00"}
 
+            # build arrows expression
             arrows_node = {
                 "id": "n" + str(node_identifier),
                 "position": {
@@ -159,8 +166,8 @@ class IFCGraphGenerator:
                 "caption": str(node_identifier),
                 "style": {
                     "border-color": node_border_colors[node_type],
-                    "radius": 20,
-                    "outside-position": "top"
+                    "radius": 20
+                    # "outside-position": "top"
                 },
                 "properties": attr_dict,
 
@@ -168,6 +175,56 @@ class IFCGraphGenerator:
             arrows["nodes"].append(arrows_node)
 
             x_pos += 100
+
+            _, single_associations, aggregated_associations = self.separate_attributes(entity)
+
+            for assoc in single_associations:
+                # association may be set to None, then continue
+
+                target = entity.get_info()[assoc]
+                if target is None:
+                    continue
+
+                # build arrows expression
+                rel = {
+                    "id": "n" + str(rel_counter),
+                    "type": "REL",
+                    "style": {},
+                    "type": assoc,
+                    "fromId": "n" + str(node_identifier),
+                    "toId": "n" + str(target.get_info()["id"])
+                }
+
+                arrows["relationships"].append(rel)
+
+                rel_counter += 1
+
+            list_item = 0
+            for agg_assoc in aggregated_associations:
+
+                targets = entity.get_info()[agg_assoc]
+
+                for target in targets:
+                    if target is None:
+                        continue
+
+                    # build arrows expression
+                    rel = {
+                        "id": "n" + str(rel_counter),
+                        "type": "REL",
+                        "style": {},
+                        "type": agg_assoc,
+                        "properties": {
+                            "listItem": str(list_item)
+                        },
+                        "fromId": "n" + str(node_identifier),
+                        "toId": "n" + str(target.get_info()["id"])
+                    }
+
+                    arrows["relationships"].append(rel)
+                    list_item += 1
+
+                rel_counter += 1
 
         # save
         f = open(r"C:\Users\sesse\Downloads\tmp_graph.json", 'w')
