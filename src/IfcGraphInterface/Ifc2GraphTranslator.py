@@ -19,7 +19,15 @@ class IFCGraphGenerator:
     trigger console output while parsing using the ToConsole boolean
     """
 
-    def __init__(self, connector, model_path, ParserConfig, write_to_file=False):
+    def __init__(self, connector, model_path, write_to_file=False):
+        """
+
+        @param connector: can be null if write_to_file is set to True
+        @param model_path:
+        @param write_to_file: if False, all commands are directly executed on the connected neo4j db.
+                                if set to True, cypher is written to console or *.cypher file
+        """
+
 
         # try to open the ifc model and load the content into the model variable
         try:
@@ -41,11 +49,6 @@ class IFCGraphGenerator:
 
         # set the connector
         self.connector = connector
-
-        # set output
-        self.parserConfig = ParserConfig
-        self.printToConsole = False
-        self.printToLog = True
 
         self.write_to_file = write_to_file
 

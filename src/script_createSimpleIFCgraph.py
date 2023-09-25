@@ -7,7 +7,7 @@ connector = Neo4jConnector()
 connector.connect_driver()
 
 # parse model
-graph_generator = IFCGraphGenerator(connector, path, None, write_to_db=True)
+graph_generator = IFCGraphGenerator(connector, path, write_to_file=True)
 
 cy = graph_generator.generateGraph()
 

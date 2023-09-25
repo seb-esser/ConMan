@@ -38,7 +38,7 @@ def main():
     start = time.perf_counter()
     for idx, path in enumerate(paths):
         # parse model
-        graph_generator = IFCGraphGenerator(connector, path, None)
+        graph_generator = IFCGraphGenerator(connector, path)
         print('Generating Graph %d/%d' % (idx + 1, amount))
         graph_generator.generateGraph()
     finish = time.perf_counter()
