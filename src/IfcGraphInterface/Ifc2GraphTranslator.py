@@ -1,4 +1,6 @@
 """ package import """
+from pprint import pprint
+
 import jsonpickle
 
 from neo4j_middleware.Neo4jGraphFactory import Neo4jGraphFactory
@@ -29,7 +31,6 @@ class IFCGraphGenerator:
         @param write_to_file: if False, all commands are directly executed on the connected neo4j db.
                                 if set to True, cypher is written to console or *.cypher file
         """
-
 
         # try to open the ifc model and load the content into the model variable
         try:
@@ -122,8 +123,56 @@ class IFCGraphGenerator:
             content = f.read()
         arrows = jsonpickle.decode(content)
 
-        print(arrows)
+        x_pos = 0
+        y_pos = 0
 
+        for entity in self.model:
+
+            # get node data
+            attr_dict, entity_type = self.extract_node_data(entity=entity)
+
+            # escape lists into strings
+            for key, val in attr_dict.items():
+                if type(val) in [list, tuple, dict]:
+                    attr_dict[key] = str(val)
+
+            # check if the primary_node_type is either an ObjectDef or Relationship or neither
+            if entity.is_a('IfcObjectDefinition'):
+                node_type = "PrimaryNode"
+            elif entity.is_a('IfcRelationship'):
+                node_type = "ConnectionNode"
+            else:
+                node_type = "SecondaryNode"
+
+            node_identifier = attr_dict['p21_id']
+
+            node_border_colors = {"PrimaryNode": "#0062b1",
+                                  "SecondaryNode": "#fcc400",
+                                  "ConnectionNode": "#68bc00"}
+
+            arrows_node = {
+                "id": "n" + str(node_identifier),
+                "position": {
+                    "x": x_pos,
+                    "y": y_pos
+                },
+                "caption": str(node_identifier),
+                "style": {
+                    "border-color": node_border_colors[node_type],
+                    "radius": 20,
+                    "outside-position": "top"
+                },
+                "properties": attr_dict,
+
+            }
+            arrows["nodes"].append(arrows_node)
+
+            x_pos += 100
+
+        # save
+        f = open(r"C:\Users\sesse\Downloads\tmp_graph.json", 'w')
+        f.write(jsonpickle.dumps(arrows, unpicklable=True))
+        f.close()
 
     def validate_parsing_result(self):
         """
@@ -153,30 +202,8 @@ class IFCGraphGenerator:
         """
         translates an IFC instance into a neo4j node
         """
-        # get some basic data
-        info = entity.get_info()
 
-        # node_properties, single_associations, aggregated_associations = self.separate_attributes(primary_node_type)
-        node_properties, _, _ = self.separate_attributes(entity)
-
-        # create a dictionary of properties
-        node_properties_dict = {}
-        for p_name in node_properties:
-            p_val = info[p_name]
-
-            if p_name == 'NominalValue':
-                wrapped_val = p_val.wrappedValue
-                p_val = 'IfcLabel({})'.format(str(wrapped_val).replace("'", ""))
-                p_val = str(p_val)
-                # ToDo: consider this workaround when translating a graph back in its SPF representation
-
-            node_properties_dict[p_name] = p_val
-
-        # rename some keys
-        node_properties_dict['p21_id'] = node_properties_dict.pop('id')
-        node_properties_dict['EntityType'] = node_properties_dict.pop('type')
-
-        entity_type = node_properties_dict['EntityType']
+        node_properties_dict, entity_type = self.extract_node_data(entity)
 
         # run cypher command
         cypher_statement = Neo4jGraphFactory.merge_node_with_attr(label=label,
@@ -463,3 +490,37 @@ class IFCGraphGenerator:
         node_attributes.append('id')
         node_attributes.append('type')
         return node_attributes, single_associations, aggregated_associations
+
+    def extract_node_data(self, entity):
+        """
+        extracts the relevant information from a given IFC entity instance. Returns the label,
+        @param entity:
+        @return:
+        """
+
+        # get some basic data
+        info = entity.get_info()
+
+        # node_properties, single_associations, aggregated_associations = self.separate_attributes(primary_node_type)
+        node_properties, _, _ = self.separate_attributes(entity)
+
+        # create a dictionary of properties
+        node_properties_dict = {}
+        for p_name in node_properties:
+            p_val = info[p_name]
+
+            if p_name == 'NominalValue':
+                wrapped_val = p_val.wrappedValue
+                p_val = 'IfcLabel({})'.format(str(wrapped_val).replace("'", ""))
+                p_val = str(p_val)
+                # ToDo: consider this workaround when translating a graph back in its SPF representation
+
+            node_properties_dict[p_name] = p_val
+
+        # rename some keys
+        node_properties_dict['p21_id'] = node_properties_dict.pop('id')
+        node_properties_dict['EntityType'] = node_properties_dict.pop('type')
+
+        entity_type = node_properties_dict['EntityType']
+
+        return node_properties_dict, entity_type
