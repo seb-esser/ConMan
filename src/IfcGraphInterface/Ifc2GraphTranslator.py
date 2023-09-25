@@ -125,7 +125,7 @@ class IFCGraphGenerator:
         print(arrows)
 
 
-    def validateParsingResult(self):
+    def validate_parsing_result(self):
         """
         Compares the number of entities in the model with the number of nodes in the graph
         @return: boolean
@@ -190,6 +190,8 @@ class IFCGraphGenerator:
         else:
             self.connector.run_cypher_statement(cypher_statement)
         self.cypher_statements.append(cypher_statement)
+
+        return cypher_statement
 
     def build_node_rels(self, entity):
         # get info
