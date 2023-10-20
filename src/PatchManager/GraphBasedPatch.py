@@ -34,12 +34,12 @@ class GraphBasedPatch(Patch):
         @return:
         """
 
-        print("Applying attribute changes... ")
+        print("Applying semantic transformations... ")
         # loop over attribute changes
         for rule in self.attribute_changes:
             self.__apply_attribute_rule(rule)
 
-        print("Applying structural changes... ")
+        print("Applying topological transformations ... ")
         # loop over all structural transformations
         for rule in self.operations:
             if rule.operation_type == StructuralModificationTypeEnum.ADDED:
