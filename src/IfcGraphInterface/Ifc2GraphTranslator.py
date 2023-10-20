@@ -227,7 +227,9 @@ class IFCGraphGenerator:
                 rel_counter += 1
 
         # save
-        f = open(r"C:\Users\sesse\Downloads\tmp_graph.json", 'w')
+        model_path = self.model_path
+        save_path = model_path[:-4] + "_arrowsVis.json"
+        f = open(save_path, 'w')
         f.write(jsonpickle.dumps(arrows, unpicklable=True))
         f.close()
 
