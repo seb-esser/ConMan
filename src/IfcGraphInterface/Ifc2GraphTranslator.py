@@ -304,12 +304,15 @@ class IFCGraphGenerator:
             edge_attrs = {'rel_type': association_name}
 
             # merge with existing
-            cy = Neo4jGraphFactory.merge_on_p21(
-                p21_id, p21_id_child, edge_attrs, self.timestamp, without_match=True)
+
 
             if self.write_to_file:
+                cy = Neo4jGraphFactory.merge_on_p21(
+                    p21_id, p21_id_child, edge_attrs, self.timestamp, without_match=True)
                 print(cy)
             else:
+                cy = Neo4jGraphFactory.merge_on_p21(
+                    p21_id, p21_id_child, edge_attrs, self.timestamp, without_match=False)
                 self.connector.run_cypher_statement(cy)
             self.cypher_statements.append(cy)
 
@@ -356,12 +359,14 @@ class IFCGraphGenerator:
                 }
 
             # merge with existing
-            cy = Neo4jGraphFactory.merge_on_p21(
-                parent_p21, p21_id_child, edge_attrs, self.timestamp, without_match=True)
 
             if self.write_to_file:
+                cy = Neo4jGraphFactory.merge_on_p21(
+                    parent_p21, p21_id_child, edge_attrs, self.timestamp, without_match=True)
                 print(cy)
             else:
+                cy = Neo4jGraphFactory.merge_on_p21(
+                    parent_p21, p21_id_child, edge_attrs, self.timestamp, without_match=False)
                 self.connector.run_cypher_statement(cy)
             self.cypher_statements.append(cy)
 
