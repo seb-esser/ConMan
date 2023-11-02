@@ -1,6 +1,7 @@
 """ package import """
 import logging
 import time
+from datetime import datetime
 
 """ class import """
 from IfcGraphInterface.Ifc2GraphTranslator import IFCGraphGenerator
@@ -9,7 +10,8 @@ from neo4j_middleware.neo4jConnector import Neo4jConnector
 # --- Script ---
 
 # init logging
-logging.basicConfig(filename='myapp.log', level=logging.INFO)
+current_date_and_time = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+logging.basicConfig(filename='{}.neo4j-query-log.log'.format(current_date_and_time), level=logging.INFO)
 logging.info('Started')
 
 
@@ -26,9 +28,9 @@ def main():
     #    paths.append(filepath)
     # print(paths)
 
-    paths = ['./00_sampleData/IFC_stepP21/wand_tuer/01_Wand_single-guidsMod.ifc',
-             # './00_sampleData/IFC_stepP21/wand_tuer/02_Wand_mitTuer-guidsMod.ifc'
-             ]
+    paths = [
+        '00_sampleData/IFC_stepP21/diss_samples/cube_single.ifc',
+        '00_sampleData/IFC_stepP21/diss_samples/cube_single-PosChange.ifc']
 
     for p in paths:
         print(p)
@@ -38,7 +40,7 @@ def main():
     start = time.perf_counter()
     for idx, path in enumerate(paths):
         # parse model
-        graph_generator = IFCGraphGenerator(connector, path)
+        graph_generator = IFCGraphGenerator(connector, path, write_to_file=False)
         print('Generating Graph %d/%d' % (idx + 1, amount))
         graph_generator.generateGraph()
     finish = time.perf_counter()

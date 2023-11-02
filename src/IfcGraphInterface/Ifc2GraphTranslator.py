@@ -304,8 +304,6 @@ class IFCGraphGenerator:
             edge_attrs = {'rel_type': association_name}
 
             # merge with existing
-
-
             if self.write_to_file:
                 cy = Neo4jGraphFactory.merge_on_p21(
                     p21_id, p21_id_child, edge_attrs, self.timestamp, without_match=True)
