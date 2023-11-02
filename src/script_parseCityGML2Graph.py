@@ -1,4 +1,5 @@
 """ package import """
+import datetime
 import logging
 import time
 
@@ -9,7 +10,8 @@ from CityGMLGraphInterface.CityGML2GraphTranslator import CityGMLGraphGenerator
 # --- Script ---
 
 # init logging
-logging.basicConfig(filename='myapp.log', level=logging.INFO)
+current_date_and_time = datetime.datetime.now()
+logging.basicConfig(filename='{}.neo4j-query-log.log', level=logging.INFO)
 logging.info('Started')
 
 def main():
