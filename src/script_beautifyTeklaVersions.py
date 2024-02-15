@@ -1,9 +1,9 @@
 import ifcopenshell
 
 model_v2 = ifcopenshell.open(
-    r"C:\Users\sesse\OneDrive - TUM\01_TUMCMS\00_Promotion\dev\00_ArchTW-Kopplung\TW-Model-3\TW-Model\IFC\TW-v2-realExport.ifc")
+    r"C:\Users\sesse\OneDrive - TUM\01_TUMCMS\00_Promotion\dev\00_ArchTW-Kopplung\0_Beispielmodelle\TW\TW-v2.ifc")
 model_v1 = ifcopenshell.open(
-    r"C:\Users\sesse\OneDrive - TUM\01_TUMCMS\00_Promotion\dev\00_ArchTW-Kopplung\TW-Model-3\TW-Model\IFC\Tragwerk-dflt.ifc")
+    r"C:\Users\sesse\OneDrive - TUM\01_TUMCMS\00_Promotion\dev\00_ArchTW-Kopplung\0_Beispielmodelle\TW\TW-v1.ifc")
 
 transfer_dict = {}
 
@@ -20,12 +20,19 @@ for elem in model_v1.by_type("IfcElement"):
 
     transfer_dict[revit_id] = {"GlobalId": elem.GlobalId, "Name": name}
 
+# extract voidings
 voiding_transfer_dict = {}
-
 for elem in model_v1.by_type("IfcVoidingFeature"):
-    identifier = elem.Description
-    voiding_transfer_dict[identifier] = {"GlobalId": elem.GlobalId}
 
+    # get name and extract Revit elementID
+    tu = elem.Name.split(":")
+    revit_id = tu[-1]
+    name = ":".join(tu[:-1])
+
+    voiding_transfer_dict[revit_id] = {"GlobalId": elem.GlobalId, "Name": name}
+
+
+# apply element mod
 for elem in model_v2.by_type("IfcElement"):
 
     if elem.get_info()["type"] == "IfcVoidingFeature":
@@ -40,8 +47,17 @@ for elem in model_v2.by_type("IfcElement"):
     elem.Name = transfer_dict[revit_id]["Name"] + ":" + revit_id
     elem.GlobalId = transfer_dict[revit_id]["GlobalId"]
 
-# for elem in model_v2.by_type("IfcVoidingFeature"):
-#     elem.GlobalId = voiding_transfer_dict[elem.Description]
+# apply void mod
+for elem in model_v2.by_type("IfcVoidingFeature"):
+
+    # get name and extract Revit elementID
+    tu = elem.Name.split(":")
+    revit_id = tu[-1]
+    name = ":".join(tu[:-1])
+
+    # reset values to initial version
+    elem.Name = voiding_transfer_dict[revit_id]["Name"] + ":" + revit_id
+    elem.GlobalId = voiding_transfer_dict[revit_id]["GlobalId"]
 
 model_v2.write(
-    r"C:\Users\sesse\OneDrive - TUM\01_TUMCMS\00_Promotion\dev\00_ArchTW-Kopplung\TW-Model-3\TW-Model\IFC\TW-v2-realExport-bautified.ifc")
+    r"C:\Users\sesse\OneDrive - TUM\01_TUMCMS\00_Promotion\dev\00_ArchTW-Kopplung\0_Beispielmodelle\TW\TW-v2-guidMod.ifc")
