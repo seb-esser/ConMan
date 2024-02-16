@@ -5,6 +5,7 @@ from neo4jGraphDiff.Caption.NodeMatchingTable import NodePair
 from neo4jGraphDiff.Config.ConfiguratorEnums import MatchCriteriaEnum
 from neo4jGraphDiff.GraphDelta import GraphDelta
 from neo4j_middleware.Neo4jQueryFactory import Neo4jQueryFactory
+from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.GraphPath import GraphPath
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeDiffData import NodeDiffData
@@ -75,7 +76,7 @@ class ResourceDiff(AbsGraphDiff):
                 print("".ljust(indent * 4) + ' leaf node.')
             return
 
-        # compare children and raise an dissimilarity if necessary.
+        # compare children and raise dissimilarity if necessary.
         [nodes_unchanged, nodes_added, nodes_deleted] = self.utils.calc_intersection(children_init, children_updated,
                                                                                      matching_method)
 
@@ -209,9 +210,16 @@ class ResourceDiff(AbsGraphDiff):
             root_updated = self.current_prim_updated
 
             if node_init == root_init:
-                pattern = GraphPattern(paths=[])
-                # ToDo: improve situation if a propertyModification has been applied to a primary node.
-                #  Then the construction of a full pattern fails.
+
+                # if SemModification has been applied to primary node, we must construct a pattern with one virtual node
+                # indicated by -1
+                pattern = GraphPattern(paths=[
+                    GraphPath(
+                        [EdgeItem(start_node=root_init, end_node=NodeItem(-1), rel_id=-1)
+                         ]
+                    )
+                ])
+
             else:
                 pattern = self.__get_pattern(root_init.id, node_init.id)
 

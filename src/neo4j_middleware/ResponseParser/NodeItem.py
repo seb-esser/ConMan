@@ -292,3 +292,49 @@ class NodeItem:
         # cleaned_node_attrs.pop('p21_id', None)
 
         return '({0}{1}{2})'.format(cy_node_identifier, cy_node_labels, cy_node_attrs)
+
+    def to_arrows_vis(self, ignore_null_values: bool = False, x_pos = 0, y_pos = 0):
+        """
+        prepares a node to be visualized in the arrows app
+        @param ignore_null_values:
+        @param x_pos:
+        @param y_pos:
+        @return:
+        """
+
+        attr_dict = {}
+        # escape lists into strings
+        for key, val in self.attrs.items():
+            if type(val) in [list, tuple, dict]:
+                attr_dict[key] = str(val)
+            else:
+                attr_dict[key] = val
+
+        # drop p21_id
+        attr_dict.pop("p21_id", None)
+
+        if ignore_null_values:
+            new_dict = {k: v for k, v in attr_dict.items() if v != "None"}
+            attr_dict = new_dict
+
+        node_border_colors = {"PrimaryNode": "#0062b1",
+                              "SecondaryNode": "#fcc400",
+                              "ConnectionNode": "#68bc00"}
+
+        # build arrows expression
+        arrows_node = {
+            "id": str(self.get_node_identifier()),
+            "position": {
+                "x": x_pos,
+                "y": y_pos
+            },
+            "caption": str(self.attrs["p21_id"]),
+            "style": {
+                "border-color": node_border_colors[self.get_node_type()],
+                "radius": 20
+                # "outside-position": "top"
+            },
+            "properties": attr_dict,
+
+        }
+        return arrows_node

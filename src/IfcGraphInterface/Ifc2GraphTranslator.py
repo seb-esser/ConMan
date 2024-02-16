@@ -148,6 +148,8 @@ class IFCGraphGenerator:
                 node_type = "ConnectionNode"
             else:
                 node_type = "SecondaryNode"
+                # skip secondary nodes
+                continue
 
             node_identifier = attr_dict['p21_id']
             attr_dict.pop("p21_id")
@@ -203,6 +205,9 @@ class IFCGraphGenerator:
             for agg_assoc in aggregated_associations:
 
                 targets = entity.get_info()[agg_assoc]
+                if targets is None:
+                    print("Havent found target: TargetName: {}".format(agg_assoc))
+                    continue
 
                 for target in targets:
                     if target is None:
@@ -339,6 +344,13 @@ class IFCGraphGenerator:
                 }
 
             except:
+                if type(child_entities) is tuple:
+                    print("Found issue when building relationships")
+                    print("Child entity is: ", child_entities)
+                elif type(child_entities) is str:
+                    print("Found issues when building relationship")
+                    print("Child entity is: ", child_entities)
+
                 if child_entities.is_a() == "IfcPropertySet":
                     select_problem = True
                 # in some weird cases, ifcopenshell fails to traverse objectified relationships

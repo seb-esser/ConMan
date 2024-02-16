@@ -19,10 +19,11 @@ def main():
         "CAM": ("ts20220715T135504", "ts20220715T135358"),
         "FirstStorey": ("ts20220930T111448", "ts20220930T111542"),
         "WandTuer": ("ts20221001T100832", "ts20221001T100900"),
-        "WandTuermodGuids": ("ts20221002T111302", "ts20221001T111540")
+        "WandTuermodGuids": ("ts20221002T111302", "ts20221001T111540"),
+        "TW1-TW2": ("ts20240215T144400", "ts20240215T144956")
     }
 
-    case_study = 'WandTuermodGuids'
+    case_study = 'TW1-TW2'
     ts_init, ts_updated = testcases[case_study]
 
     connector = Neo4jConnector()

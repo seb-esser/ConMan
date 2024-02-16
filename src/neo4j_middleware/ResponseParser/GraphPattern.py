@@ -3,6 +3,7 @@ from pprint import pprint
 from typing import List
 import re
 
+import jsonpickle
 import networkx
 
 from neo4j_middleware import neo4jConnector
@@ -549,3 +550,58 @@ class GraphPattern:
                                              }
                                          })
         return graph
+
+    def to_arrows_visualization(self, ignore_null_values: bool = False):
+        """
+        creates a json that can be used for arrows.app visualization
+        """
+
+        # load base
+        with open("neo4j_middleware/base_arrows_format.json") as f:
+            content = f.read()
+        arrows = jsonpickle.decode(content)
+
+        x_pos = 0
+        y_pos = 0
+
+        rel_counter = 0
+
+        nodes = self.get_unified_node_set()
+
+        for node in nodes:
+            arrows_node = node.to_arrows_vis(ignore_null_values=True, x_pos=x_pos, y_pos=y_pos)
+            arrows["nodes"].append(arrows_node)
+
+            x_pos += 100
+
+        edges = self.get_unified_edge_set()
+
+        for edge in edges:
+
+            # skip virtual edges
+            if edge.edge_id == -1:
+                continue
+
+            # prepare rel property
+            if "listItem" in edge.attributes:
+                rel_prop = {"listItem": str(edge.attributes["listItem"])}
+            else:
+                rel_prop = {}
+            # build arrows expression
+            rel = {
+                "id": "r" + str(edge.edge_id),
+                "type": "REL",
+                "style": {},
+                "properties": rel_prop,
+                "type": edge.get_rel_type(),
+                "fromId": "n" + str(edge.start_node.id),
+                "toId": "n" + str(edge.end_node.id)
+            }
+
+            arrows["relationships"].append(rel)
+
+            rel_counter += 1
+
+
+
+        return arrows

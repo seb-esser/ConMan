@@ -29,8 +29,9 @@ def main():
     # print(paths)
 
     paths = [
-        '00_sampleData/IFC_stepP21/diss_samples/cube_single.ifc',
-        '00_sampleData/IFC_stepP21/diss_samples/cube_single-PosChange.ifc']
+        '00_sampleData/IFC_stepP21/diss-casestudy/TW-v1.ifc',
+        '00_sampleData/IFC_stepP21/diss-casestudy/TW-v2.ifc'
+    ]
 
     for p in paths:
         print(p)

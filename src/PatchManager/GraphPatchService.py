@@ -54,6 +54,8 @@ class GraphPatchService(PatchService):
         self.delta: GraphDelta = jsonpickle.decode(content)
         print("[INFO] loading delta json: DONE.")
 
+        return self.delta
+
     def generate_patch(self) -> GraphBasedPatch:
         """
         produces a patch from a given delta

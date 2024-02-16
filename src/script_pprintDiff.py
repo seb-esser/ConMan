@@ -1,10 +1,11 @@
-from PatchManager.PatchService import PatchService
-from neo4j_middleware.neo4jConnector import Neo4jConnector
+from pprint import pprint
+
+import jsonpickle
+
+from neo4jGraphDiff.GraphDelta import GraphDelta
 
 
 def main():
-    connector = Neo4jConnector()
-    connector.connect_driver()
 
     testcases = {
         "sleeperExample": ("ts20200202T105551", "ts20200204T105551"),
@@ -19,25 +20,27 @@ def main():
         "new_cuboid": ("ts20210623T091748", "ts20210623T091749"),
         "solibri": ("ts20121017T152740", "ts20121017T154702"),
         "CAM": ("ts20220715T135504", "ts20220715T135358"),
+        "FirstStorey": ("ts20220930T111448", "ts20220930T111542"),
         "WandTuer": ("ts20221001T100832", "ts20221001T100900"),
         "WandTuermodGuids": ("ts20221002T111302", "ts20221001T111540"),
         "TW1-TW2": ("ts20240215T144400", "ts20240215T144956")
     }
+
     case_study = 'TW1-TW2'
     ts_init, ts_updated = testcases[case_study]
 
-    # init service
-    service = PatchService()
+    path = 'GraphDelta_init{}-updt{}.json'.format(ts_init, ts_updated)
 
-    # load patch
-    patch = service.load_patch_from_json('Patch_init{}-updt{}.json'.format(ts_init, ts_updated))
+    # load graph delta
+    with open(path) as f:
+        content = f.read()
 
-    print(patch)
+    print("[INFO] loading delta json....")
+    delta: GraphDelta = jsonpickle.decode(content)
 
-    # patch.remove_highlight_labels(connector=connector)
-    # patch.highlight_patch(connector=connector)
-
-    connector.disconnect_driver()
+    for sMod in delta.property_updates:
+        arrow_vis = sMod.pattern.to_arrows_visualization()
+        print(jsonpickle.encode(arrow_vis, unpicklable=False))
 
 
 if __name__ == "__main__":
