@@ -214,3 +214,32 @@ class EdgeItem:
         if self.is_virtual_edge():
             return None
         return self.attributes["rel_type"]
+
+    def to_arrows_vis(self):
+        """
+        Prepares an edge to be printed in arrows app
+        @return:
+        """
+
+        # prepare rel property
+        if "listItem" in self.attributes:
+            rel_prop = {"listItem": str(self.attributes["listItem"])}
+        else:
+            rel_prop = {}
+        # build arrows expression
+        arrows_edge = {
+            "id": "r" + str(self.edge_id),
+            "style": {
+                "type-background-color": "#cccccc",
+                "type-border-color": "#4d4d4d",
+                "type-border-width": 1,
+                "arrow-width": 4,
+                "detail-orientation": "horizontal"
+            },
+            "properties": rel_prop,
+            "type": self.get_rel_type(),
+            "fromId": "n" + str(self.start_node.id),
+            "toId": "n" + str(self.end_node.id)
+        }
+
+        return arrows_edge

@@ -551,9 +551,11 @@ class GraphPattern:
                                          })
         return graph
 
-    def to_arrows_visualization(self, ignore_null_values: bool = False):
+    def to_arrows_visualization(self, ignore_null_values: bool = False, create_relaxed_pattern: bool = False):
         """
         creates a json that can be used for arrows.app visualization
+        :param ignore_null_values: skip attr values with None/null
+        :param create_relaxed_pattern: skip attributes that are not relevant to create unique match
         """
 
         # load base
@@ -564,50 +566,26 @@ class GraphPattern:
         x_pos = 0
         y_pos = 0
 
-        rel_counter = 0
-
         nodes = self.get_unified_node_set()
 
         for node in nodes:
-            arrows_node = node.to_arrows_vis(ignore_null_values=True, x_pos=x_pos, y_pos=y_pos)
+            # create arrows fragment
+            arrows_node = node.to_arrows_vis(ignore_null_values=ignore_null_values,
+                                             x_pos=x_pos,
+                                             y_pos=y_pos,
+                                             create_relaxed_pattern = create_relaxed_pattern)
             arrows["nodes"].append(arrows_node)
-
             x_pos += 100
 
         edges = self.get_unified_edge_set()
 
         for edge in edges:
-
             # skip virtual edges
             if edge.edge_id == -1:
                 continue
 
-            # prepare rel property
-            if "listItem" in edge.attributes:
-                rel_prop = {"listItem": str(edge.attributes["listItem"])}
-            else:
-                rel_prop = {}
-            # build arrows expression
-            rel = {
-                "id": "r" + str(edge.edge_id),
-                "type": edge.get_rel_type(),
-                "style": {
-                    "type-background-color": "#cccccc",
-                    "type-border-color": "#4d4d4d",
-                    "type-border-width": 1,
-                    "arrow-width": 4,
-                    "detail-orientation": "horizontal"
-                },
-                "properties": rel_prop,
-                "type": edge.get_rel_type(),
-                "fromId": "n" + str(edge.start_node.id),
-                "toId": "n" + str(edge.end_node.id)
-            }
-
-            arrows["relationships"].append(rel)
-
-            rel_counter += 1
-
-
+            # create arrows fragment
+            arrows_edge = edge.to_arrows_vis()
+            arrows["relationships"].append(arrows_edge)
 
         return arrows

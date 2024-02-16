@@ -293,12 +293,14 @@ class NodeItem:
 
         return '({0}{1}{2})'.format(cy_node_identifier, cy_node_labels, cy_node_attrs)
 
-    def to_arrows_vis(self, ignore_null_values: bool = False, x_pos = 0, y_pos = 0):
+    def to_arrows_vis(self, ignore_null_values: bool = False, x_pos = 0, y_pos = 0, create_relaxed_pattern: bool=False):
         """
         prepares a node to be visualized in the arrows app
         @param ignore_null_values:
         @param x_pos:
         @param y_pos:
+        @param create_relaxed_pattern: specifies if pattern shall be printed without optional attributes
+        that are not required to create unique match
         @return:
         """
 
@@ -315,6 +317,10 @@ class NodeItem:
 
         if ignore_null_values:
             new_dict = {k: v for k, v in attr_dict.items() if v != "None"}
+            attr_dict = new_dict
+
+        if create_relaxed_pattern:
+            new_dict = {k: v for k, v in attr_dict.items() if k in ["EntityType", "GlobalId"]}
             attr_dict = new_dict
 
         node_border_colors = {"PrimaryNode": "#0062b1",

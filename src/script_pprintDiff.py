@@ -39,8 +39,15 @@ def main():
     delta: GraphDelta = jsonpickle.decode(content)
 
     for sMod in delta.property_updates:
-        arrow_vis = sMod.pattern.to_arrows_visualization()
-        print(jsonpickle.encode(arrow_vis, unpicklable=False))
+
+        print("SemModification:")
+        print("Key: " + sMod.attrName)
+        print("ValInit: {}".format(sMod.valueOld))
+        print("ValUpdt: {}".format(sMod.valueNew))
+        print("UniquePath: ")
+        arrow_vis_relaxed = sMod.pattern.to_arrows_visualization(create_relaxed_pattern=True)
+        print(jsonpickle.encode(arrow_vis_relaxed, unpicklable=False))
+        print("")
 
 
 if __name__ == "__main__":
