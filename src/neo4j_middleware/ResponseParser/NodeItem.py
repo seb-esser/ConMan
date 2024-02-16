@@ -331,7 +331,8 @@ class NodeItem:
             "caption": str(self.attrs["p21_id"]),
             "style": {
                 "border-color": node_border_colors[self.get_node_type()],
-                "radius": 20
+                "radius": 25,
+                "property-alignment": "center"
                 # "outside-position": "top"
             },
             "properties": attr_dict,

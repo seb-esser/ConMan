@@ -590,8 +590,14 @@ class GraphPattern:
             # build arrows expression
             rel = {
                 "id": "r" + str(edge.edge_id),
-                "type": "REL",
-                "style": {},
+                "type": edge.get_rel_type(),
+                "style": {
+                    "type-background-color": "#cccccc",
+                    "type-border-color": "#4d4d4d",
+                    "type-border-width": 1,
+                    "arrow-width": 4,
+                    "detail-orientation": "horizontal"
+                },
                 "properties": rel_prop,
                 "type": edge.get_rel_type(),
                 "fromId": "n" + str(edge.start_node.id),
