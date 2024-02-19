@@ -23,7 +23,7 @@ def main():
         "FirstStorey": ("ts20220930T111448", "ts20220930T111542"),
         "WandTuer": ("ts20221001T100832", "ts20221001T100900"),
         "WandTuermodGuids": ("ts20221002T111302", "ts20221001T111540"),
-        "TW1-TW2": ("ts20240215T144400", "ts20240215T144956")
+        "TW1-TW2": ("ts20240215T144400", "ts20240215T144950")
     }
 
     case_study = 'TW1-TW2'
@@ -38,15 +38,19 @@ def main():
     print("[INFO] loading delta json....")
     delta: GraphDelta = jsonpickle.decode(content)
 
+    print("SMOD COUNT: {}".format(len(delta.property_updates)))
     for sMod in delta.property_updates:
 
         print("SemModification:")
+        print("PrimNode: {}".format(sMod.pattern.get_entry_node().attrs["GlobalId"]))
         print("Key: " + sMod.attrName)
         print("ValInit: {}".format(sMod.valueOld))
         print("ValUpdt: {}".format(sMod.valueNew))
         print("UniquePath: ")
-        arrow_vis_relaxed = sMod.pattern.to_arrows_visualization(create_relaxed_pattern=True)
+        arrow_vis_relaxed = sMod.pattern.to_arrows_visualization(create_relaxed_pattern=False)
         print(jsonpickle.encode(arrow_vis_relaxed, unpicklable=False))
+        print("CYPHER")
+        print(sMod.pattern.to_cypher_match(entType_guid_only=True))
         print("")
 
 
