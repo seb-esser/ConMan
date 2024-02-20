@@ -33,9 +33,9 @@ def main():
     #     '00_sampleData/IFC_stepP21/diss-casestudy/TW-v2.ifc'
     # ]
     paths = [
-        # '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v1.ifc',
-        # '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v2.ifc',
-        '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v3.ifc'
+        '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v1-purified.ifc',
+        '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v2-purified.ifc',
+        '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v3-purified.ifc'
     ]
 
     for p in paths:

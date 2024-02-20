@@ -1,5 +1,10 @@
-from PatchManager.GraphPatchService import GraphPatchService
-from neo4j_middleware.neo4jConnector import Neo4jConnector
+from pprint import pprint
+
+import jsonpickle
+
+from PatchManager.GraphBasedPatch import GraphBasedPatch
+from PatchManager.Patch import Patch
+from neo4jGraphDiff.GraphDelta import GraphDelta
 
 
 def main():
@@ -22,27 +27,30 @@ def main():
         "WandTuermodGuids": ("ts20221002T111302", "ts20221001T111540"),
         "TW1-TW2": ("ts20240215T144400", "ts20240215T144950"),
         "ARC1-ARC2": ("ts20240214T141022", "ts20240214T171613"),
-        "ARC2-ARC3": ("ts20240214T171613", "ts20240219T144637"),
-        "ARC1-ARC2-pure": ("ts20240220T112536", "ts20240220T112601"),
-        "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845")
+        "ARC2-ARC3": ("ts20240214T171613", "ts20240219T144637")
     }
 
-    case_study = 'ARC1-ARC2-pure'
+    case_study = 'ARC1-ARC2'
     ts_init, ts_updated = testcases[case_study]
 
-    connector = Neo4jConnector()
+    path = 'Patch_init{}-updt{}.json'.format(ts_init, ts_updated)
 
-    connector.connect_driver()
+    # load graph delta
+    with open(path) as f:
+        content = f.read()
 
-    service = GraphPatchService()
-    service.load_delta('GraphDelta_init{}-updt{}.json'.format(ts_init, ts_updated))
+    print("[INFO] loading patch json....")
+    patch: GraphBasedPatch = jsonpickle.decode(content)
 
-    patch = service.generate_patch()
-
-    service.save_patch_to_json(patch)
-
-    # finally disconnect
-    connector.disconnect_driver()
+    print(patch)
+    for sMod in patch.attribute_changes:
+        print("SemModification:")
+        print("PrimNode: {} - {}".format(sMod.path.get_start_node().attrs["EntityType"], sMod.path.get_start_node().attrs["GlobalId"]))
+        print("ModifiedNode: {}".format(sMod.path.get_last_node().attrs["EntityType"]))
+        print("Key: " + sMod.attribute_name)
+        print("ValInit: {}".format(sMod.init_value))
+        print("ValUpdt: {}".format(sMod.updated_value))
+        print()
 
 
 if __name__ == "__main__":

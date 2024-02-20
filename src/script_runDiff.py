@@ -22,10 +22,14 @@ def main():
                  "FirstStorey": ("ts20220930T111448", "ts20220930T111542"),
                  "WandTuer": ("ts20221001T100832", "ts20221001T100900"),
                  "WandTuermodGuids": ("ts20221002T111302", "ts20221001T111540"),
-                 "TW1-TW2": ("ts20240215T144400", "ts20240215T144950")
+                 "TW1-TW2": ("ts20240215T144400", "ts20240215T144950"),
+                 "ARC1-ARC2": ("ts20240214T141022", "ts20240214T171613"),
+                 "ARC2-ARC3": ("ts20240214T171613", "ts20240219T144637"),
+                 "ARC1-ARC2-pure": ("ts20240220T112536", "ts20240220T112601"),
+                 "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845")
                  }
 
-    case_study = 'TW1-TW2'
+    case_study = 'ARC2-ARC3-pure'
     ts_init, ts_updated = testcases[case_study]
 
     print('Running Diff on case study: >{}<'.format(case_study))
@@ -35,7 +39,7 @@ def main():
     if confirm != "y":
         exit()
 
-    connector.run_cypher_statement("Match(n:{})-[r:EQUIVALENT_TO]-(m:{}) DELETE r".format(ts_init, ts_updated))
+    # connector.run_cypher_statement("Match(n:{})-[r:EQUIVALENT_TO]-(m:{}) DELETE r".format(ts_init, ts_updated))
 
     # get topmost entry nodes
     raw_init = connector.run_cypher_statement(

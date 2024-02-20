@@ -22,7 +22,10 @@ class GraphPath:
         returns the last node of the path
         @return:
         """
-        return self.segments[-1].end_node
+        if len(self.segments) > 1:
+            return self.segments[-1].end_node
+        else:
+            return self.segments[0].start_node
 
     @classmethod
     def from_neo4j_response(cls, raw: str):
