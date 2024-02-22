@@ -29,15 +29,15 @@ def main():
                  "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845")
                  }
 
-    case_study = 'ARC2-ARC3-pure'
+    case_study = 'ARC1-ARC2-pure'
     ts_init, ts_updated = testcases[case_study]
 
-    print('Running Diff on case study: >{}<'.format(case_study))
-    print("Do you really want to re-run the diff calculation? ")
-    confirm = input("[y, n]")
-
-    if confirm != "y":
-        exit()
+    # print('Running Diff on case study: >{}<'.format(case_study))
+    # print("Do you really want to re-run the diff calculation? ")
+    # confirm = input("[y, n]")
+    #
+    # if confirm != "y":
+    #     exit()
 
     # connector.run_cypher_statement("Match(n:{})-[r:EQUIVALENT_TO]-(m:{}) DELETE r".format(ts_init, ts_updated))
 
@@ -57,12 +57,14 @@ def main():
     entry_updated: NodeItem = NodeItem.from_neo4j_response(raw_updated)[0]
 
     pDiff = GraphDiff(connector=connector, ts_init=ts_init, ts_updated=ts_updated)
-    delta = pDiff.diff_subgraphs(entry_init, entry_updated)
+    delta = pDiff.diff_graphs(entry_init, entry_updated)
 
     # connect equivalent nodes
     print('[INFO] building EQUIVALENT_TO edges ... ')
     pDiff.build_equivalent_to_edges()
     print('[INFO] building EQUIVALENT_TO edges: DONE. ')
+
+    pDiff.diff_conNodes()
 
     u_input = 'y'
     # u_input = input('Store delta object to json? [y, n]')

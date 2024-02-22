@@ -25,7 +25,7 @@ class GraphDiff(AbsGraphDiff):
                                           label_updated=self.label_updated,
                                           config=self.configuration)
 
-    def diff_subgraphs(self, entry_init: NodeItem, entry_updated: NodeItem):
+    def diff_graphs(self, entry_init: NodeItem, entry_updated: NodeItem):
         """
         RENAME TO calculate_graph_delta()
         performs a hierarchy-driven substructure traversal. GraphDelta is available under self.delta
@@ -171,3 +171,58 @@ class GraphDiff(AbsGraphDiff):
                 """.format(p.init_node.id, p.updated_node.id)
             self.connector.run_cypher_statement(cy)
 
+    def diff_conNodes(self):
+        delta = self.get_result()
+
+        # get all conNodes init
+        cy = "MATCH (c:ConnectionNode:{}) RETURN c".format(delta.ts_init)
+        raw = self.connector.run_cypher_statement(cy)
+        conNodes_init = NodeItem.from_neo4j_response(raw)
+
+        # get all conNodes init
+        cy = "MATCH (c:ConnectionNode:{}) RETURN c".format(delta.ts_updated)
+        raw = self.connector.run_cypher_statement(cy)
+        conNodes_updt = NodeItem.from_neo4j_response(raw)
+
+        # sort nodes with unchanged guids
+        set_calculator = SetCalculator()
+        [unc, added, deleted] = set_calculator.calc_intersection(
+            conNodes_init, conNodes_updt, MatchCriteriaEnum.OnGuid)
+
+        for pair in unc:
+            if NodePair(pair[0],
+                        pair[1]) not in self.resource_diff.result.node_matching_table.get_all_primaryNode_pairs():
+                self.resource_diff.result.node_matching_table.add_matched_nodes(pair[0], pair[1])
+
+                # build edge
+
+                cy = """
+                           MATCH (n) WHERE ID(n) ={0}
+                           MATCH (m) WHERE ID(m)= {1}
+                           MERGE (n)-[:EQUIVALENT_TO]->(m)
+                           """.format(pair[0].id,pair[1].id)
+                self.connector.run_cypher_statement(cy)
+
+        # # perform pattern-based equivalence
+        # ToDo:
+        # the Idea is the following:
+        # 1. get all init conNodes
+        # 2. for each con node:
+        #       - get its surrounding pattern of nodes that have an equivalent_to edge
+        #       - check if this pattern exists in the upated model (without specifying the GUID of the conNode
+        #       - if yes, to the same with the counterpart (get p from G_updt, match in G_init)
+        #       - if both directions are successful (i.e., a match is found), handle these nodes as equivalent
+
+        # for con_init in conNodes_init:
+        #     # get pattern
+        #     cy = (
+        #         """MATCH pa = {0}-[:rel]->(n)
+        #         WHERE EXISTS ((n)-[:EQUIVALENT_TO]-())
+        #         RETURN pa,  NODES(pa), RELATIONSHIPS(pa)""".format(con_init.to_cypher(entType_guid_only=True)))
+        #     # check if pattern is available in updated graph
+        #     raw = self.connector.run_cypher_statement(cy)
+        #     pattern: GraphPattern = GraphPattern.from_neo4j_response(raw)
+        #
+        #     # check if pattern exists in the counterpart. Dont forget to change the timestamp and remove the guid
+        #
+        #

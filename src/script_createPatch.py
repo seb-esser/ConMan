@@ -27,7 +27,7 @@ def main():
         "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845")
     }
 
-    case_study = 'ARC1-ARC2-pure'
+    case_study = 'ARC2-ARC3-pure'
     ts_init, ts_updated = testcases[case_study]
 
     connector = Neo4jConnector()

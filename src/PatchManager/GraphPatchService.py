@@ -122,6 +122,16 @@ class GraphPatchService(PatchService):
                 # save pushout
                 push_out_pattern.paths.extend(GraphPattern.from_neo4j_response(raw).paths)
 
+                p = self.find_sub_pushOuts(s_mod.child, [])
+
+                push_out_pattern.paths.extend(p.paths)
+
+                # check if any of the end-nodes has a conNode-like secondary node connecting to him
+                # (e.g. IfcMaterialDefinitionRepresentation)
+                for path in push_out_pattern.paths:
+                    end_node = path.get_last_node()
+
+
             # changes in the secondary structure of a rooted entity
             elif s_mod.child.get_node_type() == "SecondaryNode":
 
@@ -428,3 +438,37 @@ class GraphPatchService(PatchService):
                     all_context.paths.append(path_to_current_node)
 
         return push_out, all_context, all_glue
+
+    def find_sub_pushOuts(self, n: NodeItem, visited_nodes: List[NodeItem]):
+        """
+        Traverses graph under removed or inserted primary node
+        @param visited_nodes:
+        @param n:
+        @return: pattern with inserted and removed path including corresponding conNodes
+        """
+
+        # prevent endless loops
+        if n in visited_nodes:
+            return
+
+        # check if additional PrimaryNodes are placed next to the push-out-entry (e.g., wall with wall type)
+        cy = """
+            MATCH pa = {0}<-[r1:rel]-(c:ConnectionNode)-[r2:rel]-(p) 
+            WHERE NOT EXISTS((p)-[:EQUIVALENT_TO]-()) AND NOT EXISTS((c)-[:EQUIVALENT_TO]-()) 
+            RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
+            """.format(n.to_cypher())
+
+        # query pushout
+        raw = self.connector.run_cypher_statement(cy)
+        p = GraphPattern.from_neo4j_response(raw)
+
+        # continue traverse
+        for path in p.paths:
+            # extend already visited nodes
+            visited_nodes.append(n)
+            print(path.get_last_node().get_node_identifier())
+            p_sub = self.find_sub_pushOuts(path.get_last_node(), visited_nodes)
+            if p_sub is not None:
+                p.paths.extend(p_sub.paths)
+
+        return p

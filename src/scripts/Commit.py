@@ -44,7 +44,7 @@ def commit(commit_message: str):
         entry_updated: NodeItem = NodeItem.from_neo4j_response(raw_updated)[0]
 
         pDiff = GraphDiff(connector=connector, ts_init=last_committed.timestamp, ts_updated=most_recent.timestamp)
-        delta = pDiff.diff_subgraphs(entry_init, entry_updated)
+        delta = pDiff.diff_graphs(entry_init, entry_updated)
 
         # connect equivalent nodes
         pDiff.build_equivalent_to_edges()

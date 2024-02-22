@@ -25,7 +25,7 @@ def diff(label_init, label_updated):
     entry_updated: NodeItem = NodeItem.from_neo4j_response(raw_updated)[0]
 
     diff = GraphDiff(connector, label_init, label_updated)
-    delta = diff.diff_subgraphs(entry_init, entry_updated)
+    delta = diff.diff_graphs(entry_init, entry_updated)
 
     print(delta)
 
