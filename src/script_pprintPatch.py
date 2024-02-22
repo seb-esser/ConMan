@@ -27,10 +27,12 @@ def main():
         "WandTuermodGuids": ("ts20221002T111302", "ts20221001T111540"),
         "TW1-TW2": ("ts20240215T144400", "ts20240215T144950"),
         "ARC1-ARC2": ("ts20240214T141022", "ts20240214T171613"),
-        "ARC2-ARC3": ("ts20240214T171613", "ts20240219T144637")
+        "ARC2-ARC3": ("ts20240214T171613", "ts20240219T144637"),
+        "ARC1-ARC2-pure": ("ts20240220T112536", "ts20240220T112601"),
+        "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845")
     }
 
-    case_study = 'ARC1-ARC2'
+    case_study = 'ARC2-ARC3-pure'
     ts_init, ts_updated = testcases[case_study]
 
     path = 'Patch_init{}-updt{}.json'.format(ts_init, ts_updated)
@@ -51,6 +53,16 @@ def main():
         print("ValInit: {}".format(sMod.init_value))
         print("ValUpdt: {}".format(sMod.updated_value))
         print()
+
+    for topoMod in patch.operations:
+        print("TopoModification:")
+        print("PushOut")
+        print(jsonpickle.encode(topoMod.push_out_pattern.to_arrows_visualization(), unpicklable=False))
+
+        print("Context")
+        print(jsonpickle.encode(topoMod.context_pattern.to_arrows_visualization(), unpicklable=False))
+        print("Glue")
+        print(jsonpickle.encode(topoMod.gluing_pattern.to_arrows_visualization(), unpicklable=False))
 
 
 if __name__ == "__main__":

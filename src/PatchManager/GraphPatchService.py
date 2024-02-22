@@ -126,11 +126,38 @@ class GraphPatchService(PatchService):
 
                 push_out_pattern.paths.extend(p.paths)
 
-                # check if any of the end-nodes has a conNode-like secondary node connecting to him
-                # (e.g. IfcMaterialDefinitionRepresentation)
-                for path in push_out_pattern.paths:
-                    end_node = path.get_last_node()
+                p.unify_edge_set()
+                nodes = p.get_unified_node_set()
 
+                for node in nodes:
+                    print("Arrows Vis for node: {}".format(node))
+                    cy = """
+                     MATCH pa = {0}-[:rel*..10]->(sec:SecondaryNode)
+                     WHERE NOT (sec)-[:EQUIVALENT_TO]-() 
+                     RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
+                     """.format(node.to_cypher())
+
+                    raw = self.connector.run_cypher_statement(cy)
+                    if len(raw) == 0:
+                        print("No subgraph under the node you were searching for. ")
+                        continue
+                    sub_secondary_pattern = GraphPattern.from_neo4j_response(raw)
+
+                    # check if inverse secondary nodes connect
+                    if sub_secondary_pattern is not None:
+
+                        last_node = sub_secondary_pattern.get_last_node()
+                        cy = """
+                             MATCH pa = {0}<-[:rel]-(sec1:SecondaryNode)-[:rel*..10]->(sec2:SecondaryNode)
+                             WHERE NOT (sec1)-[:EQUIVALENT_TO]-() AND NOT (sec2)-[:EQUIVALENT_TO]-()
+                             RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
+                             """.format(last_node.to_cypher())
+                        raw = self.connector.run_cypher_statement(cy)
+                        sub_sub_secondary_pattern = GraphPattern.from_neo4j_response(raw)
+                        sub_secondary_pattern.paths.extend(sub_sub_secondary_pattern.paths)
+
+                    # print(jsonpickle.encode(sub_secondary_pattern.to_arrows_visualization(), unpicklable=False))
+                    # push_out_pattern.paths.extend(sub_secondary_pattern.paths)
 
             # changes in the secondary structure of a rooted entity
             elif s_mod.child.get_node_type() == "SecondaryNode":
