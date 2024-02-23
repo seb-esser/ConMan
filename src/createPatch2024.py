@@ -1,4 +1,6 @@
+from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
+from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
 
 
@@ -56,29 +58,63 @@ def main():
 
         # check if glue is required
         cy = """
-        MATCH {0}
-        OPTIONAL MATCH paIN =(n{1})-[:rel]->(a) WHERE EXISTS ((a)-[:EQUIVALENT_TO]-()) 
-        OPTIONAL MATCH paOUT = (n{1})<-[:rel]-(a) WHERE EXISTS ((a)-[:EQUIVALENT_TO]-()) 
+        MATCH pa = {}<-[:rel]-(a) WHERE EXISTS ((a)-[:EQUIVALENT_TO]-())         
+        RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
+        """.format(node.to_cypher())
+        raw_in = connector.run_cypher_statement(cy)
 
-        RETURN paIN,  NODES(paIN), RELATIONSHIPS(paIN), paOUT,  NODES(paOUT), RELATIONSHIPS(paOUT)
-        """.format(node.to_cypher(), node.id)
-        raw = connector.run_cypher_statement(cy)
-        if raw is None:
-            continue
+        cy = """
+        MATCH pa = {0}-[:rel]->(a) WHERE EXISTS ((a)-[:EQUIVALENT_TO]-())         
+        RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
+        """.format(node.to_cypher())
+        raw_out = connector.run_cypher_statement(cy)
 
-        raw_in = raw[0][0:2]
-        raw_out = raw[0][3:5]
-        if raw_in is not None:
-            in_glue_edge = GraphPattern.from_neo4j_response(raw_in)
-            glue.paths.extend(in_glue_edge.paths)
+        if not len(raw_in) == 0:
+            # get glue
+            in_glue_pattern = GraphPattern.from_neo4j_response(raw_in)
+            glue.paths.extend(in_glue_pattern.paths)
+
+            # get context
+
+            if in_glue_pattern.get_entry_node().get_node_type() in ["PrimaryNode", "ConnectionNode"]:
+                in_context = GraphPattern([EdgeItem(in_glue_pattern.get_entry_node(), NodeItem(-1), -1)])
+                context.paths.extend(in_context.paths)
+                continue
+
+            cy = """
+            MATCH pa = {}<-[:rel*]-(p:PrimaryNode)
+            WHERE EXISTS ((p)-[:EQUIVALENT_TO]-())         
+            RETURN pa,  NODES(pa), RELATIONSHIPS(pa) LIMIT 1
+            """.format(in_glue_pattern.paths[0].segments[0].start_node.to_cypher())
+
+            raw = connector.run_cypher_statement(cy)
+            in_context = GraphPattern.from_neo4j_response(raw)
+            context.paths.extend(in_context.paths)
+
+        elif not len(raw_out) == 0:
+            out_glue_pattern = GraphPattern.from_neo4j_response(raw_out)
+            glue.paths.extend(out_glue_pattern.paths)
+
+            # get context
+
+            if out_glue_pattern.get_entry_node().get_node_type() in ["PrimaryNode", "ConnectionNode"]:
+                in_context = GraphPattern([EdgeItem(out_glue_pattern.get_entry_node(), NodeItem(-1), -1)])
+                context.paths.extend(in_context.paths)
+                continue
+
+            cy = """
+            MATCH pa = {}<-[:rel*]-(p:PrimaryNode)
+            WHERE EXISTS ((p)-[:EQUIVALENT_TO]-())         
+            RETURN pa,  NODES(pa), RELATIONSHIPS(pa) LIMIT 1
+            """.format(out_glue_pattern.paths[0].segments[0].end_node.to_cypher())
+
+            raw = connector.run_cypher_statement(cy)
+            in_context = GraphPattern.from_neo4j_response(raw)
+            context.paths.extend(in_context.paths)
+
+
         else:
-            out_glue_edge = GraphPattern.from_neo4j_response(raw_out)
-            glue.paths.extend(out_glue_edge.paths)
-
-
-
-
-
+            continue
 
     print(pattern_inserted)
 
