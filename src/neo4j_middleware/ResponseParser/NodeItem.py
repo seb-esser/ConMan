@@ -263,8 +263,11 @@ class NodeItem:
         if self.id == -1:
             # virtual node
             return '()'
+        if "p21_id" in self.attrs:
+            cy_node_identifier = "n" + str(self.attrs["p21_id"])
+        else:
+            cy_node_identifier = self.get_node_identifier()
 
-        cy_node_identifier = self.get_node_identifier()
         cy_node_attrs = ""
         cy_node_labels = ""
 

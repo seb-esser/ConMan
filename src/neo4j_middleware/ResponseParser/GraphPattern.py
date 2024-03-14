@@ -134,25 +134,68 @@ class GraphPattern:
             # empty pattern
             return ''
 
-        self.get_unified_edge_set()
+        # self.get_unified_edge_set()
 
         # init cypher query
         cy_list = []
 
         path_iterator = 0
         # loop over all paths. Each path contains a list of segments
-        for path in self.paths:
+        # for path in self.paths:
+        #
+        #     if optional_match:
+        #         cy_list.append("OPTIONAL ")
+        #     cy_list.append("MATCH ")
+        #     cy_l = path.to_cypher(path_number=path_iterator, skip_timestamp=skip_timestamps
+        #                           , entType_guid_only=entType_guid_only)
+        #     cy_list.extend(cy_l)
+        #
+        #     # increase path iterator by one
+        #     path_iterator += 1
+        #     cy_list.append(' ')
 
-            if optional_match:
-                cy_list.append("OPTIONAL ")
-            cy_list.append("MATCH ")
-            cy_l = path.to_cypher(path_number=path_iterator, skip_timestamp=skip_timestamps
-                                  , entType_guid_only=entType_guid_only)
-            cy_list.extend(cy_l)
+        nodes_already_specified = []
+        edges_already_specified = []
 
-            # increase path iterator by one
+        # loop over all paths. Each path contains a list of segments
+        for unified_path in self.paths:
+
+            # define path section
+            edge_iterator = 0
+
+            for edge in unified_path.segments:
+
+                if edge.start_node not in nodes_already_specified:
+                    skip_start_attrs = False
+                    skip_start_labels = False
+                else:
+                    skip_start_attrs = True
+                    skip_start_labels = True
+                if edge.end_node not in nodes_already_specified:
+                    skip_end_attrs = False
+                    skip_end_labels = False
+                else:
+                    skip_end_attrs = True
+                    skip_end_labels = True
+                if edge in edges_already_specified and not edge.is_virtual_edge():
+                    continue
+
+                cy_frag = "MATCH " + edge.to_cypher(skip_start_node_attrs=skip_start_attrs,
+                                                    skip_start_node_labels=skip_start_labels,
+                                                    skip_end_node_attrs=skip_end_attrs,
+                                                    skip_end_node_labels=skip_end_labels,
+                                                    entType_guid_only=entType_guid_only) + " "
+
+                nodes_already_specified.append(edge.start_node)
+                nodes_already_specified.append(edge.end_node)
+                edges_already_specified.append(edge)
+
+                cy_list.append(cy_frag)
+                edge_iterator += 1
+
+            # increase path iterator
             path_iterator += 1
-            cy_list.append(' ')
+
 
         if define_return:
             num_paths = self.get_number_of_paths()

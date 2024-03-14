@@ -5,6 +5,7 @@ import jsonpickle
 from PatchManager.GraphBasedPatch import GraphBasedPatch
 from PatchManager.Patch import Patch
 from neo4jGraphDiff.GraphDelta import GraphDelta
+from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 
 
 def main():
@@ -54,15 +55,32 @@ def main():
         print("ValUpdt: {}".format(sMod.updated_value))
         print()
 
+    overall_push_out = GraphPattern()
+    overall_glue = GraphPattern()
+    overall_context = GraphPattern()
     for topoMod in patch.operations:
         print("TopoModification:")
         print("PushOut")
         print(jsonpickle.encode(topoMod.push_out_pattern.to_arrows_visualization(), unpicklable=False))
+        overall_push_out.paths.extend(topoMod.push_out_pattern.paths)
 
         print("Context")
         print(jsonpickle.encode(topoMod.context_pattern.to_arrows_visualization(), unpicklable=False))
+        overall_context.paths.extend(topoMod.context_pattern.paths)
+
         print("Glue")
         print(jsonpickle.encode(topoMod.gluing_pattern.to_arrows_visualization(), unpicklable=False))
+        overall_glue.paths.extend(topoMod.gluing_pattern.paths)
+
+    print("Overall PushOut")
+    print(jsonpickle.encode(overall_push_out.to_arrows_visualization(), unpicklable=False))
+    print(overall_push_out.to_cypher_merge())
+    print("Overall Context")
+    print(jsonpickle.encode(overall_context.to_arrows_visualization(create_relaxed_pattern=True), unpicklable=False))
+    print(overall_context.to_cypher_match())
+    print("Overall Glue")
+    print(jsonpickle.encode(overall_glue.to_arrows_visualization(create_relaxed_pattern=True), unpicklable=False))
+    print(overall_glue.to_cypher_merge())
 
 
 if __name__ == "__main__":

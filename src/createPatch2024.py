@@ -35,7 +35,7 @@ def main():
 
     # pushout to be removed
     cy = """
-    MATCH pa = (n:{})-[:rel]->(m) 
+    MATCH pa = (n:{})-[:rel*0..]->(m) 
     WHERE NOT EXISTS ((n)-[:EQUIVALENT_TO]-()) AND NOT EXISTS((m)-[:EQUIVALENT_TO]-()) 
     RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
     """.format(ts_init)
@@ -44,7 +44,7 @@ def main():
 
     # pushout to be inserted
     cy = """
-        MATCH pa = (n:{})-[:rel*]->(m) 
+        MATCH pa = (n:{})-[:rel*0..]->(m) 
         WHERE NOT EXISTS ((n)-[:EQUIVALENT_TO]-()) AND NOT EXISTS((m)-[:EQUIVALENT_TO]-()) 
         RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
         """.format(ts_updated)

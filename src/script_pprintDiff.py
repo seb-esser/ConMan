@@ -3,6 +3,7 @@ from pprint import pprint
 import jsonpickle
 
 from neo4jGraphDiff.GraphDelta import GraphDelta
+from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 
 
 def main():
@@ -30,7 +31,7 @@ def main():
         "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845")
     }
 
-    case_study = 'ARC2-ARC3-pure'
+    case_study = 'ARC1-ARC2-pure'
     ts_init, ts_updated = testcases[case_study]
 
     path = 'GraphDelta_init{}-updt{}.json'.format(ts_init, ts_updated)
@@ -41,6 +42,8 @@ def main():
 
     print("[INFO] loading delta json....")
     delta: GraphDelta = jsonpickle.decode(content)
+
+    overall_sMod_pattern = GraphPattern()
 
     print("SMOD COUNT: {}".format(len(delta.property_updates)))
     for sMod in delta.property_updates:
@@ -53,12 +56,39 @@ def main():
         print("UniquePath: ")
         arrow_vis_relaxed = sMod.pattern.to_arrows_visualization(create_relaxed_pattern=False)
         print(jsonpickle.encode(arrow_vis_relaxed, unpicklable=False))
-        print("CYPHER")
+        print("CYPHER UNIQUE PATH: ")
         print(sMod.pattern.to_cypher_match(entType_guid_only=True))
+        if type(sMod.valueNew) in [int, float]:
+            print("SET n{}.{} = {}".format(sMod.node_init.attrs["p21_id"], sMod.attrName, sMod.valueNew))
+        else:
+            print("SET n{}.{} = \"{}\"".format(sMod.node_init.attrs["p21_id"], sMod.attrName, sMod.valueNew))
+
         print("")
 
+        # create overall pattern
+        overall_sMod_pattern.paths.extend(sMod.pattern.paths)
+
+    print("Overall SMOD Pattern")
+
+    print(jsonpickle.encode(
+        overall_sMod_pattern.to_arrows_visualization(create_relaxed_pattern=True),
+        unpicklable=False))
+
+    print(overall_sMod_pattern.to_cypher_match(entType_guid_only=True))
+    for sMod in delta.property_updates:
+        if type(sMod.valueNew) in [int, float]:
+            print("SET n{}.{} = {}".format(sMod.node_init.attrs["p21_id"], sMod.attrName, sMod.valueNew))
+        else:
+            print("SET n{}.{} = \"{}\"".format(sMod.node_init.attrs["p21_id"], sMod.attrName, sMod.valueNew))
+
     print()
-    print("PMOD COUNT: {}".format(len(delta.structure_updates)))
+
+    print("Latex Table view")
+    for sMod in delta.property_updates:
+        print("{} & {} & {} & {} \\\\".format(sMod.node_init.attrs["p21_id"], sMod.attrName, sMod.valueOld, sMod.valueNew))
+
+    print()
+    print("TopoMOD COUNT: {}".format(len(delta.structure_updates)))
     for topoMod in delta.structure_updates:
         print("TopoModification: ")
         print("Parent: {} - {}".format(topoMod.parent.attrs["GlobalId"], topoMod.parent.attrs["EntityType"]))
