@@ -524,7 +524,8 @@ class IFCGraphGenerator:
                                'ColourList',
                                'ColourIndex',
                                'NominalValue',
-                               'AddressLines'
+                               'AddressLines',
+                               'StartOfNextHatchLine'
 
                                ]:
                 node_attributes.append(attr.name())
