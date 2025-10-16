@@ -1,3 +1,7 @@
+# Please check out ConMan2 https://github.com/seb-esser/ConMan2
+
+--------- 
+
 # Versioning Manager as BIM Level 3 CDE
 
 ## Installation and Setup
