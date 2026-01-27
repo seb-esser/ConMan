@@ -32,10 +32,14 @@ def main():
     #     '00_sampleData/IFC_stepP21/diss-casestudy/TW-v1.ifc',
     #     '00_sampleData/IFC_stepP21/diss-casestudy/TW-v2.ifc'
     # ]
+    # paths = [
+    #     '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v1-purified.ifc',
+    #     '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v2-purified.ifc',
+    #     '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v3-purified.ifc'
+    # ]
     paths = [
-        '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v1-purified.ifc',
-        '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v2-purified.ifc',
-        '00_sampleData/IFC_stepP21/diss-casestudy/ARC-v3-purified.ifc'
+        '00_sampleData/IFC_stepP21/EC3-2026/2026-01-IBC-ExitSample-v1-purified.ifc',
+        '00_sampleData/IFC_stepP21/EC3-2026/2026-01-IBC-ExitSample-v2-purified.ifc'
     ]
 
     for p in paths:
@@ -52,15 +56,15 @@ def main():
     finish = time.perf_counter()
     print('100% done. Graphs generated. Finished in {} seconds.'.format(round(finish - start, 2)))
 
-    print("Performing post-processing: Remove layer assignments and styled items ")
+    # print("Performing post-processing: Remove layer assignments and styled items ")
 
-    cy = 'MATCH p = (n{EntityType:"IfcStyledItem"})-[r:rel]->(s:SecondaryNode) DELETE r'
-    connector.run_cypher_statement(cy)
+    # cy = 'MATCH p = (n{EntityType:"IfcStyledItem"})-[r:rel]->(s:SecondaryNode) DELETE r'
+    # connector.run_cypher_statement(cy)
 
-    cy = 'MATCH p = (n{EntityType:"IfcPresentationLayerAssignment"})-[r:rel]->(s:SecondaryNode) DELETE r'
-    connector.run_cypher_statement(cy)
+    # cy = 'MATCH p = (n{EntityType:"IfcPresentationLayerAssignment"})-[r:rel]->(s:SecondaryNode) DELETE r'
+    # connector.run_cypher_statement(cy)
 
-    print("Post-processing done. ")
+    # print("Post-processing done. ")
 
     # disconnect from database
     connector.disconnect_driver()

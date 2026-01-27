@@ -62,6 +62,8 @@ class GraphPatchService(PatchService):
         @return: the patch object
         """
 
+        raise NotImplementedError("This method is being reworked. See createPatch2024.py for the new implementation.")
+
         patch = GraphBasedPatch(self.connector)
 
         try:

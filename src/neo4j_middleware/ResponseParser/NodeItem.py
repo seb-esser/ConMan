@@ -1,6 +1,5 @@
 from typing import List
 
-import neo4j.data
 import neo4j.graph
 
 from neo4j_middleware.CypherUtilities import CypherUtilities
@@ -130,39 +129,51 @@ class NodeItem:
         if raw == []:
             return []
 
-        if type(raw) == list:
+        if isinstance(raw, list):
 
-            # cast
             for raw_node in raw:
+                node_candidate = raw_node
 
-                # unpack if record
-                if type(raw_node) == neo4j.data.Record:
-                    raw_node = raw_node[0]
+                # if this is a Record-like container (no labels attr but indexable),
+                # try to unpack the first element which is usually the node
+                if not hasattr(node_candidate, 'labels') and hasattr(node_candidate, '__getitem__'):
+                    try:
+                        node_candidate = node_candidate[0]
+                    except Exception:
+                        pass
 
-                node_labels = list(raw_node.labels)
-                node = cls(node_id=int(raw_node.id), rel_type=None)
-                node.set_node_attributes(dict(raw_node._properties))
+                if not hasattr(node_candidate, 'labels'):
+                    # cannot interpret this item as a node, skip
+                    continue
+
+                node_labels = list(node_candidate.labels)
+                node = cls(node_id=int(node_candidate.id), rel_type=None)
+                node.set_node_attributes(dict(getattr(node_candidate, '_properties', {})))
                 node.labels = node_labels
                 ret_val.append(node)
 
             return ret_val
 
-        if type(raw) == neo4j.data.Record:
-            # passed a single node into the method, therefore we can skip the unpacking
+        # handle single-record or single-node cases: try to normalize to a node-like object
+        node_candidate = raw
+        if not hasattr(node_candidate, 'labels') and hasattr(node_candidate, '__getitem__'):
+            try:
+                node_candidate = node_candidate[0]
+            except Exception:
+                pass
 
-            # cast
-            for raw_node in raw:
-                node_labels = list(raw_node.labels)
-                node = cls(node_id=int(raw_node.id), rel_type=None)
-                node.set_node_attributes(dict(raw_node._properties))
-                node.labels = node_labels
-                ret_val.append(node)
+        if hasattr(node_candidate, 'labels'):
+            node_labels = list(node_candidate.labels)
+            node = cls(node_id=int(node_candidate.id), rel_type=None)
+            node.set_node_attributes(dict(getattr(node_candidate, '_properties', {})))
+            node.labels = node_labels
+            ret_val.append(node)
 
-        elif type(raw) == neo4j.graph.Node:
-            raw_node = raw
+        elif isinstance(node_candidate, neo4j.graph.Node):
+            raw_node = node_candidate
             node_labels = list(raw_node.labels)
             node = cls(node_id=int(raw_node.id), rel_type=None)
-            node.set_node_attributes(dict(raw_node._properties))
+            node.set_node_attributes(dict(getattr(raw_node, '_properties', {})))
             node.labels = node_labels
             ret_val.append(node)
 

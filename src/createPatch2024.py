@@ -27,10 +27,11 @@ def main():
                  "ARC1-ARC2": ("ts20240214T141022", "ts20240214T171613"),
                  "ARC2-ARC3": ("ts20240214T171613", "ts20240219T144637"),
                  "ARC1-ARC2-pure": ("ts20240220T112536", "ts20240220T112601"),
-                 "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845")
+                 "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845"), 
+                 "EC3-2026-v1-v2": ("ts20260127T103750", "ts20260127T104923")
                  }
 
-    case_study = 'ARC2-ARC3-pure'
+    case_study = 'EC3-2026-v1-v2'
     ts_init, ts_updated = testcases[case_study]
 
     # pushout to be removed
@@ -116,7 +117,17 @@ def main():
         else:
             continue
 
-    print(pattern_inserted)
+    print("PushOut Remove ")
+    print(pattern_removed.to_arrows_visualization())
+    # print("PushOut Insert")
+    # print(pattern_inserted.to_arrows_visualization())
+    # print("Glue ")
+    # print(glue.to_arrows_visualization())
+    # print("Context ")   
+    # print(context.to_arrows_visualization())
+
+    # ToDo: Merge overlapping patterns for integrated visualization
+
 
 
 if __name__ == "__main__":

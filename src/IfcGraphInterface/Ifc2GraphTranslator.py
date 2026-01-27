@@ -44,7 +44,7 @@ class IFCGraphGenerator:
             raise Exception('Unable to open IFC model on given file path')
 
         # define the label (i.e., the model timestamp)
-        my_label = 'ts' + self.model.wrapped_data.header.file_name.time_stamp
+        my_label = 'ts' + self.model.header.file_name.time_stamp
         my_label = my_label.replace('-', '')
         my_label = my_label.replace(':', '')
         self.timestamp = my_label

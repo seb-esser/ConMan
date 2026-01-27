@@ -30,10 +30,11 @@ def main():
         "ARC1-ARC2": ("ts20240214T141022", "ts20240214T171613"),
         "ARC2-ARC3": ("ts20240214T171613", "ts20240219T144637"),
         "ARC1-ARC2-pure": ("ts20240220T112536", "ts20240220T112601"),
-        "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845")
+        "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845"), 
+        "EC3-2026-v1-v2": ("ts20260127T103750", "ts20260127T104923")
     }
 
-    case_study = 'ARC2-ARC3-pure'
+    case_study = 'EC3-2026-v1-v2'
     ts_init, ts_updated = testcases[case_study]
 
     path = 'Patch_init{}-updt{}.json'.format(ts_init, ts_updated)
