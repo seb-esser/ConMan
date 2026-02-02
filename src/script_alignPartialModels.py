@@ -1,3 +1,5 @@
+## Sample script supporting the concepts of the ICCCBE 2024 paper 
+
 from pprint import pprint
 
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem

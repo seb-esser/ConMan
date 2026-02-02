@@ -28,10 +28,11 @@ def main():
         "ARC1-ARC2": ("ts20240214T141022", "ts20240214T171613"),
         "ARC2-ARC3": ("ts20240214T171613", "ts20240219T144637"),
         "ARC1-ARC2-pure": ("ts20240220T112536", "ts20240220T112601"),
-        "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845")
+        "ARC2-ARC3-pure": ("ts20240220T112601", "ts20240220T112845"), 
+        "EC3-2026-v1-v2": ("ts20260127T103750", "ts20260127T104923")
     }
 
-    case_study = 'ARC1-ARC2-pure'
+    case_study = 'EC3-2026-v1-v2'
     ts_init, ts_updated = testcases[case_study]
 
     path = 'GraphDelta_init{}-updt{}.json'.format(ts_init, ts_updated)
@@ -75,11 +76,18 @@ def main():
         unpicklable=False))
 
     print(overall_sMod_pattern.to_cypher_match(entType_guid_only=True))
+    p21_ids = set()
     for sMod in delta.property_updates:
+        p21 = sMod.node_init.attrs.get("p21_id")
+        if p21 is not None:
+            p21_ids.add(p21)
         if type(sMod.valueNew) in [int, float]:
             print("SET n{}.{} = {}".format(sMod.node_init.attrs["p21_id"], sMod.attrName, sMod.valueNew))
         else:
             print("SET n{}.{} = \"{}\"".format(sMod.node_init.attrs["p21_id"], sMod.attrName, sMod.valueNew))
+
+    smod_affected_nodes_count = len(p21_ids)
+    print("SMOD number of affected nodes: {}".format(smod_affected_nodes_count))
 
     print()
 
@@ -88,14 +96,7 @@ def main():
         print("{} & {} & {} & {} \\\\".format(sMod.node_init.attrs["p21_id"], sMod.attrName, sMod.valueOld, sMod.valueNew))
 
     print()
-    print("TopoMOD COUNT: {}".format(len(delta.structure_updates)))
-    for topoMod in delta.structure_updates:
-        print("TopoModification: ")
-        print("Parent: {} - {}".format(topoMod.parent.attrs["GlobalId"], topoMod.parent.attrs["EntityType"]))
-        print("Child: {} - {}".format(topoMod.child.attrs["GlobalId"], topoMod.child.attrs["EntityType"]))
-        print("OPERATION: {}".format(topoMod.modType))
-        print()
-
+   
 
 if __name__ == "__main__":
     main()

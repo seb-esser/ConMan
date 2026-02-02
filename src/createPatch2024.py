@@ -2,6 +2,7 @@ from neo4j_middleware.ResponseParser.EdgeItem import EdgeItem
 from neo4j_middleware.ResponseParser.GraphPattern import GraphPattern
 from neo4j_middleware.ResponseParser.NodeItem import NodeItem
 from neo4j_middleware.neo4jConnector import Neo4jConnector
+import os, json
 
 
 def main():
@@ -40,6 +41,7 @@ def main():
     WHERE NOT EXISTS ((n)-[:EQUIVALENT_TO]-()) AND NOT EXISTS((m)-[:EQUIVALENT_TO]-()) 
     RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
     """.format(ts_init)
+    print(cy) 
     raw = connector.run_cypher_statement(cy)
     pattern_removed = GraphPattern.from_neo4j_response(raw)
 
@@ -49,6 +51,7 @@ def main():
         WHERE NOT EXISTS ((n)-[:EQUIVALENT_TO]-()) AND NOT EXISTS((m)-[:EQUIVALENT_TO]-()) 
         RETURN pa,  NODES(pa), RELATIONSHIPS(pa)
         """.format(ts_updated)
+    print(cy) 
     raw = connector.run_cypher_statement(cy)
     pattern_inserted = GraphPattern.from_neo4j_response(raw)
 
@@ -117,14 +120,27 @@ def main():
         else:
             continue
 
-    print("PushOut Remove ")
-    print(pattern_removed.to_arrows_visualization())
-    # print("PushOut Insert")
-    # print(pattern_inserted.to_arrows_visualization())
-    # print("Glue ")
-    # print(glue.to_arrows_visualization())
-    # print("Context ")   
-    # print(context.to_arrows_visualization())
+
+    folder = os.path.join(os.getcwd(), f"patch-arrowsVis_{ts_init}-{ts_updated}")
+    os.makedirs(folder, exist_ok=True)
+
+    def _save_visual(obj, filename):
+        json_str = obj.to_arrows_visualization()
+        try:
+            data = json.loads(json_str) if isinstance(json_str, str) else json_str
+        except Exception:
+            data = json_str
+        path = os.path.join(folder, filename)
+        with open(path, "w", encoding="utf-8") as f:
+            if isinstance(data, (dict, list)):
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            else:
+                f.write(str(data))
+
+    _save_visual(pattern_removed, "pattern_removed.json")
+    _save_visual(pattern_inserted, "pattern_inserted.json")
+    _save_visual(glue, "glue.json")
+    _save_visual(context, "context.json")
 
     # ToDo: Merge overlapping patterns for integrated visualization
 
